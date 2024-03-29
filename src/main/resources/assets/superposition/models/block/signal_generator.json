@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "superposition:block/signal_generator/front_0",
+    "side": "superposition:block/signal_generator/side",
+    "top": "superposition:block/signal_generator/top"
+  }
+}
