@@ -7,7 +7,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.networking.packet.ParticleSyncPacket;
+import org.modogthedev.superposition.networking.packet.ParticleSyncS2CPacket;
 
 public class Messages {
     private static SimpleChannel INSTANCE;
@@ -27,10 +27,10 @@ public class Messages {
 
         INSTANCE = net;
 
-        net.messageBuilder(ParticleSyncPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(ParticleSyncPacket::new)
-                .encoder(ParticleSyncPacket::toBytes)
-                .consumerMainThread(ParticleSyncPacket::handle)
+        net.messageBuilder(ParticleSyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ParticleSyncS2CPacket::new)
+                .encoder(ParticleSyncS2CPacket::toBytes)
+                .consumerMainThread(ParticleSyncS2CPacket::handle)
                 .add();
     }
 

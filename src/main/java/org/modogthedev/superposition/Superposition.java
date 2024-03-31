@@ -31,6 +31,7 @@ import org.modogthedev.superposition.core.ModBlock;
 import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.core.ModCreativeModeTab;
 import org.modogthedev.superposition.core.ModItem;
+import org.modogthedev.superposition.event.ClientEvents;
 import org.modogthedev.superposition.particle.ParticleManager;
 import org.slf4j.Logger;
 
@@ -41,7 +42,7 @@ public class Superposition {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "superposition";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public Superposition() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -58,6 +59,7 @@ public class Superposition {
 
         IEventBus bus = MinecraftForge.EVENT_BUS;
         bus.addListener(ParticleManager::tick);
+        bus.addListener(ClientEvents::clientTickEvent);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

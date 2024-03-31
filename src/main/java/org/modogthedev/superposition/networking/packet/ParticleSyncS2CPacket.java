@@ -5,14 +5,14 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class ParticleSyncPacket {
+public class ParticleSyncS2CPacket {
     private final int stealth;
 
-    public ParticleSyncPacket(int stealth) {
+    public ParticleSyncS2CPacket(int stealth) {
         this.stealth = stealth;
     }
 
-    public ParticleSyncPacket(FriendlyByteBuf buf) {
+    public ParticleSyncS2CPacket(FriendlyByteBuf buf) {
         this.stealth = buf.readInt();
     }
 

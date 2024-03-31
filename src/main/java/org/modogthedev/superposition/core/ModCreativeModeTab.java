@@ -21,7 +21,7 @@ public class ModCreativeModeTab {
 
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("tab",
             () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.example_tab"))
+                    .title(Component.translatable("creativemodetab.superposition"))
                     .icon(ModItem.SIGNAL_GENERATOR.get()::getDefaultInstance)
                     .displayItems((displayParams, output) ->
                             EXAMPLE_TAB_ITEMS.forEach(itemLike -> output.accept(itemLike.get())))
