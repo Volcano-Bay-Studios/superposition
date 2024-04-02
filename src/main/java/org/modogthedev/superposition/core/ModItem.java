@@ -14,4 +14,6 @@ public class ModItem {
 
     public static final RegistryObject<BlockItem> SIGNAL_GENERATOR = addToTab(ITEMS.register("signal_generator",
             () -> new BlockItem(ModBlock.SIGNAL_GENERATOR.get(), new Item.Properties())));
+    public static final RegistryObject<BlockItem> MODULATOR = addToTab(ITEMS.register("modulator",
+            () -> new BlockItem(ModBlock.MODULATOR.get(), new Item.Properties())));
 }

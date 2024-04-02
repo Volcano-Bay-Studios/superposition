@@ -1,14 +1,19 @@
 package org.modogthedev.superposition.screens;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.FastColor;
+import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.event.ClientEvents;
@@ -29,48 +34,68 @@ public class SignalGeneratorScreen extends DialScreen {
     public float frequency;
     public boolean mute = true;
     public boolean swap = false;
+    public VertexConsumer lineConsumer;
 
     public SignalGeneratorScreen(Component pTitle, BlockPos pos) {
         super(pTitle);
         SignalGeneratorScreen.pos = pos;
         ticks = 0;
-        addDial(-25,0);
-        addDial(25,0);
+        addDial(-25, 0);
+        addDial(25, 0);
         swap = Minecraft.getInstance().level.getBlockState(pos).getValue(SignalGeneratorBlock.SWAP_SIDES);
     }
+
     public void playDownSound(SoundManager pHandler) {
         pHandler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
     public void drawPixel(GuiGraphics pGuiGraphics, int x, int y) {
+
         pGuiGraphics.blit(PIXEL, x, y, 0, 0, 1, 1);
     }
 
+    public void fill(GuiGraphics graphics, int pMinX, int pMinY, int pMaxX, int pMaxY, int pColor) { // In ryan we trust
+        float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
+        float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
+        float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
+        float f2 = (float) FastColor.ARGB32.blue(pColor) / 255.0F;
+
+        Matrix4f matrix4f = graphics.pose().last().pose();
+
+        this.lineConsumer.vertex(matrix4f, (float) pMinX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, (float) pMinX, (float) pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+    }
+
     public void renderSine(GuiGraphics pGuiGraphics) {
+        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width - 158) / 2;
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 158; i += .05f) {
             int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * 25);
-            drawPixel(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition));
+            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
+        flush(pGuiGraphics);
         if (frequency < 1) {
-            pGuiGraphics.blit(WARN_ON,width/2-81,height/2-20,0,0,14,14,14,14);
+            pGuiGraphics.blit(WARN_ON, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
         } else {
-            pGuiGraphics.blit(WARN_OFF,width/2-81,height/2-20,0,0,14,14,14,14);
+            pGuiGraphics.blit(WARN_OFF, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
         }
     }
+
     public void calculateWavelength() {
-        frequency = Math.abs(1 + (dials.get(0).scrolledAmount/10) + (dials.get(1).scrolledAmount));
+        frequency = Math.abs(1 + (dials.get(0).scrolledAmount / 10) + (dials.get(1).scrolledAmount));
     }
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if ((double) width /2+72 > pMouseX - 10 && (double) width /2+72 < pMouseX && (double) height /2-20 > pMouseY - 24 && (double) height /2-20 < pMouseY) {
+        if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             mute = !mute;
         }
-        if ((double) width /2+58 > pMouseX - 10 && (double) width /2+60 < pMouseX && (double) height /2-20 > pMouseY - 24 && (double) height /2-20 < pMouseY) {
+        if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             swap = !swap;
         }
@@ -87,6 +112,13 @@ public class SignalGeneratorScreen extends DialScreen {
         return super.mouseScrolled(pMouseX, pMouseY, pDelta);
     }
 
+    private void flush(GuiGraphics graphics) { // In ryan we trust
+        RenderSystem.disableDepthTest();
+        graphics.bufferSource().endBatch();
+        RenderSystem.enableDepthTest();
+        this.lineConsumer = null;
+    }
+
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         calculateWavelength();
@@ -96,18 +128,22 @@ public class SignalGeneratorScreen extends DialScreen {
         renderSine(pGuiGraphics);
         frequency = 5;
         if (mute) {
-            pGuiGraphics.blit(SWITCH_ON,width/2+72,height/2-20,0,0,10,24,10,24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF,width/2+72,height/2-20,0,0,10,24,10,24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
         }
         if (swap) {
-            pGuiGraphics.blit(SWITCH_ON,width/2+58,height/2-20,0,0,10,24,10,24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 - 20, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF,width/2+58,height/2-20,0,0,10,24,10,24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 - 20, 0, 0, 10, 24, 10, 24);
         }
-
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }

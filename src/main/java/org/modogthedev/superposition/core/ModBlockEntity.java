@@ -15,4 +15,8 @@ public class ModBlockEntity {
             BLOCK_ENTITIES.register("signal_generator",
                     () -> BlockEntityType.Builder.of(SignalGeneratorBlockEntity::new, ModBlock.SIGNAL_GENERATOR.get())
                             .build(null));
+    public static final RegistryObject<BlockEntityType<SignalGeneratorBlockEntity>> MODULATOR =
+            BLOCK_ENTITIES.register("modulator",
+                    () -> BlockEntityType.Builder.of(SignalGeneratorBlockEntity::new, ModBlock.MODULATOR.get())
+                            .build(null));
 }
