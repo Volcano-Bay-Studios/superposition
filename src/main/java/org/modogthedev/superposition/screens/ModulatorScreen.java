@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -21,15 +20,11 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
-import org.modogthedev.superposition.event.ClientEvents;
 import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SyncedBlockEntity;
 
-import java.awt.*;
-
-public class SignalGeneratorScreen extends DialScreen {
+public class ModulatorScreen extends DialScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/signal_generator_background.png");
     private static final ResourceLocation PIXEL = new ResourceLocation(Superposition.MODID, "textures/screen/pixel.png");
     private static final ResourceLocation WARN_ON = new ResourceLocation(Superposition.MODID, "textures/screen/warn_on.png");
@@ -46,7 +41,7 @@ public class SignalGeneratorScreen extends DialScreen {
     public boolean swap = false;
     public VertexConsumer lineConsumer;
 
-    public SignalGeneratorScreen(Component pTitle, BlockPos pos) {
+    public ModulatorScreen(Component pTitle, BlockPos pos) {
         super(pTitle);
         SignalGeneratorScreen.pos = pos;
         ticks = 0;

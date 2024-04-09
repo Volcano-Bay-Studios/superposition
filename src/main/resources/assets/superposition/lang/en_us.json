@@ -1,5 +1,8 @@
 {
   "block.superposition.signal_generator" : "Signal Generator",
 
+  "sounds.superposition.sine" : "Sine Plays",
+
+
   "creativemodetab.superposition" : "Superposition"
 }

@@ -34,16 +34,6 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F - direction.toYRot()));
         pPoseStack.translate(-0.5D, 0.0D, -0.5D);
         VertexConsumer vertexconsumer = pBuffer.getBuffer(RenderType.cutoutMipped());
-        Matrix4f matrix4f = pPoseStack.last().pose();
-        float pMinX = 0;
-        float pMinY = 0;
-        float pMaxX = 16;
-        float pMaxY = 16;
-        RenderSystem.setShaderTexture(0,new ResourceLocation(Superposition.MODID,"textures/block/signal_generator/front_7.png"));
-        vertexconsumer.vertex(matrix4f, (float) pMinX, (float) pMinY, 0.0f).uv(0,0).uv2(16,16);
-        vertexconsumer.vertex(matrix4f, (float) pMinX, (float) pMaxY, 0.0f).uv(0,0).uv2(16,16);
-        vertexconsumer.vertex(matrix4f, (float) pMaxX, (float) pMaxY, 0.0f).uv(0,0).uv2(16,16);
-        vertexconsumer.vertex(matrix4f, (float) pMaxX, (float) pMinY, 0.0f).uv(0,0).uv2(16,16);
         pPoseStack.popPose();
     }
 }

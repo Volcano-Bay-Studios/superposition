@@ -35,10 +35,11 @@ public class SignalGeneratorBlock extends TickingBlock implements EntityBlock {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
     public static BooleanProperty SWAP_SIDES = SuperpositionBlockStates.SWAP_SIDES;
+    public static BooleanProperty ON = SuperpositionBlockStates.ON;
     public static SignalGeneratorScreen signalGeneratorScreen = null;
     public SignalGeneratorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,false).setValue(ON, false));
     }
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
@@ -72,6 +73,7 @@ public class SignalGeneratorBlock extends TickingBlock implements EntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
+        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES, ON});
     }
+
 }

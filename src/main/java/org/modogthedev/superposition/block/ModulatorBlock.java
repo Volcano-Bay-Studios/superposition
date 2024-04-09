@@ -21,6 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
+import org.modogthedev.superposition.screens.ModulatorScreen;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.TickingBlock;
 
@@ -28,7 +29,7 @@ public class ModulatorBlock extends TickingBlock implements EntityBlock {
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
     public static BooleanProperty SWAP_SIDES = SuperpositionBlockStates.SWAP_SIDES;
-    public static SignalGeneratorScreen signalGeneratorScreen = null;
+    public static ModulatorScreen modulatorScreen = null;
     public ModulatorBlock(Properties properties) {
         super(properties);
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,false));
@@ -41,7 +42,7 @@ public class ModulatorBlock extends TickingBlock implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntity.SIGNAL_GENERATOR.get().create(pos, state);
+        return ModBlockEntity.MODULATOR.get().create(pos, state);
     }
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
@@ -56,12 +57,13 @@ public class ModulatorBlock extends TickingBlock implements EntityBlock {
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (pLevel.isClientSide) {
-            signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pPos);
-            Minecraft.getInstance().setScreen(signalGeneratorScreen);
+            modulatorScreen = new ModulatorScreen(Component.literal("Signal Generator"), pPos);
+            Minecraft.getInstance().setScreen(modulatorScreen);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.SUCCESS;
     }
+
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {

@@ -1,0 +1,8 @@
+{
+  "sine": {
+    "subtitles": "sounds.superposition.sine",
+    "sounds": [
+      "superposition:sine"
+    ]
+  }
+}
