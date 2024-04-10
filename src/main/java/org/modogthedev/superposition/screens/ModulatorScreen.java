@@ -114,11 +114,11 @@ public class ModulatorScreen extends DialScreen {
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 + 9 > pMouseY - 24 && (double) height / 2 + 9 < pMouseY) {
+        if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             mute = !mute;
         }
-        if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 + 9 > pMouseY - 24 && (double) height / 2 + 9 < pMouseY) {
+        if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             swap = !swap;
         }
@@ -153,16 +153,16 @@ public class ModulatorScreen extends DialScreen {
         renderBars(pGuiGraphics);
 
         if (mute) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 + 9, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 + 9, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
         }
         if (swap) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 + 9, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 + 9, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
         }
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
