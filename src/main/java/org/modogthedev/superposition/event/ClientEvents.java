@@ -6,6 +6,6 @@ import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 public class ClientEvents {
     public static int ticks = 0;
     public static void clientTickEvent(TickEvent.ClientTickEvent event) {
-        SignalGeneratorScreen.ticks++;
+
     }
 }

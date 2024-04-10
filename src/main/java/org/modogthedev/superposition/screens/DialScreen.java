@@ -7,7 +7,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.util.Mth;
 
 import java.util.ArrayList;
@@ -22,6 +21,9 @@ public class DialScreen extends Screen {
     }
     public void addDial(int x, int y) {
         dials.add(new Dial(x, y));
+    }
+    public void addDial(int x, int y, int maxScroll) {
+        dials.add(new Dial(x, y,maxScroll));
     }
     public void setPositions() {
         for (Dial dial: dials) {
@@ -40,7 +42,7 @@ public class DialScreen extends Screen {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         setPositions();
         for (Dial dial: dials) {
-            DialRederer.renderDail(pGuiGraphics,dial.x,dial.y, (int) dial.scrolledAmount);
+            DialRenderer.renderDial(pGuiGraphics,dial.x,dial.y, (int) dial.scrolledAmount);
         }
         if (mouseDown) {
             for (Dial dial: dials) {
@@ -52,10 +54,15 @@ public class DialScreen extends Screen {
                     if (dial.lastAngle == 0 || Math.abs(dial.lastAngle-angle) > 300)
                         dial.lastAngle = angle;
                     else {
-                        if (Math.abs(dial.lastAngle-angle) > 1)
-                            playScrollSound(Minecraft.getInstance().getSoundManager());
+                        if (Math.abs(dial.scrolledAmount) > dial.maxScroll) {
+                            dial.scrolledAmount = dial.maxScroll;
+                        } else {
+                            if (Math.abs(dial.lastAngle-angle) > 1)
+                                playScrollSound(Minecraft.getInstance().getSoundManager());
+                        }
                         dial.scrolledAmount += (dial.lastAngle-angle)/10;
                         dial.lastAngle = angle;
+
                     }
                 }
             }
@@ -85,7 +92,11 @@ public class DialScreen extends Screen {
         for (Dial dial: dials) {
             if (dial.mouseOver) {
                 dial.scrolledAmount += pDelta;
-                playScrollSound(Minecraft.getInstance().getSoundManager());
+                if (Math.abs(dial.scrolledAmount) > dial.maxScroll) {
+                    dial.scrolledAmount = dial.maxScroll;
+                } else {
+                    playScrollSound(Minecraft.getInstance().getSoundManager());
+                }
             }
         }
         return super.mouseScrolled(pMouseX, pMouseY, pDelta);
@@ -104,6 +115,12 @@ public class DialScreen extends Screen {
             this.targetx = x;
             this.targety = y;
         }
+        public Dial(int x, int y, int maxScroll) {
+            this.maxScroll = maxScroll;
+            this.targetx = x;
+            this.targety = y;
+        }
+        int maxScroll;
         int targetx;
         int targety;
         int x;

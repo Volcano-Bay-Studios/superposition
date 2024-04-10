@@ -39,42 +39,6 @@
         "model": "superposition:block/signal_generator/signal_generator",
         "y": 90
       }
-    },
-
-    {
-      "when": {
-        "facing": "north", "on" : "true"
-      },
-      "apply": {
-        "model": "superposition:block/signal_generator/signal_generator_on"
-      }
-    },
-    {
-      "when": {
-        "facing": "south", "on" : "true"
-      },
-      "apply": {
-        "model": "superposition:block/signal_generator/signal_generator_on",
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "facing": "west", "on" : "true"
-      },
-      "apply": {
-        "model": "superposition:block/signal_generator/signal_generator_on",
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "facing": "east", "on" : "true"
-      },
-      "apply": {
-        "model": "superposition:block/signal_generator/signal_generator_on",
-        "y": 90
-      }
     }
   ]
 }

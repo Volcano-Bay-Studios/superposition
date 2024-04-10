@@ -39,7 +39,7 @@ public class SignalGeneratorBlock extends TickingBlock implements EntityBlock {
     public static SignalGeneratorScreen signalGeneratorScreen = null;
     public SignalGeneratorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,false).setValue(ON, false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true).setValue(ON, false));
     }
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {

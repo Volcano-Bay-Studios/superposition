@@ -4,9 +4,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.modogthedev.superposition.Superposition;
 
-public class DialRederer {
+public class DialRenderer {
     public static ResourceLocation dial = new ResourceLocation(Superposition.MODID,"textures/screen/dial.png");
-    public static void renderDail(GuiGraphics guiGraphics, int x,int y, int index) {
+    public static void renderDial(GuiGraphics guiGraphics, int x, int y, int index) {
         if (index > 23) {
 
             index = (int) (index - (Math.floor(index/23)*23));

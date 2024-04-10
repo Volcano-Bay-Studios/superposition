@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
@@ -25,7 +26,7 @@ import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2
 import org.modogthedev.superposition.util.Mth;
 
 public class ModulatorScreen extends DialScreen {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/signal_generator_background.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/modulator_screen.png");
     private static final ResourceLocation PIXEL = new ResourceLocation(Superposition.MODID, "textures/screen/pixel.png");
     private static final ResourceLocation WARN_ON = new ResourceLocation(Superposition.MODID, "textures/screen/warn_on.png");
     private static final ResourceLocation WARN_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/warn_off.png");
@@ -35,18 +36,20 @@ public class ModulatorScreen extends DialScreen {
     public static final int imageHeight = 224;
     public static BlockPos pos;
     public static int ticks = 0;
-    public float frequency;
+    public float frequency = 10;
     public float startFrequency = 1;
+    public float amplitude;
+    public float modRate;
     public boolean mute = true;
     public boolean swap = false;
     public VertexConsumer lineConsumer;
 
     public ModulatorScreen(Component pTitle, BlockPos pos) {
         super(pTitle);
-        SignalGeneratorScreen.pos = pos;
+        ModulatorScreen.pos = pos;
         ticks = 0;
-        addDial(-25, 0);
-        addDial(25, 0);
+        addDial(-72, 0, 76);
+        addDial(-50, 0,76);
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalGeneratorBlockEntity generatorBlockEntity) {
@@ -60,8 +63,38 @@ public class ModulatorScreen extends DialScreen {
     }
 
     public void drawPixel(GuiGraphics pGuiGraphics, int x, int y) {
-
-        pGuiGraphics.blit(PIXEL, x, y, 0, 0, 1, 1);
+        fill(pGuiGraphics,x,y,x+1,y+1,0xFF56d156);
+    }
+    public void renderSine(GuiGraphics pGuiGraphics) {
+        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
+        int startPos = (this.width - 70) / 2;
+        int j = (this.height - imageHeight) / 2;
+        int width = this.width;
+        for (float i = 0; i < 61; i += .05f) {
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+(amplitude/5)));
+            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+        }
+    }
+    public void renderSine2(GuiGraphics pGuiGraphics) {
+        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
+        int startPos = (this.width + 68) / 2;
+        int j = (this.height - imageHeight) / 2;
+        int width = this.width;
+        for (float i = 0; i < 45; i += .05f) {
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks+20) / frequency) * 5);
+            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+        }
+    }
+    public void renderBars(GuiGraphics guiGraphics) {
+        this.lineConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
+        int width = this.width; // Redundant call?
+        int barHeight = Math.min(76,Math.abs((int) dials.get(0).scrolledAmount));
+        int barHeight2 = Math.min(76,Math.abs((int) dials.get(1).scrolledAmount));
+        fill(guiGraphics,width/2-79,height/2-25-barHeight,width/2-65,height/2-25,0xFF56d156);
+        fill(guiGraphics,width/2-57,height/2-25-barHeight2,width/2-43,height/2-25,0xFF56d156);
+        modRate = barHeight;
+        amplitude = barHeight2;
+        flush(guiGraphics);
     }
 
     public void fill(GuiGraphics graphics, int pMinX, int pMinY, int pMaxX, int pMaxY, int pColor) { // In ryan we trust
@@ -78,34 +111,14 @@ public class ModulatorScreen extends DialScreen {
         this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
     }
 
-    public void renderSine(GuiGraphics pGuiGraphics) {
-        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
-        int startPos = (this.width - 158) / 2;
-        int j = (this.height - imageHeight) / 2;
-        int width = this.width;
-        for (float i = 0; i < 158; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * 25);
-            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
-        }
-        flush(pGuiGraphics);
-        if (frequency < .72f) {
-            pGuiGraphics.blit(WARN_ON, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
-        } else {
-            pGuiGraphics.blit(WARN_OFF, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
-        }
-    }
-
-    public void calculateWavelength() {
-        frequency = Math.abs((dials.get(0).scrolledAmount / 10) + (dials.get(1).scrolledAmount)+(startFrequency));
-    }
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
+        if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 + 9 > pMouseY - 24 && (double) height / 2 + 9 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             mute = !mute;
         }
-        if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
+        if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 + 9 > pMouseY - 24 && (double) height / 2 + 9 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             swap = !swap;
         }
@@ -131,23 +144,25 @@ public class ModulatorScreen extends DialScreen {
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        calculateWavelength();
         int i = (this.width - imageWidth) / 2;
         int j = (this.height - imageHeight) / 2;
         pGuiGraphics.blit(BACKGROUND, i, j, 0, 0, imageWidth, imageHeight);
-        renderSine(pGuiGraphics);
 //        frequency = 5;
+        renderSine(pGuiGraphics);
+        renderSine2(pGuiGraphics);
+        renderBars(pGuiGraphics);
+
         if (mute) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 + 9, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 + 9, 0, 0, 10, 24, 10, 24);
         }
         if (swap) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 + 9, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 + 9, 0, 0, 10, 24, 10, 24);
         }
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
@@ -159,6 +174,30 @@ public class ModulatorScreen extends DialScreen {
             float pitch = Mth.getFromRange(0,30,2,.72f,frequency);
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(),pitch));
         }
+        ticks++;
+        BlockPos sidedPos = new BlockPos(0,0,0);
+        if (!swap) {
+            sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getClockWise(), 1);
+        } else {
+            sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(),1);
+        }
+        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
+        if (blockEntity instanceof SignalGeneratorBlockEntity signalGeneratorBlockEntity) {
+            BlockPos sidedPos2 = new BlockPos(0,0,0);
+            if (!blockEntity.getBlockState().getValue(SignalGeneratorBlock.SWAP_SIDES)) {
+                sidedPos2 = sidedPos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getClockWise(), 1);
+            } else {
+                sidedPos2 = sidedPos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(),1);
+            }
+
+            if (sidedPos2.equals(pos)) {
+                this.frequency = signalGeneratorBlockEntity.frequency; //TODO Take into account the swap side of the signal generator block
+            } else {
+                frequency = 0;
+            }
+        } else {
+            this.frequency = 0;
+        }
     }
 
     @Override
@@ -168,7 +207,7 @@ public class ModulatorScreen extends DialScreen {
     }
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("frequency",frequency);
+        tag.putFloat("modRate",modRate);
         tag.putBoolean("swap",swap);
         Messages.sendToServer(new BlockEntityModificationC2SPacket(tag,pos));
     }
