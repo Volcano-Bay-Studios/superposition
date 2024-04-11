@@ -114,6 +114,7 @@ public class DialScreen extends Screen {
         public Dial(int x, int y) {
             this.targetx = x;
             this.targety = y;
+            this.maxScroll = 999999;
         }
         public Dial(int x, int y, int maxScroll) {
             this.maxScroll = maxScroll;

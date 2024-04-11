@@ -19,6 +19,7 @@ import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
+import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.Messages;
@@ -52,8 +53,9 @@ public class ModulatorScreen extends DialScreen {
         addDial(-50, 0,76);
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
-        if (blockEntity instanceof SignalGeneratorBlockEntity generatorBlockEntity) {
-            startFrequency = generatorBlockEntity.frequency;
+        if (blockEntity instanceof ModulatorBlockEntity generatorBlockEntity) {
+            dials.get(0).scrolledAmount = generatorBlockEntity.redstoneMod;
+            dials.get(1).scrolledAmount = generatorBlockEntity.modRate;
         }
         swap = state.getValue(SignalGeneratorBlock.SWAP_SIDES);
     }
@@ -93,7 +95,7 @@ public class ModulatorScreen extends DialScreen {
         fill(guiGraphics,width/2-79,height/2-25-barHeight,width/2-65,height/2-25,0xFF56d156);
         fill(guiGraphics,width/2-57,height/2-25-barHeight2,width/2-43,height/2-25,0xFF56d156);
         modRate = barHeight;
-        amplitude = barHeight2;
+        amplitude = barHeight2+(ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos)*((float) barHeight /15));
         flush(guiGraphics);
     }
 
@@ -202,12 +204,13 @@ public class ModulatorScreen extends DialScreen {
 
     @Override
     public void onClose() {
-        super.onClose();
         updateBlock();
+        super.onClose();
     }
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("modRate",modRate);
+        tag.putFloat("modRate",Math.min(76,Math.abs((int) dials.get(1).scrolledAmount)));
+        tag.putFloat("redstoneMod",Math.min(76,Math.abs((int) dials.get(0).scrolledAmount)));
         tag.putBoolean("swap",swap);
         Messages.sendToServer(new BlockEntityModificationC2SPacket(tag,pos));
     }

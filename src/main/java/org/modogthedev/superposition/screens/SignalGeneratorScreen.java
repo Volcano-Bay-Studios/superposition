@@ -162,6 +162,7 @@ public class SignalGeneratorScreen extends DialScreen {
         super.tick();
         if (!mute && frequency > .72f) {
             float pitch = Mth.getFromRange(0,30,2,.72f,frequency);
+            
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(),pitch));
         }
         ticks++;

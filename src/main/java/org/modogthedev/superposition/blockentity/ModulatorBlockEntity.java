@@ -2,9 +2,11 @@ package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
@@ -13,6 +15,7 @@ import org.modogthedev.superposition.util.TickableBlockEntity;
 public class ModulatorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity {
     Vec3 pos = new Vec3(this.getBlockPos().getX(),this.getBlockPos().getY(),this.getBlockPos().getZ());
     public float modRate;
+    public float redstoneMod;
 
     public ModulatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntity.MODULATOR.get(), pos, state);
@@ -21,14 +24,19 @@ public class ModulatorBlockEntity extends SyncedBlockEntity implements TickableB
     public void writeData(CompoundTag tag) {
         super.writeData(tag);
         this.modRate = tag.getFloat("modRate");
+        this.redstoneMod = tag.getFloat("redstoneMod");
 
         level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
 //        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
+    }
+    public static float getRedstoneOffset(Level level, BlockPos pos) {
+        return level.getSignal(pos,level.getBlockState(pos).getValue(ModulatorBlock.FACING).getOpposite());
     }
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         pTag.putFloat("modRate", modRate);
+        pTag.putFloat("redstoneMod",redstoneMod);
         super.saveAdditional(pTag);
     }
 
@@ -36,7 +44,9 @@ public class ModulatorBlockEntity extends SyncedBlockEntity implements TickableB
     public void load(CompoundTag pTag) {
         super.load(pTag);
         this.modRate = pTag.getFloat("modRate");
+        this.redstoneMod = pTag.getFloat("redstoneMod");
     }
+
 
 
 
