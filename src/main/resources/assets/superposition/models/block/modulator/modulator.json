@@ -1,0 +1,8 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "top": "superposition:block/modulator/top",
+    "front": "superposition:block/modulator/front",
+    "side": "superposition:block/modulator/side"
+  }
+}

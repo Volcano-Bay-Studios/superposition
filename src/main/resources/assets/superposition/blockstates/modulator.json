@@ -2,7 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "superposition:block/signal_generator/signal_generator"
+        "model": "superposition:block/modulator/modulator"
       }
     },
     {
@@ -10,7 +10,7 @@
         "facing": "north"
       },
       "apply": {
-        "model": "superposition:block/signal_generator/signal_generator"
+        "model": "superposition:block/modulator/modulator"
       }
     },
     {
@@ -18,7 +18,7 @@
         "facing": "south"
       },
       "apply": {
-        "model": "superposition:block/signal_generator/signal_generator",
+        "model": "superposition:block/modulator/modulator",
         "y": 180
       }
     },
@@ -27,7 +27,7 @@
         "facing": "west"
       },
       "apply": {
-        "model": "superposition:block/signal_generator/signal_generator",
+        "model": "superposition:block/modulator/modulator",
         "y": 270
       }
     },
@@ -36,7 +36,7 @@
         "facing": "east"
       },
       "apply": {
-        "model": "superposition:block/signal_generator/signal_generator",
+        "model": "superposition:block/modulator/modulator",
         "y": 90
       }
     }

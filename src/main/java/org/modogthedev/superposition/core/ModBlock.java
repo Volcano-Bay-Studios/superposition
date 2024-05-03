@@ -9,6 +9,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.block.AmplifierBlock;
+import org.modogthedev.superposition.block.AntennaBlock;
 import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 
@@ -25,6 +27,14 @@ public class ModBlock {
     public static final RegistryObject<ModulatorBlock> MODULATOR = registerBlock("modulator",
             () -> new ModulatorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f)
+            ));
+    public static final RegistryObject<AntennaBlock> ANTENNA = registerBlock("antenna",
+            () -> new AntennaBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+    public static final RegistryObject<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
+            () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
+                    .strength(2.0f, 8f).noOcclusion()
             ));
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

@@ -1,18 +1,19 @@
 package org.modogthedev.superposition.blockentity;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.ModBlockEntity;
-import org.modogthedev.superposition.util.SyncedBlockEntity;
+import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
-public class ModulatorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity {
+public class ModulatorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     Vec3 pos = new Vec3(this.getBlockPos().getX(),this.getBlockPos().getY(),this.getBlockPos().getZ());
     public float modRate;
     public float redstoneMod;
@@ -47,8 +48,11 @@ public class ModulatorBlockEntity extends SyncedBlockEntity implements TickableB
         this.redstoneMod = pTag.getFloat("redstoneMod");
     }
 
-
-
+    @Override
+    public Signal modulateSignal(Signal signal) {
+        signal.setModulation(modRate+(getRedstoneOffset(level, getBlockPos())*((float) redstoneMod /15)));
+        return signal;
+    }
 
     @Override
     public void tick() {

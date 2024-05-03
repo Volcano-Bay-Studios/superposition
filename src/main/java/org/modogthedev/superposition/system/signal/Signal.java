@@ -1,21 +1,18 @@
-package org.modogthedev.superposition.particle;
+package org.modogthedev.superposition.system.signal;
 
-import net.minecraft.client.particle.DustParticle;
-import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class Particle {
+public class Signal {
+    public float frequency;
+    public float modulation;
     public Vec3 pos;
     public Vec3 vel;
     public Level level;
     public int lifetime = 0;
-    public TYPE type;
-    public float frequency;
     public float quanta;
 
     public void tick() {
@@ -32,7 +29,7 @@ public class Particle {
         return tag;
     }
 
-    public Particle(Vec3 pos, Level level, float frequency, float quanta, Vec3 vel) {
+    public Signal(Vec3 pos, Level level, float frequency, float quanta, Vec3 vel) {
         this.pos = pos;
         this.level = level;
         this.frequency = frequency;
@@ -40,13 +37,7 @@ public class Particle {
         this.vel = vel.normalize();
     }
 
-    public enum TYPE {
-        RADIO,
-        MICROWAVE,
-        INFRARED,
-        VISIBLE,
-        ULTRAVIOLET,
-        XRAY,
-        GAMMARAY
+    public void setModulation(float newModulation) {
+        modulation = newModulation;
     }
 }

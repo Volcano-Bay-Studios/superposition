@@ -16,7 +16,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.event.ClientEvents;
 import org.modogthedev.superposition.networking.Messages;
-import org.modogthedev.superposition.particle.ParticleManager;
+import org.modogthedev.superposition.system.signal.SignalManager;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -44,7 +44,7 @@ public class Superposition {
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = MinecraftForge.EVENT_BUS;
-        bus.addListener(ParticleManager::tick);
+        bus.addListener(SignalManager::tick);
         bus.addListener(ClientEvents::clientTickEvent);
     }
 
