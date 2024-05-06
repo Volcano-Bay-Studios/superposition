@@ -1,7 +1,13 @@
 {
   "block.superposition.signal_generator" : "Signal Generator",
+  "block.superposition.modulator" : "Modulator",
+  "block.superposition.amplifier" : "Amplifier",
+  "block.superposition.antenna" : "Antenna Part",
+
+  "item.superposition.screwdriver" : "Screwdriver",
 
   "sounds.superposition.sine" : "Sine Plays",
+  "sounds.superposition.screwdriver" : "Screwdriver Screws",
 
 
   "creativemodetab.superposition" : "Superposition"

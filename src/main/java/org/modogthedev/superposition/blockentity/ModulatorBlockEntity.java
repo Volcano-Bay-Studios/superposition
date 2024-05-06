@@ -56,6 +56,8 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public void tick() {
+        super.tick();
+
     }
 
 }

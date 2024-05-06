@@ -1,0 +1,44 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "superposition:block/modulator/modulator"
+      }
+    },
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "superposition:block/modulator/modulator"
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "superposition:block/modulator/modulator",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "superposition:block/modulator/modulator",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "superposition:block/modulator/modulator",
+        "y": 90
+      }
+    }
+  ]
+}

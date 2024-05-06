@@ -113,6 +113,7 @@ public class SignalGeneratorScreen extends DialScreen {
         if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             swap = !swap;
+            updateBlock();
         }
         return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
@@ -173,6 +174,13 @@ public class SignalGeneratorScreen extends DialScreen {
         super.onClose();
         updateBlock();
     }
+
+    @Override
+    public void dialUpdated() {
+        super.dialUpdated();
+        updateBlock();
+    }
+
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
         tag.putFloat("frequency",frequency);

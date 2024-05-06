@@ -17,9 +17,13 @@ public class SignalManager {
         Level level = event.level;
         ifAbsent(level);
         if (!level.isClientSide) {
+            List<Signal> signalsForRemoval = new ArrayList<>();
             for (Signal signal : transmittedSignals.get(level)) {
-                signal.tick();
+                if (signal.tick()) {
+                    signalsForRemoval.add(signal);
+                }
             }
+            transmittedSignals.get(level).removeAll(signalsForRemoval);
         }
     }
 
@@ -30,8 +34,8 @@ public class SignalManager {
         }
     }
 
-    public static void addParticle(Vec3 pos, Level level, float frequency, float quanta, Vec3 vel) {
-        ifAbsent(level);
-        transmittedSignals.get(level).add(new Signal(pos, level, frequency, quanta, vel));
+    public static void addParticle(Signal signal) {
+        ifAbsent(signal.level);
+        transmittedSignals.get(signal.level).add(signal);
     }
 }

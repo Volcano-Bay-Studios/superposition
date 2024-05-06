@@ -23,13 +23,10 @@ import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.screens.ModulatorScreen;
-import org.modogthedev.superposition.screens.SignalGeneratorScreen;
-import org.modogthedev.superposition.util.TickingBlock;
+import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class ModulatorBlock extends TickingBlock implements EntityBlock {
-    public static final DirectionProperty FACING = DirectionalBlock.FACING;
+public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlock {
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
-    public static BooleanProperty SWAP_SIDES = SuperpositionBlockStates.SWAP_SIDES;
     public static ModulatorScreen modulatorScreen = null;
     public ModulatorBlock(Properties properties) {
         super(properties);

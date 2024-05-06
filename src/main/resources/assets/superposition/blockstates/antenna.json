@@ -2,12 +2,12 @@
   "multipart": [
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_post_ends"
+        "model": "superposition:block/antenna/post_ends"
       }
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_post"
+        "model": "superposition:block/antenna/post"
       },
       "when": {
         "east": "false",
@@ -18,7 +18,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_cap"
+        "model": "superposition:block/antenna/cap"
       },
       "when": {
         "east": "false",
@@ -29,7 +29,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_cap",
+        "model": "superposition:block/antenna/cap",
         "y": 90
       },
       "when": {
@@ -41,7 +41,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_cap_alt"
+        "model": "superposition:block/antenna/cap_alt"
       },
       "when": {
         "east": "false",
@@ -52,7 +52,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_cap_alt",
+        "model": "superposition:block/antenna/cap_alt",
         "y": 90
       },
       "when": {
@@ -64,7 +64,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_side"
+        "model": "superposition:block/antenna/side"
       },
       "when": {
         "north": "true"
@@ -72,7 +72,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_side",
+        "model": "superposition:block/antenna/side",
         "y": 90
       },
       "when": {
@@ -81,7 +81,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_side_alt"
+        "model": "superposition:block/antenna/side_alt"
       },
       "when": {
         "south": "true"
@@ -89,7 +89,7 @@
     },
     {
       "apply": {
-        "model": "minecraft:block/iron_bars_side_alt",
+        "model": "superposition:block/antenna/side_alt",
         "y": 90
       },
       "when": {

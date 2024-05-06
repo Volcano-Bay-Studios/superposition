@@ -8,15 +8,30 @@ import net.minecraft.world.phys.Vec3;
 
 public class Signal {
     public float frequency;
+    public static final int speed = 10;
     public float modulation;
     public Vec3 pos;
-    public Vec3 vel;
     public Level level;
     public int lifetime = 0;
-    public float quanta;
+    public int endTime = 0;
+    public float maxDist = 0;
+    public float minDist = 0;
+    public float amplitude;
+    public boolean emitting = true;
+    public Vec3 sourcePos;
 
-    public void tick() {
-        this.level.addParticle(ParticleTypes.FLAME, pos.x, pos.y+1, pos.z, 0, 0, 0);
+    public boolean tick() {
+        this.level.addParticle(ParticleTypes.FLAME, pos.x, pos.y, pos.z, 0, 0, 0);
+        lifetime++;
+        if (!emitting) {
+            int endTicks = lifetime-endTime;
+            minDist = endTicks*speed;
+            if (endTicks > endTime) {
+                return true;
+            }
+        }
+        maxDist = lifetime*speed;
+        return false;
     }
 
     protected CompoundTag addAdditionalSaveData() {
@@ -29,12 +44,11 @@ public class Signal {
         return tag;
     }
 
-    public Signal(Vec3 pos, Level level, float frequency, float quanta, Vec3 vel) {
+    public Signal(Vec3 pos, Level level, float frequency, float amplitude) {
         this.pos = pos;
         this.level = level;
         this.frequency = frequency;
-        this.quanta = quanta;
-        this.vel = vel.normalize();
+        this.amplitude = amplitude;
     }
 
     public void setModulation(float newModulation) {

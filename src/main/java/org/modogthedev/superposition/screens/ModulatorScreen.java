@@ -20,11 +20,12 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
-import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SignalActorBlockEntity;
 
 public class ModulatorScreen extends DialScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/modulator_screen.png");
@@ -95,6 +96,7 @@ public class ModulatorScreen extends DialScreen {
         fill(guiGraphics,width/2-79,height/2-25-barHeight,width/2-65,height/2-25,0xFF56d156);
         fill(guiGraphics,width/2-57,height/2-25-barHeight2,width/2-43,height/2-25,0xFF56d156);
         modRate = barHeight;
+        assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
         amplitude = barHeight2+(ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos)*((float) barHeight /15));
         flush(guiGraphics);
     }
@@ -123,6 +125,7 @@ public class ModulatorScreen extends DialScreen {
         if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
             swap = !swap;
+            updateBlock();
         }
         return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
@@ -177,23 +180,19 @@ public class ModulatorScreen extends DialScreen {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(),pitch));
         }
         ticks++;
-        BlockPos sidedPos = new BlockPos(0,0,0);
+        BlockPos sidedPos;
+        assert Minecraft.getInstance().level != null : "Tried to access screen from server!";
         if (!swap) {
             sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getClockWise(), 1);
         } else {
             sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(),1);
         }
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalGeneratorBlockEntity signalGeneratorBlockEntity) {
-            BlockPos sidedPos2 = new BlockPos(0,0,0);
-            if (!blockEntity.getBlockState().getValue(SignalGeneratorBlock.SWAP_SIDES)) {
-                sidedPos2 = sidedPos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getClockWise(), 1);
-            } else {
-                sidedPos2 = sidedPos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(),1);
-            }
-
-            if (sidedPos2.equals(pos)) {
-                this.frequency = signalGeneratorBlockEntity.frequency; //TODO Take into account the swap side of the signal generator block
+        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
+            BlockPos sidedPos2 = signalActorBlockEntity.getSwappedPos();
+            Signal blockSignal = signalActorBlockEntity.getSignal(new Object());
+            if (blockSignal != null) {
+                this.frequency = blockSignal.frequency; //TODO Take into account the swap side of the signal generator block
             } else {
                 frequency = 0;
             }
@@ -207,6 +206,13 @@ public class ModulatorScreen extends DialScreen {
         updateBlock();
         super.onClose();
     }
+
+    @Override
+    public void dialUpdated() {
+        super.dialUpdated();
+        updateBlock();
+    }
+
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
         tag.putFloat("modRate",Math.min(76,Math.abs((int) dials.get(1).scrolledAmount)));
