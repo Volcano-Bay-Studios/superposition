@@ -50,7 +50,8 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public Signal modulateSignal(Signal signal) {
-        signal.setModulation(modRate+(getRedstoneOffset(level, getBlockPos())*((float) redstoneMod /15)));
+        if (signal != null)
+            signal.setModulation(modRate+(getRedstoneOffset(level, getBlockPos())*((float) redstoneMod /15)));
         return signal;
     }
 

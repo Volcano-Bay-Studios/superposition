@@ -54,7 +54,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
             lastCall = nextCall;
-            return this.modulateSignal(signalActorBlockEntity.getSignal(nextCall));
+            return this.
+                    modulateSignal(signalActorBlockEntity.getSignal(nextCall));
         } else {
             return null;
         }
@@ -68,6 +69,16 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
             lastCall = nextCall;
             return this.modulateSignal(signalActorBlockEntity.createSignal(nextCall));
+        } else {
+            return null;
+        }
+    }
+    public SignalActorBlockEntity topBE(Object nextCall) {
+        BlockPos sidedPos = getSwappedPos();
+        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
+            lastCall = nextCall;
+            return signalActorBlockEntity.topBE(nextCall);
         } else {
             return null;
         }

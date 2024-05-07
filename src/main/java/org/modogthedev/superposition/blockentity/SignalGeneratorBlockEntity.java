@@ -9,6 +9,7 @@ import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -32,7 +33,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         boolean animated = frequency > .7f;
 
         level.setBlock(getBlockPos(), getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")).setValue(SignalGeneratorBlock.ON, animated), 2);
-//        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
+        updateSignal();
     }
 
     @Override
@@ -52,17 +53,15 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     @Override
     public void tick() {
         super.tick();
-        if (connectedSignal != null && !transmitting)
-            endSignal();
-        if (connectedSignal == null && transmitting)
-            updateSignal();
-
+        if (this.level.isClientSide)
+            return;
     }
 
     public void endSignal() {
         if (connectedSignal != null) {
             connectedSignal.endTime = connectedSignal.lifetime;
             connectedSignal.emitting = false;
+            SignalManager.stopSignal(connectedSignal);
             connectedSignal = null;
         }
     }
@@ -85,4 +84,8 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         connectedSignal = signal;
     }
 
+    @Override
+    public SignalActorBlockEntity topBE(Object nextCall) {
+        return this;
+    }
 }

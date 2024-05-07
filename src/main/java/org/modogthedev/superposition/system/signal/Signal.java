@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.system.antenna.Antenna;
 
 public class Signal {
     public float frequency;
@@ -16,21 +17,24 @@ public class Signal {
     public int endTime = 0;
     public float maxDist = 0;
     public float minDist = 0;
+    float maxRange;
     public float amplitude;
     public boolean emitting = true;
     public Vec3 sourcePos;
+    public Antenna antenna;
 
     public boolean tick() {
         this.level.addParticle(ParticleTypes.FLAME, pos.x, pos.y, pos.z, 0, 0, 0);
         lifetime++;
         if (!emitting) {
             int endTicks = lifetime-endTime;
+            maxRange = amplitude*100;
             minDist = endTicks*speed;
-            if (endTicks > endTime) {
+            if (minDist > maxRange) {
                 return true;
             }
         }
-        maxDist = lifetime*speed;
+        maxDist = Math.min(maxRange,lifetime*speed);
         return false;
     }
 
@@ -45,7 +49,7 @@ public class Signal {
     }
 
     public Signal(Vec3 pos, Level level, float frequency, float amplitude) {
-        this.pos = pos;
+        this.sourcePos = pos;
         this.level = level;
         this.frequency = frequency;
         this.amplitude = amplitude;

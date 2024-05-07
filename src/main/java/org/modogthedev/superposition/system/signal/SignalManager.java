@@ -1,16 +1,14 @@
 package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
-import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class SignalManager {
-    static HashMap<Level, List<Signal>> transmittedSignals = new HashMap<>();
+    public static HashMap<Level, List<Signal>> transmittedSignals = new HashMap<>();
     static HashMap<Level, List<Signal>> untransmittedSignals = new HashMap<>();
 
     public static void tick(TickEvent.LevelTickEvent event) {
@@ -20,7 +18,7 @@ public class SignalManager {
             List<Signal> signalsForRemoval = new ArrayList<>();
             for (Signal signal : transmittedSignals.get(level)) {
                 if (signal.tick()) {
-                    signalsForRemoval.add(signal);
+                      signalsForRemoval.add(signal);
                 }
             }
             transmittedSignals.get(level).removeAll(signalsForRemoval);
@@ -34,8 +32,21 @@ public class SignalManager {
         }
     }
 
-    public static void addParticle(Signal signal) {
+    public static void addSignal(Signal signal) {
+        if (signal.level.isClientSide)
+            return;
         ifAbsent(signal.level);
-        transmittedSignals.get(signal.level).add(signal);
+        if (transmittedSignals.get(signal.level).contains(signal)) {
+            transmittedSignals.get(signal.level).set(transmittedSignals.get(signal.level).indexOf(signal),signal);
+        } else {
+            transmittedSignals.get(signal.level).add(signal);
+        }
+    }
+    public static void stopSignal(Signal signal){
+        if (transmittedSignals.get(signal.level).contains(signal)) {
+            Signal ourSignal = transmittedSignals.get(signal.level).get(transmittedSignals.get(signal.level).indexOf(signal));
+            ourSignal.emitting = false;
+            transmittedSignals.get(signal.level).set(transmittedSignals.get(signal.level).indexOf(signal),ourSignal);
+        }
     }
 }

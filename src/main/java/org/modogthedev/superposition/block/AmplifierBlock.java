@@ -44,7 +44,7 @@ public class AmplifierBlock extends SignalActorTickingBlock {
     }
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        if (level.getBlockState(pos).getValue(SWAP_SIDES)) {
+        if (!level.getBlockState(pos).getValue(SWAP_SIDES)) {
             return direction == level.getBlockState(pos).getValue(FACING).getClockWise();
         } else {
             return direction == level.getBlockState(pos).getValue(FACING).getCounterClockWise();
