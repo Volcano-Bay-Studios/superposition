@@ -9,12 +9,12 @@ import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
+import org.modogthedev.superposition.util.AntennaActorBlockEntity;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
-public class AmplifierBlockEntity  extends SignalActorBlockEntity implements TickableBlockEntity {
-    public Antenna antenna;
+public class AmplifierBlockEntity  extends AntennaActorBlockEntity {
     Signal signal;
     public AmplifierBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntity.AMPLIFIER.get(), pos, state);
@@ -28,13 +28,9 @@ public class AmplifierBlockEntity  extends SignalActorBlockEntity implements Tic
 //        System.out.println(SignalManager.transmittedSignals.get(level).size());
         BlockPos sidedPos = getSwappedPos();
         int power = level.getSignal(worldPosition,getSwappedSide());
-        if (antenna == null) {
-            Antenna getAntenna = AntennaManager.getAmplifierAntenna(level,worldPosition);
-            if (getAntenna != null)
-                antenna = getAntenna;
-        }
+
         float amplitude = power;
-        if (power > 0) {
+        if (antenna != null && power > 0) {
             SignalActorBlockEntity signalActorBlockEntity = topBE(new Object());
             if (signalActorBlockEntity != null) {
                 Signal signalForBroadcast = signalActorBlockEntity.createSignal(new Object());

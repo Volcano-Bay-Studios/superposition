@@ -7,6 +7,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.block.AntennaBlock;
+import org.modogthedev.superposition.block.ReceiverBlock;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,7 +40,7 @@ public class BlockHelper {
                     //Add this block to the list of blocks that are yet to be done.
                     todo.add(relative);
                 }
-            } else if (b instanceof AmplifierBlock){
+            } else if (b instanceof AmplifierBlock || b instanceof ReceiverBlock) {
                 foundBase = relative;
             }
         }

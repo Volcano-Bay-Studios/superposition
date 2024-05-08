@@ -3,6 +3,7 @@
   "block.superposition.modulator" : "Modulator",
   "block.superposition.amplifier" : "Amplifier",
   "block.superposition.antenna" : "Antenna Part",
+  "block.superposition.receiver" : "Receiver",
 
   "item.superposition.screwdriver" : "Screwdriver",
 

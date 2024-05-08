@@ -7,6 +7,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
+import org.modogthedev.superposition.blockentity.ReceiverBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 
 public class ModBlockEntity {
@@ -24,5 +25,9 @@ public class ModBlockEntity {
     public static final RegistryObject<BlockEntityType<AmplifierBlockEntity>> AMPLIFIER =
             BLOCK_ENTITIES.register("amplifier",
                     () -> BlockEntityType.Builder.of(AmplifierBlockEntity::new, ModBlock.AMPLIFIER.get())
+                            .build(null));
+    public static final RegistryObject<BlockEntityType<ReceiverBlockEntity>> RECEIVER =
+            BLOCK_ENTITIES.register("receiver",
+                    () -> BlockEntityType.Builder.of(ReceiverBlockEntity::new, ModBlock.RECEIVER.get())
                             .build(null));
 }

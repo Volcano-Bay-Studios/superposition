@@ -26,9 +26,9 @@ public class Signal {
     public boolean tick() {
         this.level.addParticle(ParticleTypes.FLAME, pos.x, pos.y, pos.z, 0, 0, 0);
         lifetime++;
+        maxRange = amplitude*100;
         if (!emitting) {
             int endTicks = lifetime-endTime;
-            maxRange = amplitude*100;
             minDist = endTicks*speed;
             if (minDist > maxRange) {
                 return true;

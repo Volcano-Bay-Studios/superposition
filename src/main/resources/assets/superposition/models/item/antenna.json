@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "superposition:block/antenna/post_ends"
-  }
+  "parent": "superposition:block/antenna/post"
 }

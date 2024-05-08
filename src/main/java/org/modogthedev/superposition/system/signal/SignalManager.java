@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
+import org.modogthedev.superposition.system.antenna.AntennaManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +16,10 @@ public class SignalManager {
         Level level = event.level;
         ifAbsent(level);
         if (!level.isClientSide) {
+            AntennaManager.clearSignals(level);
             List<Signal> signalsForRemoval = new ArrayList<>();
             for (Signal signal : transmittedSignals.get(level)) {
+                AntennaManager.postSignal(signal);
                 if (signal.tick()) {
                       signalsForRemoval.add(signal);
                 }
