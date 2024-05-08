@@ -53,9 +53,8 @@ public class ReceiverBlock extends SignalActorTickingBlock {
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
         ReceiverBlockEntity blockEntity = (ReceiverBlockEntity) pLevel.getBlockEntity(pPos);
         if (blockEntity != null && blockEntity.getSignals() != null) {
-            System.out.println(blockEntity.getSignals().size());
             return Math.min(15, blockEntity.getSignals().size());
         }
-        return 6;
+        return 0;
     }
 }

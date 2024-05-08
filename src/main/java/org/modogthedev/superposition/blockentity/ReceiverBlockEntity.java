@@ -28,7 +28,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         if (antenna == null)
             updateAntenna();
         if (antenna == null) {
-            System.out.println("womp womp");
             return null;
         }
         return antenna.signals;

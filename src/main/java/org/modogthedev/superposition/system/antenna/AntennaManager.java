@@ -79,10 +79,17 @@ public class AntennaManager {
         if (thisPart.base() != null) {
             int ordinal = get(thisPart.base(), level);
             if (ordinal >= 0) {
+                List<BlockPos> parts = new ArrayList<>(thisPart.parts());
+                if (parts.size() < 2) {
+                    antennas.get(level).remove(antennas.get(level).get(ordinal));
+                    //TODO remove antenna from block entities
+                    return;
+                }
                 antennas.get(level).set(ordinal, antennas.get(level).get(ordinal));
             } else {
-                List<BlockPos> parts = new ArrayList<>();
-                parts.addAll(thisPart.parts());
+                List<BlockPos> parts = new ArrayList<>(thisPart.parts());
+                if (parts.size() < 2)
+                    return;
                 Antenna newAntenna = new Antenna(parts, thisPart.base(), level);
                 newAntenna.reading = (level.getBlockState(thisPart.base()).getBlock().equals(ModBlock.RECEIVER.get()));
                 antennas.get(level).add(newAntenna);
