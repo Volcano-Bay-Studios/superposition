@@ -7,6 +7,7 @@ import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.AntennaActorBlockEntity;
 
 import java.util.List;
@@ -22,14 +23,18 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
     public void onLoad() {
         super.onLoad();
         updateAntenna();
+        if (antenna != null)
+            SignalManager.postSignalsToAntenna(antenna);
     }
 
     public List<Signal> getSignals() {
-        if (antenna == null)
+        if (antenna == null) {
             updateAntenna();
+        }
         if (antenna == null) {
             return null;
         }
+        SignalManager.postSignalsToAntenna(antenna);
         return antenna.signals;
     }
 

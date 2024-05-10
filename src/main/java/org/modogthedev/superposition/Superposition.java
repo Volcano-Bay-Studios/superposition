@@ -36,7 +36,7 @@ public class Superposition {
         SuperpositionItems.ITEMS.register(modEventBus);
         ModCreativeModeTab.register(modEventBus);
         ModBlockEntity.BLOCK_ENTITIES.register(modEventBus);
-        ModBlock.BLOCKS.register(modEventBus);
+        SuperpositionBlocks.BLOCKS.register(modEventBus);
         SuperpositionSounds.SOUND_EVENTS.register(modEventBus);
         Messages.register();
 
@@ -53,7 +53,7 @@ public class Superposition {
     }
     public void addCreativeTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTab() == ModCreativeModeTab.TAB.get()) {
-            event.accept(ModBlock.SIGNAL_GENERATOR.get().asItem());
+            event.accept(SuperpositionBlocks.SIGNAL_GENERATOR.get().asItem());
             for (RegistryObject<Item> object: SuperpositionItems.ITEMS.getEntries()) {
                 event.accept(object.get());
             }

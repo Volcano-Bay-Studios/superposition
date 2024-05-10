@@ -8,6 +8,7 @@ import org.modogthedev.superposition.system.antenna.AntennaManager;
 
 public class AntennaActorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     public Antenna antenna;
+    int sleep = 0;
     public AntennaActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
@@ -25,8 +26,19 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
             if (getAntenna != null)
                 antenna = getAntenna;
         }
+        if (sleep > 0)
+            sleep--;
+    }
+    public void removeAntenna() {
+        antenna = null;
+        update();
+    }
+    public void update() {
+        level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
     }
     public void updateAntenna() {
-        AntennaManager.antennaPartUpdate(level,worldPosition.above());
+        Antenna getAntenna = AntennaManager.getAmplifierAntenna(level,worldPosition);
+        if (getAntenna != null)
+            antenna = getAntenna;
     }
 }

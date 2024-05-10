@@ -13,7 +13,7 @@ import org.modogthedev.superposition.block.*;
 
 import java.util.function.Supplier;
 
-public class ModBlock {
+public class SuperpositionBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, Superposition.MODID);
 

@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
+import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
 import java.util.ArrayList;
@@ -25,6 +26,12 @@ public class SignalManager {
                 }
             }
             transmittedSignals.get(level).removeAll(signalsForRemoval);
+        }
+    }
+    public static void postSignalsToAntenna(Antenna antenna){
+        antenna.signals.clear();
+        for (Signal signal : transmittedSignals.get(antenna.level)) {
+            AntennaManager.postSignalToAntenna(signal,antenna);
         }
     }
 

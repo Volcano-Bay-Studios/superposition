@@ -11,15 +11,15 @@ public class Antenna {
     public Level level;
     public List<BlockPos> antennaParts = new ArrayList<>();
     public List<Signal> signals = new ArrayList<>();
-    public BlockPos amplifierBlock;
+    public BlockPos antennaActor;
     public boolean reading;
-    public Antenna(List<BlockPos> antennaParts, BlockPos amplifierBlock, Level level) {
+    public Antenna(List<BlockPos> antennaParts, BlockPos antennaActor, Level level) {
         this.antennaParts = antennaParts;
-        this.amplifierBlock = amplifierBlock;
+        this.antennaActor = antennaActor;
         this.level = level;
     }
 
     public boolean isPos(BlockPos pos) {
-        return amplifierBlock.equals(pos);
+        return antennaActor.equals(pos);
     }
 }

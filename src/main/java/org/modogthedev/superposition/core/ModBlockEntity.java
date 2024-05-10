@@ -16,18 +16,18 @@ public class ModBlockEntity {
 
     public static final RegistryObject<BlockEntityType<SignalGeneratorBlockEntity>> SIGNAL_GENERATOR =
             BLOCK_ENTITIES.register("signal_generator",
-                    () -> BlockEntityType.Builder.of(SignalGeneratorBlockEntity::new, ModBlock.SIGNAL_GENERATOR.get())
+                    () -> BlockEntityType.Builder.of(SignalGeneratorBlockEntity::new, SuperpositionBlocks.SIGNAL_GENERATOR.get())
                             .build(null));
     public static final RegistryObject<BlockEntityType<ModulatorBlockEntity>> MODULATOR =
             BLOCK_ENTITIES.register("modulator",
-                    () -> BlockEntityType.Builder.of(ModulatorBlockEntity::new, ModBlock.MODULATOR.get())
+                    () -> BlockEntityType.Builder.of(ModulatorBlockEntity::new, SuperpositionBlocks.MODULATOR.get())
                             .build(null));
     public static final RegistryObject<BlockEntityType<AmplifierBlockEntity>> AMPLIFIER =
             BLOCK_ENTITIES.register("amplifier",
-                    () -> BlockEntityType.Builder.of(AmplifierBlockEntity::new, ModBlock.AMPLIFIER.get())
+                    () -> BlockEntityType.Builder.of(AmplifierBlockEntity::new, SuperpositionBlocks.AMPLIFIER.get())
                             .build(null));
     public static final RegistryObject<BlockEntityType<ReceiverBlockEntity>> RECEIVER =
             BLOCK_ENTITIES.register("receiver",
-                    () -> BlockEntityType.Builder.of(ReceiverBlockEntity::new, ModBlock.RECEIVER.get())
+                    () -> BlockEntityType.Builder.of(ReceiverBlockEntity::new, SuperpositionBlocks.RECEIVER.get())
                             .build(null));
 }

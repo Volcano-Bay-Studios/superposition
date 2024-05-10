@@ -24,6 +24,9 @@ public class BlockHelper {
             Direction.SOUTH,
             Direction.WEST
     };
+    public static boolean base(Block b) {
+        return (b instanceof AmplifierBlock || b instanceof ReceiverBlock);
+    }
 
     private static BlockPos getConnectedblocks(LevelReader reader, BlockPos pos, Set<BlockPos> results, List<BlockPos> todo, BlockPos base) {
         BlockPos foundBase = null;
@@ -40,7 +43,7 @@ public class BlockHelper {
                     //Add this block to the list of blocks that are yet to be done.
                     todo.add(relative);
                 }
-            } else if (b instanceof AmplifierBlock || b instanceof ReceiverBlock) {
+            } else if (base(b)) {
                 foundBase = relative;
             }
         }
@@ -53,6 +56,11 @@ public class BlockHelper {
 
         //Add the current block to the list of blocks that are yet to be done
         list.add(pos);
+
+        //Check if current block is base
+        Block b = level.getBlockState(pos).getBlock();
+        if (base(b))
+            basePos = pos;
 
         //Execute this method for each block in the 'todo' list
         while((pos = list.poll()) != null) {
