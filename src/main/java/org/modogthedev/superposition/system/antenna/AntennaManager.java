@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.AntennaActorBlockEntity;
@@ -39,9 +40,11 @@ public class AntennaManager {
 
             if (!antenna.reading)
                 continue;
-            float dist = (float) antenna.antennaActor.distSqr(pos);
+            float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
             if (dist < signal.maxDist && dist > signal.minDist) {
                 antenna.signals.add(signal);
+            } else {
+                System.out.println(dist);
             }
         }
     }
@@ -51,7 +54,7 @@ public class AntennaManager {
         BlockPos pos = Mth.blockPosFromVec3(signal.pos);
         if (!antenna.reading)
             return;
-        float dist = (float) antenna.antennaActor.distSqr(pos);
+        float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
         if (dist < signal.maxDist && dist > signal.minDist) {
             antenna.signals.add(signal);
         }
@@ -106,7 +109,10 @@ public class AntennaManager {
                     }
                     return;
                 }
-                antennas.get(level).set(ordinal, antennas.get(level).get(ordinal));
+                Antenna ourAntenna = antennas.get(level).get(ordinal);
+                ourAntenna.antennaParts = parts;
+                ourAntenna.updateDimensions();
+                antennas.get(level).set(ordinal, ourAntenna);
                 if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
                     antennaActorBlockEntity.update();
                 }
@@ -116,6 +122,7 @@ public class AntennaManager {
                     return;
                 Antenna newAntenna = new Antenna(parts, thisPart.base(), level);
                 newAntenna.reading = (level.getBlockState(thisPart.base()).getBlock().equals(SuperpositionBlocks.RECEIVER.get()));
+                newAntenna.updateDimensions();
                 antennas.get(level).add(newAntenna);
                 BlockEntity blockEntity = level.getBlockEntity(newAntenna.antennaActor);
                 if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {

@@ -4,38 +4,34 @@
 	"render_type": "cutout_mipped",
 	"textures": {
 		"1": "superposition:block/antenna/antenna",
-		"2": "block/iron_bars",
 		"particle": "block/iron_bars"
 	},
 	"elements": [
 		{
-			"from": [8, 0, 7],
-			"to": [8, 16, 8],
+			"from": [7, -1, 7],
+			"to": [9, 0, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, -1, 7]},
 			"faces": {
-				"east": {"uv": [9, 0, 8, 16], "texture": "#2"},
-				"west": {"uv": [8, 0, 9, 16], "texture": "#2"}
+				"north": {"uv": [5, 12, 7, 13], "texture": "#1"},
+				"east": {"uv": [5, 13, 7, 14], "texture": "#1"},
+				"south": {"uv": [5, 12, 7, 13], "texture": "#1"},
+				"west": {"uv": [5, 12, 7, 13], "texture": "#1"},
+				"up": {"uv": [5, 12, 7, 14], "texture": "#1"},
+				"down": {"uv": [5, 12, 7, 14], "texture": "#1"}
 			}
 		},
 		{
-			"from": [7, 0, 7],
-			"to": [9, 16, 7],
+			"from": [7, 16, 7],
+			"to": [9, 17, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 16, 7]},
 			"faces": {
-				"north": {"uv": [7, 0, 9, 16], "texture": "#2"},
-				"south": {"uv": [9, 0, 7, 16], "texture": "#2"}
-			}
-		},
-		{
-			"from": [5, 0, 5],
-			"to": [11, 16, 9],
-			"faces": {
-				"north": {"uv": [1, 0, 4, 16], "texture": "#1"},
-				"east": {"uv": [5.5, 0, 3.5, 16], "texture": "#1"},
-				"south": {"uv": [13.5, 4, 14, 4.5], "texture": "#1"},
-				"west": {"uv": [3.5, 0, 5.5, 16], "texture": "#1"},
-				"up": {"uv": [16, 15.5, 13, 13.5], "texture": "#1"},
-				"down": {"uv": [13, 13.5, 16, 15.5], "texture": "#1"}
+				"north": {"uv": [5, 10, 7, 11], "texture": "#1"},
+				"east": {"uv": [5, 11, 7, 12], "texture": "#1"},
+				"south": {"uv": [5, 10, 7, 11], "texture": "#1"},
+				"west": {"uv": [5, 11, 7, 12], "texture": "#1"},
+				"up": {"uv": [5, 10, 7, 12], "texture": "#1"},
+				"down": {"uv": [5, 10, 7, 12], "texture": "#1"}
 			}
 		}
-	],
-	"display": {}
+	]
 }

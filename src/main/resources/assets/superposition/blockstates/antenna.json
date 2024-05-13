@@ -2,11 +2,6 @@
   "multipart": [
     {
       "apply": {
-        "model": "superposition:block/antenna/post_ends"
-      }
-    },
-    {
-      "apply": {
         "model": "superposition:block/antenna/post"
       },
       "when": {
@@ -24,7 +19,8 @@
         "east": "false",
         "north": "true",
         "south": "false",
-        "west": "false"
+        "west": "false",
+        "short": "false"
       }
     },
     {
@@ -36,7 +32,8 @@
         "east": "true",
         "north": "false",
         "south": "false",
-        "west": "false"
+        "west": "false",
+        "short": "false"
       }
     },
     {
@@ -47,7 +44,8 @@
         "east": "false",
         "north": "false",
         "south": "true",
-        "west": "false"
+        "west": "false",
+        "short": "false"
       }
     },
     {
@@ -59,7 +57,8 @@
         "east": "false",
         "north": "false",
         "south": "false",
-        "west": "true"
+        "west": "true",
+        "short": "false"
       }
     },
     {
@@ -67,7 +66,8 @@
         "model": "superposition:block/antenna/side"
       },
       "when": {
-        "north": "true"
+        "north": "true",
+        "short": "false"
       }
     },
     {
@@ -76,7 +76,8 @@
         "y": 90
       },
       "when": {
-        "east": "true"
+        "east": "true",
+        "short": "false"
       }
     },
     {
@@ -84,7 +85,8 @@
         "model": "superposition:block/antenna/side_alt"
       },
       "when": {
-        "south": "true"
+        "south": "true",
+        "short": "false"
       }
     },
     {
@@ -93,7 +95,96 @@
         "y": 90
       },
       "when": {
-        "west": "true"
+        "west": "true",
+        "short": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/cap_short"
+      },
+      "when": {
+        "east": "false",
+        "north": "true",
+        "south": "false",
+        "west": "false",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/cap_short",
+        "y": 90
+      },
+      "when": {
+        "east": "true",
+        "north": "false",
+        "south": "false",
+        "west": "false",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/cap_alt_short"
+      },
+      "when": {
+        "east": "false",
+        "north": "false",
+        "south": "true",
+        "west": "false",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/cap_alt_short",
+        "y": 90
+      },
+      "when": {
+        "east": "false",
+        "north": "false",
+        "south": "false",
+        "west": "true",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/side_short"
+      },
+      "when": {
+        "north": "true",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/side_short",
+        "y": 90
+      },
+      "when": {
+        "east": "true",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/side_alt_short"
+      },
+      "when": {
+        "south": "true",
+        "short": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "superposition:block/antenna/side_alt_short",
+        "y": 90
+      },
+      "when": {
+        "west": "true",
+        "short": "true"
       }
     }
   ]

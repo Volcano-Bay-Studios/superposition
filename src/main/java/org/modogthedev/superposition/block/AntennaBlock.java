@@ -13,17 +13,21 @@ import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.util.BlockHelper;
 
 public class AntennaBlock extends CrossCollisionBlock {
+    public static BooleanProperty SHORT = SuperpositionBlockStates.SHORT;
     public AntennaBlock(Properties p_54198_) {
-        super(2.5F, 3.0F, 16.0F, 16.0F, 16.0F, p_54198_);
+        super(2F, 1.0F, 16.0F, 16.0F, 16.0F, p_54198_);
+        this.registerDefaultState((this.stateDefinition.any()).setValue(SHORT,false));
     }
 
     @Override
@@ -90,6 +94,7 @@ public class AntennaBlock extends CrossCollisionBlock {
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
+        pBuilder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED,SHORT);
     }
+
 }

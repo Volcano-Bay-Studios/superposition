@@ -8,5 +8,6 @@ public class SuperpositionBlockStates {
     public static final IntegerProperty AMPLITUDE = IntegerProperty.create("amplitude",0,10);
     public static final BooleanProperty SWAP_SIDES = BooleanProperty.create("swap");
     public static final BooleanProperty ON = BooleanProperty.create("on");
+    public static final BooleanProperty SHORT = BooleanProperty.create("short");
 
 }
