@@ -7,7 +7,6 @@ import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
 public class AntennaActorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
-    public Antenna antenna;
     int sleep = 0;
     public AntennaActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);

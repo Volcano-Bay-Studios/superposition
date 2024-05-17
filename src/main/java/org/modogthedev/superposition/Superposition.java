@@ -1,6 +1,7 @@
 package org.modogthedev.superposition;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,6 +17,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.event.ClientEvents;
 import org.modogthedev.superposition.networking.Messages;
+import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.slf4j.Logger;
 
@@ -44,7 +46,8 @@ public class Superposition {
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = MinecraftForge.EVENT_BUS;
-        bus.addListener(SignalManager::tick);
+        bus.addListener(SignalManager::tick); //TODO only add to the side its used on
+        bus.addListener(ClientSignalManager::tick);
         bus.addListener(ClientEvents::clientTickEvent);
     }
 
@@ -60,17 +63,8 @@ public class Superposition {
         }
     }
 
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-    }
 
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents {
-
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-        }
+    public static ResourceLocation asResource(String loc) {
+        return new ResourceLocation(MODID, loc);
     }
 }

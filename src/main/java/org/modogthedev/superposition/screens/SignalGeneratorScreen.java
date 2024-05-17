@@ -192,4 +192,5 @@ public class SignalGeneratorScreen extends DialScreen {
     public boolean isPauseScreen() {
         return false;
     }
+
 }

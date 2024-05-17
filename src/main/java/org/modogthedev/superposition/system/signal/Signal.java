@@ -7,6 +7,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.system.antenna.Antenna;
 
+import java.util.UUID;
+
 public class Signal {
     public float frequency;
     public static final int speed = 10;
@@ -20,11 +22,13 @@ public class Signal {
     float maxRange;
     public float amplitude;
     public boolean emitting = true;
-    public Vec3 sourcePos;
     public Antenna antenna;
+    public UUID uuid = UUID.randomUUID();
 
     public boolean tick() {
-        this.level.addParticle(ParticleTypes.FLAME, pos.x, pos.y, pos.z, 0, 0, 0);
+        for (float i = 0; i < 361; i += .1f) {
+            this.level.addParticle(ParticleTypes.ELECTRIC_SPARK, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, 0, 0);
+        }
         lifetime++;
         maxRange = amplitude*100;
         if (!emitting) {
@@ -38,18 +42,8 @@ public class Signal {
         return false;
     }
 
-    protected CompoundTag addAdditionalSaveData() {
-        CompoundTag tag = new CompoundTag();
-        ListTag list = new ListTag();
-        CompoundTag particle = new CompoundTag();
-        particle.putDouble("x", pos.x);
-        list.add(particle);
-        tag.put("particle", list);
-        return tag;
-    }
-
     public Signal(Vec3 pos, Level level, float frequency, float amplitude) {
-        this.sourcePos = pos;
+        this.pos = pos;
         this.level = level;
         this.frequency = frequency;
         this.amplitude = amplitude;

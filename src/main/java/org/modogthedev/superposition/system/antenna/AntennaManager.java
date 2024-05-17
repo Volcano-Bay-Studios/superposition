@@ -90,8 +90,6 @@ public class AntennaManager {
 
     public static void antennaPartUpdate(LevelReader reader, BlockPos pos) {
         Level level = (Level) reader;
-        if (level.isClientSide)
-            return;
         if (reader.getBlockEntity(pos.below()) instanceof AntennaActorBlockEntity)
             pos = pos.below();
         BlockHelper.AntennaPart thisPart = BlockHelper.getAntennaPart(reader, pos);
