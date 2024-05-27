@@ -18,6 +18,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public SignalActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
+    public BlockPos getDataPos() {
+        return getSwappedPos();
+    }
     public BlockPos getSwappedPos() {
         BlockPos sidedPos2 = new BlockPos(0, 0, 0);
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {

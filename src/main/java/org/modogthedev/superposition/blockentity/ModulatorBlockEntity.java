@@ -11,6 +11,7 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.ModBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
+import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 public class ModulatorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
@@ -61,4 +62,8 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
 
     }
 
+    @Override
+    public BlockPos getDataPos() {
+        return getBlockPos().relative(level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getOpposite(), 1);
+    }
 }

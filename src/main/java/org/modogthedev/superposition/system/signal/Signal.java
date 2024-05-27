@@ -24,6 +24,7 @@ public class Signal {
     public boolean emitting = true;
     public Antenna antenna;
     public UUID uuid = UUID.randomUUID();
+    public EncodedData encodedData;
 
     public boolean tick() {
         for (float i = 0; i < 361; i += .1f) {

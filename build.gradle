@@ -139,6 +139,13 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+    mavenCentral()
+//    maven { "https://maven.parchmentmc.org" }
+//    maven { "https://maven.tterrag.com" }
+//    maven { "https://maven.blamejared.com
+//    " }
+//    maven { "https://cursemaven.com" }
+
     maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
 }
 
@@ -149,6 +156,8 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+//    modImplementation("com.jozufozu.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+
 //    modRuntimeOnly("me.djtheredstoner:DevAuth-${moduleName}:${version}")
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings

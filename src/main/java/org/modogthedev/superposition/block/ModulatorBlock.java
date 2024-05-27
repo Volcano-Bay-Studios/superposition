@@ -71,4 +71,5 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
         stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
     }
+
 }

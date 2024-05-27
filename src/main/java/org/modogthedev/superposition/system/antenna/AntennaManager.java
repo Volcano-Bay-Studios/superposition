@@ -44,7 +44,7 @@ public class AntennaManager {
             if (dist < signal.maxDist && dist > signal.minDist) {
                 antenna.signals.add(signal);
             } else {
-                System.out.println(dist);
+//                System.out.println(dist);
             }
         }
     }
