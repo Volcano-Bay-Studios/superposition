@@ -18,6 +18,7 @@ import org.modogthedev.superposition.util.TickableBlockEntity;
 public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     Vec3 pos = new Vec3(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
     public float frequency;
+    public float dial = 0;
     Signal connectedSignal;
     public boolean transmitting;
 
@@ -25,6 +26,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     public SignalGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntity.SIGNAL_GENERATOR.get(), pos, state);
     }
+
 
     @Override
     public void writeData(CompoundTag tag) {
@@ -53,8 +55,17 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     @Override
     public void tick() {
         super.tick();
-        if (this.level.isClientSide)
+        if (this.level.isClientSide) {
+            float speed = Mth.getFromRange(64,0,.1f,3,frequency);
+            if (frequency < .72f || frequency > 64) {
+                speed = 0;
+            }
+            dial += speed;
+            if (dial > 24) {
+                dial = 0;
+            }
             return;
+        }
     }
 
     public void endSignal() {

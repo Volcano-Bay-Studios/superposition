@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.entity.DecoratedPotPatterns;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
@@ -55,6 +56,8 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
 
         float offset = (stage / stages);
         float uvOffsetx = 0f;
+
+        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
 
         buffer
                 .vertex(m, min, 0.5001f, min)
@@ -103,5 +106,10 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
     public boolean isInvalid(SignalGeneratorBlockEntity be) {
         return !be.hasLevel() || be.getBlockState()
                 .getBlock() == Blocks.AIR;
+    }
+
+    @Override
+    public boolean shouldRender(SignalGeneratorBlockEntity pBlockEntity, Vec3 pCameraPos) {
+        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos) && (pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING),1)).is(Blocks.AIR) || !pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING),1)).canOcclude()));
     }
 }

@@ -93,7 +93,7 @@ public class SignalGeneratorScreen extends DialScreen {
             fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
         flush(pGuiGraphics);
-        if (frequency < .72f) {
+        if (frequency < .72f || frequency > 40) {
             pGuiGraphics.blit(WARN_ON, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
         } else {
             pGuiGraphics.blit(WARN_OFF, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
@@ -183,7 +183,7 @@ public class SignalGeneratorScreen extends DialScreen {
 
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("frequency",frequency);
+        tag.putFloat("frequency", frequency);
         tag.putBoolean("swap",swap);
         Messages.sendToServer(new BlockEntityModificationC2SPacket(tag,pos));
     }

@@ -74,6 +74,19 @@ public class AntennaBlock extends CrossCollisionBlock {
     public VoxelShape getVisualShape(BlockState pState, BlockGetter pReader, BlockPos pPos, CollisionContext pContext) {
         return Shapes.empty();
     }
+    public static boolean isCap(BlockState state) {
+        boolean north = state.getValue(NORTH);
+        boolean south = state.getValue(SOUTH);
+        boolean west = state.getValue(WEST);
+        boolean east = state.getValue(EAST);
+        if (north && !south && !west && !east)
+            return true;
+        else if (south && !north && !west && !east)
+            return true;
+        else if (west && !north && !south && !east)
+            return true;
+        else return east && !north && !south && !west;
+    }
 
     public boolean skipRendering(BlockState pState, BlockState pAdjacentBlockState, Direction pSide) {
         if (pAdjacentBlockState.is(this)) {

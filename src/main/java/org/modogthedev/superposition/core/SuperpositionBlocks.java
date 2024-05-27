@@ -19,7 +19,7 @@ public class SuperpositionBlocks {
 
     public static final RegistryObject<SignalGeneratorBlock> SIGNAL_GENERATOR = registerBlock("signal_generator",
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f)
+                    .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistryObject<ModulatorBlock> MODULATOR = registerBlock("modulator",
             () -> new ModulatorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
@@ -27,15 +27,15 @@ public class SuperpositionBlocks {
             ));
     public static final RegistryObject<AntennaBlock> ANTENNA = registerBlock("antenna",
             () -> new AntennaBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
-                    .strength(2.0f, 8f).noOcclusion()
+                    .strength(2.0f, 8f).noOcclusion().lightLevel(value -> AntennaBlock.isCap(value) ? 4 : 0)
             ));
     public static final RegistryObject<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
             () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
-                    .strength(2.0f, 8f).noOcclusion()
+                    .strength(2.0f, 8f)
             ));
     public static final RegistryObject<ReceiverBlock> RECEIVER = registerBlock("receiver",
             () -> new ReceiverBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f).noOcclusion()
+                    .strength(2.0f, 8f)
             ));
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
