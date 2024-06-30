@@ -75,7 +75,7 @@ public class ModulatorScreen extends DialScreen {
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 61; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+((amplitude+readAmplitude)/5)+signalAmplitude));
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+((readAmplitude)/5)+signalAmplitude));
             fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
@@ -190,7 +190,7 @@ public class ModulatorScreen extends DialScreen {
         }
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            Signal blockSignal = signalActorBlockEntity.getSignal(new Object());
+            Signal blockSignal = signalActorBlockEntity.getSignal(new Object(), false);
             if (blockSignal != null) {
                 this.frequency = blockSignal.frequency; //TODO Explode if signal to high
                 this.readAmplitude = blockSignal.amplitude;

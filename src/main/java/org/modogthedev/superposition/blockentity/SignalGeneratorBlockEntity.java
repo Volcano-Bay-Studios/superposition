@@ -75,15 +75,14 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     }
 
     @Override
-    public Signal getSignal(Object nextCall) {
+    public Signal getSignal(Object nextCall, boolean selfModulate) {
         updateSignal();
         return connectedSignal;
     }
 
     @Override
     public Signal createSignal(Object nextObject) {
-        if (connectedSignal == null)
-            updateSignal();
+        updateSignal();
         return connectedSignal;
     }
 

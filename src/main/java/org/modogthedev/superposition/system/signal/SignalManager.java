@@ -1,12 +1,15 @@
 package org.modogthedev.superposition.system.signal;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.TickEvent;
+import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
 import org.modogthedev.superposition.system.antenna.Antenna;
@@ -25,6 +28,9 @@ public class SignalManager {
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
         for (Signal signal : transmittedSignals.get(level)) {
+            BlockState baseState = level.getBlockState(BlockPos.containing(signal.pos));
+            if (!baseState.is(SuperpositionBlocks.AMPLIFIER.get()))
+                stopSignal(signal);
             AntennaManager.postSignal(signal);
             if (signal.tick()) {
                 signalsForRemoval.add(signal);

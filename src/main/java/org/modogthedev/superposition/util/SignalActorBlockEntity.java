@@ -60,7 +60,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public void postSignal(Signal signal) {
 
     }
-    public Signal getSignal(Object nextCall) {
+    public Signal getSignal(Object nextCall, boolean selfModulate) {
         BlockPos sidedPos = getSwappedPos();
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
@@ -69,9 +69,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             if (signals != null && !signals.isEmpty())
                 refSignal = SignalManager.randomSignal(signals);
             else
-                refSignal = signalActorBlockEntity.getSignal(nextCall);
+                refSignal = signalActorBlockEntity.getSignal(nextCall, true);
             lastCall = nextCall;
-            return this.modulateSignal(refSignal);
+            if (selfModulate)
+                refSignal = this.modulateSignal(refSignal);
+            return refSignal;
         } else {
             return null;
         }
@@ -106,6 +108,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
     }
     public List<Signal> modulateSignals(List<Signal> signalList) {
+        for (Signal signal: signalList) {
+            signal = this.modulateSignal(signal);
+        }
         return signalList;
     }
     public Signal modulateSignal(Signal signal) {
