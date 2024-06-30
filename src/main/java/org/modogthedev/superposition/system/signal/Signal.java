@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class Signal {
     public float frequency;
-    public static final int speed = 10;
+    public static final int speed = 64;
     public float modulation;
     public Vec3 pos;
     public Level level;
@@ -33,7 +33,7 @@ public class Signal {
         lifetime++;
         maxRange = amplitude*100;
         if (!emitting) {
-            int endTicks = lifetime-endTime;
+            int endTicks = lifetime-endTime-2;
             minDist = endTicks*speed;
             if (minDist > maxRange) {
                 return true;

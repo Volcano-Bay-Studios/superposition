@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ReceiverBlockEntity;
-import org.modogthedev.superposition.core.ModBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class ReceiverBlock extends SignalActorTickingBlock {
@@ -42,7 +42,7 @@ public class ReceiverBlock extends SignalActorTickingBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntity.RECEIVER.get().create(pos, state);
+        return SuperpositionBlockEntity.RECEIVER.get().create(pos, state);
     }
 
     @Override

@@ -1,18 +1,15 @@
 package org.modogthedev.superposition.blockentity;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
-import org.modogthedev.superposition.core.ModBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
@@ -24,7 +21,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
 
     public SignalGeneratorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntity.SIGNAL_GENERATOR.get(), pos, state);
+        super(SuperpositionBlockEntity.SIGNAL_GENERATOR.get(), pos, state);
     }
 
 
@@ -79,7 +76,8 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public Signal getSignal(Object nextCall) {
-        return new Signal(pos,level,frequency,0);
+        updateSignal();
+        return connectedSignal;
     }
 
     @Override
@@ -90,9 +88,14 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     }
 
     public void updateSignal() {
-        Signal signal = new Signal(pos, level, frequency, 0);
-        endSignal();
-        connectedSignal = signal;
+        if (connectedSignal == null)
+            connectedSignal = new Signal(pos,level,frequency,1);
+        else {
+            connectedSignal.pos = pos;
+            connectedSignal.level = level;
+            connectedSignal.frequency = frequency;
+            connectedSignal.amplitude = 1;
+        }
     }
 
     @Override

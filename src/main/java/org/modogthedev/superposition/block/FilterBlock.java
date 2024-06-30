@@ -10,27 +10,33 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.blockentity.ReceiverBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class SignalGeneratorBlock extends SignalActorTickingBlock implements EntityBlock {
+public class FilterBlock extends SignalActorTickingBlock implements EntityBlock {
 
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
-    public static BooleanProperty ON = SuperpositionBlockStates.ON;
     public static SignalGeneratorScreen signalGeneratorScreen = null;
-    public SignalGeneratorBlock(Properties properties) {
+
+    public FilterBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true).setValue(ON, false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
         return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
@@ -39,8 +45,9 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntity.SIGNAL_GENERATOR.get().create(pos, state);
+        return SuperpositionBlockEntity.FILTER.get().create(pos, state);
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -71,8 +78,13 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES, ON});
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
+        ReceiverBlockEntity blockEntity = (ReceiverBlockEntity) pLevel.getBlockEntity(pPos);
+        return super.getAnalogOutputSignal(pState, pLevel, pPos);
     }
 
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
+        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
+    }
 }

@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.blockentity;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
@@ -8,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
-import org.modogthedev.superposition.core.ModBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -20,7 +19,7 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
     public float redstoneMod;
 
     public ModulatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntity.MODULATOR.get(), pos, state);
+        super(SuperpositionBlockEntity.MODULATOR.get(), pos, state);
     }
     @Override
     public void writeData(CompoundTag tag) {
@@ -52,7 +51,7 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     public Signal modulateSignal(Signal signal) {
         if (signal != null)
-            signal.setModulation(modRate+(getRedstoneOffset(level, getBlockPos())*((float) redstoneMod /15)));
+            signal.amplitude += (modRate+(getRedstoneOffset(level, getBlockPos())*((float) redstoneMod /15)));
         return signal;
     }
 

@@ -17,12 +17,11 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import org.modogthedev.superposition.core.ModBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -30,11 +29,10 @@ import org.modogthedev.superposition.util.SignalActorTickingBlock;
 public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock {
 
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
-    public static BooleanProperty ON = SuperpositionBlockStates.ON;
     public static SignalGeneratorScreen signalGeneratorScreen = null;
     public EncoderBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true).setValue(ON, false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
     }
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
@@ -44,7 +42,7 @@ public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntity.SIGNAL_GENERATOR.get().create(pos, state);
+        return SuperpositionBlockEntity.SIGNAL_GENERATOR.get().create(pos, state);
     }
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
@@ -77,7 +75,7 @@ public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES, ON});
+        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
     }
 
 }

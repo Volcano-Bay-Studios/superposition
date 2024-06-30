@@ -39,7 +39,7 @@ public class ModulatorScreen extends DialScreen {
     public static BlockPos pos;
     public static int ticks = 0;
     public float frequency = 10;
-    public float startFrequency = 1;
+    public float signalAmplitude = 0;
     public float amplitude;
     public float modRate;
     public boolean mute = true;
@@ -75,7 +75,7 @@ public class ModulatorScreen extends DialScreen {
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 61; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+((amplitude+readAmplitude)/5)));
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+((amplitude+readAmplitude)/5)+signalAmplitude));
             fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
@@ -85,7 +85,7 @@ public class ModulatorScreen extends DialScreen {
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 45; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks+20) / frequency) * 5);
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks+20) / frequency) * (5+signalAmplitude));
             fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
@@ -190,11 +190,11 @@ public class ModulatorScreen extends DialScreen {
         }
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            BlockPos sidedPos2 = signalActorBlockEntity.getSwappedPos();
             Signal blockSignal = signalActorBlockEntity.getSignal(new Object());
             if (blockSignal != null) {
-                this.frequency = blockSignal.frequency; //TODO Take into account the swap side of the signal generator block
+                this.frequency = blockSignal.frequency; //TODO Explode if signal to high
                 this.readAmplitude = blockSignal.amplitude;
+//                this.signalAmplitude = blockSignal.amplitude;
             } else {
                 frequency = 0;
                 readAmplitude = 0;

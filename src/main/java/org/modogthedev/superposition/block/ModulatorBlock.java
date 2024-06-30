@@ -14,13 +14,11 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import org.modogthedev.superposition.core.ModBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.screens.ModulatorScreen;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -40,7 +38,7 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntity.MODULATOR.get().create(pos, state);
+        return SuperpositionBlockEntity.MODULATOR.get().create(pos, state);
     }
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {

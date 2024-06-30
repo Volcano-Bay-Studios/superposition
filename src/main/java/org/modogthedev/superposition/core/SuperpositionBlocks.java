@@ -37,6 +37,10 @@ public class SuperpositionBlocks {
             () -> new ReceiverBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f)
             ));
+    public static final RegistryObject<FilterBlock> FILTER = registerBlock("filter",
+            () -> new FilterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f)
+            ));
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);

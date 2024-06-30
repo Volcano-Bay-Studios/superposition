@@ -93,4 +93,8 @@ public class SignalManager {
             transmittedSignals.get(signal.level).set(transmittedSignals.get(signal.level).indexOf(signal),ourSignal);
         }
     }
+    public static Signal randomSignal(List<Signal> signalList) {
+        int ordinal = (int) Math.floor(Math.random()*signalList.size());
+        return signalList.get(ordinal);
+    }
 }

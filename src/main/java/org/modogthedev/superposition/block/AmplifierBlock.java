@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.Nullable;
-import org.modogthedev.superposition.core.ModBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class AmplifierBlock extends SignalActorTickingBlock {
@@ -27,7 +27,7 @@ public class AmplifierBlock extends SignalActorTickingBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntity.AMPLIFIER.get().create(pos, state);
+        return SuperpositionBlockEntity.AMPLIFIER.get().create(pos, state);
     }
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
