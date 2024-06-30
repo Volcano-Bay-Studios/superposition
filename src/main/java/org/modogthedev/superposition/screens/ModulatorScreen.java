@@ -76,7 +76,8 @@ public class ModulatorScreen extends DialScreen {
         int width = this.width;
         for (float i = 0; i < 61; i += .05f) {
             int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+((readAmplitude)/5)+signalAmplitude));
-            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+            if (calculatedPosition>-35 && calculatedPosition < 42)
+                fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
     public void renderSine2(GuiGraphics pGuiGraphics) {
@@ -85,8 +86,9 @@ public class ModulatorScreen extends DialScreen {
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 45; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks+20) / frequency) * (5+signalAmplitude));
-            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks+20) / frequency) * (5+((readAmplitude)/5)+signalAmplitude));
+            if (calculatedPosition>-35 && calculatedPosition < 42)
+                fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
     public void renderBars(GuiGraphics guiGraphics) {

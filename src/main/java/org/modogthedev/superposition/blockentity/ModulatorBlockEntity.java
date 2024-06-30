@@ -17,7 +17,7 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
     Vec3 pos = new Vec3(this.getBlockPos().getX(),this.getBlockPos().getY(),this.getBlockPos().getZ());
     public float modRate;
     public float redstoneMod;
-
+    public float temp;
     public ModulatorBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntity.MODULATOR.get(), pos, state);
     }
