@@ -2,6 +2,7 @@ package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
@@ -11,6 +12,9 @@ import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.TickableBlockEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     Vec3 pos = new Vec3(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
@@ -53,6 +57,10 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     public void tick() {
         super.tick();
         if (this.level.isClientSide) {
+            List<Component> tooltip = new ArrayList<>();
+            tooltip.add(Component.literal("Signal Generator Status:"));
+            tooltip.add(Component.literal("Frequency - "+Math.floor(frequency*10)/10));
+
             float speed = Mth.getFromRange(64,0,.1f,3,frequency);
             if (frequency < .72f || frequency > 64) {
                 speed = 0;
@@ -61,6 +69,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             if (dial > 24) {
                 dial = 0;
             }
+            setTooltip(tooltip);
             return;
         }
     }

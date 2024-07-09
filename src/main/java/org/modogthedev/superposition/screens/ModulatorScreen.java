@@ -52,7 +52,7 @@ public class ModulatorScreen extends DialScreen {
         ModulatorScreen.pos = pos;
         ticks = 0;
         addDial(-72, 0, 76);
-        addDial(-50, 0,76);
+        addDial(-50, 0, 76);
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof ModulatorBlockEntity generatorBlockEntity) {
@@ -67,40 +67,43 @@ public class ModulatorScreen extends DialScreen {
     }
 
     public void drawPixel(GuiGraphics pGuiGraphics, int x, int y) {
-        fill(pGuiGraphics,x,y,x+1,y+1,0xFF56d156);
+        fill(pGuiGraphics, x, y, x + 1, y + 1, 0xFF56d156);
     }
+
     public void renderSine(GuiGraphics pGuiGraphics) {
         this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width - 70) / 2;
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 61; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5+((readAmplitude)/5)+signalAmplitude));
-            if (calculatedPosition>-35 && calculatedPosition < 42)
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
+            if (calculatedPosition > -35 && calculatedPosition < 42)
                 fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
+
     public void renderSine2(GuiGraphics pGuiGraphics) {
         this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width + 68) / 2;
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
         for (float i = 0; i < 45; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks+20) / frequency) * (5+((readAmplitude)/5)+signalAmplitude));
-            if (calculatedPosition>-35 && calculatedPosition < 42)
+            int calculatedPosition = (int) (Math.sin((double) (i + ticks + 20) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
+            if (calculatedPosition > -35 && calculatedPosition < 42)
                 fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
         }
     }
+
     public void renderBars(GuiGraphics guiGraphics) {
         this.lineConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int width = this.width; // Redundant call?
-        int barHeight = Math.min(76,Math.abs((int) dials.get(0).scrolledAmount));
-        int barHeight2 = Math.min(76,Math.abs((int) dials.get(1).scrolledAmount));
-        fill(guiGraphics,width/2-79,height/2-25-barHeight,width/2-65,height/2-25,0xFF56d156);
-        fill(guiGraphics,width/2-57,height/2-25-barHeight2,width/2-43,height/2-25,0xFF56d156);
+        int barHeight = Math.min(76, Math.abs((int) dials.get(0).scrolledAmount));
+        int barHeight2 = Math.min(76, Math.abs((int) dials.get(1).scrolledAmount));
+        fill(guiGraphics, width / 2 - 79, height / 2 - 25 - barHeight, width / 2 - 65, height / 2 - 25, 0xFF56d156);
+        fill(guiGraphics, width / 2 - 57, height / 2 - 25 - barHeight2, width / 2 - 43, height / 2 - 25, 0xFF56d156);
         modRate = barHeight;
         assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
-        amplitude = barHeight2+(ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos)*((float) barHeight /15));
+        amplitude = barHeight2 + (ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
         flush(guiGraphics);
     }
 
@@ -179,8 +182,8 @@ public class ModulatorScreen extends DialScreen {
     public void tick() {
         super.tick();
         if (!mute && frequency > .72f) {
-            float pitch = Mth.getFromRange(0,30,2,.72f,frequency);
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(),pitch));
+            float pitch = Mth.getFromRange(0, 30, 2, .72f, frequency);
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
         }
         ticks++;
         BlockPos sidedPos;
@@ -188,7 +191,7 @@ public class ModulatorScreen extends DialScreen {
         if (!swap) {
             sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getClockWise(), 1);
         } else {
-            sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(),1);
+            sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(), 1);
         }
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
@@ -221,10 +224,10 @@ public class ModulatorScreen extends DialScreen {
 
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("modRate",Math.min(76,Math.abs((int) dials.get(1).scrolledAmount)));
-        tag.putFloat("redstoneMod",Math.min(76,Math.abs((int) dials.get(0).scrolledAmount)));
-        tag.putBoolean("swap",swap);
-        Messages.sendToServer(new BlockEntityModificationC2SPacket(tag,pos));
+        tag.putFloat("modRate", Math.min(76, Math.abs((int) dials.get(1).scrolledAmount)));
+        tag.putFloat("redstoneMod", Math.min(76, Math.abs((int) dials.get(0).scrolledAmount)));
+        tag.putBoolean("swap", swap);
+        Messages.sendToServer(new BlockEntityModificationC2SPacket(tag, pos));
     }
 
     @Override

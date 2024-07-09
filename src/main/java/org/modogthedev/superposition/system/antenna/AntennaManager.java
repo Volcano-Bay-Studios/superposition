@@ -112,6 +112,7 @@ public class AntennaManager {
                 ourAntenna.updateDimensions();
                 antennas.get(level).set(ordinal, ourAntenna);
                 if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
+                    antennaActorBlockEntity.setAntenna(ourAntenna);
                     antennaActorBlockEntity.update();
                 }
             } else {

@@ -35,6 +35,9 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
     public void update() {
         level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
     }
+    public void setAntenna(Antenna antenna) {
+        this.antenna = antenna;
+    }
     public void updateAntenna() {
         Antenna getAntenna = AntennaManager.getAmplifierAntenna(level,worldPosition);
         if (getAntenna != null)

@@ -1,11 +1,17 @@
 package org.modogthedev.superposition;
 
 import com.mojang.logging.LogUtils;
+import foundry.veil.api.client.color.Color;
+import foundry.veil.api.client.color.ColorTheme;
+import foundry.veil.api.client.color.theme.IThemeProperty;
+import foundry.veil.forge.VeilForgeClient;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -25,11 +31,13 @@ public class Superposition {
     public static final String MODID = "superposition";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static ColorTheme SUPERPOSITION_THEME = new ColorTheme();
 
     public Superposition() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> SuperpositionClient::init);
         // Register the commonSetup method for modloading
+        innitTheme();
         modEventBus.addListener(this::commonSetup);
         SuperpositionItems.ITEMS.register(modEventBus);
         ModCreativeModeTab.register(modEventBus);
@@ -45,6 +53,33 @@ public class Superposition {
         bus.addListener(SignalManager::tick); //TODO only add to the side its used on
         bus.addListener(ClientSignalManager::tick);
         bus.addListener(ClientEvents::clientTickEvent);
+    }
+    public void innitTheme() {
+        SUPERPOSITION_THEME.addColor(new Color(50, 168, 82,200));
+        SUPERPOSITION_THEME.addColor(new Color(60, 186, 94,255));
+        SUPERPOSITION_THEME.addColor(new Color(44, 150, 72,255));
+//        SUPERPOSITION_THEME.addColor("connectingLine",new Color(44, 150, 72));
+//        SUPERPOSITION_THEME.addProperty("connectingLineThickness", new IThemeProperty<Float>() {
+//            @Override
+//            public String getName() {
+//                return null;
+//            }
+//
+//            @Override
+//            public void setName(String s) {
+//
+//            }
+//
+//            @Override
+//            public Float getValue() {
+//                return 1f;
+//            }
+//
+//            @Override
+//            public Class<?> getType() {
+//                return Float.class;
+//            }
+//        });
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

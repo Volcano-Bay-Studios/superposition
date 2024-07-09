@@ -20,11 +20,11 @@ public class FilterBlockEntity  extends SignalActorBlockEntity implements Tickab
     }
 
     @Override
-    public Signal modulateSignal(Signal signal) {
+    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         if (signal.frequency < minFilter || signal.frequency > maxFilter) {
             return null;
         }
-        return super.modulateSignal(signal);
+        return super.modulateSignal(signal,updateTooltip);
     }
 
     @Override
