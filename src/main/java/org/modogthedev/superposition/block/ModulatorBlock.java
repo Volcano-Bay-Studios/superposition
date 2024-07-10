@@ -32,7 +32,7 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     public static ModulatorScreen modulatorScreen = null;
     public ModulatorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
     }
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {

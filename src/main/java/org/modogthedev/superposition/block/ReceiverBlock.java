@@ -20,7 +20,7 @@ import org.modogthedev.superposition.util.SignalActorTickingBlock;
 public class ReceiverBlock extends SignalActorTickingBlock {
     public ReceiverBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
     }
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {

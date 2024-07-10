@@ -3,8 +3,6 @@ package org.modogthedev.superposition;
 import com.mojang.logging.LogUtils;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
-import foundry.veil.api.client.color.theme.IThemeProperty;
-import foundry.veil.forge.VeilForgeClient;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
@@ -37,7 +35,7 @@ public class Superposition {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> SuperpositionClient::init);
         // Register the commonSetup method for modloading
-        innitTheme();
+        initTheme();
         modEventBus.addListener(this::commonSetup);
         SuperpositionItems.ITEMS.register(modEventBus);
         ModCreativeModeTab.register(modEventBus);
@@ -54,7 +52,7 @@ public class Superposition {
         bus.addListener(ClientSignalManager::tick);
         bus.addListener(ClientEvents::clientTickEvent);
     }
-    public void innitTheme() {
+    public void initTheme() {
         SUPERPOSITION_THEME.addColor(new Color(50, 168, 82,200));
         SUPERPOSITION_THEME.addColor(new Color(60, 186, 94,255));
         SUPERPOSITION_THEME.addColor(new Color(44, 150, 72,255));

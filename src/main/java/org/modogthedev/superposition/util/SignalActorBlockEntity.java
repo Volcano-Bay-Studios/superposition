@@ -231,56 +231,36 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     }
     public Signal getSignal(Object nextCall, boolean selfModulate) {
-        BlockPos sidedPos = getSwappedPos();
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
-            Signal refSignal;
-            List<Signal> signals = getSignalList(nextCall);
-            if (signals != null && !signals.isEmpty())
-                refSignal = SignalManager.randomSignal(signals);
-            else
-                refSignal = signalActorBlockEntity.getSignal(nextCall, true);
-            lastCall = nextCall;
-            if (selfModulate)
-                refSignal = signalActorBlockEntity.modulateSignal(refSignal,false);
-            return refSignal;
-        } else {
-            return null;
-        }
+        return SignalManager.randomSignal(putSignals);
     }
     public List<Signal> getSignalList(Object nextCall) {
-        if (!(lastCallList == null || !lastCallList.equals(nextCall))) {
-            return null;
-        }
-        BlockPos sidedPos = getSwappedPos();
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            lastCallList = nextCall;
-            if (signalActorBlockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity && antennaActorBlockEntity.antenna == null)
-                antennaActorBlockEntity.updateAntenna();
-            if (signalActorBlockEntity.antenna != null && signalActorBlockEntity.antenna.signals != null)
-                return signalActorBlockEntity.modulateSignals(signalActorBlockEntity.antenna.signals);
-            else
-                return signalActorBlockEntity.modulateSignals(signalActorBlockEntity.getSignalList(nextCall));
-        }
-        return null;
+        return putSignals;
     }
     public void putSignalList(Object nextCall, List<Signal> list) {
         if (!(lastCallList == null || !lastCallList.equals(nextCall))) {
             return;
         }
-        BlockPos sidedPos = getInvertedSwappedPos();
+        BlockPos sidedPos = getSwappedPos();
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            list = signalActorBlockEntity.modulateSignals(list);
-            lastCallList = nextCall;
+            if (signalActorBlockEntity.getInvertedSwappedPos().equals(getBlockPos())) {
+                list = signalActorBlockEntity.modulateSignals(list, true);
+                lastCallList = nextCall;
+                putSignals = list;
+                signalActorBlockEntity.putSignalList(nextCall, list);
+            }
+        } else {
             putSignals = list;
-            signalActorBlockEntity.putSignalList(nextCall, list);
         }
     }
-    public List<Signal> modulateSignals(List<Signal> signalList) {
+    public void putSignal(Signal signal) {
+        List<Signal> signals = new ArrayList<>();
+        signals.add(signal);
+        putSignalList(new Object(),signals);
+    }
+    public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
         for (Signal signal: signalList) {
-            signal = this.modulateSignal(signal,true);
+            signal = this.modulateSignal(signal,updateTooltip);
         }
         return signalList;
     }

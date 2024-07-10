@@ -56,7 +56,9 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     @Override
     public void tick() {
         super.tick();
+        putSignal(getSignal(new Object(),true));
         if (this.level.isClientSide) {
+
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(Component.literal("Signal Generator Status:"));
             tooltip.add(Component.literal("Frequency - "+Math.floor(frequency*10)/10));

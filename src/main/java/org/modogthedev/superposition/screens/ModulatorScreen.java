@@ -38,7 +38,7 @@ public class ModulatorScreen extends DialScreen {
     public static final int imageHeight = 224;
     public static BlockPos pos;
     public static int ticks = 0;
-    public float frequency = 10;
+    public float frequency = 0;
     public float signalAmplitude = 0;
     public float amplitude;
     public float modRate;
@@ -186,13 +186,8 @@ public class ModulatorScreen extends DialScreen {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
         }
         ticks++;
-        BlockPos sidedPos;
         assert Minecraft.getInstance().level != null : "Tried to access screen from server!";
-        if (!swap) {
-            sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getClockWise(), 1);
-        } else {
-            sidedPos = pos.relative(Minecraft.getInstance().level.getBlockState(pos).getValue(ModulatorBlock.FACING).getCounterClockWise(), 1);
-        }
+
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
             Signal blockSignal = signalActorBlockEntity.getSignal(new Object(), false);

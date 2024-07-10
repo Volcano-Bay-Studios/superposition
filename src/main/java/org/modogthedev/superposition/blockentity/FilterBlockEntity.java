@@ -28,7 +28,7 @@ public class FilterBlockEntity  extends SignalActorBlockEntity implements Tickab
     }
 
     @Override
-    public List<Signal> modulateSignals(List<Signal> signalList) {
+    public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
         List<Signal> finalSignals = new ArrayList<>();
         for (Signal signal: signalList) {
             if (signal.frequency > minFilter && signal.frequency < maxFilter) {
@@ -45,6 +45,6 @@ public class FilterBlockEntity  extends SignalActorBlockEntity implements Tickab
 
     @Override
     public void putSignalList(Object nextCall, List<Signal> list) {
-        super.putSignalList(nextCall, modulateSignals(list));
+        super.putSignalList(nextCall, modulateSignals(list,true));
     }
 }
