@@ -2,7 +2,6 @@ package org.modogthedev.superposition.util;
 
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
-import foundry.veil.api.client.tooltip.Tooltippable;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.client.tooltip.anim.TooltipTimeline;
 import net.minecraft.client.Minecraft;
@@ -11,22 +10,22 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.block.AntennaBlock;
+import org.modogthedev.superposition.block.SignalGeneratorBlock;
+import org.modogthedev.superposition.item.ScrewdriverItem;
+import org.modogthedev.superposition.networking.Messages;
+import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
     @Unique
@@ -43,6 +42,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private boolean veil$tooltipEnabled = false;
     @Unique
     private int veil$tooltipY = 0;
+    private int configSelection = 0;
+    private boolean interactNext = false;
+    private boolean stepNext = false;
+    private List<String> configurationTooltipString = new ArrayList<>();
+    private List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
 
     public List<Component> getTooltip() {
         return this.veil$tooltip;
@@ -66,10 +70,10 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             CompoundTag themeTag = new CompoundTag();
             Iterator var3 = this.veil$theme.getColorsMap().entrySet().iterator();
 
-            while(var3.hasNext()) {
-                Map.Entry<String, Color> entry = (Map.Entry)var3.next();
-                String key = entry.getKey() != null ? (String)entry.getKey() : "";
-                themeTag.putInt(key, ((Color)entry.getValue()).getRGB());
+            while (var3.hasNext()) {
+                Map.Entry<String, Color> entry = (Map.Entry) var3.next();
+                String key = entry.getKey() != null ? (String) entry.getKey() : "";
+                themeTag.putInt(key, ((Color) entry.getValue()).getRGB());
             }
 
             tag.put("theme", themeTag);
@@ -94,8 +98,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             CompoundTag themeTag = tag.getCompound("theme");
             Iterator var3 = themeTag.getAllKeys().iterator();
 
-            while(var3.hasNext()) {
-                String key = (String)var3.next();
+            while (var3.hasNext()) {
+                String key = (String) var3.next();
                 this.veil$theme.addColor(key, Color.of(themeTag.getInt(key)));
             }
         }
@@ -105,7 +109,10 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public void setTooltip(List<Component> tooltip) {
         this.veil$tooltip = tooltip;
     }
-    public void setTooltipEnabled(boolean enabled) { this.veil$tooltipEnabled = enabled;}
+
+    public void setTooltipEnabled(boolean enabled) {
+        this.veil$tooltipEnabled = enabled;
+    }
 
     public void addTooltip(Component tooltip) {
         this.veil$tooltip.add(tooltip);
@@ -120,7 +127,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public ColorTheme getTheme() {
-        return this.veil$theme;
+        return Superposition.SUPERPOSITION_THEME;
     }
 
     public void setTheme(ColorTheme theme) {
@@ -180,20 +187,25 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     protected void saveAdditional(CompoundTag pTag) {
         pTag.put("tooltipData", this.saveTooltipData());
     }
+
     @Override
     public void load(CompoundTag pTag) {
         this.loadTooltipData(pTag.getCompound("tooltipData"));
     }
+
     public Antenna antenna;
     Object lastCall;
     Object lastCallList;
     List<Signal> putSignals = new ArrayList<>();
+
     public SignalActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
+
     public BlockPos getDataPos() {
         return getSwappedPos();
     }
+
     public BlockPos getSwappedPos() {
         BlockPos sidedPos2 = new BlockPos(0, 0, 0);
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
@@ -203,18 +215,20 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
         return sidedPos2;
     }
+
     public Direction getSwappedSide() {
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            return  level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise();
+            return level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise();
         } else {
-            return  level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+            return level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
         }
     }
+
     public Direction getInvertedSwappedSide() {
         if (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            return  level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise();
+            return level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise();
         } else {
-            return  level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+            return level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
         }
     }
 
@@ -227,17 +241,19 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
         return sidedPos2;
     }
+
     public void postSignal(Signal signal) {
 
     }
-    public Signal getSignal(Object nextCall, boolean selfModulate) {
+
+    public Signal getSignal() {
         return SignalManager.randomSignal(putSignals);
     }
-    public List<Signal> getSignalList(Object nextCall) {
-        return putSignals;
-    }
+
+
     public void putSignalList(Object nextCall, List<Signal> list) {
-        if (!(lastCallList == null || !lastCallList.equals(nextCall))) {
+        putSignals = list;
+        if (!(lastCallList == null || !lastCallList.equals(nextCall)) || Minecraft.getInstance().level == null) {
             return;
         }
         BlockPos sidedPos = getSwappedPos();
@@ -246,49 +262,115 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             if (signalActorBlockEntity.getInvertedSwappedPos().equals(getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
                 lastCallList = nextCall;
-                putSignals = list;
                 signalActorBlockEntity.putSignalList(nextCall, list);
             }
-        } else {
-            putSignals = list;
         }
     }
+
     public void putSignal(Signal signal) {
         List<Signal> signals = new ArrayList<>();
         signals.add(signal);
-        putSignalList(new Object(),signals);
+        putSignalList(new Object(), signals);
     }
+
     public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
-        for (Signal signal: signalList) {
-            signal = this.modulateSignal(signal,updateTooltip);
+        List<Signal> safeList = new ArrayList<>(signalList);
+        for (Signal signal : safeList) {
+            signal = this.modulateSignal(signal, updateTooltip);
         }
-        return signalList;
+        return safeList;
     }
+
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         return signal;
     }
+
     public Signal createSignal(Object nextCall) {
-        BlockPos sidedPos = getSwappedPos();
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
-            lastCall = nextCall;
-            return this.modulateSignal(signalActorBlockEntity.createSignal(nextCall),false);
-        } else {
+        Level level = getLevel();
+        if (level == null)
             return null;
-        }
-    }
-    public SignalActorBlockEntity topBE(Object nextCall) {
-        BlockPos sidedPos = getSwappedPos();
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
+        BlockPos sidedPos = getInvertedSwappedPos();
+        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
             lastCall = nextCall;
-            return signalActorBlockEntity.topBE(nextCall);
+            return this.modulateSignal(signalActorBlockEntity.createSignal(nextCall), false);
         } else {
             return null;
         }
     }
 
+    public void endSignal(Object nextCall) {
+        if (Minecraft.getInstance().level == null)
+            return;
+        BlockPos sidedPos = getSwappedPos();
+        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
+            lastCall = nextCall;
+            signalActorBlockEntity.endSignal(nextCall);
+        }
+    }
+
+    @Override
+    public void writeData(CompoundTag tag) {
+        super.writeData(tag);
+        level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
+    }
+
+    public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {
+        configurationTooltipString.add(name);
+        configurationTooltipExecutable.add(configurationTooltip);
+    }
+    public void setupConfigTooltips() {
+        configurationTooltipString.clear();
+        configurationTooltipExecutable.clear();
+        if (!getTooltip().isEmpty())
+            addTooltip("");
+        addTooltip("Configuration: ");
+        addConfigTooltip("Signal Direction - " + (getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES) ? "Right" : "Left"), new ConfigurationTooltip() {
+            @Override
+            public void execute() {
+                CompoundTag tag = new CompoundTag();
+                tag.putBoolean("swap", !getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES));
+                Messages.sendToServer(new BlockEntityModificationC2SPacket(tag, getBlockPos()));
+            }
+        });
+    }
+    private void finaliseConfigTooltips() {
+        int i = 0;
+        for (String string: configurationTooltipString) {
+            if (i == configSelection)
+                addTooltip(string+" ←");
+            else
+                addTooltip(string);
+            i++;
+        }
+    }
+    public void incrementConfigSelection() {
+        stepNext = true;
+    }
+    public void interactConfig() {
+        interactNext = true;
+    }
+    private void checkEvents() {
+        if (stepNext) {
+            configSelection++;
+            stepNext = false;
+        }
+        if (configSelection >= configurationTooltipString.size())
+            configSelection = 0;
+        if (interactNext) {
+            configurationTooltipExecutable.get(configSelection).execute();
+            interactNext = false;
+        }
+    }
     @Override
     public void tick() {
+        if (level.isClientSide) {
+            if (Minecraft.getInstance().player.getMainHandItem().getItem() instanceof ScrewdriverItem) {
+                setupConfigTooltips();
+                checkEvents();
+                finaliseConfigTooltips();
+            }
+        }
     }
 }

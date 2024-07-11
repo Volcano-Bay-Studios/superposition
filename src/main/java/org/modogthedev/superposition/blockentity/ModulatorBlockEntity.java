@@ -34,8 +34,6 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
         super.writeData(tag);
         this.modRate = tag.getFloat("modRate");
         this.redstoneMod = tag.getFloat("redstoneMod");
-        this.temp = tag.getFloat("temp");
-        this.amplitude = tag.getFloat("amplitude");
 
         level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
 //        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
@@ -48,8 +46,6 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
     protected void saveAdditional(CompoundTag pTag) {
         pTag.putFloat("modRate", modRate);
         pTag.putFloat("redstoneMod",redstoneMod);
-        pTag.putFloat("temp",temp);
-        pTag.putFloat("amplitude",amplitude);
         super.saveAdditional(pTag);
     }
 
@@ -58,8 +54,6 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
         super.load(pTag);
         this.modRate = pTag.getFloat("modRate");
         this.redstoneMod = pTag.getFloat("redstoneMod");
-        this.temp = pTag.getFloat("temp");
-        this.amplitude = pTag.getFloat("amplitude");
     }
 
     @Override
@@ -74,24 +68,24 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public void tick() {
-        super.tick();
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
+            this.setTooltip(tooltip);
             if (amplitude>0) {
-                tooltip.add(Component.literal("Modulator Status: "));
-                tooltip.add(Component.literal("Amplitude - "+Math.floor(amplitude*10)/10));
-                tooltip.add(Component.literal("Temperature - "+Math.floor(temp*10)/10+"°C"));
+                addTooltip(Component.literal("Modulator Status: "));
+                addTooltip(Component.literal("Amplitude - "+Math.floor(amplitude*10)/10));
+                addTooltip(Component.literal("Temperature - "+Math.floor(temp*10)/10+"°C"));
             } else {
 
-                tooltip.add(Component.literal("No Signal"));
+                addTooltip(Component.literal("No Signal"));
             }
-            this.setTooltip(tooltip);
 
         }
             float tempGoal = (amplitude/10f);
             temp = tempGoal+26;
 
         amplitude = 0;
+        super.tick();
     }
 
     @Override

@@ -37,17 +37,16 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         if (antenna == null) {
             return null;
         }
-        if (level.isClientSide)
-            ClientSignalManager.postSignalsToAntenna(antenna);
-        else
-            SignalManager.postSignalsToAntenna(antenna);
+//        if (level.isClientSide)
+////            ClientSignalManager.postSignalsToAntenna(antenna);
+//        else
+//            SignalManager.postSignalsToAntenna(antenna);
 
         return antenna.signals;
     }
 
     @Override
     public void tick() {
-        super.tick();
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(Component.literal("Receiver Status:"));
         if (antenna != null) {
@@ -57,16 +56,17 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
             tooltip.add(Component.literal("Signal - "+(signals.isEmpty() ? "NONE":"OK")));
             if (currentSize != lastSize) {
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
-                lastSize = currentSize;
             }
             if (!signals.isEmpty()) {
                 putSignalList(new Object(), signals);
 
             }
+            lastSize = currentSize;
         } else {
             tooltip.add(Component.literal("Antenna - ERROR"));
         }
         this.setTooltip(tooltip);
+        super.tick();
     }
 
     @Override

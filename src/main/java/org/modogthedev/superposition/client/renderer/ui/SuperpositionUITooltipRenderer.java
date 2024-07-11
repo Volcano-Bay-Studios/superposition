@@ -25,6 +25,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.util.SPTooltipable;
 
 import java.util.List;
@@ -95,12 +96,12 @@ public class SuperpositionUITooltipRenderer {
         tooltipY = Math.min(tooltipY, height - tooltipHeight - 20);
 
         float fade = Mth.clamp((hoverTicks + partialTicks) / 24f, 0, 1);
-        Color background = tooltippable.getTheme().getColor("background");
-        Color borderTop = tooltippable.getTheme().getColor("topBorder");
-        Color borderBottom = tooltippable.getTheme().getColor("bottomBorder");
-        background = resetAlpha(background).multiply(1,1,1,.7f);
-        borderBottom = resetAlpha(borderBottom);
-        borderTop = resetAlpha(borderTop);
+        Color background = new Color(50, 168, 82,150);
+        Color borderTop = new Color(60, 186, 94,255);
+        Color borderBottom =new Color(44, 150, 72,255);
+//        background = resetAlpha(background).multiply(1,1,1,.7f);
+//        borderBottom = resetAlpha(borderBottom);
+//        borderTop = resetAlpha(borderTop);
         float heightBonus = tooltippable.getTooltipHeight();
         float widthBonus = tooltippable.getTooltipWidth();
         float textXOffset = tooltippable.getTooltipXOffset();

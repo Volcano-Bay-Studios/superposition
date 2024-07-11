@@ -55,8 +55,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public void tick() {
-        super.tick();
-        putSignal(getSignal(new Object(),true));
+        putSignal(getSignal());
         if (this.level.isClientSide) {
 
             List<Component> tooltip = new ArrayList<>();
@@ -72,11 +71,11 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
                 dial = 0;
             }
             setTooltip(tooltip);
-            return;
+            super.tick();
         }
     }
 
-    public void endSignal() {
+    public void endSignal(Object object) {
         if (connectedSignal != null) {
             connectedSignal.endTime = connectedSignal.lifetime;
             connectedSignal.emitting = false;
@@ -86,7 +85,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     }
 
     @Override
-    public Signal getSignal(Object nextCall, boolean selfModulate) {
+    public Signal getSignal() {
         updateSignal();
         return connectedSignal;
     }
@@ -98,18 +97,12 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     }
 
     public void updateSignal() {
-        if (connectedSignal == null)
+        if (connectedSignal == null || !connectedSignal.emitting)
             connectedSignal = new Signal(pos,level,frequency,1);
         else {
-            connectedSignal.pos = pos;
             connectedSignal.level = level;
             connectedSignal.frequency = frequency;
             connectedSignal.amplitude = 1;
         }
-    }
-
-    @Override
-    public SignalActorBlockEntity topBE(Object nextCall) {
-        return this;
     }
 }

@@ -190,7 +190,7 @@ public class ModulatorScreen extends DialScreen {
 
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            Signal blockSignal = signalActorBlockEntity.getSignal(new Object(), false);
+            Signal blockSignal = signalActorBlockEntity.getSignal();
             if (blockSignal != null) {
                 this.frequency = blockSignal.frequency; //TODO Explode if signal to high
                 this.readAmplitude = blockSignal.amplitude;

@@ -40,7 +40,7 @@ public class BlockEntityModificationC2SPacket {
             Level world = player.level();
             if (world == null || !world.isLoaded(pos))
                 return;
-            if (!pos.closerThan(player.blockPosition(), maxRange))
+            if (!player.canReach(pos,5))
                 return;
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof SyncedBlockEntity) {

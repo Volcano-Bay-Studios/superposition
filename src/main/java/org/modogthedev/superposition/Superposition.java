@@ -56,28 +56,9 @@ public class Superposition {
         SUPERPOSITION_THEME.addColor(new Color(50, 168, 82,200));
         SUPERPOSITION_THEME.addColor(new Color(60, 186, 94,255));
         SUPERPOSITION_THEME.addColor(new Color(44, 150, 72,255));
-//        SUPERPOSITION_THEME.addColor("connectingLine",new Color(44, 150, 72));
-//        SUPERPOSITION_THEME.addProperty("connectingLineThickness", new IThemeProperty<Float>() {
-//            @Override
-//            public String getName() {
-//                return null;
-//            }
-//
-//            @Override
-//            public void setName(String s) {
-//
-//            }
-//
-//            @Override
-//            public Float getValue() {
-//                return 1f;
-//            }
-//
-//            @Override
-//            public Class<?> getType() {
-//                return Float.class;
-//            }
-//        });
+        SUPERPOSITION_THEME.addColor("background",new Color(50, 168, 82,200));
+        SUPERPOSITION_THEME.addColor("topBorder",new Color(60, 186, 94,255));
+        SUPERPOSITION_THEME.addColor("bottomBorder",new Color(44, 150, 72,255));
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

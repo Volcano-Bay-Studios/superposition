@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
@@ -40,6 +41,8 @@ public class FilterBlockEntity  extends SignalActorBlockEntity implements Tickab
 
     @Override
     public void tick() {
+        List<Component> tooltip = new ArrayList<>();
+        this.setTooltip(tooltip);
         super.tick();
     }
 

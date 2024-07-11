@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.block.AntennaBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
+import org.modogthedev.superposition.util.SignalActorBlockEntity;
 
 public class ScrewdriverItem extends Item {
     public ScrewdriverItem(Properties pProperties) {
@@ -26,6 +27,13 @@ public class ScrewdriverItem extends Item {
             pContext.getLevel().setBlock(pContext.getClickedPos(),pContext.getLevel().getBlockState(pContext.getClickedPos()).setValue(AntennaBlock.SHORT,!state.getValue(AntennaBlock.SHORT)),2);
             if (pContext.getLevel().isClientSide)
                 return InteractionResult.SUCCESS;
+        }
+        if (pContext.getLevel().getBlockEntity(pContext.getClickedPos()) instanceof SignalActorBlockEntity signalActorBlockEntity) {
+            if (pContext.getPlayer().isCrouching())
+                signalActorBlockEntity.interactConfig();
+            else
+                signalActorBlockEntity.incrementConfigSelection();
+            return InteractionResult.SUCCESS;
         }
         return super.useOn(pContext);
     }

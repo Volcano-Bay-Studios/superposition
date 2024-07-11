@@ -24,16 +24,19 @@ import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
+import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.screens.ModulatorScreen;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlock {
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
     public static ModulatorScreen modulatorScreen = null;
+
     public ModulatorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
         return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
@@ -44,6 +47,7 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SuperpositionBlockEntity.MODULATOR.get().create(pos, state);
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -56,12 +60,14 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (pLevel.isClientSide) {
-            modulatorScreen = new ModulatorScreen(Component.literal("Signal Generator"), pPos);
-            Minecraft.getInstance().setScreen(modulatorScreen);
+        if (!(pPlayer.getMainHandItem().getItem() instanceof ScrewdriverItem)) {
+            if (pLevel.isClientSide) {
+                modulatorScreen = new ModulatorScreen(Component.literal("Signal Generator"), pPos);
+                Minecraft.getInstance().setScreen(modulatorScreen);
+            }
             return InteractionResult.SUCCESS;
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -73,12 +79,13 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
         stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
     }
+
     public void stepOn(Level pLevel, BlockPos pPos, BlockState pState, Entity pEntity) {
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
         if (blockEntity instanceof ModulatorBlockEntity modulatorBlockEntity) {
-            if (modulatorBlockEntity.temp>42) {
-                if ((!pEntity.isSteppingCarefully() || modulatorBlockEntity.temp<50) && pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) pEntity)) {
-                    pEntity.hurt(pLevel.damageSources().hotFloor(), (float) Math.floor(modulatorBlockEntity.temp/4f)-9);
+            if (modulatorBlockEntity.temp > 42) {
+                if ((!pEntity.isSteppingCarefully() || modulatorBlockEntity.temp < 50) && pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) pEntity)) {
+                    pEntity.hurt(pLevel.damageSources().hotFloor(), (float) Math.floor(modulatorBlockEntity.temp / 4f) - 9);
                 }
             }
         }

@@ -19,6 +19,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
+import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
@@ -27,10 +28,12 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
     public static BooleanProperty ON = SuperpositionBlockStates.ON;
     public static SignalGeneratorScreen signalGeneratorScreen = null;
+
     public SignalGeneratorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true).setValue(ON, false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true).setValue(ON, false));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
         return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
@@ -41,6 +44,7 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SuperpositionBlockEntity.SIGNAL_GENERATOR.get().create(pos, state);
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -62,12 +66,14 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (pLevel.isClientSide) {
-            signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pPos);
-            Minecraft.getInstance().setScreen(signalGeneratorScreen);
+        if (!(pPlayer.getMainHandItem().getItem() instanceof ScrewdriverItem)) {
+            if (pLevel.isClientSide) {
+                signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pPos);
+                Minecraft.getInstance().setScreen(signalGeneratorScreen);
+            }
             return InteractionResult.SUCCESS;
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResult.PASS;
     }
 
     @Override
