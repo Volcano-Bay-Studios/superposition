@@ -85,7 +85,7 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     public void stepOn(Level pLevel, BlockPos pPos, BlockState pState, Entity pEntity) {
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
         if (blockEntity instanceof ModulatorBlockEntity modulatorBlockEntity) {
-            if (modulatorBlockEntity.temp > 42) {
+            if (modulatorBlockEntity.temp > 40) {
                 if ((!pEntity.isSteppingCarefully() || modulatorBlockEntity.temp < 50) && pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) pEntity)) {
                     pEntity.hurt(pLevel.damageSources().hotFloor(), (float) Math.floor(modulatorBlockEntity.temp / 4f) - 9);
                 }

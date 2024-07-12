@@ -15,9 +15,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.block.ModulatorBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
@@ -25,13 +25,9 @@ import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SignalActorBlockEntity;
 
 public class ModulatorScreen extends DialScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/modulator_screen.png");
-    private static final ResourceLocation PIXEL = new ResourceLocation(Superposition.MODID, "textures/screen/pixel.png");
-    private static final ResourceLocation WARN_ON = new ResourceLocation(Superposition.MODID, "textures/screen/warn_on.png");
-    private static final ResourceLocation WARN_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/warn_off.png");
     private static final ResourceLocation SWITCH_ON = new ResourceLocation(Superposition.MODID, "textures/screen/switch_on.png");
     private static final ResourceLocation SWITCH_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/switch_off.png");
     public static final int imageWidth = 176;
@@ -43,7 +39,7 @@ public class ModulatorScreen extends DialScreen {
     public float amplitude;
     public float modRate;
     public boolean mute = true;
-    public boolean swap = false;
+    public boolean swap;
     public VertexConsumer lineConsumer;
     float readAmplitude = 0;
 
@@ -53,6 +49,7 @@ public class ModulatorScreen extends DialScreen {
         ticks = 0;
         addDial(-72, 0, 76);
         addDial(-50, 0, 76);
+        assert Minecraft.getInstance().level != null : "Level was null in Modulator Screen";
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof ModulatorBlockEntity generatorBlockEntity) {
@@ -66,19 +63,17 @@ public class ModulatorScreen extends DialScreen {
         pHandler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
-    public void drawPixel(GuiGraphics pGuiGraphics, int x, int y) {
-        fill(pGuiGraphics, x, y, x + 1, y + 1, 0xFF56d156);
-    }
-
     public void renderSine(GuiGraphics pGuiGraphics) {
         this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width - 70) / 2;
         int j = (this.height - imageHeight) / 2;
-        int width = this.width;
-        for (float i = 0; i < 61; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
-            if (calculatedPosition > -35 && calculatedPosition < 42)
-                fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+        float resolution = 0.5f;
+        for (float i = 0; i < 61; i += resolution) {
+            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
+            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
+            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition,-35,42);
+            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition,-35,42);
+            fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + resolution, (j + 45 + nextCalculatedPosition), 0xFF56d156);
         }
     }
 
@@ -86,11 +81,13 @@ public class ModulatorScreen extends DialScreen {
         this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width + 68) / 2;
         int j = (this.height - imageHeight) / 2;
-        int width = this.width;
-        for (float i = 0; i < 45; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks + 20) / frequency) * (5 + ((readAmplitude-amplitude) / 5) + signalAmplitude));
-            if (calculatedPosition > -35 && calculatedPosition < 42)
-                fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+        float resolution = 0.5f;
+        for (float i = 0; i < 45; i += resolution) {
+            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude-amplitude) / 5) + signalAmplitude));
+            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) / frequency) * (5 + ((readAmplitude-amplitude) / 5) + signalAmplitude));
+            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition,-35,42);
+            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition,-35,42);
+            fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + resolution, (j + 45 + nextCalculatedPosition), 0xFF56d156);
         }
     }
 
@@ -99,15 +96,23 @@ public class ModulatorScreen extends DialScreen {
         int width = this.width; // Redundant call?
         int barHeight = Math.min(76, Math.abs((int) dials.get(0).scrolledAmount));
         int barHeight2 = Math.min(76, Math.abs((int) dials.get(1).scrolledAmount));
-        fill(guiGraphics, width / 2 - 79, height / 2 - 25 - barHeight, width / 2 - 65, height / 2 - 25, 0xFF56d156);
-        fill(guiGraphics, width / 2 - 57, height / 2 - 25 - barHeight2, width / 2 - 43, height / 2 - 25, 0xFF56d156);
+        fill(guiGraphics, width / 2f - 79, height / 2f - 25 - barHeight, width / 2f - 65, height / 2f - 25, 0xFF56d156);
+        fill(guiGraphics, width / 2f - 57, height / 2f - 25 - barHeight2, width / 2f - 43, height / 2f - 25, 0xFF56d156);
         modRate = barHeight;
         assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
         amplitude = barHeight2 + (ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
         flush(guiGraphics);
     }
 
-    public void fill(GuiGraphics graphics, int pMinX, int pMinY, int pMaxX, int pMaxY, int pColor) { // In ryan we trust
+    public void fill(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
+        if (pMinY > pMaxY) {
+            float minY = pMinY;
+            pMinY = pMaxY;
+            pMaxY = minY+3;
+        } else {
+            pMaxY += 3;
+        }
+            // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -115,10 +120,10 @@ public class ModulatorScreen extends DialScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, (float) pMinX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, (float) pMinX, (float) pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
     }
 
 
@@ -154,7 +159,7 @@ public class ModulatorScreen extends DialScreen {
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         int i = (this.width - imageWidth) / 2;
         int j = (this.height - imageHeight) / 2;
         pGuiGraphics.blit(BACKGROUND, i, j, 0, 0, imageWidth, imageHeight);

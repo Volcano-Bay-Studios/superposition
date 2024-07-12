@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
@@ -69,7 +70,15 @@ public class SignalGeneratorScreen extends DialScreen {
         pGuiGraphics.blit(PIXEL, x, y, 0, 0, 1, 1);
     }
 
-    public void fill(GuiGraphics graphics, int pMinX, int pMinY, int pMaxX, int pMaxY, int pColor) { // In ryan we trust
+    public void fill(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
+        if (pMinY > pMaxY) {
+            float minY = pMinY;
+            pMinY = pMaxY;
+            pMaxY = minY+3;
+        } else {
+            pMaxY += 3;
+        }
+        // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -77,10 +86,10 @@ public class SignalGeneratorScreen extends DialScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, (float) pMinX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, (float) pMinX, (float) pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, (float) pMaxX, (float) pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
     }
 
     public void renderSine(GuiGraphics pGuiGraphics) {
@@ -88,9 +97,11 @@ public class SignalGeneratorScreen extends DialScreen {
         int startPos = (this.width - 158) / 2;
         int j = (this.height - imageHeight) / 2;
         int width = this.width;
-        for (float i = 0; i < 158; i += .05f) {
-            int calculatedPosition = (int) (Math.sin((double) (i + ticks) / frequency) * 25);
-            fill(pGuiGraphics, (int) (i + (startPos)), (j + 45 + calculatedPosition), (int) (i + (startPos)) + 1, (j + 45 + calculatedPosition) + 1, 0xFF56d156);
+        float resolution = 0.5f;
+        for (float i = 0; i < 158; i += resolution) {
+            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * 25);
+            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) / frequency) * 25);
+            fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
         }
         flush(pGuiGraphics);
         if (frequency < .72f || frequency > 40) {
@@ -136,7 +147,7 @@ public class SignalGeneratorScreen extends DialScreen {
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         calculateWavelength();
         int i = (this.width - imageWidth) / 2;
         int j = (this.height - imageHeight) / 2;
