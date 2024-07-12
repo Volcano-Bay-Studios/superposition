@@ -55,4 +55,9 @@ public class Signal {
     public void setModulation(float newModulation) {
         modulation = newModulation;
     }
+
+    @Override
+    public String toString() {
+        return "Signal Frequency: "+frequency+" Amplitude: "+amplitude;
+    }
 }

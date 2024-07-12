@@ -31,4 +31,8 @@ public class SuperpositionBlockEntity {
             BLOCK_ENTITIES.register("filter",
                     () -> BlockEntityType.Builder.of(FilterBlockEntity::new, SuperpositionBlocks.FILTER.get())
                             .build(null));
+    public static final RegistryObject<BlockEntityType<SignalReadoutBlockEntity>> SIGNAL_READOUT =
+            BLOCK_ENTITIES.register("signal_readout",
+                    () -> BlockEntityType.Builder.of(SignalReadoutBlockEntity::new, SuperpositionBlocks.SIGNAL_READOUT.get())
+                            .build(null));
 }

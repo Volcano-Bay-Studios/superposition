@@ -42,7 +42,6 @@ public class AntennaManager {
     }
 
     public static void postSignalToAntenna(Signal signal, Antenna antenna) {
-        Level level = signal.level;
         BlockPos pos = Mth.blockPosFromVec3(signal.pos);
         if (!antenna.reading)
             return;

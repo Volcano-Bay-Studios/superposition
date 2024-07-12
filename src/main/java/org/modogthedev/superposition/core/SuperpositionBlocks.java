@@ -21,6 +21,10 @@ public class SuperpositionBlocks {
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistryObject<SignalReadoutBlock> SIGNAL_READOUT = registerBlock("signal_readout",
+            () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
     public static final RegistryObject<ModulatorBlock> MODULATOR = registerBlock("modulator",
             () -> new ModulatorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f)
