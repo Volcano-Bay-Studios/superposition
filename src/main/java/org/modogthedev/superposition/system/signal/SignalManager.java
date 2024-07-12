@@ -65,6 +65,7 @@ public class SignalManager {
                 tag.putFloat("z", (float) signal.pos.z);
                 tag.putFloat("amp", signal.amplitude);
                 tag.putFloat("freq", signal.frequency);
+                tag.putFloat("source_freq",signal.sourceFrequency);
                 tag.putFloat("mod", signal.modulation);
                 tag.putBoolean("emit", signal.emitting);
                 tag.putInt("life", signal.lifetime);

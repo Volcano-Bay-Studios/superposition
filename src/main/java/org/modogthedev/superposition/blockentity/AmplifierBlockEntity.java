@@ -8,6 +8,7 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.AntennaActorBlockEntity;
+import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SignalActorBlockEntity;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class AmplifierBlockEntity  extends AntennaActorBlockEntity {
         super(SuperpositionBlockEntity.AMPLIFIER.get(), pos, state);
     }
 
+
     @Override
     public void tick() {
         preTick();
@@ -27,8 +29,14 @@ public class AmplifierBlockEntity  extends AntennaActorBlockEntity {
         BlockPos sidedPos = getSwappedPos();
         int power = level.getSignal(worldPosition,getSwappedSide());
         tooltip.add(Component.literal("Amplifier Status:"));
-        if (antenna != null)
-            tooltip.add(Component.literal("Antenna Classification - "+classifyAntenna()));
+        float frequency = 0;
+        if (antenna!= null) {
+            frequency =  Mth.antennaSizeToHz(antenna.antennaParts.size());
+        }
+        if (antenna != null && level.isClientSide) {
+            tooltip.add(Component.literal("Antenna Classification - " + classifyAntenna()));
+            tooltip.add(Component.literal("Antenna Frequency - " + Mth.frequencyToHzReadable(frequency)));
+        }
         boolean noSignal = false;
         if (antenna != null) {
             Signal signalForBroadcast = createSignal(new Object());
@@ -37,8 +45,12 @@ public class AmplifierBlockEntity  extends AntennaActorBlockEntity {
                     signalForBroadcast.pos = new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
                     signalForBroadcast.emitting = true;
                     signalForBroadcast.level = level;
+                    frequency += signalForBroadcast.frequency;
+                    signalForBroadcast.frequency = frequency;
                     SignalManager.addSignal(signalForBroadcast);
                     signal = signalForBroadcast;
+                    if (level.isClientSide)
+                        tooltip.add(Component.literal("Broadcast Frequency - " + Mth.frequencyToHzReadable(signalForBroadcast.frequency)));
                 } else if (signal != null)
                     stopTransmission();
             } else {

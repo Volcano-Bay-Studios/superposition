@@ -47,10 +47,13 @@ public class AntennaManager {
         if (!antenna.reading)
             return;
         float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
+        float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size());
         if (dist < signal.maxDist && dist > signal.minDist) {
-            Signal signal1 = new Signal(signal.pos,signal.level,signal.frequency,signal.amplitude);
+            Signal signal1 = new Signal(signal.pos,signal.level,signal.frequency,signal.amplitude,signal.sourceFrequency);
             signal1.amplitude = signal.amplitude/Math.max(1,dist/100);
-            antenna.signals.add(signal1);
+            signal1.amplitude = signal1.amplitude/Math.max(1,(Math.abs(antennaFrequency-signal.frequency)/40000));
+            if (signal1.amplitude>1)
+                antenna.signals.add(signal1);
         }
     }
 

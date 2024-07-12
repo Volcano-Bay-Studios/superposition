@@ -44,7 +44,7 @@ public class ClientSignalManager {
             UUID uuid = tag.getUUID("uuid");
             included.remove(uuid);
             Vec3 pos = new Vec3(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
-            Signal signal = new Signal(pos, level, tag.getFloat("freq"), tag.getFloat("amp"));
+            Signal signal = new Signal(pos, level, tag.getFloat("freq"), tag.getFloat("amp"),tag.getFloat("source_freq"));
             signal.modulation = tag.getFloat("mod");
             signal.emitting = tag.getBoolean("emit");
             signal.lifetime = tag.getInt("life");

@@ -96,8 +96,8 @@ public class ModulatorScreen extends DialScreen {
         int width = this.width; // Redundant call?
         int barHeight = Math.min(76, Math.abs((int) dials.get(0).scrolledAmount));
         int barHeight2 = Math.min(76, Math.abs((int) dials.get(1).scrolledAmount));
-        fill(guiGraphics, width / 2f - 79, height / 2f - 25 - barHeight, width / 2f - 65, height / 2f - 25, 0xFF56d156);
-        fill(guiGraphics, width / 2f - 57, height / 2f - 25 - barHeight2, width / 2f - 43, height / 2f - 25, 0xFF56d156);
+        fillExact(guiGraphics, width / 2f - 79, height / 2f - 25 - barHeight, width / 2f - 65, height / 2f - 25, 0xFF56d156);
+        fillExact(guiGraphics, width / 2f - 57, height / 2f - 25 - barHeight2, width / 2f - 43, height / 2f - 25, 0xFF56d156);
         modRate = barHeight;
         assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
         amplitude = barHeight2 + (ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
@@ -113,6 +113,20 @@ public class ModulatorScreen extends DialScreen {
             pMaxY += 3;
         }
             // In ryan we trust
+        float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
+        float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
+        float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
+        float f2 = (float) FastColor.ARGB32.blue(pColor) / 255.0F;
+
+        Matrix4f matrix4f = graphics.pose().last().pose();
+
+        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+    }
+    public void fillExact(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
+        // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -197,7 +211,7 @@ public class ModulatorScreen extends DialScreen {
         if (blockEntity instanceof ModulatorBlockEntity signalActorBlockEntity) {
             Signal blockSignal = signalActorBlockEntity.getSignal();
             if (blockSignal != null) {
-                this.frequency = blockSignal.frequency; //TODO Explode if signal to high
+                this.frequency = blockSignal.sourceFrequency; //TODO Explode if signal to high
                 this.readAmplitude = signalActorBlockEntity.lastAmplitude;
 //                this.signalAmplitude = blockSignal.amplitude;
             } else {

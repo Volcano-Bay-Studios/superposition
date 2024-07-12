@@ -61,7 +61,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(Component.literal("Signal Generator Status:"));
-            tooltip.add(Component.literal("Frequency - "+Math.floor(frequency*10)/10));
+            tooltip.add(Component.literal("Frequency - "+Mth.frequencyToHzReadable(frequency*100000)));
 
             float speed = Mth.getFromRange(64,0,.1f,3,frequency);
             if (frequency < .72f || frequency > 64) {
@@ -98,10 +98,10 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     public void updateSignal() {
         if (connectedSignal == null || !connectedSignal.emitting)
-            connectedSignal = new Signal(pos,level,frequency,1);
+            connectedSignal = new Signal(pos,level,frequency*100000,1,frequency);
         else {
             connectedSignal.level = level;
-            connectedSignal.frequency = frequency;
+            connectedSignal.frequency = frequency*100000;
             connectedSignal.amplitude = 1;
         }
     }

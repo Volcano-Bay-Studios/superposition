@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public class Signal {
     public float frequency;
+    public float sourceFrequency;
     public static final int speed = 64;
     public float modulation;
     public Vec3 pos;
@@ -43,11 +44,12 @@ public class Signal {
         return false;
     }
 
-    public Signal(Vec3 pos, Level level, float frequency, float amplitude) {
+    public Signal(Vec3 pos, Level level, float frequency, float amplitude, float sourceFrequency) {
         this.pos = pos;
         this.level = level;
         this.frequency = frequency;
         this.amplitude = amplitude;
+        this.sourceFrequency = sourceFrequency;
     }
 
     public void setModulation(float newModulation) {

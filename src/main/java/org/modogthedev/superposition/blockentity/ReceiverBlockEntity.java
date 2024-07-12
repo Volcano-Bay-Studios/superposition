@@ -9,6 +9,7 @@ import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.AntennaActorBlockEntity;
+import org.modogthedev.superposition.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,10 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(Component.literal("Receiver Status:"));
         if (antenna != null) {
-            tooltip.add(Component.literal("Antenna Classification - "+classifyAntenna()));
+            if (level.isClientSide) {
+                tooltip.add(Component.literal("Antenna Classification - " + classifyAntenna()));
+                tooltip.add(Component.literal("Antenna Frequency - " + Mth.frequencyToHzReadable(Mth.antennaSizeToHz(antenna.antennaParts.size()))));
+            }
             List<Signal> signals = getSignals();
             int currentSize = signals.size();
             tooltip.add(Component.literal("Signal - "+(signals.isEmpty() ? "NONE":"OK")));
