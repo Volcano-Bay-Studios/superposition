@@ -37,15 +37,7 @@ public class AntennaManager {
         Level level = signal.level;
         BlockPos pos = Mth.blockPosFromVec3(signal.pos);
         for (Antenna antenna : antennas.get(level)) {
-
-            if (!antenna.reading)
-                continue;
-            float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
-            if (dist < signal.maxDist && dist > signal.minDist) {
-                antenna.signals.add(signal);
-            } else {
-//                System.out.println(dist);
-            }
+            postSignalToAntenna(signal,antenna);
         }
     }
 
@@ -56,7 +48,9 @@ public class AntennaManager {
             return;
         float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
         if (dist < signal.maxDist && dist > signal.minDist) {
-            antenna.signals.add(signal);
+            Signal signal1 = new Signal(signal.pos,signal.level,signal.frequency,signal.amplitude);
+            signal1.amplitude = signal.amplitude/Math.max(1,dist/100);
+            antenna.signals.add(signal1);
         }
     }
 

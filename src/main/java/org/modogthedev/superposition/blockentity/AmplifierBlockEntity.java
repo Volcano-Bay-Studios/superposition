@@ -21,25 +21,37 @@ public class AmplifierBlockEntity  extends AntennaActorBlockEntity {
 
     @Override
     public void tick() {
+        preTick();
         List<Component> tooltip = new ArrayList<>();
-        this.setTooltip(tooltip);
-        super.tick();
 //        System.out.println(SignalManager.transmittedSignals.get(level).size());
         BlockPos sidedPos = getSwappedPos();
         int power = level.getSignal(worldPosition,getSwappedSide());
-
-        if (antenna != null && power > 0) {
+        tooltip.add(Component.literal("Amplifier Status:"));
+        if (antenna != null)
+            tooltip.add(Component.literal("Antenna Classification - "+classifyAntenna()));
+        boolean noSignal = false;
+        if (antenna != null) {
             Signal signalForBroadcast = createSignal(new Object());
             if (signalForBroadcast != null) {
-                signalForBroadcast.pos = new Vec3(worldPosition.getX(),worldPosition.getY(),worldPosition.getZ());
-                signalForBroadcast.emitting = true;
-                signalForBroadcast.level = level;
-                SignalManager.addSignal(signalForBroadcast);
-                signal = signalForBroadcast;
+                if (power > 0) {
+                    signalForBroadcast.pos = new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
+                    signalForBroadcast.emitting = true;
+                    signalForBroadcast.level = level;
+                    SignalManager.addSignal(signalForBroadcast);
+                    signal = signalForBroadcast;
+                } else if (signal != null)
+                    stopTransmission();
+            } else {
+                if (signal != null)
+                    stopTransmission();
+                noSignal = true;
             }
         } else if (signal != null) {
             stopTransmission();
         }
+        tooltip.add(Component.literal("Signal - "+((signal != null) ? "BROADCASTING" : (noSignal?"NO SIGNAL":"OFFLINE"))));
+        this.setTooltip(tooltip);
+        super.tick();
     }
     public void stopTransmission() {
         endSignal(new Object());

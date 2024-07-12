@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.system.signal;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -24,8 +25,10 @@ public class SignalManager {
 
     public static void tick(TickEvent.LevelTickEvent event) {
         Level level = event.level;
-        if (level.isClientSide)
+        if (level.isClientSide) {
+            ClientSignalManager.tick((ClientLevel) level);
             return;
+        }
         ifAbsent(level);
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
@@ -34,7 +37,6 @@ public class SignalManager {
                 BlockState baseState = level.getBlockState(BlockPos.containing(signal.pos));
                 if (!baseState.is(SuperpositionBlocks.AMPLIFIER.get()))
                     stopSignal(signal);
-                AntennaManager.postSignal(signal);
                 if (signal.tick()) {
                     signalsForRemoval.add(signal);
                 }

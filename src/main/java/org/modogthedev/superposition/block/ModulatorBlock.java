@@ -21,11 +21,14 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
+import org.modogthedev.superposition.blockentity.ReceiverBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.screens.ModulatorScreen;
+import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlock {
@@ -62,8 +65,7 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!(pPlayer.getMainHandItem().getItem() instanceof ScrewdriverItem)) {
             if (pLevel.isClientSide) {
-                modulatorScreen = new ModulatorScreen(Component.literal("Signal Generator"), pPos);
-                Minecraft.getInstance().setScreen(modulatorScreen);
+                ScreenManager.openModulatorScreen(pPos);
             }
             return InteractionResult.SUCCESS;
         }
@@ -92,4 +94,17 @@ public class ModulatorBlock extends SignalActorTickingBlock implements EntityBlo
         super.stepOn(pLevel, pPos, pState, pEntity);
     }
 
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState pState) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
+        ModulatorBlockEntity blockEntity = (ModulatorBlockEntity) pLevel.getBlockEntity(pPos);
+        if (blockEntity != null && blockEntity.lastAmplitude > 0) {
+            return (int) Math.min(15, blockEntity.lastAmplitude/10f);
+        }
+        return 0;
+    }
 }

@@ -41,6 +41,7 @@ public class FilterBlockEntity  extends SignalActorBlockEntity implements Tickab
 
     @Override
     public void tick() {
+        preTick();
         List<Component> tooltip = new ArrayList<>();
         this.setTooltip(tooltip);
         super.tick();

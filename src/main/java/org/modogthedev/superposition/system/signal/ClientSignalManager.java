@@ -1,17 +1,13 @@
 package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
-import org.modogthedev.superposition.networking.Messages;
-import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
@@ -23,15 +19,13 @@ import java.util.UUID;
 public class ClientSignalManager {
     public static HashMap<Level, HashMap<UUID, Signal>> clientSignals = new HashMap<>();
 
-    public static void tick(TickEvent.LevelTickEvent event) {
-        Level level = event.level;
-        if (!level.isClientSide)
+    public static void tick(ClientLevel level) {
+        if (level == null || !level.isClientSide)
             return;
         ifAbsent(level);
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
         for (Signal signal : clientSignals.get(level).values()) {
-            AntennaManager.postSignal(signal);
             if (signal.tick()) {
                 signalsForRemoval.add(signal);
             }

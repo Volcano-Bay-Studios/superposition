@@ -40,7 +40,7 @@ public class SuperpositionUITooltipRenderer {
         PoseStack stack = graphics.pose();
         stack.pushPose();
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
+        if (mc.level == null || mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
             return;
         }
 

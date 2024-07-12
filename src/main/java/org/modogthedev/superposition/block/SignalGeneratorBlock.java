@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.block;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -16,10 +15,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.item.ScrewdriverItem;
+import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
@@ -68,8 +72,7 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (!(pPlayer.getMainHandItem().getItem() instanceof ScrewdriverItem)) {
             if (pLevel.isClientSide) {
-                signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pPos);
-                Minecraft.getInstance().setScreen(signalGeneratorScreen);
+                ScreenManager.openSignalGenerator(pPos);
             }
             return InteractionResult.SUCCESS;
         }

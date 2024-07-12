@@ -26,6 +26,8 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
     public float redstoneMod;
     public float temp = 26;
     public float amplitude;
+    public float lastAmplitude;
+    boolean updateNext = false;
     public ModulatorBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntity.MODULATOR.get(), pos, state);
     }
@@ -60,6 +62,8 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         if (signal != null) {
             signal.amplitude += (modRate + (getRedstoneOffset(level, getBlockPos()) * ((float) redstoneMod / 15)));
+            if (amplitude != signal.amplitude)
+                level.updateNeighbourForOutputSignal(getBlockPos(),getBlockState().getBlock());
             if (updateTooltip)
                 amplitude = signal.amplitude;
         }
@@ -68,22 +72,34 @@ public class ModulatorBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public void tick() {
+        preTick();
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
             this.setTooltip(tooltip);
             if (amplitude>0) {
                 addTooltip(Component.literal("Modulator Status: "));
                 addTooltip(Component.literal("Amplitude - "+Math.floor(amplitude*10)/10));
-                addTooltip(Component.literal("Temperature - "+Math.floor(temp*10)/10+"°C"));
             } else {
 
                 addTooltip(Component.literal("No Signal"));
             }
-
+            if (temp > 26.1)
+                addTooltip(Component.literal("Temperature - "+Math.floor(temp*10)/10+"°C"));
         }
-            float tempGoal = (amplitude/10f);
-            temp = tempGoal+26;
+        float tempGoal = (amplitude/10f)+26;
+        if (temp>(tempGoal+.1f)) {
+            temp -= .01f;
+        } else if (temp<(tempGoal-.1f)) {
+            temp += .05f;
+        }
+        if (lastAmplitude != amplitude)
+            updateNext = true;
+        if (updateNext) {
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+            updateNext = true;
+        }
 
+        lastAmplitude = amplitude;
         amplitude = 0;
         super.tick();
     }

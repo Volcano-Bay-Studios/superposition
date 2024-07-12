@@ -32,8 +32,7 @@ public class Superposition {
     public static ColorTheme SUPERPOSITION_THEME = new ColorTheme();
 
     public Superposition() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> SuperpositionClient::init);
+         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         // Register the commonSetup method for modloading
         initTheme();
         modEventBus.addListener(this::commonSetup);
@@ -49,8 +48,8 @@ public class Superposition {
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = MinecraftForge.EVENT_BUS;
         bus.addListener(SignalManager::tick); //TODO only add to the side its used on
-        bus.addListener(ClientSignalManager::tick);
-        bus.addListener(ClientEvents::clientTickEvent);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> SuperpositionClient::init);
+
     }
     public void initTheme() {
         SUPERPOSITION_THEME.addColor(new Color(50, 168, 82,200));

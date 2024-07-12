@@ -68,19 +68,8 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock 
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (pLevel.isClientSide) {
-            signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pPos);
-            Minecraft.getInstance().setScreen(signalGeneratorScreen);
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
-        ReceiverBlockEntity blockEntity = (ReceiverBlockEntity) pLevel.getBlockEntity(pPos);
-        return super.getAnalogOutputSignal(pState, pLevel, pPos);
+        return 1;
     }
 
     @Override

@@ -47,6 +47,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private boolean stepNext = false;
     private List<String> configurationTooltipString = new ArrayList<>();
     private List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
+    int ticksSinceSignal = 0;
 
     public List<Component> getTooltip() {
         return this.veil$tooltip;
@@ -193,7 +194,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         this.loadTooltipData(pTag.getCompound("tooltipData"));
     }
 
-    public Antenna antenna;
     Object lastCall;
     Object lastCallList;
     List<Signal> putSignals = new ArrayList<>();
@@ -249,15 +249,19 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public Signal getSignal() {
         return SignalManager.randomSignal(putSignals);
     }
+    public List<Signal> getSignals() {
+        return putSignals;
+    }
 
 
     public void putSignalList(Object nextCall, List<Signal> list) {
         putSignals = list;
-        if (!(lastCallList == null || !lastCallList.equals(nextCall)) || Minecraft.getInstance().level == null) {
+        ticksSinceSignal = 0;
+        if (!(lastCallList == null || !lastCallList.equals(nextCall)) || level == null) {
             return;
         }
         BlockPos sidedPos = getSwappedPos();
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
+        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
             if (signalActorBlockEntity.getInvertedSwappedPos().equals(getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
@@ -300,10 +304,10 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public void endSignal(Object nextCall) {
-        if (Minecraft.getInstance().level == null)
+        if (level == null)
             return;
         BlockPos sidedPos = getSwappedPos();
-        BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(sidedPos);
+        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
             lastCall = nextCall;
             signalActorBlockEntity.endSignal(nextCall);
@@ -353,7 +357,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
     private void checkEvents() {
         if (stepNext) {
-            configSelection++;
+            if (configurationTooltipString.size()>1) {
+                configSelection++;
+            } else {
+                configurationTooltipExecutable.get(configSelection).execute();
+            }
             stepNext = false;
         }
         if (configSelection >= configurationTooltipString.size())
@@ -362,6 +370,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             configurationTooltipExecutable.get(configSelection).execute();
             interactNext = false;
         }
+    }
+    public void preTick() {
+        if (ticksSinceSignal>0)
+            putSignals.clear();
+        ticksSinceSignal++;
     }
     @Override
     public void tick() {

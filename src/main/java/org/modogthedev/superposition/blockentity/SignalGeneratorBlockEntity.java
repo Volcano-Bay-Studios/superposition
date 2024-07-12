@@ -55,6 +55,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public void tick() {
+        preTick();
         putSignal(getSignal());
         if (this.level.isClientSide) {
 
@@ -74,7 +75,6 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             super.tick();
         }
     }
-
     public void endSignal(Object object) {
         if (connectedSignal != null) {
             connectedSignal.endTime = connectedSignal.lifetime;
