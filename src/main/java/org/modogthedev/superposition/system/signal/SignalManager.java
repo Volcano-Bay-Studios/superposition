@@ -35,7 +35,7 @@ public class SignalManager {
         for (Signal signal : transmittedSignals.get(level)) {
             if (!signal.level.isClientSide) {
                 BlockState baseState = level.getBlockState(BlockPos.containing(signal.pos));
-                if (!baseState.is(SuperpositionBlocks.AMPLIFIER.get()))
+                if (!baseState.is(SuperpositionBlocks.TRANSMITTER.get()))
                     stopSignal(signal);
                 if (signal.tick()) {
                     signalsForRemoval.add(signal);

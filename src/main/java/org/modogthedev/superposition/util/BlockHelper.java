@@ -2,10 +2,9 @@ package org.modogthedev.superposition.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import org.modogthedev.superposition.block.AmplifierBlock;
+import org.modogthedev.superposition.block.TransmitterBlock;
 import org.modogthedev.superposition.block.AntennaBlock;
 import org.modogthedev.superposition.block.ReceiverBlock;
 
@@ -25,7 +24,7 @@ public class BlockHelper {
             Direction.WEST
     };
     public static boolean base(Block b) {
-        return (b instanceof AmplifierBlock || b instanceof ReceiverBlock);
+        return (b instanceof TransmitterBlock || b instanceof ReceiverBlock);
     }
 
     private static BlockPos getConnectedblocks(LevelReader reader, BlockPos pos, Set<BlockPos> results, List<BlockPos> todo, BlockPos base) {

@@ -4,5 +4,30 @@
     "sounds": [
       "superposition:sine"
     ]
+  },
+  "screwdriver": {
+    "subtitles": "sounds.superposition.screwdriver",
+    "sounds": [
+      "superposition:screwdriver_1",
+      "superposition:screwdriver_2"
+    ]
+  },
+  "switch_on": {
+    "subtitles": "sounds.superposition.switch_on",
+    "sounds": [
+      "superposition:switch_on"
+    ]
+  },
+  "switch_off": {
+    "subtitles": "sounds.superposition.switch_off",
+    "sounds": [
+      "superposition:switch_off"
+    ]
+  },
+  "scroll": {
+    "subtitles": "sounds.superposition.scroll",
+    "sounds": [
+      "superposition:scroll"
+    ]
   }
 }

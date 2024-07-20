@@ -30,9 +30,9 @@ public class ScrewdriverItem extends Item {
         }
         if (pContext.getLevel().getBlockEntity(pContext.getClickedPos()) instanceof SignalActorBlockEntity signalActorBlockEntity) {
             if (pContext.getPlayer().isCrouching())
-                signalActorBlockEntity.interactConfig();
-            else
                 signalActorBlockEntity.incrementConfigSelection();
+            else
+                signalActorBlockEntity.interactConfig();
             return InteractionResult.SUCCESS;
         }
         return super.useOn(pContext);

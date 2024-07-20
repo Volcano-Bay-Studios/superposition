@@ -6,6 +6,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.SignalReadoutBlockEntity;
+import org.modogthedev.superposition.client.renderer.block.AmplifierBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.SignalGeneratorBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.SignalReadoutBlockEntityRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
@@ -16,5 +17,6 @@ public class ModEventBusClientEvents {
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(SuperpositionBlockEntity.SIGNAL_GENERATOR.get(), SignalGeneratorBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(SuperpositionBlockEntity.SIGNAL_READOUT.get(), SignalReadoutBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(SuperpositionBlockEntity.AMPLIFIER.get(), AmplifierBlockEntityRenderer::new);
     }
 }

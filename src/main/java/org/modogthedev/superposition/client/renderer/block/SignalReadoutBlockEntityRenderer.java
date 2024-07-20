@@ -24,7 +24,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
     public SignalReadoutBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
-    int size = 14;
+    static final int size = 12;
     @Override
     public void render(SignalReadoutBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
@@ -34,8 +34,9 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
-        ms.translate(0.5, 0.5, 0.5);
+        ms.translate(0.5, 0.748, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
+        ms.translate(0,-.125,0);
 
 
         Matrix4f m = ms.last().pose();
@@ -49,17 +50,17 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
         float stages = 25;
 
         float uvOffsetx = 0f;
-        int offset = 1;
-        float part = 1f / size;
+        int offset = 2;
+        float part = 1f / 16f;
         float totalpart = 1f / 16;
 
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING), 1));
         for (int i = 0; i < size; i++) {
-            float x = (i * totalpart) + (1 / 16f) - min;
+            float x = (i * totalpart) + (offset / 16f) - min;
             float y = .5f;
             Signal[] signals = spaceArray(be.signals);
             if (signals != null && signals[i] != null)
-                y = (float) (((signals[i].amplitude) / be.highestValue) / -2.1f+(Math.random()/64))+((be.lowestValue/be.highestValue))/4;
+                y = Math.max(-.061f,(float) ((((signals[i].amplitude) / be.highestValue) / -6f+(Math.random()/64))+((be.lowestValue/be.highestValue)/4)));
             buffer
                     .vertex(m, x, 0.5001f, min)
                     .color(1f, 1f, 1f, alpha)
@@ -96,7 +97,44 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
                     .normal(n, 0, 1, 0)
                     .endVertex();
         }
+        ms.translate(0,.00025,.22);
+        alpha = .4f;
+        VertexConsumer screenBuffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.asResource("textures/screen/monitor_screen.png")));
+        screenBuffer
+                .vertex(m, -0.375f, 0.5001f, -0.28125f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(0,0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
 
+        screenBuffer
+                .vertex(m, -0.375f, 0.5001f, 0.28125f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(0, 1)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
+
+        screenBuffer
+                .vertex(m, 0.375f, 0.5001f, 0.28125f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(1, 1)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
+
+        screenBuffer
+                .vertex(m, 0.375f, 0.5001f, -0.28125f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(1,0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
     }
 
     private static boolean[] findIndexes(int n, int r) {
@@ -150,6 +188,6 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 
     @Override
     public boolean shouldRender(SignalReadoutBlockEntity pBlockEntity, Vec3 pCameraPos) {
-        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos) && (pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING), 1)).is(Blocks.AIR) || !pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING), 1)).canOcclude()));
+        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos));
     }
 }

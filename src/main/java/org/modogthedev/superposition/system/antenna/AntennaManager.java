@@ -49,7 +49,7 @@ public class AntennaManager {
         float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size());
         if (dist < signal.maxDist && dist > signal.minDist) {
             Signal signal1 = new Signal(signal.pos,signal.level,signal.frequency,signal.amplitude,signal.sourceFrequency);
-            signal1.amplitude = signal.amplitude/Math.max(1,dist/100);
+            signal1.amplitude = signal.amplitude/Math.max(1,dist/(1000000000/signal.frequency));
             signal1.amplitude = signal1.amplitude/Math.max(1,(Math.abs(antennaFrequency-signal.frequency)/40000));
             if (signal1.amplitude>1)
                 antenna.signals.add(signal1);
@@ -68,7 +68,7 @@ public class AntennaManager {
         return -1;
     }
 
-    public static Antenna getAmplifierAntenna(LevelReader levelReader, BlockPos pos) {
+    public static Antenna getAntennaActorAntenna(LevelReader levelReader, BlockPos pos) {
         Level level = (Level) levelReader;
         Antenna antenna = null;
         int ordinal = get(pos, level);

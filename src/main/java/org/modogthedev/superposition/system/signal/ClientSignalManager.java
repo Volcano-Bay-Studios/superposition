@@ -7,7 +7,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.TickEvent;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
@@ -59,6 +58,7 @@ public class ClientSignalManager {
                 signal1.frequency = signal.frequency;
                 signal1.amplitude = signal.amplitude;
                 signal1.pos = signal.pos;
+                signal1.sourceFrequency = signal.sourceFrequency;
             } else
                 clientSignals.get(level).put(uuid, signal);
         }

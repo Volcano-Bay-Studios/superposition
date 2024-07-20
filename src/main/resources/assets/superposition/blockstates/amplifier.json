@@ -1,16 +1,12 @@
 {
   "multipart": [
     {
-      "apply": {
-        "model": "superposition:block/modulator/modulator"
-      }
-    },
-    {
       "when": {
         "facing": "north"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator"
+        "model": "superposition:block/amplifier",
+        "y": 90
       }
     },
     {
@@ -18,8 +14,8 @@
         "facing": "south"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator",
-        "y": 180
+        "model": "superposition:block/amplifier",
+        "y": 270
       }
     },
     {
@@ -27,8 +23,7 @@
         "facing": "west"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator",
-        "y": 270
+        "model": "superposition:block/amplifier"
       }
     },
     {
@@ -36,8 +31,8 @@
         "facing": "east"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator",
-        "y": 90
+        "model": "superposition:block/amplifier",
+        "y": 180
       }
     }
   ]

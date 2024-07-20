@@ -10,6 +10,7 @@ import org.modogthedev.superposition.system.antenna.Antenna;
 import java.util.UUID;
 
 public class Signal {
+
     public float frequency;
     public float sourceFrequency;
     public static final int speed = 64;

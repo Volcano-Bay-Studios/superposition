@@ -102,6 +102,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         else {
             connectedSignal.level = level;
             connectedSignal.frequency = frequency*100000;
+            connectedSignal.sourceFrequency = frequency;
             connectedSignal.amplitude = 1;
         }
     }

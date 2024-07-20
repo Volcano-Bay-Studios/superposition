@@ -19,15 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
-import org.modogthedev.superposition.blockentity.ModulatorBlockEntity;
+import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 
-public class ModulatorScreen extends DialScreen {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/modulator_screen.png");
+public class AmplifierScreen extends WidgetScreen {
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/amplifier_screen.png");
     private static final ResourceLocation SWITCH_ON = new ResourceLocation(Superposition.MODID, "textures/screen/switch_on.png");
     private static final ResourceLocation SWITCH_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/switch_off.png");
     public static final int imageWidth = 176;
@@ -43,16 +43,16 @@ public class ModulatorScreen extends DialScreen {
     public VertexConsumer lineConsumer;
     float readAmplitude = 0;
 
-    public ModulatorScreen(Component pTitle, BlockPos pos) {
+    public AmplifierScreen(Component pTitle, BlockPos pos) {
         super(pTitle);
-        ModulatorScreen.pos = pos;
+        AmplifierScreen.pos = pos;
         ticks = 0;
         addDial(-72, 0, 76);
         addDial(-50, 0, 76);
-        assert Minecraft.getInstance().level != null : "Level was null in Modulator Screen";
+        assert Minecraft.getInstance().level != null : "Level was null in Amplifier Screen";
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
-        if (blockEntity instanceof ModulatorBlockEntity generatorBlockEntity) {
+        if (blockEntity instanceof AmplifierBlockEntity generatorBlockEntity) {
             dials.get(0).scrolledAmount = generatorBlockEntity.redstoneMod;
             dials.get(1).scrolledAmount = generatorBlockEntity.modRate;
         }
@@ -100,7 +100,7 @@ public class ModulatorScreen extends DialScreen {
         fillExact(guiGraphics, width / 2f - 57, height / 2f - 25 - barHeight2, width / 2f - 43, height / 2f - 25, 0xFF56d156);
         modRate = barHeight;
         assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
-        amplitude = barHeight2 + (ModulatorBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
+        amplitude = barHeight2 + (AmplifierBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
         flush(guiGraphics);
     }
 
@@ -144,11 +144,11 @@ public class ModulatorScreen extends DialScreen {
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
-            this.playDownSound(Minecraft.getInstance().getSoundManager());
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),mute);
             mute = !mute;
         }
         if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
-            this.playDownSound(Minecraft.getInstance().getSoundManager());
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),swap);
             swap = !swap;
             updateBlock();
         }
@@ -208,7 +208,7 @@ public class ModulatorScreen extends DialScreen {
         assert Minecraft.getInstance().level != null : "Tried to access screen from server!";
 
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
-        if (blockEntity instanceof ModulatorBlockEntity signalActorBlockEntity) {
+        if (blockEntity instanceof AmplifierBlockEntity signalActorBlockEntity) {
             Signal blockSignal = signalActorBlockEntity.getSignal();
             if (blockSignal != null) {
                 this.frequency = blockSignal.sourceFrequency; //TODO Explode if signal to high

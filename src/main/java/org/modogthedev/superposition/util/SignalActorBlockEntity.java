@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.AntennaBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
+import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
@@ -351,9 +353,13 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
     public void incrementConfigSelection() {
         stepNext = true;
+        assert level != null;
+        level.playLocalSound(getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS,1,1,false);
     }
     public void interactConfig() {
         interactNext = true;
+        assert level != null;
+        level.playLocalSound(getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS,1,1,false);
     }
     private void checkEvents() {
         if (stepNext) {

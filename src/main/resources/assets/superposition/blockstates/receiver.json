@@ -1,16 +1,93 @@
 {
   "multipart": [
     {
+      "when": {
+        "facing": "north",
+        "swap": "true"
+      },
       "apply": {
-        "model": "superposition:block/modulator/modulator"
+        "model": "superposition:block/cap/left",
+        "y": 90
       }
     },
+    {
+      "when": {
+        "facing": "north",
+        "swap": "false"
+      },
+      "apply": {
+        "model": "superposition:block/cap/right",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "swap": "true"
+      },
+      "apply": {
+        "model": "superposition:block/cap/left",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "swap": "false"
+      },
+      "apply": {
+        "model": "superposition:block/cap/right",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "swap": "true"
+      },
+      "apply": {
+        "model": "superposition:block/cap/left"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "swap": "false"
+      },
+      "apply": {
+        "model": "superposition:block/cap/right"
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "swap": "true"
+      },
+      "apply": {
+        "model": "superposition:block/cap/left",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "swap": "false"
+      },
+      "apply": {
+        "model": "superposition:block/cap/right",
+        "y": 180
+      }
+    },
+
+
+
     {
       "when": {
         "facing": "north"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator"
+        "model": "superposition:block/receiver",
+        "y": 90
       }
     },
     {
@@ -18,8 +95,8 @@
         "facing": "south"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator",
-        "y": 180
+        "model": "superposition:block/receiver",
+        "y": 270
       }
     },
     {
@@ -27,8 +104,7 @@
         "facing": "west"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator",
-        "y": 270
+        "model": "superposition:block/receiver"
       }
     },
     {
@@ -36,8 +112,8 @@
         "facing": "east"
       },
       "apply": {
-        "model": "superposition:block/modulator/modulator",
-        "y": 90
+        "model": "superposition:block/receiver",
+        "y": 180
       }
     }
   ]

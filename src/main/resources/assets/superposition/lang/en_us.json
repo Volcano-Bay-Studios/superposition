@@ -1,11 +1,17 @@
 {
   "block.superposition.signal_generator" : "Signal Generator",
-  "block.superposition.modulator" : "Modulator",
   "block.superposition.amplifier" : "Amplifier",
+  "block.superposition.transmitter" : "Transmitter",
   "block.superposition.antenna" : "Antenna Part",
   "block.superposition.receiver" : "Receiver",
+  "block.superposition.signal_readout" : "Signal Readout",
+  "block.superposition.filter" : "Filter",
+  "block.superposition.casing" : "Casing",
 
   "item.superposition.screwdriver" : "Screwdriver",
+  "item.superposition.low_pass_filter" : "Low Pass Filter",
+  "item.superposition.high_pass_filter" : "High Pass Filter",
+  "item.superposition.band_pass_filter" : "Band Pass Filter",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

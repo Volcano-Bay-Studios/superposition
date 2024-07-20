@@ -21,33 +21,41 @@ public class SuperpositionBlocks {
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-    public static final RegistryObject<SignalReadoutBlock> SIGNAL_READOUT = registerBlock("signal_readout",
+    public static final RegistryObject<CasingBlock> CASING = registerBlock("casing",
+            () -> new CasingBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+    public static final RegistryObject<SignalReadoutBlock> SIGNAL_READOUT = registerBlockNoBlockItem("signal_readout",
             () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-    public static final RegistryObject<ModulatorBlock> MODULATOR = registerBlock("modulator",
-            () -> new ModulatorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f)
+    public static final RegistryObject<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
+            () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistryObject<AntennaBlock> ANTENNA = registerBlock("antenna",
             () -> new AntennaBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
                     .strength(2.0f, 8f).noOcclusion().lightLevel(value -> AntennaBlock.isCap(value) ? 4 : 0)
             ));
-    public static final RegistryObject<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
-            () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
-                    .strength(2.0f, 8f)
+    public static final RegistryObject<TransmitterBlock> TRANSMITTER = registerBlock("transmitter",
+            () -> new TransmitterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistryObject<ReceiverBlock> RECEIVER = registerBlock("receiver",
             () -> new ReceiverBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f)
+                    .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistryObject<FilterBlock> FILTER = registerBlock("filter",
             () -> new FilterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f)
+                    .strength(2.0f, 8f).noOcclusion()
             ));
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);
+        return toReturn;
+    }
+    private static <T extends Block> RegistryObject<T> registerBlockNoBlockItem(String name, Supplier<T> block) {
+        RegistryObject<T> toReturn = BLOCKS.register(name, block);
         return toReturn;
     }
     private static <T extends Block> RegistryObject<Item> registerBlockItem(String name, RegistryObject<T> block) {

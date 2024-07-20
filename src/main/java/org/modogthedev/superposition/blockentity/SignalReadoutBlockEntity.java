@@ -1,7 +1,9 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -15,7 +17,8 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
     public SignalReadoutBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntity.SIGNAL_READOUT.get(), pos, state);
     }
-    public Signal[] signals = new Signal[14];
+    private BlockPos linkedPos = null;
+    public Signal[] signals = new Signal[12];
     public float highestValue = 0;
     public float lowestValue = 0;
     @Override
@@ -23,7 +26,9 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
         preTick();
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
-        List<Signal> frequencySorted = new ArrayList<>(getSignals());
+        List<Signal> frequencySorted = getSignals();
+        if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
+            frequencySorted = signalActorBlockEntity.getSignals();
         frequencySorted.sort((o1, o2) -> {
             if (o1.frequency == o2.frequency)
                 return 0;
@@ -32,7 +37,7 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
             else
                 return 1;
         });
-        List<Signal> amplitudeSorted = new ArrayList<>(getSignals());
+        List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
         amplitudeSorted.sort((o1, o2) -> {
             if (o1.amplitude == o2.amplitude)
                 return 0;
@@ -47,12 +52,31 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
             if (amplitudeSorted.size() == 1)
                 lowestValue = lowestValue/2;
         }
-        while (amplitudeSorted.size()>14) {
+        while (amplitudeSorted.size()>12) {
             amplitudeSorted.remove(amplitudeSorted.get(amplitudeSorted.size()-1));
             frequencySorted.remove(frequencySorted.get(frequencySorted.size()-1));
         }
-        signals = frequencySorted.toArray(new Signal[14]);
+        signals = frequencySorted.toArray(new Signal[12]);
 
         super.tick();
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag pTag) {
+        if (linkedPos != null) {
+            pTag.putInt("x", linkedPos.getX());
+            pTag.putInt("y", linkedPos.getY());
+            pTag.putInt("z", linkedPos.getZ());
+        }
+        super.saveAdditional(pTag);
+    }
+    public void loadLinkedPos(CompoundTag pTag) {
+        linkedPos = new BlockPos(pTag.getInt("x"),pTag.getInt("y"),pTag.getInt("z"));
+    }
+
+    @Override
+    public void load(CompoundTag pTag) {
+        linkedPos = new BlockPos(pTag.getInt("x"),pTag.getInt("y"),pTag.getInt("z"));
+        super.load(pTag);
     }
 }

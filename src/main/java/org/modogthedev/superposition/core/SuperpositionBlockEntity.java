@@ -15,13 +15,13 @@ public class SuperpositionBlockEntity {
             BLOCK_ENTITIES.register("signal_generator",
                     () -> BlockEntityType.Builder.of(SignalGeneratorBlockEntity::new, SuperpositionBlocks.SIGNAL_GENERATOR.get())
                             .build(null));
-    public static final RegistryObject<BlockEntityType<ModulatorBlockEntity>> MODULATOR =
-            BLOCK_ENTITIES.register("modulator",
-                    () -> BlockEntityType.Builder.of(ModulatorBlockEntity::new, SuperpositionBlocks.MODULATOR.get())
-                            .build(null));
     public static final RegistryObject<BlockEntityType<AmplifierBlockEntity>> AMPLIFIER =
             BLOCK_ENTITIES.register("amplifier",
                     () -> BlockEntityType.Builder.of(AmplifierBlockEntity::new, SuperpositionBlocks.AMPLIFIER.get())
+                            .build(null));
+    public static final RegistryObject<BlockEntityType<TransmitterBlockEntity>> TRANSMITTER =
+            BLOCK_ENTITIES.register("transmitter",
+                    () -> BlockEntityType.Builder.of(TransmitterBlockEntity::new, SuperpositionBlocks.TRANSMITTER.get())
                             .build(null));
     public static final RegistryObject<BlockEntityType<ReceiverBlockEntity>> RECEIVER =
             BLOCK_ENTITIES.register("receiver",

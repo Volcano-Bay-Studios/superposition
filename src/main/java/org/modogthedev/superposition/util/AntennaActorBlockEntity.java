@@ -29,7 +29,7 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
     public void tick() {
         super.tick();
         if (antenna == null) {
-            Antenna getAntenna = AntennaManager.getAmplifierAntenna(level,worldPosition);
+            Antenna getAntenna = AntennaManager.getAntennaActorAntenna(level,worldPosition);
             if (getAntenna != null)
                 antenna = getAntenna;
         }
@@ -47,7 +47,7 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
         this.antenna = antenna;
     }
     public void updateAntenna() {
-        Antenna getAntenna = AntennaManager.getAmplifierAntenna(level,worldPosition);
+        Antenna getAntenna = AntennaManager.getAntennaActorAntenna(level,worldPosition);
            if (getAntenna != null)
             antenna = getAntenna;
     }

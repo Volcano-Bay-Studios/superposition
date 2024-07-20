@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -22,15 +21,11 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
-import org.modogthedev.superposition.event.ClientEvents;
 import org.modogthedev.superposition.networking.Messages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SyncedBlockEntity;
 
-import java.awt.*;
-
-public class SignalGeneratorScreen extends DialScreen {
+public class SignalGeneratorScreen extends WidgetScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/signal_generator_background.png");
     private static final ResourceLocation PIXEL = new ResourceLocation(Superposition.MODID, "textures/screen/pixel.png");
     private static final ResourceLocation WARN_ON = new ResourceLocation(Superposition.MODID, "textures/screen/warn_on.png");
@@ -118,11 +113,11 @@ public class SignalGeneratorScreen extends DialScreen {
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
-            this.playDownSound(Minecraft.getInstance().getSoundManager());
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),mute);
             mute = !mute;
         }
         if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
-            this.playDownSound(Minecraft.getInstance().getSoundManager());
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),swap);
             swap = !swap;
             updateBlock();
         }
