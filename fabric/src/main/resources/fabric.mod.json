@@ -1,0 +1,35 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${mod_description}",
+    "authors": [
+        "${mod_authors}"
+    ],
+    "contact": {
+        "homepage": "https://github.com/Volcano-Bay-Studios/superposition",
+        "sources": "https://github.com/Volcano-Bay-Studios/superposition"
+    },
+    "license": "MIT",
+    "icon": "assets/superposition/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "org.modogthedev.superposition.fabric.SuperpositionFabric"
+        ],
+        "client": [
+            "org.modogthedev.superposition.fabric.client.SuperpositionFabricClient"
+        ]
+    },
+    "mixins": [
+        "superposition.mixins.json",
+        "superposition-common.mixins.json"
+    ],
+    "depends": {
+        "fabric": "*",
+        "minecraft": ">=${minecraft_version}",
+        "architectury": ">=${architectury_version}",
+        "veil": ">=1.0.0"
+    }
+}

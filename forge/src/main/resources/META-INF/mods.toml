@@ -1,0 +1,43 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+#issueTrackerURL = ""
+license="${mod_license}"
+
+[[mods]]
+modId="superposition"
+version="${version}"
+displayName="${mod_name}"
+#updateJSONURL="https://change.me.example.invalid/updates.json"
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
+#logoFile="superposition.png"
+#credits="Thanks for this example mod goes to Java"
+authors="${mod_authors}"
+description='''${mod_description}'''
+
+[[dependencies.superposition]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.superposition]]
+modId="minecraft"
+mandatory=true
+versionRange="[${minecraft_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.superposition]]
+modId = "architectury"
+mandatory = true
+versionRange = "[${architectury_version},)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.superposition]]
+modId = "veil"
+mandatory = true
+versionRange = "[1,)"
+ordering = "NONE"
+side = "BOTH"
