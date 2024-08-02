@@ -14,7 +14,7 @@ import java.util.List;
 
 public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements TickableBlockEntity {
     public SignalReadoutBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.SIGNAL_READOUT.value(), pos, state);
+        super(SuperpositionBlockEntities.SIGNAL_READOUT.get(), pos, state);
     }
     private BlockPos linkedPos = null;
     public Signal[] signals = new Signal[12];

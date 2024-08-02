@@ -17,36 +17,33 @@ dependencies {
 
 tasks.build.get().finalizedBy(tasks.named("shadowJar"))
 
+
 tasks.processResources {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    val expandProps = mapOf(
+        "group" to rootProject.property("maven_group"),
+        "version" to project.version,
 
-    for (file in listOf("fabric.mod.json", "mods.toml", "pack.mcmeta")) {
-        filesMatching(file) {
-            expand(
-                mapOf(
-                    "group" to rootProject.property("maven_group"),
-                    "version" to project.version,
+        "mod_id" to rootProject.property("mod_id"),
+        "mod_name" to rootProject.property("mod_name"),
+        "mod_license" to rootProject.property("mod_license"),
+        "mod_description" to rootProject.property("mod_description"),
+        "mod_authors" to rootProject.property("mod_authors"),
+        "mod_version" to rootProject.property("mod_version"),
+        "maven_group" to rootProject.property("maven_group"),
 
-                    "mod_id" to rootProject.property("mod_id"),
-                    "mod_name" to rootProject.property("mod_name"),
-                    "mod_license" to rootProject.property("mod_license"),
-                    "mod_description" to rootProject.property("mod_description"),
-                    "mod_authors" to rootProject.property("mod_authors"),
-                    "mod_version" to rootProject.property("mod_version"),
-                    "maven_group" to rootProject.property("maven_group"),
+        "minecraft_version" to rootProject.property("minecraft_version"),
+        "architectury_version" to rootProject.property("architectury_version"),
+        "forge_loader_range" to rootProject.property("forge_loader_range"),
+        "forge_version_range" to rootProject.property("forge_version_range"),
 
-                    "minecraft_version" to rootProject.property("minecraft_version"),
-                    "architectury_version" to rootProject.property("architectury_version"),
-                    "forge_loader_range" to rootProject.property("forge_loader_range"),
-                    "forge_version_range" to rootProject.property("forge_version_range"),
-
-                    "veil_version" to rootProject.property("veil_version"),
-                    "flywheel_version" to rootProject.property("flywheel_version"),
-                    "jei_version" to rootProject.property("jei_version"),
-                )
-            )
-        }
+        "veil_version" to rootProject.property("veil_version"),
+        "flywheel_version" to rootProject.property("flywheel_version"),
+        "jei_version" to rootProject.property("jei_version"),
+    )
+    filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml", "*.mixins.json")) {
+        expand(expandProps)
     }
+    inputs.properties(expandProps)
 }
 
 allprojects {
@@ -110,35 +107,31 @@ allprojects {
     }
 
     tasks.processResources {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        val expandProps = mapOf(
+            "group" to rootProject.property("maven_group"),
+            "version" to project.version,
 
-        for (file in listOf("fabric.mod.json", "mods.toml", "pack.mcmeta")) {
-            filesMatching(file) {
-                expand(
-                    mapOf(
-                        "group" to rootProject.property("maven_group"),
-                        "version" to project.version,
+            "mod_id" to rootProject.property("mod_id"),
+            "mod_name" to rootProject.property("mod_name"),
+            "mod_license" to rootProject.property("mod_license"),
+            "mod_description" to rootProject.property("mod_description"),
+            "mod_authors" to rootProject.property("mod_authors"),
+            "mod_version" to rootProject.property("mod_version"),
+            "maven_group" to rootProject.property("maven_group"),
 
-                        "mod_id" to rootProject.property("mod_id"),
-                        "mod_name" to rootProject.property("mod_name"),
-                        "mod_license" to rootProject.property("mod_license"),
-                        "mod_description" to rootProject.property("mod_description"),
-                        "mod_authors" to rootProject.property("mod_authors"),
-                        "mod_version" to rootProject.property("mod_version"),
-                        "maven_group" to rootProject.property("maven_group"),
+            "minecraft_version" to rootProject.property("minecraft_version"),
+            "architectury_version" to rootProject.property("architectury_version"),
+            "forge_loader_range" to rootProject.property("forge_loader_range"),
+            "forge_version_range" to rootProject.property("forge_version_range"),
 
-                        "minecraft_version" to rootProject.property("minecraft_version"),
-                        "architectury_version" to rootProject.property("architectury_version"),
-                        "forge_loader_range" to rootProject.property("forge_loader_range"),
-                        "forge_version_range" to rootProject.property("forge_version_range"),
-
-                        "veil_version" to rootProject.property("veil_version"),
-                        "flywheel_version" to rootProject.property("flywheel_version"),
-                        "jei_version" to rootProject.property("jei_version"),
-                    )
-                )
-            }
+            "veil_version" to rootProject.property("veil_version"),
+            "flywheel_version" to rootProject.property("flywheel_version"),
+            "jei_version" to rootProject.property("jei_version"),
+        )
+        filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml", "*.mixins.json")) {
+            expand(expandProps)
         }
+        inputs.properties(expandProps)
     }
 
     tasks.register<Jar>("prodJar") {

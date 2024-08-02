@@ -13,11 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TransmitterBlockEntity extends AntennaActorBlockEntity {
-    Signal signal;
-    public TransmitterBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.TRANSMITTER.value(), pos, state);
-    }
 
+   private Signal signal;
+
+    public TransmitterBlockEntity(BlockPos pos, BlockState state) {
+        super(SuperpositionBlockEntities.TRANSMITTER.get(), pos, state);
+    }
 
     @Override
     public void tick() {

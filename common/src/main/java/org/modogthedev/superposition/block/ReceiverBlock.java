@@ -58,10 +58,11 @@ public class ReceiverBlock extends SignalActorTickingBlock {
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.RECEIVER.value().create(pos, state);
+        return SuperpositionBlockEntities.RECEIVER.get().create(pos, state);
     }
 
     @Override

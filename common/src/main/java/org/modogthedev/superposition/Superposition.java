@@ -15,17 +15,18 @@ public class Superposition {
     public static final ColorTheme SUPERPOSITION_THEME = new ColorTheme();
 
     public static void init() {
-        LOGGER.info("Superposition is initializing!");
+        LOGGER.info("Superposition is initializing.");
 
         initTheme();
         SuperpositionBlocks.BLOCKS.register();
+        SuperpositionBlockEntities.BLOCK_ENTITIES.register();
         SuperpositionTabs.TABS.register();
         SuperpositionItems.ITEMS.register();
         SuperpositionSounds.SOUNDS.register();
         SuperpositionMessages.register();
         TickEvent.SERVER_LEVEL_POST.register(SignalManager::tick);
 
-        LOGGER.info("Superposition has been initialized!");
+        LOGGER.info("Superposition has been initialized.");
     }
 
     public static void initTheme() {

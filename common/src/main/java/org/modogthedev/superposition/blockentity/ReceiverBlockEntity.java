@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReceiverBlockEntity extends AntennaActorBlockEntity {
+
     public ReceiverBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.RECEIVER.value(), pos, state);
+        super(SuperpositionBlockEntities.RECEIVER.get(), pos, state);
     }
 
     int lastSize = 0;

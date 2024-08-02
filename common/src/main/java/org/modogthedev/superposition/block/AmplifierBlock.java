@@ -86,7 +86,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.AMPLIFIER.value().create(pos, state);
+        return SuperpositionBlockEntities.AMPLIFIER.get().create(pos, state);
     }
 
     @Override

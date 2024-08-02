@@ -43,7 +43,7 @@ public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.SIGNAL_GENERATOR.value().create(pos, state);
+        return SuperpositionBlockEntities.SIGNAL_GENERATOR.get().create(pos, state);
     }
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {

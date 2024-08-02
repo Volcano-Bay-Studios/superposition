@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FilterBlockEntity  extends SignalActorBlockEntity implements TickableBlockEntity {
-    float minFilter = 0;
-    float maxFilter = 64;
+
+    private float minFilter = 0;
+    private float maxFilter = 64;
+
     public FilterBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(SuperpositionBlockEntities.FILTER.value(), pPos, pBlockState);
+        super(SuperpositionBlockEntities.FILTER.get(), pPos, pBlockState);
     }
 
     @Override

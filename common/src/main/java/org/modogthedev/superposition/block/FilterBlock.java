@@ -68,7 +68,7 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.FILTER.value().create(pos, state);
+        return SuperpositionBlockEntities.FILTER.get().create(pos, state);
     }
 
     @Override

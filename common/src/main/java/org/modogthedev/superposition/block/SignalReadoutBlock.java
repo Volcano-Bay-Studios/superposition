@@ -65,7 +65,7 @@ public class SignalReadoutBlock extends SignalActorTickingBlock implements Entit
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.SIGNAL_READOUT.value().create(pos, state);
+        return SuperpositionBlockEntities.SIGNAL_READOUT.get().create(pos, state);
     }
 
     @Override

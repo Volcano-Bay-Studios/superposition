@@ -27,9 +27,11 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     boolean updateNext = false;
     public int ticks = 0;
     public int step = 0;
+
     public AmplifierBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.AMPLIFIER.value(), pos, state);
+        super(SuperpositionBlockEntities.AMPLIFIER.get(), pos, state);
     }
+
     @Override
     public void writeData(CompoundTag tag) {
         super.writeData(tag);

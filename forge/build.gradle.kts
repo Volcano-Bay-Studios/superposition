@@ -26,13 +26,13 @@ configurations {
 }
 
 dependencies {
-    forge("net.minecraftforge:forge:${rootProject.property("forge_version")}")
+    forge("net.minecraftforge:forge:${rootProject.property("minecraft_version")}-${rootProject.property("forge_version")}")
 
     common(project(":common", "namedElements")) { isTransitive = false }
     shadowCommon(project(":common", "transformProductionForge")) { isTransitive = false }
 
-    modApi("dev.architectury:architectury-forge:${rootProject.property("architectury_version")}")
-    modImplementation("foundry.veil:Veil-forge-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
+    modApi("dev.architectury:architectury-forge:${rootProject.property("architectury_version")}"){ isTransitive = false }
+    modImplementation("foundry.veil:Veil-forge-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}") { isTransitive = false; exclude(group = "maven.modrinth") }
     modApi("mezz.jei:jei-${rootProject.property("minecraft_version")}-forge-api:${rootProject.property("jei_version")}")
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-latest:1.2.1")

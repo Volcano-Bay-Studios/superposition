@@ -14,15 +14,14 @@ import org.modogthedev.superposition.system.signal.ClientSignalManager;
 public class SuperpositionClient {
     public static void init() {
         PlatformHelper.register();
-        registerBlockEntityRenderers();
 
         ClientTickEvent.CLIENT_LEVEL_POST.register(ClientSignalManager::tick);
     }
 
     public static void registerBlockEntityRenderers() {
-        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_GENERATOR.value(), SignalGeneratorBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_READOUT.value(), SignalReadoutBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.AMPLIFIER.value(), AmplifierBlockEntityRenderer::new);
+        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_GENERATOR.get(), SignalGeneratorBlockEntityRenderer::new);
+        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_READOUT.get(), SignalReadoutBlockEntityRenderer::new);
+        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.AMPLIFIER.get(), AmplifierBlockEntityRenderer::new);
     }
 
     public static void setScreen(Screen screen) {

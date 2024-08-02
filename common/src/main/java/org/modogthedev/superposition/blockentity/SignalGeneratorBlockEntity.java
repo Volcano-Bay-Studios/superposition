@@ -25,7 +25,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
 
     public SignalGeneratorBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.SIGNAL_GENERATOR.value(), pos, state);
+        super(SuperpositionBlockEntities.SIGNAL_GENERATOR.get(), pos, state);
     }
 
 

@@ -52,7 +52,7 @@ public class TransmitterBlock extends SignalActorTickingBlock implements IRedsto
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.TRANSMITTER.value().create(pos, state);
+        return SuperpositionBlockEntities.TRANSMITTER.get().create(pos, state);
     }
 
     @Override
