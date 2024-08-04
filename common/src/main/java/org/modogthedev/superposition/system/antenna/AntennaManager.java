@@ -24,6 +24,10 @@ public class AntennaManager {
             antennas.put(level, new ArrayList<>());
         }
     }
+    public static List<Antenna> getAntennaList(Level level) {
+        ifAbsent(level);
+        return antennas.get(level);
+    }
 
     public static void clearSignals(Level level) {
         if (antennas.get(level) == null)
@@ -128,6 +132,11 @@ public class AntennaManager {
                 if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
                     antennaActorBlockEntity.update();
                 }
+            }
+        } else {
+            int ordinal = get(pos, level);
+            if (ordinal >= 0) {
+                antennas.get(level).remove(antennas.get(level).get(ordinal));
             }
         }
     }

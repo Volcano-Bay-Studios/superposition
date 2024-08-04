@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.SignalReadoutBlockEntity;
-import org.modogthedev.superposition.util.SignalActorBlockEntity;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 
 import java.util.Objects;
 

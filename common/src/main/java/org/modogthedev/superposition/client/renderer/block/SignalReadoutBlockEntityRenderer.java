@@ -95,44 +95,44 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
                     .normal(n, 0, 1, 0)
                     .endVertex();
         }
-        ms.translate(0,.00025,.22);
-        alpha = .4f;
-        VertexConsumer screenBuffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/screen/monitor_screen.png")));
-        screenBuffer
-                .vertex(m, -0.375f, 0.5001f, -0.28125f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(0,0)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
-
-        screenBuffer
-                .vertex(m, -0.375f, 0.5001f, 0.28125f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(0, 1)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
-
-        screenBuffer
-                .vertex(m, 0.375f, 0.5001f, 0.28125f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(1, 1)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
-
-        screenBuffer
-                .vertex(m, 0.375f, 0.5001f, -0.28125f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(1,0)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+//        ms.translate(0,-.00025,.22);
+//        alpha = .4f;
+//        VertexConsumer screenBuffer = bufferSource.getBuffer(SuperpositionRenderTypes.entityTranslucentEmissive(Superposition.id("textures/screen/monitor_screen.png")));
+//        screenBuffer
+//                .vertex(m, -0.375f, 0.5001f, -0.28125f)
+//                .color(1f, 1f, 1f, alpha)
+//                .uv(0,0)
+//                .overlayCoords(OverlayTexture.NO_OVERLAY)
+//                .uv2(light)
+//                .normal(n, 0, 1, 0)
+//                .endVertex();
+//
+//        screenBuffer
+//                .vertex(m, -0.375f, 0.5001f, 0.28125f)
+//                .color(1f, 1f, 1f, alpha)
+//                .uv(0, 1)
+//                .overlayCoords(OverlayTexture.NO_OVERLAY)
+//                .uv2(light)
+//                .normal(n, 0, 1, 0)
+//                .endVertex();
+//
+//        screenBuffer
+//                .vertex(m, 0.375f, 0.5001f, 0.28125f)
+//                .color(1f, 1f, 1f, alpha)
+//                .uv(1, 1)
+//                .overlayCoords(OverlayTexture.NO_OVERLAY)
+//                .uv2(light)
+//                .normal(n, 0, 1, 0)
+//                .endVertex();
+//
+//        screenBuffer
+//                .vertex(m, 0.375f, 0.5001f, -0.28125f)
+//                .color(1f, 1f, 1f, alpha)
+//                .uv(1,0)
+//                .overlayCoords(OverlayTexture.NO_OVERLAY)
+//                .uv2(light)
+//                .normal(n, 0, 1, 0)
+//                .endVertex();
     }
 
     private static boolean[] findIndexes(int n, int r) {

@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 import java.util.ArrayList;
@@ -26,37 +25,39 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
         List<Signal> frequencySorted = getSignals();
+
         if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
             frequencySorted = signalActorBlockEntity.getSignals();
-        frequencySorted.sort((o1, o2) -> {
-            if (o1.frequency == o2.frequency)
-                return 0;
-            if (o1.frequency < o2.frequency)
-                return -1;
-            else
-                return 1;
-        });
-        List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
-        amplitudeSorted.sort((o1, o2) -> {
-            if (o1.amplitude == o2.amplitude)
-                return 0;
-            if (o1.amplitude < o2.amplitude)
-                return -1;
-            else
-                return 1;
-        });
-        if (!amplitudeSorted.isEmpty()) {
-            highestValue = amplitudeSorted.get(amplitudeSorted.size() - 1).amplitude;
-            lowestValue = amplitudeSorted.get(0).amplitude;
-            if (amplitudeSorted.size() == 1)
-                lowestValue = lowestValue/2;
+        if (frequencySorted != null) {
+            frequencySorted.sort((o1, o2) -> {
+                if (o1.frequency == o2.frequency)
+                    return 0;
+                if (o1.frequency < o2.frequency)
+                    return -1;
+                else
+                    return 1;
+            });
+            List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
+            amplitudeSorted.sort((o1, o2) -> {
+                if (o1.amplitude == o2.amplitude)
+                    return 0;
+                if (o1.amplitude < o2.amplitude)
+                    return -1;
+                else
+                    return 1;
+            });
+            if (!amplitudeSorted.isEmpty()) {
+                highestValue = amplitudeSorted.get(amplitudeSorted.size() - 1).amplitude;
+                lowestValue = amplitudeSorted.get(0).amplitude;
+                if (amplitudeSorted.size() == 1)
+                    lowestValue = lowestValue / 2;
+            }
+            while (amplitudeSorted.size() > 12) {
+                amplitudeSorted.remove(amplitudeSorted.get(amplitudeSorted.size() - 1));
+                frequencySorted.remove(frequencySorted.get(frequencySorted.size() - 1));
+            }
+            signals = frequencySorted.toArray(new Signal[12]);
         }
-        while (amplitudeSorted.size()>12) {
-            amplitudeSorted.remove(amplitudeSorted.get(amplitudeSorted.size()-1));
-            frequencySorted.remove(frequencySorted.get(frequencySorted.size()-1));
-        }
-        signals = frequencySorted.toArray(new Signal[12]);
-
         super.tick();
     }
 

@@ -22,6 +22,7 @@ public class SignalActorTickingBlock extends Block implements EntityBlock {
 
     public static BooleanProperty SWAP_SIDES = SuperpositionBlockStates.SWAP_SIDES;
     public static final DirectionProperty FACING = DirectionalBlock.FACING;
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {

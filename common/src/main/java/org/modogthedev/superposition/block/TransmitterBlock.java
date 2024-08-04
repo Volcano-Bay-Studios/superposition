@@ -19,10 +19,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.util.AntennaActorTickingBlock;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class TransmitterBlock extends SignalActorTickingBlock implements IRedstoneConnectingBlock {
+public class TransmitterBlock extends AntennaActorTickingBlock {
     public TransmitterBlock(Properties pProperties) {
         super(pProperties.isRedstoneConductor((state, getter, pos) -> true));
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
@@ -68,14 +69,5 @@ public class TransmitterBlock extends SignalActorTickingBlock implements IRedsto
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
         stateBuilder.add(new Property[]{FACING, SWAP_SIDES});
-    }
-
-    @Override
-    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        if (level.getBlockState(pos).getValue(SWAP_SIDES)) {
-            return direction == level.getBlockState(pos).getValue(FACING).getClockWise();
-        } else {
-            return direction == level.getBlockState(pos).getValue(FACING).getCounterClockWise();
-        }
     }
 }

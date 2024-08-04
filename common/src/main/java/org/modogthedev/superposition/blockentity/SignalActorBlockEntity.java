@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.util;
+package org.modogthedev.superposition.blockentity;
 
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
@@ -23,6 +23,7 @@ import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
+import org.modogthedev.superposition.util.*;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.*;
@@ -388,4 +389,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             }
         }
     }
+    //TODO: Weak power checking method PLEASE
+
 }

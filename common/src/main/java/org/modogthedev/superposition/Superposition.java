@@ -13,6 +13,7 @@ public class Superposition {
     public static final String MODID = "superposition";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final ColorTheme SUPERPOSITION_THEME = new ColorTheme();
+    public static boolean DEBUG = false;
 
     public static void init() {
         LOGGER.info("Superposition is initializing.");

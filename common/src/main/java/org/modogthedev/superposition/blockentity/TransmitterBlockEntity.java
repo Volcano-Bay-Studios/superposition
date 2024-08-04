@@ -39,7 +39,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
         if (antenna != null) {
             Signal signalForBroadcast = createSignal(new Object());
             if (signalForBroadcast != null) {
-                if (level.getSignal(getBlockPos(),getSwappedSide()) > 0) { //TODO borken
+                if (level.hasSignal(getBlockPos(),getSwappedSide())) { //TODO: borken
                     signalForBroadcast.pos = new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
                     signalForBroadcast.emitting = true;
                     signalForBroadcast.level = level;

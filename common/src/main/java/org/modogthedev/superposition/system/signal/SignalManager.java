@@ -1,6 +1,8 @@
 package org.modogthedev.superposition.system.signal;
 
+import net.minecraft.client.particle.GlowParticle;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -9,6 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
@@ -26,7 +29,13 @@ public class SignalManager {
         ifAbsent(level);
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
-        for (Signal signal : transmittedSignals.get(level)) {
+        if (Superposition.DEBUG) {
+            int maxDist = 2;
+            for (Antenna antenna : AntennaManager.getAntennaList(level)) {
+                    level.sendParticles(ParticleTypes.ELECTRIC_SPARK, antenna.antennaActor.getCenter().x,antenna.antennaActor.getCenter().y+1, antenna.antennaActor.getCenter().z, 10, 0, 0,0,0.1f);
+            }
+        }
+         for (Signal signal : transmittedSignals.get(level)) {
             if (!signal.level.isClientSide) {
                 BlockState baseState = level.getBlockState(BlockPos.containing(signal.pos));
                 if (!baseState.is(SuperpositionBlocks.TRANSMITTER.get()))

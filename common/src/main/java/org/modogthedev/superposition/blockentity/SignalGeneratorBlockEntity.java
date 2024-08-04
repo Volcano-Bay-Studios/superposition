@@ -10,7 +10,6 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SignalActorBlockEntity;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 import java.util.ArrayList;

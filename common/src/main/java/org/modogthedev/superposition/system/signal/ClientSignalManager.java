@@ -2,11 +2,13 @@ package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.util.MapHelper;
@@ -25,6 +27,14 @@ public class ClientSignalManager {
         ifAbsent(level);
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
+        if (Superposition.DEBUG) {
+            int maxDist = 2;
+            for (Antenna antenna : AntennaManager.getAntennaList(level)) {
+                for (float i = 0; i < 361; i += 10f) {
+                    level.addParticle(ParticleTypes.ELECTRIC_SPARK, antenna.antennaActor.getCenter().x + (Math.sin(i) * maxDist),antenna.antennaActor.getCenter().y, antenna.antennaActor.getCenter().z + (Math.cos(i) * maxDist), 0, 0, 0);
+                }
+            }
+        }
         for (Signal signal : clientSignals.get(level).values()) {
             if (signal.tick()) {
                 signalsForRemoval.add(signal);
@@ -45,7 +55,7 @@ public class ClientSignalManager {
             UUID uuid = tag.getUUID("uuid");
             included.remove(uuid);
             Vec3 pos = new Vec3(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
-            Signal signal = new Signal(pos, level, tag.getFloat("freq"), tag.getFloat("amp"),tag.getFloat("source_freq"));
+            Signal signal = new Signal(pos, level, tag.getFloat("freq"), tag.getFloat("amp"), tag.getFloat("source_freq"));
             signal.modulation = tag.getFloat("mod");
             signal.emitting = tag.getBoolean("emit");
             signal.lifetime = tag.getInt("life");

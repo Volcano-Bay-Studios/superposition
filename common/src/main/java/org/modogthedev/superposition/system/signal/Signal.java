@@ -29,9 +29,9 @@ public class Signal {
     public EncodedData encodedData;
 
     public boolean tick() {
-        for (float i = 0; i < 361; i += .1f) {
+//        for (float i = 0; i < 361; i += .1f) {
 //            this.level.addParticle(ParticleTypes.ELECTRIC_SPARK, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, 0, 0);
-        }
+//        }
         lifetime++;
         maxRange = amplitude*100;
         if (!emitting) {

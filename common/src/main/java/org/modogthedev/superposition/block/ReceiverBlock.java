@@ -20,9 +20,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ReceiverBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.util.AntennaActorTickingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class ReceiverBlock extends SignalActorTickingBlock {
+public class ReceiverBlock extends AntennaActorTickingBlock {
     public ReceiverBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
@@ -58,16 +59,17 @@ public class ReceiverBlock extends SignalActorTickingBlock {
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
-
     @Nullable
+
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SuperpositionBlockEntities.RECEIVER.get().create(pos, state);
     }
 
+
     @Override
     public boolean hasAnalogOutputSignal(BlockState pState) {
-        return true;
+        return false;
     }
 
     @Override

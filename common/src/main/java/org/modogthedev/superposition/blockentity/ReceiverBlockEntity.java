@@ -26,9 +26,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-
-        updateAntenna();
-
         if (antenna != null)
             if (level.isClientSide)
                 ClientSignalManager.postSignalsToAntenna(antenna);
@@ -38,9 +35,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
 
     @Override
     public List<Signal> getSignals() {
-        if (antenna == null) {
-            updateAntenna();
-        }
         if (antenna == null) {
             return null;
         }
@@ -81,7 +75,7 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         } else {
             tooltip.add(Component.literal("Antenna Classification - ERROR"));
         }
-        antennaBrokenLastTick = antenna == null;
+        antennaBrokenLastTick = (antenna == null);
         this.setTooltip(tooltip);
         super.tick();
     }

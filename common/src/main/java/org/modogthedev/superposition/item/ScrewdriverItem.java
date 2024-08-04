@@ -5,9 +5,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.block.AntennaBlock;
-import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
-import org.modogthedev.superposition.util.SignalActorBlockEntity;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 
 public class ScrewdriverItem extends Item {
     public ScrewdriverItem(Properties pProperties) {
