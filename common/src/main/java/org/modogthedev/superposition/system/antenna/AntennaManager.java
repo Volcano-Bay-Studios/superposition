@@ -50,15 +50,22 @@ public class AntennaManager {
 
         if (!antenna.reading)
             return;
+        float bonusFrequency = 0;
+        BlockEntity blockEntity = signal.level.getBlockEntity(antenna.antennaActor);
+        if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
+            bonusFrequency = antennaActorBlockEntity.getBounusFrequency();
+        }
 
         float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
-        float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size());
+        float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency;
 
         if (dist < signal.maxDist && dist > signal.minDist) {
             Signal signal1 = new Signal(signal.pos, signal.level, signal.frequency, signal.amplitude, signal.sourceFrequency);
 
+            Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level,signal.sourceAntennaPos);
             signal1.amplitude /= Math.max(1, dist / (1000000000 / signal.frequency));
-            signal1.amplitude /= Math.max(1, (Math.abs(antennaFrequency - signal.frequency) / 40000));
+//            signal1.amplitude /= Math.max(1, (Math.abs(antennaFrequency - signal.frequency) / 40000));
+            signal1.amplitude /= Math.max(1, 1f/(Mth.resonanceAlgorithm(antenna.antennaParts.size(),sourceAntenna.antennaParts.size())));
 
             if (signal1.amplitude > 1)
                 antenna.signals.add(signal1);

@@ -19,10 +19,6 @@ public class SuperpositionBlocks {
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-    public static final RegistrySupplier<CasingBlock> CASING = registerBlock("casing",
-            () -> new CasingBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f).noOcclusion()
-            ));
     public static final RegistrySupplier<SignalReadoutBlock> SIGNAL_READOUT = BLOCKS.register("signal_readout",
             () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
@@ -45,6 +41,10 @@ public class SuperpositionBlocks {
             ));
     public static final RegistrySupplier<FilterBlock> FILTER = registerBlock("filter",
             () -> new FilterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+    public static final RegistrySupplier<CasingBlock> CASING = registerBlock("casing",
+            () -> new CasingBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
 

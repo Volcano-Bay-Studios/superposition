@@ -61,6 +61,10 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
             if (level.isClientSide) {
                 tooltip.add(Component.literal("Antenna Classification - " + classifyAntenna()));
                 tooltip.add(Component.literal("Antenna Frequency - " + Mth.frequencyToHzReadable(Mth.antennaSizeToHz(antenna.antennaParts.size()))));
+                float bonusFrequency = getBounusFrequency();
+                if (bonusFrequency != 0) {
+                    tooltip.add(Component.literal("Actual Frequency - " + Mth.frequencyToHzReadable(Mth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency)));
+                }
             }
             List<Signal> signals = getSignals();
             int currentSize = signals.size();

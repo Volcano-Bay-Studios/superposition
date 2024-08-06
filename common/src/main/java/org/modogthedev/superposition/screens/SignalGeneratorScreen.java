@@ -51,7 +51,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalGeneratorBlockEntity generatorBlockEntity) {
-            startFrequency = generatorBlockEntity.frequency;
+            startFrequency = generatorBlockEntity.getFrequency();
         }
         swap = state.getValue(SignalGeneratorBlock.SWAP_SIDES);
     }

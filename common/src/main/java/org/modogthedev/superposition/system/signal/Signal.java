@@ -1,11 +1,10 @@
 package org.modogthedev.superposition.system.signal;
 
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.system.antenna.Antenna;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 
 import java.util.UUID;
 
@@ -13,6 +12,7 @@ public class Signal {
 
     public float frequency;
     public float sourceFrequency;
+    public BlockPos sourceAntennaPos;
     public static final int speed = 64;
     public float modulation;
     public Vec3 pos;
@@ -26,7 +26,7 @@ public class Signal {
     public boolean emitting = true;
     public Antenna antenna;
     public UUID uuid = UUID.randomUUID();
-    public EncodedData encodedData;
+    private EncodedData encodedData;
 
     public boolean tick() {
 //        for (float i = 0; i < 361; i += .1f) {

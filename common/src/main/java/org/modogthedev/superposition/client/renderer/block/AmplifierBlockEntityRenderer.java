@@ -26,7 +26,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
             return;
         if (be.ticks == -1)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/block/parts/amplifier_screen.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);

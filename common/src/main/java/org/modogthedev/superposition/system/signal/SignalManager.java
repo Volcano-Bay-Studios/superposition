@@ -72,6 +72,9 @@ public class SignalManager {
                 tag.putFloat("mod", signal.modulation);
                 tag.putBoolean("emit", signal.emitting);
                 tag.putInt("life", signal.lifetime);
+                tag.putInt("x1", signal.sourceAntennaPos.getX());
+                tag.putInt("y1", signal.sourceAntennaPos.getY());
+                tag.putInt("z1", signal.sourceAntennaPos.getZ());
                 list.add(tag);
             }
             wholeTag.put("signals", list);

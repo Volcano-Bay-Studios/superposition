@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -71,6 +72,7 @@ public class ClientSignalManager {
                 signal1.amplitude = signal.amplitude;
                 signal1.pos = signal.pos;
                 signal1.sourceFrequency = signal.sourceFrequency;
+                signal1.sourceAntennaPos = new BlockPos(tag.getInt("x1"),tag.getInt("y1"),tag.getInt("z1"));
             } else
                 clientSignals.get(level).put(uuid, signal);
         }

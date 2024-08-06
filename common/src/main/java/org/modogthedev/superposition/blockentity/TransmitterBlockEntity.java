@@ -43,6 +43,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     signalForBroadcast.pos = new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
                     signalForBroadcast.emitting = true;
                     signalForBroadcast.level = level;
+                    signalForBroadcast.sourceAntennaPos = getBlockPos();
                     frequency += signalForBroadcast.frequency;
                     signalForBroadcast.frequency = frequency;
                     SignalManager.addSignal(signalForBroadcast);

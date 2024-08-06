@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     Vec3 pos = new Vec3(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
-    public float frequency;
+    private float frequency;
     public float dial = 0;
     Signal connectedSignal;
     public boolean transmitting;
@@ -93,6 +93,9 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     public Signal createSignal(Object nextObject) {
         updateSignal();
         return connectedSignal;
+    }
+    public float getFrequency() {
+        return frequency;
     }
 
     public void updateSignal() {

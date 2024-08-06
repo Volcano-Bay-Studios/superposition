@@ -17,20 +17,24 @@ public class WidgetScreen extends Screen {
     public List<Dial> dials = new ArrayList<>();
     public boolean mouseDown;
     private float dialDistTraveled = 0;
+
     protected WidgetScreen(Component pTitle) {
         super(pTitle);
         setPositions();
     }
+
     public void addDial(int x, int y) {
         dials.add(new Dial(x, y));
     }
+
     public void addDial(int x, int y, int maxScroll) {
-        dials.add(new Dial(x, y,maxScroll));
+        dials.add(new Dial(x, y, maxScroll));
     }
+
     public void setPositions() {
-        for (Dial dial: dials) {
-            dial.x = (this.width/2) + dial.targetx;
-            dial.y = (this.height/2) + dial.targety;
+        for (Dial dial : dials) {
+            dial.x = (this.width / 2) + dial.targetx;
+            dial.y = (this.height / 2) + dial.targety;
         }
     }
 
@@ -43,33 +47,35 @@ public class WidgetScreen extends Screen {
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         setPositions();
-        for (Dial dial: dials) {
-            DialRenderer.renderDial(pGuiGraphics,dial.x,dial.y, (int) dial.scrolledAmount);
+        for (Dial dial : dials) {
+            DialRenderer.renderDial(pGuiGraphics, dial.x, dial.y, (int) dial.scrolledAmount);
         }
         if (mouseDown) {
-            for (Dial dial: dials) {
+            for (Dial dial : dials) {
                 if (dial.mouseOver) {
-                    float angle = (float) Math.toDegrees(Math.atan2(pMouseY-dial.y,pMouseX-dial.x));
+                    float angle = (float) Math.toDegrees(Math.atan2(pMouseY - dial.y, pMouseX - dial.x));
                     if (angle < 0) {
-                        angle = Mth.getFromRange(0,-180,180,0,angle)+180;
+                        angle = Mth.getFromRange(0, -180, 180, 0, angle) + 180;
                     }
-                    if (dial.lastAngle == 0 || Math.abs(dial.lastAngle-angle) > 300)
+                    if (dial.lastAngle == 0 || Math.abs(dial.lastAngle - angle) > 300)
                         dial.lastAngle = angle;
                     else {
                         if (Math.abs(dial.scrolledAmount) > dial.maxScroll) {
                             dial.scrolledAmount = dial.maxScroll;
-                        } else {
-                            dialDistTraveled += Math.abs(dial.lastAngle-angle);
+                        } else if (dial.scrolledAmount < 0)
+                            dial.scrolledAmount = 0;
+                        else {
+                            dialDistTraveled += Math.abs(dial.lastAngle - angle);
                             if (dialDistTraveled > 6) {
                                 dialDistTraveled = 0;
                                 dialUpdated();
-                                if (dial.lastAngle-angle>0)
+                                if (dial.lastAngle - angle > 0)
                                     playScrollSound(Minecraft.getInstance().getSoundManager());
                                 else
                                     playScrollDownSound(Minecraft.getInstance().getSoundManager());
                             }
                         }
-                        dial.scrolledAmount += (dial.lastAngle-angle)/10;
+                        dial.scrolledAmount += (dial.lastAngle - angle) / 10;
                         dial.lastAngle = angle;
 
                     }
@@ -88,7 +94,7 @@ public class WidgetScreen extends Screen {
     @Override
     public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
         mouseDown = false;
-        for (Dial dial: dials) {
+        for (Dial dial : dials) {
             dial.mouseOver = false;
             dial.lastAngle = 0;
         }
@@ -98,13 +104,15 @@ public class WidgetScreen extends Screen {
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
         getTouching((int) pMouseX, (int) pMouseY);
-        for (Dial dial: dials) {
+        for (Dial dial : dials) {
             if (dial.mouseOver) {
                 dial.scrolledAmount += pDelta;
                 if (Math.abs(dial.scrolledAmount) > dial.maxScroll) {
                     dial.scrolledAmount = dial.maxScroll;
-                } else {
-                    if (pDelta>0)
+                } else if (dial.scrolledAmount < 0)
+                    dial.scrolledAmount = 0;
+                else {
+                    if (pDelta > 0)
                         playScrollSound(Minecraft.getInstance().getSoundManager());
                     else
                         playScrollDownSound(Minecraft.getInstance().getSoundManager());
@@ -114,23 +122,28 @@ public class WidgetScreen extends Screen {
         }
         return super.mouseScrolled(pMouseX, pMouseY, pDelta);
     }
+
     public void playScrollSound(SoundManager pHandler) {
         pHandler.play(SimpleSoundInstance.forUI(SuperpositionSounds.SCROLL.get(), 1.0F));
     }
+
     public void playScrollDownSound(SoundManager pHandler) {
         pHandler.play(SimpleSoundInstance.forUI(SuperpositionSounds.SCROLL.get(), 0.9F));
     }
+
     public void playSwitchSound(SoundManager pHandler, boolean lastState) {
         if (lastState)
             pHandler.play(SimpleSoundInstance.forUI(SuperpositionSounds.SWITCH_OFF.get(), 1.0F));
         else
             pHandler.play(SimpleSoundInstance.forUI(SuperpositionSounds.SWITCH_ON.get(), 1.0F));
     }
+
     public void getTouching(int x, int y) {
         for (Dial dial : dials) {
             dial.mouseOver = (dial.x > x - dial.size / 2 && dial.x < x + dial.size / 2 && dial.y > y - dial.size / 2 && dial.y < y + dial.size / 2);
         }
     }
+
     public void dialUpdated() {
     }
 
@@ -140,11 +153,13 @@ public class WidgetScreen extends Screen {
             this.targety = y;
             this.maxScroll = 999999;
         }
+
         public Dial(int x, int y, int maxScroll) {
             this.maxScroll = maxScroll;
             this.targetx = x;
             this.targety = y;
         }
+
         int maxScroll;
         int targetx;
         int targety;
