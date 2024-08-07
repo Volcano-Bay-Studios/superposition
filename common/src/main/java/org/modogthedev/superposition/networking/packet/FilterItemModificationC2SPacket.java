@@ -40,7 +40,10 @@ public class FilterItemModificationC2SPacket {
             if (!(itemStack.getItem() instanceof FilterItem))
                 itemStack = player.getOffhandItem();
             if (itemStack.getItem() instanceof FilterItem filterItem) {
-//                filterItem.
+                CompoundTag tag = new CompoundTag();
+                tag.putFloat("value1",value1);
+                tag.putFloat("value2",value2);
+                itemStack.addTagElement("filter",tag);
             }
         });
     }

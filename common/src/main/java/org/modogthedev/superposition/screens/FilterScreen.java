@@ -15,14 +15,16 @@ public class FilterScreen extends WidgetScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/filter_screen.png");
     private static final ResourceLocation BAR = new ResourceLocation(Superposition.MODID, "textures/screen/filter_bar.png");
     private FilterItem.FilterType filterType;
-    private float value1 = 50;
+    private float value1;
     private float value2;
     public static int imageWidth = 0;
     public static int imageHeight = 0;
     public static int imageOffset = 0;
 
-    protected FilterScreen(Component pTitle, FilterItem.FilterType filterType) {
+    protected FilterScreen(Component pTitle, FilterItem.FilterType filterType,float value1,float value2) {
         super(pTitle);
+        this.value1 = value1;
+        this.value2 = value2;
         this.filterType = filterType;
         switch (filterType) {
             case LOW_PASS -> {
@@ -43,8 +45,10 @@ public class FilterScreen extends WidgetScreen {
                 imageWidth = 176;
                 imageHeight = 106;
                 imageOffset = 0;
+                dials.get(1).scrolledAmount = value2;
             }
         }
+        dials.get(0).scrolledAmount = value1;
     }
 
     @Override

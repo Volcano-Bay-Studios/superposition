@@ -16,6 +16,7 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalReadoutBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.Mth;
 
 public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<SignalReadoutBlockEntity> {
 
@@ -49,18 +50,22 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 
         float uvOffsetx = 0f;
         int offset = 2;
-        float part = 1f / 16f;
-        float totalpart = 1f / 16;
+        float part = 1f / (size+4);
+        float totalpart = 1f / (size+4);
 
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING), 1));
         for (int i = 0; i < size; i++) {
-            float x = (i * totalpart) + (offset / 16f) - min;
-            float y = .5f;
+            float x = (i * totalpart) + (offset / (size+4f)) - min;
+            float y = .21f;
+            float yinverse = .2f;
             Signal[] signals = spaceArray(be.signals);
-            if (signals != null && signals[i] != null)
-                y = Math.max(-.061f,(float) ((((signals[i].amplitude) / be.highestValue) / -6f+(Math.random()/64))+((be.lowestValue/be.highestValue)/4)));
+            if (signals != null && signals[i] != null) {
+                y = Math.max(-.061f, (float) ((((signals[i].amplitude) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)));
+            }
+            y += (float) (Math.random() / 64);
+            yinverse = -y+.4f;
             buffer
-                    .vertex(m, x, 0.5001f, min)
+                    .vertex(m, x, 0.5001f, yinverse)
                     .color(1f, 1f, 1f, alpha)
                     .uv(uvMin + uvOffsetx, (uvMin / stages))
                     .overlayCoords(OverlayTexture.NO_OVERLAY)
@@ -87,7 +92,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
                     .endVertex();
 
             buffer
-                    .vertex(m, x + part, 0.5001f, min)
+                    .vertex(m, x + part, 0.5001f, yinverse)
                     .color(1f, 1f, 1f, alpha)
                     .uv(uvMax + uvOffsetx, (uvMin / stages))
                     .overlayCoords(OverlayTexture.NO_OVERLAY)
@@ -157,7 +162,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
         Signal[] signals1 = new Signal[size];
         int count = 0;
         for (int i = 0; i < size; i++) {
-            if (signals[i] != null)
+            if (signals[(int) Mth.getFromRange(size,0,12,0,i)] != null)
                 count++;
         }
         boolean[] booleans = findIndexes(size, count);

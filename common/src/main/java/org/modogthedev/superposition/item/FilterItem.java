@@ -32,7 +32,8 @@ public class FilterItem extends Item {
         InteractionResultHolder<ItemStack> result = super.use(level, player, usedHand);
         if (result.getResult() == InteractionResult.PASS) {
             if (level.isClientSide) {
-                ScreenManager.openFilterScreen(type);
+                float[] floats = readFilterData(player.getItemInHand(usedHand));
+                ScreenManager.openFilterScreen(type,floats[0],floats[1]);
             }
         }
         return result;
