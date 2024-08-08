@@ -2,6 +2,13 @@ package org.modogthedev.superposition.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.AirItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -11,13 +18,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
+import org.modogthedev.superposition.core.SuperpositionItems;
+import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -74,6 +85,35 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
+    }
+
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (player.isCrouching() && blockEntity instanceof FilterBlockEntity filterBlockEntity){
+            BlockPos dropPos = pos.relative(state.getValue(FACING));
+            ItemStack itemStack;
+            float[] data = filterBlockEntity.readFilterData();
+            switch (filterBlockEntity.getFilterType()) {
+                case BAND_PASS ->
+                    itemStack = new ItemStack(SuperpositionItems.BAND_PASS_FILTER.get());
+                case LOW_PASS ->
+                        itemStack = new ItemStack(SuperpositionItems.LOW_PASS_FILTER.get());
+                case HIGH_PASS ->
+                        itemStack = new ItemStack(SuperpositionItems.HIGH_PASS_FILTER.get());
+                default -> {
+                    return super.use(state, level, pos, player, hand, hit);
+                }
+            }
+            ((FilterItem) itemStack.getItem()).putData(itemStack,data[0],data[1]);
+            boolean creative = player.getAbilities().instabuild;
+            if (creative && !player.getInventory().contains(itemStack)) {
+                player.getInventory().add(itemStack);
+            } else if (!creative)
+                Containers.dropItemStack(level, (double)dropPos.getX(), (double)dropPos.getY(), (double)dropPos.getZ(), itemStack);
+            filterBlockEntity.setFilter(0,0, FilterItem.FilterType.NONE);
+        }
+        return super.use(state, level, pos, player, hand, hit);
     }
 
     @Override

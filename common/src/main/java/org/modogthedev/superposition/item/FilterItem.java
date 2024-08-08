@@ -8,47 +8,77 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
+import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.screens.ScreenManager;
 
 public class FilterItem extends Item {
     public FilterType type;
+
     public FilterItem(Properties pProperties, Item.Properties properties) {
         super(properties);
         type = pProperties.type;
     }
+
     public float[] readFilterData(ItemStack itemStack) {
         CompoundTag tag = itemStack.getTagElement("filter");
         if (tag != null) {
-            float value1 =  tag.getFloat("value1");
-            float value2 =  tag.getFloat("value2");
-            return new float[]{value1,value2};
+            float value1 = tag.getFloat("value1");
+            float value2 = tag.getFloat("value2");
+            return new float[]{value1, value2};
         }
-        return new float[]{0,0};
+        return new float[]{0, 0};
     }
+
+    public void putData(ItemStack itemStack, float value1, float value2) {
+        CompoundTag tag = new CompoundTag();
+        tag.putFloat("value1", value1);
+        tag.putFloat("value2", value2);
+        itemStack.addTagElement("filter", tag);
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         InteractionResultHolder<ItemStack> result = super.use(level, player, usedHand);
         if (result.getResult() == InteractionResult.PASS) {
             if (level.isClientSide) {
                 float[] floats = readFilterData(player.getItemInHand(usedHand));
-                ScreenManager.openFilterScreen(type,floats[0],floats[1]);
+                ScreenManager.openFilterScreen(type, floats[0], floats[1]);
             }
         }
         return result;
     }
 
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity filterBlockEntity) {
+            float[] floats = readFilterData(context.getPlayer().getItemInHand(context.getHand()));
+            filterBlockEntity.setFilter(floats[0], floats[1], type);
+            if (context.getLevel().isClientSide)
+                return InteractionResult.SUCCESS;
+            boolean creative = context.getPlayer().getAbilities().instabuild;
+            if (!creative)
+                context.getPlayer().getItemInHand(context.getHand()).shrink(1);
+            return InteractionResult.CONSUME;
+        }
+        return super.useOn(context);
+    }
+
     public static class Properties {
         public FilterType type;
+
         public FilterItem.Properties type(FilterType type) {
             this.type = type;
             return this;
         }
     }
+
     public enum FilterType {
         LOW_PASS,
         HIGH_PASS,
-        BAND_PASS
+        BAND_PASS,
+        NONE
     }
 }
