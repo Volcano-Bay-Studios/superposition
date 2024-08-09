@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.item;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -10,7 +9,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.HitResult;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.screens.ScreenManager;
 
@@ -46,8 +44,10 @@ public class FilterItem extends Item {
             if (level.isClientSide) {
                 ItemStack itemStack = player.getItemInHand(usedHand);
                 float[] floats = readFilterData(itemStack);
-                ScreenManager.openFilterScreen(type, floats[0], floats[1],null);
-                return InteractionResultHolder.success(itemStack);
+                if (isPassFilter(type)) {
+                    ScreenManager.openFilterScreen(type, floats[0], floats[1], null);
+                    return InteractionResultHolder.success(itemStack);
+                }
             }
         }
         return result;
@@ -59,8 +59,10 @@ public class FilterItem extends Item {
             if (context.getPlayer().isCrouching()) {
                 if (context.getLevel().isClientSide) {
                     float[] floats = readFilterData(context.getPlayer().getItemInHand(context.getHand()));
-                    ScreenManager.openFilterScreen(type, floats[0], floats[1],context.getClickedPos());
-                    return InteractionResult.SUCCESS;
+                    if (isPassFilter(type)) {
+                        ScreenManager.openFilterScreen(type, floats[0], floats[1], context.getClickedPos());
+                        return InteractionResult.SUCCESS;
+                    }
                 }
             } else {
                 boolean creative = context.getPlayer().getAbilities().instabuild;
@@ -85,6 +87,10 @@ public class FilterItem extends Item {
             this.type = type;
             return this;
         }
+    }
+
+    public static boolean isPassFilter(FilterType type) {
+        return type == FilterType.LOW_PASS || type == FilterType.HIGH_PASS || type == FilterType.BAND_PASS;
     }
 
     public enum FilterType {

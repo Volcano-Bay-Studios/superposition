@@ -9,12 +9,14 @@ import org.modogthedev.superposition.client.renderer.block.FilterBlockEntityRend
 import org.modogthedev.superposition.client.renderer.block.SignalGeneratorBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.SignalReadoutBlockEntityRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.platform.PlatformHelper;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
 public class SuperpositionClient {
     public static void init() {
         PlatformHelper.register();
+        SuperpositionMessages.registerClient();
 
         ClientTickEvent.CLIENT_LEVEL_POST.register(ClientSignalManager::tick);
     }

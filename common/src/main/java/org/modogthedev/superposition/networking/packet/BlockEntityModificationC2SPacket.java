@@ -48,7 +48,7 @@ public class BlockEntityModificationC2SPacket {
 
             var dist = serverPlayer.position().distanceTo(pos.getCenter());
 
-            if (dist > PlatformHelper.getPlayerReach(serverPlayer) + 5)
+            if (dist > 8)
                 return;
 
             BlockEntity blockEntity = world.getBlockEntity(pos);

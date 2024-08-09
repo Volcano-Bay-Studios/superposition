@@ -27,6 +27,8 @@ dependencies {
     modApi("dev.architectury:architectury-fabric:${rootProject.property("architectury_version")}")
     modApi("com.terraformersmc:modmenu:${rootProject.property("modmenu_version")}")
     modImplementation("foundry.veil:Veil-fabric-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
+    include ("foundry.veil:Veil-fabric-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
+    include ("com.jamieswhiteshirt:reach-entity-attributes:2.5.0")
     modApi("mezz.jei:jei-${rootProject.property("minecraft_version")}-fabric-api:${rootProject.property("jei_version")}")
     modImplementation("com.jamieswhiteshirt:reach-entity-attributes:2.4.0")
 
