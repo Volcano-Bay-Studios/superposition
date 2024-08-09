@@ -15,6 +15,9 @@ public class Antenna {
     public BlockPos antennaActor;
     public boolean reading;
     public Vec3 avg;
+    public Vec3 size;
+    public Vec3 lowSize;
+    public Vec3 highSize;
     public Vec3 relativeCenter;
 
     public Antenna(List<BlockPos> antennaParts, BlockPos antennaActor, Level level) {
@@ -37,6 +40,32 @@ public class Antenna {
         avg = avg.scale((double) 1f /antennaParts.size());
         return avg;
     }
+    public Vec3 getSize() {
+        int largestX = 0;
+        int largestY = 0;
+        int largestZ = 0;
+        int smallestX = 0;
+        int smallestY = 0;
+        int smallestZ = 0;
+        for (BlockPos pos : antennaParts) {
+            BlockPos relative = antennaActor.subtract(pos);
+            if (relative.getX() > largestX)
+                largestX = relative.getX();
+            if (relative.getY() > largestY)
+                largestY = relative.getY();
+            if (relative.getZ() > largestZ)
+                largestZ = relative.getZ();
+            if (relative.getX() < smallestX)
+                smallestX = relative.getX();
+            if (relative.getY() < smallestY)
+                smallestY = relative.getY();
+            if (relative.getZ() < smallestZ)
+                smallestZ = relative.getZ();
+        }
+        lowSize = new Vec3(smallestX,smallestY,smallestZ);
+        highSize = new Vec3(largestX,largestY,largestZ);
+        return new Vec3(largestX-smallestX,largestY-smallestY,largestZ-smallestZ);
+    }
     public Vec3 getRelativeCenter() {
         Vec3 avg = new Vec3(0,0,0);
         for (BlockPos pos : antennaParts) {
@@ -49,5 +78,6 @@ public class Antenna {
     public void updateDimensions() {
         relativeCenter = getRelativeCenter();
         avg = getAvg();
+        size = getSize();
     }
 }

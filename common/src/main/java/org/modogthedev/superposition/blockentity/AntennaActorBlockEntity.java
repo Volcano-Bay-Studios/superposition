@@ -20,8 +20,14 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
     }
 
     public String classifyAntenna() {
-        if (antenna.avg.x == 0 && antenna.avg.z == 0)
-            return "Monopole";
+        if (antenna.relativeCenter.x == 0 && antenna.relativeCenter.z == 0) {
+            if (antenna.size.x == 0 && antenna.size.z == 0)
+                return "Monopole";
+            else if (antenna.size.x != 0 && antenna.size.z != 0)
+                return "Yagi";
+        }
+        if (antenna.size.x != 0 && antenna.size.z != 0)
+            return "Log Periodic";
         if ((antenna.avg.x != 0 && antenna.avg.z == 0) || (antenna.avg.z != 0 && antenna.avg.x == 0))
             return "Dipole";
         return "Unknown";
