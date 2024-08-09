@@ -14,7 +14,7 @@ public class SuperpositionTabs {
     public static final RegistrySupplier<CreativeModeTab> TAB = TABS.register(Superposition.id("tab"),
             () -> CreativeTabRegistry.create(
                     Component.translatable("creativemodetab.superposition"),
-                    () -> new ItemStack(SuperpositionBlocks.SIGNAL_GENERATOR.get().asItem())
+                    () -> new ItemStack(SuperpositionBlocks.TRANSMITTER.get().asItem())
             )
     );
 }

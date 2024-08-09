@@ -46,6 +46,14 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
 
         float alpha = 1;
         float stage = 1;
+        switch (be.getFilterType()) {
+            case LOW_PASS ->
+                stage = 1;
+            case HIGH_PASS ->
+                stage = 3;
+            case BAND_PASS ->
+                stage = 2;
+        }
         float stages = 3;
 
         float offset = (stage / stages)+.5f;

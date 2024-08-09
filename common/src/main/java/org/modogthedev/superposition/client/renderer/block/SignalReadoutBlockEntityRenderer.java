@@ -58,7 +58,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
             float x = (i * totalpart) + (offset / (size+4f)) - min;
             float y = .21f;
             float yinverse = .2f;
-            Signal[] signals = spaceArray(be.signals);
+            Signal[] signals = Mth.spaceArray(be.signals,size);
             if (signals != null && signals[i] != null) {
                 y = Math.max(-.061f, (float) ((((signals[i].amplitude) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)));
             }
@@ -140,41 +140,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 //                .endVertex();
     }
 
-    private static boolean[] findIndexes(int n, int r) {
-        boolean[] arrayWithObjects = new boolean[n];
-        if (r<2) {
-            arrayWithObjects[7] = true;
-            return arrayWithObjects;
-        }
 
-        int quotient = (n - 1) / (r - 1);
-        int remainder = (n - 1) % (r - 1);
-
-        int index = 0;
-        do {
-            arrayWithObjects[index] = true;
-        } while ((index += quotient + (remainder-- > 0 ? 1 : 0)) < n);
-
-        return arrayWithObjects;
-    }
-
-    public Signal[] spaceArray(Signal[] signals) {
-        Signal[] signals1 = new Signal[size];
-        int count = 0;
-        for (int i = 0; i < size; i++) {
-            if (signals[(int) Mth.getFromRange(size,0,12,0,i)] != null)
-                count++;
-        }
-        boolean[] booleans = findIndexes(size, count);
-        int i = 0;
-        for (int x = 0; x < size; x++) {
-            if (booleans[x]) {
-                signals1[x] = signals[i];
-                i++;
-            }
-        }
-        return signals1;
-    }
 
     private float getMaxPlaneExtent(SignalReadoutBlockEntity be) {
         return -(0.5f);

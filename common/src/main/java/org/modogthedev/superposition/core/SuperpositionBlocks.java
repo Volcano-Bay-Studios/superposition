@@ -15,6 +15,10 @@ import java.util.function.Supplier;
 
 public class SuperpositionBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Superposition.MODID, Registries.BLOCK);
+    public static final RegistrySupplier<AntennaBlock> ANTENNA = registerBlock("antenna",
+            () -> new AntennaBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
+                    .strength(2.0f, 8f).noOcclusion().lightLevel(value -> AntennaBlock.isCap(value) ? 4 : 0)
+            ));
     public static final RegistrySupplier<SignalGeneratorBlock> SIGNAL_GENERATOR = registerBlock("signal_generator",
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
@@ -22,14 +26,6 @@ public class SuperpositionBlocks {
     public static final RegistrySupplier<SignalReadoutBlock> SIGNAL_READOUT = BLOCKS.register("signal_readout",
             () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
-            ));
-    public static final RegistrySupplier<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
-            () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f).noOcclusion()
-            ));
-    public static final RegistrySupplier<AntennaBlock> ANTENNA = registerBlock("antenna",
-            () -> new AntennaBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
-                    .strength(2.0f, 8f).noOcclusion().lightLevel(value -> AntennaBlock.isCap(value) ? 4 : 0)
             ));
     public static final RegistrySupplier<TransmitterBlock> TRANSMITTER = registerBlock("transmitter",
             () -> new TransmitterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
@@ -39,6 +35,11 @@ public class SuperpositionBlocks {
             () -> new ReceiverBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistrySupplier<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
+            () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+
     public static final RegistrySupplier<FilterBlock> FILTER = registerBlock("filter",
             () -> new FilterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()

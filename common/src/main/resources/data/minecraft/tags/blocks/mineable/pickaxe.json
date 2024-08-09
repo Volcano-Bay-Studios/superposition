@@ -1,0 +1,12 @@
+{
+  "values": [
+    "superposition:casing",
+    "superposition:signal_generator",
+    "superposition:signal_readout",
+    "superposition:amplifier",
+    "superposition:antenna",
+    "superposition:transmitter",
+    "superposition:receiver",
+    "superposition:filter"
+  ]
+}

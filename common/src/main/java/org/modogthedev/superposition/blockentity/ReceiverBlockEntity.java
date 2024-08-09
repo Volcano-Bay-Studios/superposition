@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReceiverBlockEntity extends AntennaActorBlockEntity {
+    Object ourCall;
 
     public ReceiverBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.RECEIVER.get(), pos, state);
@@ -73,7 +74,8 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
             }
             if (!signals.isEmpty()) {
-                putSignalList(new Object(), signals);
+                ourCall = new Object();
+                putSignalList(ourCall, signals);
             }
             lastSize = currentSize;
         } else {
@@ -82,6 +84,12 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         antennaBrokenLastTick = (antenna == null);
         this.setTooltip(tooltip);
         super.tick();
+    }
+
+    @Override
+    public void putSignalList(Object nextCall, List<Signal> list) {
+        if (nextCall == ourCall)
+            super.putSignalList(nextCall, list);
     }
 
     @Override

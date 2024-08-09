@@ -27,37 +27,25 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
         setTooltip(tooltip);
         List<Signal> frequencySorted = getSignals();
 
-        if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
-            frequencySorted = signalActorBlockEntity.getSignals();
-        if (frequencySorted != null) {
-            frequencySorted.sort((o1, o2) -> {
-                if (o1.frequency == o2.frequency)
-                    return 0;
-                if (o1.frequency < o2.frequency)
-                    return -1;
-                else
-                    return 1;
-            });
-            List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
-            amplitudeSorted.sort((o1, o2) -> {
-                if (o1.amplitude == o2.amplitude)
-                    return 0;
-                if (o1.amplitude < o2.amplitude)
-                    return -1;
-                else
-                    return 1;
-            });
-            if (!amplitudeSorted.isEmpty()) {
-                highestValue = amplitudeSorted.get(amplitudeSorted.size() - 1).amplitude;
-                lowestValue = amplitudeSorted.get(0).amplitude;
-                if (amplitudeSorted.size() == 1)
-                    lowestValue = lowestValue / 2;
+        if (level.isClientSide) {
+            if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
+                frequencySorted = signalActorBlockEntity.getSignals();
+            if (frequencySorted != null) {
+                frequencySorted.sort((o1, o2) -> Float.compare(o1.frequency, o2.frequency));
+                List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
+                amplitudeSorted.sort((o1, o2) -> Float.compare(o1.amplitude, o2.amplitude));
+                if (!amplitudeSorted.isEmpty()) {
+                    highestValue = amplitudeSorted.get(amplitudeSorted.size() - 1).amplitude;
+                    lowestValue = amplitudeSorted.get(0).amplitude;
+                    if (amplitudeSorted.size() == 1)
+                        lowestValue = lowestValue / 2;
+                }
+                while (amplitudeSorted.size() > 12) {
+                    amplitudeSorted.remove(amplitudeSorted.get(amplitudeSorted.size() - 1));
+                    frequencySorted.remove(frequencySorted.get(frequencySorted.size() - 1));
+                }
+                signals = frequencySorted.toArray(new Signal[12]);
             }
-            while (amplitudeSorted.size() > 12) {
-                amplitudeSorted.remove(amplitudeSorted.get(amplitudeSorted.size() - 1));
-                frequencySorted.remove(frequencySorted.get(frequencySorted.size() - 1));
-            }
-            signals = frequencySorted.toArray(new Signal[12]);
         }
         super.tick();
     }
@@ -77,7 +65,8 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
 
     @Override
     public void load(CompoundTag pTag) {
-        linkedPos = new BlockPos(pTag.getInt("x"),pTag.getInt("y"),pTag.getInt("z"));
+        loadLinkedPos(pTag);
         super.load(pTag);
     }
+
 }

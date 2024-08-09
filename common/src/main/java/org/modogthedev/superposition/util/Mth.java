@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.modogthedev.superposition.system.signal.Signal;
 
 public class Mth {
     public static float getFromRange(float OldMax, float OldMin, float NewMax, float NewMin, float OldValue) {
@@ -104,5 +105,40 @@ public class Mth {
             n2 = (n2 - n1);
         } while (n2 != 0);
         return n1 << n;
+    }
+    private static boolean[] findIndexes(int n, int r) {
+        boolean[] arrayWithObjects = new boolean[n];
+        if (r<2) {
+            arrayWithObjects[7] = true;
+            return arrayWithObjects;
+        }
+
+        int quotient = (n - 1) / (r - 1);
+        int remainder = (n - 1) % (r - 1);
+
+        int index = 0;
+        do {
+            arrayWithObjects[index] = true;
+        } while ((index += quotient + (remainder-- > 0 ? 1 : 0)) < n);
+
+        return arrayWithObjects;
+    }
+
+    public static Signal[] spaceArray(Signal[] signals, int size) {
+        Signal[] signals1 = new Signal[size];
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            if (signals[(int) Mth.getFromRange(size,0,12,0,i)] != null)
+                count++;
+        }
+        boolean[] booleans = findIndexes(size, count);
+        int i = 0;
+        for (int x = 0; x < size; x++) {
+            if (booleans[x]) {
+                signals1[x] = signals[i];
+                i++;
+            }
+        }
+        return signals1;
     }
 }

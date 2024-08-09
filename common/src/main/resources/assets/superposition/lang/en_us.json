@@ -6,7 +6,7 @@
   "block.superposition.receiver" : "Receiver",
   "block.superposition.signal_readout" : "Signal Readout",
   "block.superposition.filter" : "Filter",
-  "block.superposition.casing" : "Casing",
+  "block.superposition.casing" : "Insulated Casing",
 
   "item.superposition.screwdriver" : "Screwdriver",
   "item.superposition.low_pass_filter" : "Low Pass Filter",

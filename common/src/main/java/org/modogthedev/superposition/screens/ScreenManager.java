@@ -19,8 +19,8 @@ public class ScreenManager {
         amplifierScreen = new AmplifierScreen(Component.literal("Modulator"), pos);
         SuperpositionClient.setScreen(amplifierScreen);
     }
-    public static void openFilterScreen(FilterItem.FilterType type, float value1, float value2) {
-        filterScreen = new FilterScreen(Component.literal("Filter"), type,value1,value2);
+    public static void openFilterScreen(FilterItem.FilterType type, float value1, float value2,BlockPos pos) {
+        filterScreen = new FilterScreen(Component.literal("Filter"), type,value1,value2,pos);
         SuperpositionClient.setScreen(filterScreen);
     }
 }

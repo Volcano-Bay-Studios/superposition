@@ -44,8 +44,10 @@ public class FilterItem extends Item {
         InteractionResultHolder<ItemStack> result = super.use(level, player, usedHand);
         if (result.getResult() == InteractionResult.PASS) {
             if (level.isClientSide) {
-                float[] floats = readFilterData(player.getItemInHand(usedHand));
-                ScreenManager.openFilterScreen(type, floats[0], floats[1]);
+                ItemStack itemStack = player.getItemInHand(usedHand);
+                float[] floats = readFilterData(itemStack);
+                ScreenManager.openFilterScreen(type, floats[0], floats[1],null);
+                return InteractionResultHolder.success(itemStack);
             }
         }
         return result;
@@ -54,14 +56,24 @@ public class FilterItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity filterBlockEntity) {
-            float[] floats = readFilterData(context.getPlayer().getItemInHand(context.getHand()));
-            filterBlockEntity.setFilter(floats[0], floats[1], type);
-            if (context.getLevel().isClientSide)
-                return InteractionResult.SUCCESS;
-            boolean creative = context.getPlayer().getAbilities().instabuild;
-            if (!creative)
-                context.getPlayer().getItemInHand(context.getHand()).shrink(1);
-            return InteractionResult.CONSUME;
+            if (context.getPlayer().isCrouching()) {
+                if (context.getLevel().isClientSide) {
+                    float[] floats = readFilterData(context.getPlayer().getItemInHand(context.getHand()));
+                    ScreenManager.openFilterScreen(type, floats[0], floats[1],context.getClickedPos());
+                    return InteractionResult.SUCCESS;
+                }
+            } else {
+                boolean creative = context.getPlayer().getAbilities().instabuild;
+                if (filterBlockEntity.getFilterType() == FilterType.NONE || creative) {
+                    float[] floats = readFilterData(context.getPlayer().getItemInHand(context.getHand()));
+                    filterBlockEntity.setFilter(floats[0], floats[1], type);
+                    if (context.getLevel().isClientSide)
+                        return InteractionResult.SUCCESS;
+                    if (!creative)
+                        context.getPlayer().getItemInHand(context.getHand()).shrink(1);
+                    return InteractionResult.CONSUME;
+                }
+            }
         }
         return super.useOn(context);
     }

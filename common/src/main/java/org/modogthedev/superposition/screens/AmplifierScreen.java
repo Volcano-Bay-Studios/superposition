@@ -64,7 +64,6 @@ public class AmplifierScreen extends WidgetScreen {
     }
 
     public void renderSine(GuiGraphics pGuiGraphics) {
-        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width - 70) / 2;
         int j = (this.height - imageHeight) / 2;
         float resolution = 0.5f;
@@ -78,7 +77,6 @@ public class AmplifierScreen extends WidgetScreen {
     }
 
     public void renderSine2(GuiGraphics pGuiGraphics) {
-        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int startPos = (this.width + 68) / 2;
         int j = (this.height - imageHeight) / 2;
         float resolution = 0.5f;
@@ -92,7 +90,6 @@ public class AmplifierScreen extends WidgetScreen {
     }
 
     public void renderBars(GuiGraphics guiGraphics) {
-        this.lineConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
         int width = this.width; // Redundant call?
         int barHeight = Math.min(76, Math.abs((int) dials.get(0).scrolledAmount));
         int barHeight2 = Math.min(76, Math.abs((int) dials.get(1).scrolledAmount));
@@ -101,7 +98,6 @@ public class AmplifierScreen extends WidgetScreen {
         modRate = barHeight;
         assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
         amplitude = barHeight2 + (AmplifierBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
-        flush(guiGraphics);
     }
 
     public void fill(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
@@ -165,36 +161,38 @@ public class AmplifierScreen extends WidgetScreen {
         return super.mouseScrolled(pMouseX, pMouseY, pDelta);
     }
 
-    private void flush(GuiGraphics graphics) { // In ryan we trust
+    private void flush(GuiGraphics guiGraphics) { // In ryan we trust
         RenderSystem.disableDepthTest();
-        graphics.bufferSource().endBatch();
+        guiGraphics.bufferSource().endBatch();
         RenderSystem.enableDepthTest();
         this.lineConsumer = null;
     }
 
     @Override
-    public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void render(@NotNull GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         int i = (this.width - imageWidth) / 2;
         int j = (this.height - imageHeight) / 2;
-        pGuiGraphics.blit(BACKGROUND, i, j, 0, 0, imageWidth, imageHeight);
+        this.lineConsumer = guiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
+        guiGraphics.blit(BACKGROUND, i, j, 0, 0, imageWidth, imageHeight);
 //        frequency = 5;
-        renderSine(pGuiGraphics);
-        renderSine2(pGuiGraphics);
-        renderBars(pGuiGraphics);
+        renderSine(guiGraphics);
+        renderSine2(guiGraphics);
+        renderBars(guiGraphics);
 
         if (mute) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
         }
         if (swap) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
         }
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        flush(guiGraphics);
     }
 
     @Override

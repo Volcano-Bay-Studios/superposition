@@ -17,6 +17,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     private float minFilter = 0;
     private float maxFilter = 64;
+    public List<Signal> unmodulated;
     private FilterItem.FilterType type = FilterItem.FilterType.NONE;
 
     public FilterBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -36,7 +37,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (signal.frequency < (minFilter * 100000) && signal.frequency > (Math.abs(158-maxFilter) * 100000)) {
+        if (!passValue(signal.frequency)) {
             return null;
         }
         return super.modulateSignal(signal, updateTooltip);
@@ -48,13 +49,21 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     @Override
     public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
+        if (level.isClientSide && updateTooltip)
+            unmodulated = signalList;
         List<Signal> finalSignals = new ArrayList<>();
         for (Signal signal : signalList) {
-            if (signal.frequency > (minFilter * 100000) && signal.frequency < (Math.abs(158-maxFilter) * 100000)) {
+            if (passValue(signal.frequency)) {
                 finalSignals.add(signal);
             }
         }
         return finalSignals;
+    }
+    public boolean passValue(float value) {
+        return (value) > (minFilter * 100000) && value < (Math.abs(158-maxFilter) * 100000);
+    }
+    public boolean passCustomValue(float value,float min, float max) {
+        return (value) > (min) && value < max;
     }
 
     @Override
@@ -83,9 +92,11 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     @Override
     public void putSignalList(Object nextCall, List<Signal> list) {
-        super.putSignalList(nextCall, modulateSignals(list, true));
+        super.putSignalList(nextCall, modulateSignals(list, false));
     }
-
+    public List<Signal> getUnmodulated() {
+        return unmodulated;
+    }
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
