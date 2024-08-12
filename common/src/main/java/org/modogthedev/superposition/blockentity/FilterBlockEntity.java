@@ -29,7 +29,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (!passValue(signal.frequency)) {
+        if (!passSignal(signal)) {
             return null;
         }
         return super.modulateSignal(signal, updateTooltip);
@@ -45,15 +45,17 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
             unmodulated = signalList;
         List<Signal> finalSignals = new ArrayList<>();
         for (Signal signal : signalList) {
-            if (passValue(signal.frequency)) {
+            if (passSignal(signal)) {
                 finalSignals.add(signal);
             }
         }
         return finalSignals;
     }
 
-    public boolean passValue(float value) {
-        return (value) > (minFilter * 100000) && value < (Math.abs(158 - maxFilter) * 100000);
+    public boolean passSignal(Signal signal) {
+        if (type != null)
+            return type.passSignal(signal);
+        return true;
     }
 
     public boolean passCustomValue(float value, float min, float max) {

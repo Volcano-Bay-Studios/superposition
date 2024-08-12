@@ -16,7 +16,8 @@ public class BandPassFilter extends Filter {
 
     @Override
     public boolean passSignal(Signal signal) {
-        return signal.frequency > lowFrequency && signal.frequency < highFrequency;
+        return (signal.frequency) > (lowFrequency * 100000) && signal.frequency < (Math.abs(158 - highFrequency) * 100000);
+
     }
 
     @Override
@@ -27,8 +28,10 @@ public class BandPassFilter extends Filter {
 
     @Override
     public void load(CompoundTag tag) {
-        lowFrequency = tag.getFloat("lowFrequency");
-        highFrequency = tag.getFloat("highFrequency");
+        if (tag != null) {
+            lowFrequency = tag.getFloat("lowFrequency");
+            highFrequency = tag.getFloat("highFrequency");
+        }
     }
 
     @Override

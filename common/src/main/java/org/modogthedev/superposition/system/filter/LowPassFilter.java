@@ -15,7 +15,7 @@ public class LowPassFilter extends Filter {
 
     @Override
     public boolean passSignal(Signal signal) {
-        return signal.frequency < frequency;
+        return signal.frequency < (Math.abs(158-frequency) * 100000);
     }
 
     @Override
@@ -25,7 +25,8 @@ public class LowPassFilter extends Filter {
 
     @Override
     public void load(CompoundTag tag) {
-        frequency = tag.getFloat("frequency");
+        if (tag != null)
+            frequency = tag.getFloat("frequency");
     }
 
     @Override
