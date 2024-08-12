@@ -168,6 +168,6 @@ public class WidgetScreen extends Screen {
         int size = 21;
         float lastAngle;
         boolean mouseOver;
-        float scrolledAmount;
+        public float scrolledAmount;
     }
 }

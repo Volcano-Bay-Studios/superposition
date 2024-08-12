@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.item.FilterItem;
+import org.modogthedev.superposition.system.filter.Filter;
 
 public class ScreenManager {
     private static SignalGeneratorScreen signalGeneratorScreen;
@@ -19,8 +20,11 @@ public class ScreenManager {
         amplifierScreen = new AmplifierScreen(Component.literal("Modulator"), pos);
         SuperpositionClient.setScreen(amplifierScreen);
     }
-    public static void openFilterScreen(FilterItem.FilterType type, float value1, float value2,BlockPos pos) {
-        filterScreen = new FilterScreen(Component.literal("Filter"), type,value1,value2,pos);
-        SuperpositionClient.setScreen(filterScreen);
+
+    public static void openFilterScreen(Filter type, BlockPos pos) {
+        if (!type.openCustomScreen()) {
+            filterScreen = new FilterScreen(Component.literal("Filter"), type, pos);
+            SuperpositionClient.setScreen(filterScreen);
+        }
     }
 }

@@ -9,25 +9,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.platform.PlatformHelper;
+import org.modogthedev.superposition.system.filter.Filter;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
 
 import java.util.function.Supplier;
 
 public class FilterItemModificationC2SPacket {
-    float value1;
-    float value2;
+    CompoundTag tag;
     public FilterItemModificationC2SPacket(FriendlyByteBuf buf) {
-        value1 = buf.readFloat();
-        value2 = buf.readFloat();
+        tag = buf.readNbt();
     }
 
-    public FilterItemModificationC2SPacket(float value1, float value2) {
-        this.value1 = value1;
-        this.value2 = value2;
+    public FilterItemModificationC2SPacket(Filter filter) {
+        tag = new CompoundTag();
+        filter.save(tag);
     }
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeFloat(value1);
-        buf.writeFloat(value2);
+        buf.writeNbt(tag);
     }
 
     public void handle(Supplier<NetworkManager.PacketContext> supplier) {
@@ -40,9 +38,6 @@ public class FilterItemModificationC2SPacket {
             if (!(itemStack.getItem() instanceof FilterItem))
                 itemStack = player.getOffhandItem();
             if (itemStack.getItem() instanceof FilterItem filterItem) {
-                CompoundTag tag = new CompoundTag();
-                tag.putFloat("value1",value1);
-                tag.putFloat("value2",value2);
                 itemStack.addTagElement("filter",tag);
             }
         });

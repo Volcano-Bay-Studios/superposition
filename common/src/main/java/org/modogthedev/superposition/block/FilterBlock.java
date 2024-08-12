@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AirItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -90,28 +91,18 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (player.isCrouching() && blockEntity instanceof FilterBlockEntity filterBlockEntity){
-            BlockPos dropPos = pos.relative(state.getValue(FACING));
-            ItemStack itemStack;
-            float[] data = filterBlockEntity.readFilterData();
-            switch (filterBlockEntity.getFilterType()) {
-                case BAND_PASS ->
-                    itemStack = new ItemStack(SuperpositionItems.BAND_PASS_FILTER.get());
-                case LOW_PASS ->
-                        itemStack = new ItemStack(SuperpositionItems.LOW_PASS_FILTER.get());
-                case HIGH_PASS ->
-                        itemStack = new ItemStack(SuperpositionItems.HIGH_PASS_FILTER.get());
-                default -> {
-                    return super.use(state, level, pos, player, hand, hit);
-                }
+        if (player.isCrouching() && blockEntity instanceof FilterBlockEntity filterBlockEntity) {
+            if (filterBlockEntity.getFilterType() != null) {
+                BlockPos dropPos = pos.relative(state.getValue(FACING));
+                ItemStack itemStack = filterBlockEntity.getFilterType().getItem();
+                ((FilterItem) itemStack.getItem()).putData(itemStack, filterBlockEntity.getFilterType());
+                boolean creative = player.getAbilities().instabuild;
+                if (creative && !player.getInventory().contains(itemStack)) {
+                    player.getInventory().add(itemStack);
+                } else if (!creative)
+                    Containers.dropItemStack(level, (double) dropPos.getX(), (double) dropPos.getY(), (double) dropPos.getZ(), itemStack);
+                filterBlockEntity.setFilter(null);
             }
-            ((FilterItem) itemStack.getItem()).putData(itemStack,data[0],data[1]);
-            boolean creative = player.getAbilities().instabuild;
-            if (creative && !player.getInventory().contains(itemStack)) {
-                player.getInventory().add(itemStack);
-            } else if (!creative)
-                Containers.dropItemStack(level, (double)dropPos.getX(), (double)dropPos.getY(), (double)dropPos.getZ(), itemStack);
-            filterBlockEntity.setFilter(0,0, FilterItem.FilterType.NONE);
         }
         return super.use(state, level, pos, player, hand, hit);
     }
@@ -120,8 +111,9 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        switch ((Direction)pState.getValue(FACING)) {
+        switch ((Direction) pState.getValue(FACING)) {
             case NORTH:
                 return SHAPE_NORTH;
             case SOUTH:
@@ -137,7 +129,7 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
 
     @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return getShape(pState,pLevel,pPos,pContext);
+        return getShape(pState, pLevel, pPos, pContext);
     }
 
     @Override

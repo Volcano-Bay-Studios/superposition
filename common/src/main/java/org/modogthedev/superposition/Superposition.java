@@ -19,6 +19,8 @@ public class Superposition {
         LOGGER.info("Superposition is initializing.");
 
         initTheme();
+        SuperpositionRegistries.register();
+        SuperpositionFilters.FILTERS.register();
         SuperpositionBlocks.BLOCKS.register();
         SuperpositionBlockEntities.BLOCK_ENTITIES.register();
         SuperpositionTabs.TABS.register();
