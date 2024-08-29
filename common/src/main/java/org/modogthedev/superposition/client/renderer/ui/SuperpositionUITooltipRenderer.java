@@ -116,7 +116,7 @@ public class SuperpositionUITooltipRenderer {
         if (tooltippable.getWorldspace()) {
             currentPos = currentPos == null ? pos : currentPos;
             Vec3 playerPos = mc.gameRenderer.getMainCamera().getPosition();
-            Vec3i playerPosInt = new Vec3i((int) playerPos.x, (int) playerPos.y, (int) playerPos.z);
+            Vec3i playerPosInt = new Vec3i((int) Math.round(result.getLocation().x), (int) result.getLocation().y, (int) Math.round(result.getLocation().z+1));
             Vec3i cornerInt = new Vec3i((int) pos.x, (int) pos.y, (int) pos.z);
             Vec3i diff = playerPosInt.subtract(cornerInt);
             desiredPos = pos.add(Math.round(Mth.clamp(Math.round(diff.getX()), -1, 1) * 0.5f) - 0.5f, 0.5, Math.round(Mth.clamp(Math.round(diff.getZ()), -1, 1) * 0.5f) - 0.5f);
@@ -131,7 +131,7 @@ public class SuperpositionUITooltipRenderer {
             Vector3f desiredScreenSpacePos = SpaceHelper.worldToScreenSpace(desiredPos, partialTicks);
             screenSpacePos = new Vector3f(Mth.clamp(screenSpacePos.x(), 0, width), Mth.clamp(screenSpacePos.y(), 0, height - (mc.font.lineHeight * tooltip.size())), screenSpacePos.z());
             desiredScreenSpacePos = new Vector3f(Mth.clamp(desiredScreenSpacePos.x(), 0, width), Mth.clamp(desiredScreenSpacePos.y(), 0, height - (mc.font.lineHeight * tooltip.size())), desiredScreenSpacePos.z());
-            tooltipX = (int) screenSpacePos.x();
+            tooltipX = (int) screenSpacePos.x()-(tooltipTextWidth/2);
             tooltipY = (int) screenSpacePos.y();
             desiredX = (int) desiredScreenSpacePos.x();
             desiredY = (int) desiredScreenSpacePos.y();
