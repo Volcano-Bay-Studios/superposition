@@ -53,14 +53,14 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         if (linkedPos != null) {
-            pTag.putInt("x", linkedPos.getX());
-            pTag.putInt("y", linkedPos.getY());
-            pTag.putInt("z", linkedPos.getZ());
+            pTag.putInt("linkedPosx", linkedPos.getX());
+            pTag.putInt("linkedPosy", linkedPos.getY());
+            pTag.putInt("linkedPosz", linkedPos.getZ());
         }
         super.saveAdditional(pTag);
     }
     public void loadLinkedPos(CompoundTag pTag) {
-        linkedPos = new BlockPos(pTag.getInt("x"),pTag.getInt("y"),pTag.getInt("z"));
+        linkedPos = new BlockPos(pTag.getInt("linkedPosx"),pTag.getInt("linkedPosy"),pTag.getInt("linkedPosz"));
     }
 
     @Override

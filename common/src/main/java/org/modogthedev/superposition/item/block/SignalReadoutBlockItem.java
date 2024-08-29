@@ -28,9 +28,9 @@ public class SignalReadoutBlockItem extends BlockItem {
         if (Objects.requireNonNull(pContext.getPlayer()).isCrouching()) {
             if (pContext.getLevel().getBlockEntity(pContext.getClickedPos()) instanceof SignalActorBlockEntity signalActorBlockEntity) {
                 CompoundTag tag = new CompoundTag();
-                tag.putInt("x",pContext.getClickedPos().getX());
-                tag.putInt("y",pContext.getClickedPos().getY());
-                tag.putInt("z",pContext.getClickedPos().getZ());
+                tag.putInt("linkedPosx",pContext.getClickedPos().getX());
+                tag.putInt("linkedPosy",pContext.getClickedPos().getY());
+                tag.putInt("linkedPosz",pContext.getClickedPos().getZ());
                 pContext.getItemInHand().addTagElement("linkedpos",tag);
                 return InteractionResult.SUCCESS;
             }
