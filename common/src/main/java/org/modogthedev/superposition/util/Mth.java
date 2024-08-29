@@ -30,7 +30,7 @@ public class Mth {
         } else if (frequency >=1000) {
             return Math.round(frequency/100)+"kHz";
         }
-        return frequency+"Hz";
+        return (Math.round(frequency*10))/10f+"Hz";
     }
 
     /**

@@ -58,7 +58,7 @@ public class BandPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "Band Pass Filter - " + Mth.frequencyToHzReadable(lowFrequency) + "-" + Mth.frequencyToHzReadable(highFrequency);
+        return "Band Pass Filter - " + Mth.frequencyToHzReadable(lowFrequency) + " - " + Mth.frequencyToHzReadable(Math.abs(158-highFrequency));
     }
 
     @Override
@@ -75,4 +75,5 @@ public class BandPassFilter extends Filter {
     public Filter create() {
         return new BandPassFilter(getSelfReference());
     }
+
 }

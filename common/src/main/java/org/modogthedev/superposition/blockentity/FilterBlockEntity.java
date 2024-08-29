@@ -63,6 +63,10 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
         preTick();
         List<Component> tooltip = new ArrayList<>();
         this.setTooltip(tooltip);
+        if (level.isClientSide && getFilterType() != null) {
+            addTooltip(Component.literal("Filter Status: "));
+            addTooltip(Component.literal(getFilterType().toString()));
+        }
         super.tick();
     }
 

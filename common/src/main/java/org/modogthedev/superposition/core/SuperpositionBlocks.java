@@ -24,7 +24,7 @@ public class SuperpositionBlocks {
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<SignalReadoutBlock> SIGNAL_READOUT = BLOCKS.register("signal_readout",
-            () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<TransmitterBlock> TRANSMITTER = registerBlock("transmitter",
