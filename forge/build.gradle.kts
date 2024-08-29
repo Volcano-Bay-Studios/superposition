@@ -33,6 +33,7 @@ dependencies {
 
     modApi("dev.architectury:architectury-forge:${rootProject.property("architectury_version")}"){ isTransitive = false }
     modImplementation("foundry.veil:Veil-forge-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}") { isTransitive = false; exclude(group = "maven.modrinth") }
+    include("foundry.veil:Veil-forge-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}") { isTransitive = false; exclude(group = "maven.modrinth") }
     modApi("mezz.jei:jei-${rootProject.property("minecraft_version")}-forge-api:${rootProject.property("jei_version")}")
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-forge-latest:1.2.1")

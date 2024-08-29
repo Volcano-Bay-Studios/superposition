@@ -58,10 +58,6 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
         return true;
     }
 
-    public boolean passCustomValue(float value, float min, float max) {
-        return (value) > (min) && value < max;
-    }
-
     @Override
     public void tick() {
         preTick();
@@ -87,17 +83,29 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
         if (type != null) {
+            pTag.putString("namespace", type.getSelfReference().getNamespace());
+            pTag.putString("path", type.getSelfReference().getPath());
             type.save(pTag);
-            pTag.putString("namespace", SuperpositionFilters.FILTERS.getRegistrar().getId(type).getNamespace());
-            pTag.putString("path", SuperpositionFilters.FILTERS.getRegistrar().getId(type).getPath());
         }
+    }
+
+
+    @Override
+    public void loadSyncedData(CompoundTag tag) {
+        if (tag.contains("swap"))
+            super.loadSyncedData(tag);
+//        type = SuperpositionFilters.FILTERS.getRegistrar().get(new ResourceLocation(tag.getString("namespace"), tag.getString("path"))).create();
+        if (type != null && tag.contains("path"))
+            type.load(tag);
     }
 
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
         type = SuperpositionFilters.FILTERS.getRegistrar().get(new ResourceLocation(pTag.getString("namespace"), pTag.getString("path")));
-        if (type != null)
+        if (type != null) {
+            type = type.create();
             type.load(pTag);
+        }
     }
 }

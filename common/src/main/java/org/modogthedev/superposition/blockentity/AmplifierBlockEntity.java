@@ -32,8 +32,8 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public void writeData(CompoundTag tag) {
-        super.writeData(tag);
+    public void loadSyncedData(CompoundTag tag) {
+        super.loadSyncedData(tag);
         this.modRate = tag.getFloat("modRate");
         this.redstoneMod = tag.getFloat("redstoneMod");
 

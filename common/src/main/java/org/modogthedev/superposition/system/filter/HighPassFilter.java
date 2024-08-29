@@ -1,7 +1,9 @@
 package org.modogthedev.superposition.system.filter;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -12,6 +14,14 @@ import java.util.List;
 
 public class HighPassFilter extends Filter {
     float frequency;
+
+    public HighPassFilter(ResourceLocation filter) {
+        super(filter);
+    }
+
+    public HighPassFilter() {
+        super();
+    }
 
     @Override
     public boolean passSignal(Signal signal) {
@@ -50,5 +60,9 @@ public class HighPassFilter extends Filter {
     @Override
     public ItemStack getItem() {
         return new ItemStack(SuperpositionItems.HIGH_PASS_FILTER.get());
+    }
+    @Override
+    public Filter create() {
+        return new HighPassFilter(getSelfReference());
     }
 }

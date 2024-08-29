@@ -75,6 +75,7 @@ public class SignalManager {
                 tag.putInt("x1", signal.sourceAntennaPos.getX());
                 tag.putInt("y1", signal.sourceAntennaPos.getY());
                 tag.putInt("z1", signal.sourceAntennaPos.getZ());
+                tag.putInt("sourceAntennaSize",signal.sourceAntennaSize);
                 list.add(tag);
             }
             wholeTag.put("signals", list);

@@ -314,8 +314,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     @Override
-    public void writeData(CompoundTag tag) {
-        super.writeData(tag);
+    public void loadSyncedData(CompoundTag tag) {
+        super.loadSyncedData(tag);
         level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
     }
 

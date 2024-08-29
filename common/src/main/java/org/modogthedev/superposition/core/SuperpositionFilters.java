@@ -15,9 +15,9 @@ import java.util.function.Supplier;
 
 public class SuperpositionFilters {
     public static final DeferredRegister<Filter> FILTERS = DeferredRegister.create(Superposition.MODID, SuperpositionRegistries.FILTER_REGISTRY);
-    public static final RegistrySupplier<Filter> HIGH_PASS = registerFilter("high_pass", HighPassFilter::new);
-    public static final RegistrySupplier<Filter> LOW_PASS = registerFilter("low_pass", LowPassFilter::new);
-    public static final RegistrySupplier<Filter> BAND_PASS = registerFilter("band_pass", BandPassFilter::new);
+    public static final RegistrySupplier<Filter> HIGH_PASS = registerFilter("high_pass", () -> new HighPassFilter(Superposition.id("high_pass")));
+    public static final RegistrySupplier<Filter> LOW_PASS = registerFilter("low_pass", () -> new LowPassFilter(Superposition.id("low_pass")));
+    public static final RegistrySupplier<Filter> BAND_PASS = registerFilter("band_pass", () -> new BandPassFilter(Superposition.id("band_pass")));
 
     private static <T extends Filter> RegistrySupplier<T> registerFilter(String name, Supplier<T> filter) {
         return FILTERS.register(name, filter);

@@ -30,6 +30,7 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.item.FilterItem;
+import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -91,17 +92,24 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (player.isCrouching() && blockEntity instanceof FilterBlockEntity filterBlockEntity) {
+        if (blockEntity instanceof FilterBlockEntity filterBlockEntity) {
             if (filterBlockEntity.getFilterType() != null) {
-                BlockPos dropPos = pos.relative(state.getValue(FACING));
-                ItemStack itemStack = filterBlockEntity.getFilterType().getItem();
-                ((FilterItem) itemStack.getItem()).putData(itemStack, filterBlockEntity.getFilterType());
-                boolean creative = player.getAbilities().instabuild;
-                if (creative && !player.getInventory().contains(itemStack)) {
-                    player.getInventory().add(itemStack);
-                } else if (!creative)
-                    Containers.dropItemStack(level, (double) dropPos.getX(), (double) dropPos.getY(), (double) dropPos.getZ(), itemStack);
-                filterBlockEntity.setFilter(null);
+                if (player.isCrouching()) {
+                    BlockPos dropPos = pos.relative(state.getValue(FACING));
+                    ItemStack itemStack = filterBlockEntity.getFilterType().getItem();
+                    ((FilterItem) itemStack.getItem()).putData(itemStack, filterBlockEntity.getFilterType());
+                    boolean creative = player.getAbilities().instabuild;
+                    if (creative && !player.getInventory().contains(itemStack)) {
+                        player.getInventory().add(itemStack);
+                    } else if (!creative)
+                        Containers.dropItemStack(level, (double) dropPos.getX(), (double) dropPos.getY(), (double) dropPos.getZ(), itemStack);
+                    filterBlockEntity.setFilter(null);
+                } else {
+                    if (level.isClientSide) {
+                        ScreenManager.openFilterScreen(filterBlockEntity.getFilterType(), pos, true);
+                        return InteractionResult.SUCCESS;
+                    }
+                }
             }
         }
         return super.use(state, level, pos, player, hand, hit);

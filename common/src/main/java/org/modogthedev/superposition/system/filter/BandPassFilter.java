@@ -1,7 +1,9 @@
 package org.modogthedev.superposition.system.filter;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -13,6 +15,14 @@ import java.util.List;
 public class BandPassFilter extends Filter {
     float lowFrequency;
     float highFrequency;
+
+    public BandPassFilter(ResourceLocation filter) {
+        super(filter);
+    }
+
+    public BandPassFilter() {
+        super();
+    }
 
     @Override
     public boolean passSignal(Signal signal) {
@@ -59,5 +69,10 @@ public class BandPassFilter extends Filter {
     @Override
     public Color getColor() {
         return new Color(127, 246, 95);
+    }
+
+    @Override
+    public Filter create() {
+        return new BandPassFilter(getSelfReference());
     }
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "# #",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "superposition:insulated_sheet"
+    }
+  },
+  "result": {
+    "item": "superposition:insulated_casing",
+    "count": 1
+  }
+}

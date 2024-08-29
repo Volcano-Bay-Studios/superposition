@@ -7,7 +7,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import org.modogthedev.superposition.platform.PlatformHelper;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
 
 import java.util.function.Supplier;
@@ -53,14 +52,14 @@ public class BlockEntityModificationC2SPacket {
 
             BlockEntity blockEntity = world.getBlockEntity(pos);
 
-            if (blockEntity instanceof SyncedBlockEntity) {
-                applySettings(serverPlayer, (SyncedBlockEntity) blockEntity);
+            if (blockEntity instanceof SyncedBlockEntity syncedBlockEntity) {
+                applySettings(serverPlayer, syncedBlockEntity);
                 blockEntity.setChanged();
             }
         });
     }
     public void applySettings(ServerPlayer player, SyncedBlockEntity blockEntity) {
-        blockEntity.writeData(tag);
+        blockEntity.loadSyncedData(tag);
         blockEntity.sendData();
     }
 }

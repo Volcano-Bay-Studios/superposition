@@ -15,7 +15,7 @@ public class SyncedBlockEntity extends BlockEntity {
     public SyncedBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
-    public void writeData(CompoundTag tag) {
+    public void loadSyncedData(CompoundTag tag) {
 
     }
     public void syncData() {

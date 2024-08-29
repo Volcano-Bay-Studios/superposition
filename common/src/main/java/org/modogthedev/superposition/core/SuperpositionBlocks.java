@@ -44,6 +44,10 @@ public class SuperpositionBlocks {
             () -> new FilterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistrySupplier<EncoderBlock> ENCODER = registerBlock("encoder",
+            () -> new EncoderBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
     public static final RegistrySupplier<CasingBlock> CASING = registerBlock("casing",
             () -> new CasingBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()

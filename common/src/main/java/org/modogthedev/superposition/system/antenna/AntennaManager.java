@@ -65,7 +65,7 @@ public class AntennaManager {
             Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level,signal.sourceAntennaPos);
             signal1.amplitude /= Math.max(1, dist / (1000000000 / signal.frequency));
 //            signal1.amplitude /= Math.max(1, (Math.abs(antennaFrequency - signal.frequency) / 40000));
-            signal1.amplitude /= Math.max(1, 1f/(Mth.resonanceAlgorithm(antenna.antennaParts.size(),sourceAntenna.antennaParts.size())));
+            signal1.amplitude /= Math.max(1, 1f/(Mth.resonanceAlgorithm(antenna.antennaParts.size(),Math.max(1,signal.sourceAntennaSize))));
 
             if (signal1.amplitude > 1)
                 antenna.signals.add(signal1);
@@ -102,6 +102,8 @@ public class AntennaManager {
 
     public static void antennaPartUpdate(LevelReader reader, BlockPos pos) {
         Level level = (Level) reader;
+        if (pos == null)
+            return;
         if (reader.getBlockEntity(pos.below()) instanceof AntennaActorBlockEntity)
             pos = pos.below();
         BlockHelper.AntennaPart thisPart = BlockHelper.getAntennaPart(reader, pos);

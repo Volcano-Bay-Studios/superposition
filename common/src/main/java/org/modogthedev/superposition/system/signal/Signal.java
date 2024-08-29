@@ -13,6 +13,7 @@ public class Signal {
     public float frequency;
     public float sourceFrequency;
     public BlockPos sourceAntennaPos;
+    public int sourceAntennaSize = 0;
     public static final int speed = 64;
     public float modulation;
     public Vec3 pos;

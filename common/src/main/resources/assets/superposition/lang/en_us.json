@@ -9,6 +9,7 @@
   "block.superposition.casing" : "Insulated Casing",
 
   "item.superposition.screwdriver" : "Screwdriver",
+  "item.superposition.insulated_sheet" : "Insulated Sheet",
   "item.superposition.low_pass_filter" : "Low Pass Filter",
   "item.superposition.high_pass_filter" : "High Pass Filter",
   "item.superposition.band_pass_filter" : "Band Pass Filter",

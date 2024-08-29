@@ -29,8 +29,8 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
 
     @Override
-    public void writeData(CompoundTag tag) {
-        super.writeData(tag);
+    public void loadSyncedData(CompoundTag tag) {
+        super.loadSyncedData(tag);
         this.frequency = tag.getFloat("frequency");
         boolean animated = frequency > .7f;
 

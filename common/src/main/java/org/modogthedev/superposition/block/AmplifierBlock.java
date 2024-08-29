@@ -172,7 +172,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
         AmplifierBlockEntity blockEntity = (AmplifierBlockEntity) pLevel.getBlockEntity(pPos);
         if (blockEntity != null && blockEntity.lastAmplitude > 0) {
-            return (int) Math.min(15, blockEntity.lastAmplitude/10f);
+            return (int) Math.floor(Math.min(15, blockEntity.lastAmplitude/10f));
         }
         return 0;
     }

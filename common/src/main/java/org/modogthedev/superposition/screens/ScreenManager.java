@@ -21,9 +21,9 @@ public class ScreenManager {
         SuperpositionClient.setScreen(amplifierScreen);
     }
 
-    public static void openFilterScreen(Filter type, BlockPos pos) {
+    public static void openFilterScreen(Filter type, BlockPos pos, boolean editMode) {
         if (!type.openCustomScreen()) {
-            filterScreen = new FilterScreen(Component.literal("Filter"), type, pos);
+            filterScreen = new FilterScreen(Component.literal("Filter"), type, pos, editMode);
             SuperpositionClient.setScreen(filterScreen);
         }
     }

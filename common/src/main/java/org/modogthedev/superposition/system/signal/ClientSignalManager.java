@@ -73,6 +73,7 @@ public class ClientSignalManager {
                 signal1.pos = signal.pos;
                 signal1.sourceFrequency = signal.sourceFrequency;
                 signal1.sourceAntennaPos = new BlockPos(tag.getInt("x1"),tag.getInt("y1"),tag.getInt("z1"));
+                signal1.sourceAntennaSize = tag.getInt("sourceAntennaSize");
             } else
                 clientSignals.get(level).put(uuid, signal);
         }

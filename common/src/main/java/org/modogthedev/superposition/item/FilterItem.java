@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionFilters;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.filter.Filter;
@@ -38,13 +39,13 @@ public class FilterItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         InteractionResultHolder<ItemStack> result = super.use(level, player, usedHand);
-        if (result.getObject().getItem() instanceof  FilterItem)
+        if (result.getObject().getItem() instanceof FilterItem)
             type.load(result.getObject().getTagElement("filter"));
         if (result.getResult() == InteractionResult.PASS) {
             if (level.isClientSide) {
                 ItemStack itemStack = player.getItemInHand(usedHand);
                 if (isPassFilter(type)) {
-                    ScreenManager.openFilterScreen(type, null);
+                    ScreenManager.openFilterScreen(type, null, false);
                     return InteractionResultHolder.success(itemStack);
                 }
             }
@@ -54,17 +55,10 @@ public class FilterItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getItemInHand().getItem() instanceof  FilterItem)
+        if (context.getItemInHand().getItem() instanceof FilterItem)
             type.load(context.getItemInHand().getTagElement("filter"));
-        if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity filterBlockEntity) {
-            if (context.getPlayer().isCrouching()) {
-                if (context.getLevel().isClientSide) {
-                    if (isPassFilter(type)) {
-                        ScreenManager.openFilterScreen(type, context.getClickedPos());
-                        return InteractionResult.SUCCESS;
-                    }
-                }
-            } else {
+        if (!context.getPlayer().isCrouching()) {
+            if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity filterBlockEntity) {
                 boolean creative = context.getPlayer().getAbilities().instabuild;
                 if (filterBlockEntity.getFilterType() == null || creative) {
                     type.load(context.getItemInHand().getTagElement("filter"));
@@ -76,6 +70,14 @@ public class FilterItem extends Item {
                     return InteractionResult.CONSUME;
                 }
             }
+        } else if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof SignalActorBlockEntity) {
+        } if (context.getLevel().isClientSide) {
+            if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity) {
+                    ScreenManager.openFilterScreen(type, context.getClickedPos(), false);
+                    return InteractionResult.SUCCESS;
+            }
+            ScreenManager.openFilterScreen(type, context.getClickedPos(), false);
+            return InteractionResult.SUCCESS;
         }
         return super.useOn(context);
     }
