@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RedStoneWireBlock.class)
-public class ForgeShitMixin {
+public class RedstoneCommonMixin {
     @Inject(method = "getConnectingSide(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Lnet/minecraft/world/level/block/state/properties/RedstoneSide;", at = @At("HEAD"), cancellable = true)
     private void getConnectingSide(BlockGetter level, BlockPos pos, Direction direction, CallbackInfoReturnable<RedstoneSide> cir) {
         BlockPos blockPos = pos.relative(direction);

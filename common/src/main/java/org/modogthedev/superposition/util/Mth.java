@@ -7,6 +7,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.modogthedev.superposition.system.signal.Signal;
 
+import static net.minecraft.util.Mth.lerp;
+
 public class Mth {
     public static float getFromRange(float OldMax, float OldMin, float NewMax, float NewMin, float OldValue) {
         float OldRange = (OldMax - OldMin);
@@ -15,6 +17,9 @@ public class Mth {
     }
     public static BlockPos blockPosFromVec3(Vec3 vec3) {
         return new BlockPos((int) vec3.x, (int) vec3.y, (int) vec3.z);
+    }
+    public static Vec3 lerpVec3(Vec3 start, Vec3 end, float delta) {
+        return new Vec3(lerp(delta,start.x,end.x),lerp(delta,start.y,end.y),lerp(delta,start.z,end.z));
     }
 
     /**
@@ -30,9 +35,8 @@ public class Mth {
         } else if (frequency >=1000) {
             return Math.round(frequency/100)+"kHz";
         }
-        return (Math.round(frequency*10))/10f+"Hz";
+        return (Math.round(frequency*1000))/1000f+"Hz";
     }
-
     /**
      * Returns the frequency of an antenna
      * See <a href="https://www.ahsystems.com/EMC-formulas-equations/frequency-wavelength-calculator.php">...</a>

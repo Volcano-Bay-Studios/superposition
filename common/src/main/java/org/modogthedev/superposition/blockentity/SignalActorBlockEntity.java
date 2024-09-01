@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -233,6 +234,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     public BlockPos getInvertedSwappedPos() {
         BlockPos sidedPos2 = new BlockPos(0, 0, 0);
+        if (level.getBlockState(sidedPos2).is(Blocks.AIR))
+            return null;
         if (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
             sidedPos2 = getBlockPos().relative(level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise(), 1);
         } else {

@@ -1,11 +1,14 @@
 package org.modogthedev.superposition;
 
 import com.mojang.logging.LogUtils;
+import dev.architectury.event.events.common.InteractionEvent;
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
 import net.minecraft.resources.ResourceLocation;
 import org.modogthedev.superposition.core.*;
+import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.slf4j.Logger;
 
@@ -28,7 +31,8 @@ public class Superposition {
         SuperpositionSounds.SOUNDS.register();
         SuperpositionMessages.register();
         TickEvent.SERVER_LEVEL_POST.register(SignalManager::tick);
-
+        TickEvent.SERVER_LEVEL_POST.register(CableManager::tick);
+        InteractionEvent.RIGHT_CLICK_BLOCK.register(CableManager::playerUseEvent);
         LOGGER.info("Superposition has been initialized.");
     }
 
