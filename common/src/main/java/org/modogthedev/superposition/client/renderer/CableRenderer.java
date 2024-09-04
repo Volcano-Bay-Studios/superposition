@@ -24,6 +24,7 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionConstants;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class CableRenderer {
         poseStack.translate(translation.x,translation.y,translation.z);
         List<Cable> cables =  new ArrayList<>();
         cables.addAll(CableManager.getLevelCables(level));
-        cables.addAll(CableManager.playersDraggingCables.values());
+        cables.addAll(CableManager.getPlayersDraggingCables(level).values());
         for (Cable cable: cables) {
             poseStack.pushPose();
 //            poseStack.translate(origin.x,origin.y,origin.z);
@@ -55,11 +56,11 @@ public class CableRenderer {
                     point = cable.getPoints().get(i);
                     nextPoint = cable.getPoints().get(i + 1);
                 } else {
-                    point = cable.getPoints().get(i);
-                    nextPoint = cable.getPoints().get(i-1); //TODO: render last point in the cable because when I do it start flickering for some reason :/
+                    point = cable.getPoints().get(i-1);
+                    nextPoint = cable.getPoints().get(i); //TODO: render last point in the cable because when I do it start flickering for some reason :/
                 }
                 Vec3 normal = getPointsNormal(point.getPosition(),nextPoint.getPosition());;
-                renderCableFrustrum(poseStack,new Color(68, 68, 68),.1+(i%5*.001f), Mth.lerpVec3(point.getPrevPosition(),point.getPosition(),partialTicks),normal,Mth.lerpVec3(nextPoint.getPrevPosition(),nextPoint.getPosition(),partialTicks).add(normal.scale(.01f)),normal);
+                renderCableFrustrum(poseStack,new Color(68, 68, 68), SuperpositionConstants.cableWidth +(i%5*.0001f), Mth.lerpVec3(point.getPrevPosition(),point.getPosition(),partialTicks),normal,Mth.lerpVec3(nextPoint.getPrevPosition(),nextPoint.getPosition(),partialTicks).add(normal.scale(.01f)),normal);
             }
 
             poseStack.popPose();

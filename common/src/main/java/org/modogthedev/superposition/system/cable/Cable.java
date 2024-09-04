@@ -1,18 +1,19 @@
 package org.modogthedev.superposition.system.cable;
 
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
+import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.util.Vec3LerpComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,10 @@ import java.util.List;
 public class Cable {
     private List<Point> points = new ArrayList<>();
     private final Level level;
-    public float radius = 0.5f;
-    public float elasticity = 0.8f;
+    public float radius = SuperpositionConstants.cableRadius;
+    public float elasticity = 0.99f;
     private Player playerHolding;
+    public Vec3 playerDraggedLastDelta = Vec3.ZERO;
 
     public Cable(Vec3 starAnchor, Vec3 endAnchor, int points, Level level) {
         addPoint(new Point(starAnchor));
@@ -47,19 +49,53 @@ public class Cable {
 
     private void followPlayer() {
         if (playerHolding != null) {
-            Vec3 playerOffset = playerHolding.getRopeHoldPosition(0).add(0, 0.5, 0);
-            points.get(points.size() - 1).position = playerOffset;
+            Point heldPoint = points.get(points.size() - 1);
+            Vec3 playerOffset = playerHolding.getRopeHoldPosition(0);
+            Vec3 moveVec = playerOffset.subtract(heldPoint.position);
+            if (heldPoint.position.distanceTo(playerOffset) < 10) {
+                heldPoint.position = heldPoint.position.add(moveVec.scale(1));
+            } else {
+                CableManager.playerFinishDraggingCable(playerHolding, heldPoint.position);
+            }
 //            if (radius*1.5f < points.get(points.size() - 1).position.subtract(points.get(points.size() - 2).position).length())
 //                addPoint(new Point(playerOffset));
         }
     }
 
     public void updatePhysics() {
-        followPlayer();
         integrate();
-        update(true);
+        followPlayer();
         update(false);
+        update(true);
         updateCollisions();
+        lerpPos();
+        sendSignal();
+    }
+
+    private void sendSignal() {
+        if (level != null && playerHolding == null) {
+            BlockPos startPos = BlockPos.containing(points.get(0).getPosition());
+            BlockPos endPos = BlockPos.containing(points.get(points.size() - 1).getPosition());
+            if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
+                BlockEntity start = level.getBlockEntity(startPos);
+                BlockEntity end = level.getBlockEntity(endPos);
+                if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof  SignalActorBlockEntity endSignalActor) {
+                    List<Signal> signalList = startSignalActor.getSignals();
+                    if (signalList != null && !signalList.isEmpty()) {
+                        endSignalActor.putSignalList(new Object(),signalList);
+                    }
+                }
+            }
+        }
+    }
+
+    private void lerpPos() {
+        Point lastPoint = points.get(points.size() - 1);
+        if (lastPoint.lerpedPos != null) {
+            lastPoint.position = lastPoint.lerpedPos.stepAndGather();
+            if (lastPoint.lerpedPos.isComplete())
+                lastPoint.lerpedPos = null;
+        }
     }
 
     private void update(boolean isForwards) {
@@ -112,15 +148,19 @@ public class Cable {
     }
 
     private void integrate() {
-        for (int i = 1; i < (points.size() - 1); i++) {
+        for (int i = 1; i < (points.size()); i++) {
             Point point = points.get(i);
-            Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -9.8, 0).scale(.05 * 0.05));
-            Vec3 normal = (nextPosition.subtract(point.position));
-            point.prevPosition = point.position;
-            if (point.inContact)
-                point.position = point.position.add(normal.scale(0.7f));
-            else
-                point.position = point.position.add(normal.scale(0.99f));
+            if (i < points.size() - 1) {
+                Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -9.8, 0).scale(.05 * 0.05));
+                Vec3 normal = (nextPosition.subtract(point.position));
+                point.prevPosition = point.position;
+                if (point.inContact)
+                    point.position = point.position.add(normal.scale(0.7f));
+                else
+                    point.position = point.position.add(normal.scale(0.9f));
+            } else {
+                point.prevPosition = point.position;
+            }
         }
     }
 
@@ -132,12 +172,14 @@ public class Cable {
         return points;
     }
 
+
     public static class Point {
         private Vec3 prevPosition;
         private Vec3 position;
         private boolean inContact = false;
         private float forwardLength;
         private float backwordsLength;
+        public Vec3LerpComponent lerpedPos = null;
 
         public Point(Vec3 position) {
             this.position = position;
@@ -161,10 +203,7 @@ public class Cable {
         }
 
         public float getLength() {
-            if (forwardLength > backwordsLength)
-                return forwardLength;
-            else
-                return backwordsLength;
+            return Math.max(forwardLength, backwordsLength);
         }
 
         public void setPrevPosition(Vec3 vec3) {
