@@ -1,79 +1,92 @@
 package org.modogthedev.superposition.system.cable;
 
-import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.InteractionEvent;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.core.SuperpositionItems;
-import org.modogthedev.superposition.system.antenna.Antenna;
+import org.modogthedev.superposition.core.SuperpositionMessages;
+import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CableManager {
-    private static final HashMap<Level, List<Cable>> cables = new HashMap<>();
+    private static final HashMap<Level, HashMap<UUID,Cable>> cables = new HashMap<>();
     private static final HashMap<Player, Cable> playersDraggingCables = new HashMap<>();
-    private static final HashMap<Level, List<Cable>> clientCables = new HashMap<>();
+    private static final HashMap<Level, HashMap<UUID,Cable>> clientCables = new HashMap<>();
     private static final HashMap<Player, Cable> clientPlayersDraggingCables = new HashMap<>();
 
     private static void ifAbsent(Level level) {
-        if (!getCables(level).containsKey(level)) {
-            getCables(level).put(level, new ArrayList<>());
+        if (!getCablesMap(level).containsKey(level)) {
+            getCablesMap(level).put(level, new HashMap<>());
         }
     }
-
-    public static HashMap<Level, List<Cable>> getCables(Level level) {
+    public static HashMap<Level, HashMap<UUID,Cable>> getCablesMap(Level level) {
         return level.isClientSide ? clientCables : cables;
     }
 
-    public static HashMap<Player, Cable> getPlayersDraggingCables(Level level) {
+    public static Collection<Cable> getCables(Level level) {
+        return level.isClientSide ? clientCables.get(level).values() : cables.get(level).values();
+    }
+    public static HashMap<Player, Cable> getPlayersDraggingCablesMap(Level level) {
         return level.isClientSide ? playersDraggingCables : clientPlayersDraggingCables;
     }
 
     public static void tick(ServerLevel level) {
         ifAbsent(level);
-        for (Cable cable : getCables(level).get(level)) {
+        for (Cable cable : getCables(level)) {
             cable.updatePhysics();
         }
-        for (Cable cable : getPlayersDraggingCables(level).values()) {
+        for (Cable cable : getPlayersDraggingCablesMap(level).values()) {
             cable.updatePhysics();
         }
         dragPlayers(level);
+        for (UUID uuid : getCablesMap(level).get(level).keySet()) {
+            Cable cable = getCablesMap(level).get(level).get(uuid);
+            CableSyncS2CPacket packet = new CableSyncS2CPacket(cable,uuid,false);
+            for (ServerPlayer player: level.getServer().getPlayerList().getPlayers()) {
+                float maxDistance = cable.getPoints().size()+100;
+                if (cable.getPoints().get(0).getPosition().distanceTo(player.position()) < maxDistance)
+                    SuperpositionMessages.sendToPlayer(packet, player);
+            }
+        }
+        for (Player player : getPlayersDraggingCablesMap(level).keySet()) {
+            Cable cable = getPlayersDraggingCablesMap(level).get(player);
+            CableSyncS2CPacket packet = new CableSyncS2CPacket(cable,player.getUUID(),true);
+            for (ServerPlayer targetPlayer: level.getServer().getPlayerList().getPlayers()) {
+                float maxDistance = cable.getPoints().size()+100;
+                if (cable.getPoints().get(0).getPosition().distanceTo(targetPlayer.position()) < maxDistance)
+                    SuperpositionMessages.sendToPlayer(packet, targetPlayer);
+            }
+        }
     }
 
     public static void clientTick(Level level) {
         ifAbsent(level);
-        for (Cable cable : getCables(level).get(level)) {
+        for (Cable cable : getCables(level)) {
 //            cable.debugDraw();
             cable.updatePhysics();
         }
-        for (Cable cable : getPlayersDraggingCables(level).values()) {
+        for (Cable cable : getPlayersDraggingCablesMap(level).values()) {
             cable.updatePhysics();
         }
         dragPlayers(level);
     }
 
     public static void dragPlayers(Level level) {
-        for (Player player : getPlayersDraggingCables(level).keySet()) {
+        for (Player player : getPlayersDraggingCablesMap(level).keySet()) {
             LivingEntity holder = (LivingEntity) player;
-            Cable cable = getPlayersDraggingCables(level).get(player);
+            Cable cable = getPlayersDraggingCablesMap(level).get(player);
             float longestSegment = 0f;
             for (int i = 1; i < (cable.getPoints().size()); i++) {
                 if (longestSegment < cable.getPoints().get(i).getLength())
@@ -97,7 +110,7 @@ public class CableManager {
     }
 
     public static void playerUsesCable(Player player, Vec3 vec3) {
-        if (getPlayersDraggingCables(player.level()).containsKey(player)) {
+        if (getPlayersDraggingCablesMap(player.level()).containsKey(player)) {
             playerFinishDraggingCable(player, vec3);
         } else {
             playerStartCable(vec3, player.level(), player);
@@ -107,7 +120,7 @@ public class CableManager {
     public static EventResult playerUseEvent(Player player, InteractionHand hand, BlockPos pos, Direction face) {
         Vec3 anchorPosition = pos.getCenter().add(pos.getCenter().subtract(pos.relative(face).getCenter()).scale(-0.45));
         if (player.getItemInHand(hand).is(Items.AIR)) {
-            if (!getPlayersDraggingCables(player.level()).containsKey(player)) {
+            if (!getPlayersDraggingCablesMap(player.level()).containsKey(player)) {
                 CableClipResult cableClipResult = new CableClipResult(player.position(), 8, player.level());
                 List<Pair<Cable, Cable.Point>> raycast = cableClipResult.rayCast(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
                 if (!raycast.isEmpty()) {
@@ -116,14 +129,14 @@ public class CableManager {
                         if (cable.getPoints().get(cable.getPoints().size() - 1) == raycast.get(i).getB()) {
                             cable.setPlayerHolding(player);
                             cable.getPoints().get(cable.getPoints().size() - 1).setPosition(player.position());
-                            getPlayersDraggingCables(player.level()).put(player, cable);
-                            getCables(player.level()).get(player.level()).remove(cable);
+                            getPlayersDraggingCablesMap(player.level()).put(player, cable);
+                            getCables(player.level()).remove(cable);
                             return EventResult.interruptTrue();
                         }
                     }
                 }
             } else {
-                Cable cable = getPlayersDraggingCables(player.level()).get(player);
+                Cable cable = getPlayersDraggingCablesMap(player.level()).get(player);
                 if (player.isCrouching()) {
                     playerFinishDraggingCable(player, anchorPosition);
                     return EventResult.interruptTrue();
@@ -134,25 +147,28 @@ public class CableManager {
     }
 
     private static void playerStartCable(Vec3 pos, Level level, Player player) {
+        if (player.level().isClientSide)
+            return;
         Cable newCable = new Cable(pos, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level);
         newCable.setPlayerHolding(player);
-        getPlayersDraggingCables(level).put(player, newCable);
+        getPlayersDraggingCablesMap(level).put(player, newCable);
     }
 
     public static void playerFinishDraggingCable(Player player, Vec3 vec3) {
-        Cable cable = getPlayersDraggingCables(player.level()).get(player);
+        Cable cable = getPlayersDraggingCablesMap(player.level()).get(player);
         if (cable != null) {
             Cable.Point anchorPoint = new Cable.Point(vec3);
             anchorPoint.lerpedPos = new Vec3LerpComponent(vec3, cable.getPoints().get(cable.getPoints().size() - 1).getPosition(), 5);
             cable.addPoint(anchorPoint);
             cable.setPlayerHolding(null);
-            getPlayersDraggingCables(player.level()).remove(player);
-            addCable(cable, player.level());
+            getPlayersDraggingCablesMap(player.level()).remove(player);
+            if (!player.level().isClientSide)
+                addCable(cable, player.level(), UUID.randomUUID());
         }
     }
 
     public static void playerExtendsCable(Player player, int amount) {
-        Cable cable = getPlayersDraggingCables(player.level()).get(player);
+        Cable cable = getPlayersDraggingCablesMap(player.level()).get(player);
         if (cable != null) {
             for (int i = 0; i < amount; i++)
                 cable.addPoint(new Cable.Point(player.position()));
@@ -160,23 +176,23 @@ public class CableManager {
     }
 
     public static void playerShrinksCable(Player player) {
-        Cable cable = getPlayersDraggingCables(player.level()).get(player);
+        Cable cable = getPlayersDraggingCablesMap(player.level()).get(player);
         if (cable != null) {
             cable.shrink();
         }
     }
 
-    public static void addCable(Cable cable, Level level) {
+    public static void addCable(Cable cable, Level level, UUID uuid) {
         ifAbsent(level);
-        getCables(level).get(level).add(cable);
+        getCablesMap(level).get(level).put(uuid,cable);
     }
 
-    public static List<Cable> getLevelCables(Level level) {
+    public static Collection<Cable> getLevelCables(Level level) {
         ifAbsent(level);
-        return getCables(level).get(level);
+        return getCables(level);
     }
 
     public static List<Cable> getPlayerDraggingCables(Level level) {
-        return (List<Cable>) getPlayersDraggingCables(level).values();
+        return (List<Cable>) getPlayersDraggingCablesMap(level).values();
     }
 }

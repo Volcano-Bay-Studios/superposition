@@ -3,12 +3,14 @@ package org.modogthedev.superposition.system.cable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
@@ -17,14 +19,17 @@ import org.modogthedev.superposition.util.Vec3LerpComponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Cable {
     private List<Point> points = new ArrayList<>();
-    private final Level level;
+    private Level level;
     public float radius = SuperpositionConstants.cableRadius;
     public float elasticity = 0.99f;
     private Player playerHolding;
     public Vec3 playerDraggedLastDelta = Vec3.ZERO;
+    public int ticksSinceUpdate = 0;
+    public int avgTicksSinceUpdate = 1;
 
     public Cable(Vec3 starAnchor, Vec3 endAnchor, int points, Level level) {
         addPoint(new Point(starAnchor));
@@ -33,6 +38,11 @@ public class Cable {
             addPoint(new Point(Mth.lerpVec3(starAnchor, endAnchor, delta)));
         }
         addPoint(new Point(endAnchor));
+        this.level = level;
+    }
+
+    private Cable(List<Point> points, Level level) {
+        this.points = points;
         this.level = level;
     }
 
@@ -63,6 +73,7 @@ public class Cable {
     }
 
     public void updatePhysics() {
+        ticksSinceUpdate++;
         integrate();
         followPlayer();
         update(false);
@@ -167,11 +178,53 @@ public class Cable {
     public void setPlayerHolding(Player player) {
         this.playerHolding = player;
     }
+    public void setLevel(Level level) {
+        this.level = level;
+    }
 
     public List<Point> getPoints() {
         return points;
     }
-
+    public void toBytes(FriendlyByteBuf buf) {
+        buf.writeInt(points.size());
+        for (Point point : points) {
+            buf.writeDouble(point.position.x);
+            buf.writeDouble(point.position.y);
+            buf.writeDouble(point.position.z);
+            buf.writeDouble(point.prevPosition.x);
+            buf.writeDouble(point.prevPosition.y);
+            buf.writeDouble(point.prevPosition.z);
+        }
+    }
+    public void update(FriendlyByteBuf buf) {
+        int size = buf.readInt();
+        List<Point> pointList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            Point newPoint = new Point(new Vec3(buf.readDouble(),buf.readDouble(),buf.readDouble()));
+            newPoint.setPrevPosition(new Vec3(buf.readDouble(),buf.readDouble(),buf.readDouble()));
+            pointList.add(newPoint);
+        }
+        points = pointList;
+    }
+    public static Cable fromBytes(FriendlyByteBuf buf, Level level) {
+        int size = buf.readInt();
+        List<Point> pointList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            Point newPoint = new Point(new Vec3(buf.readDouble(),buf.readDouble(),buf.readDouble()));
+            newPoint.setPrevPosition(new Vec3(buf.readDouble(),buf.readDouble(),buf.readDouble()));
+            pointList.add(newPoint);
+        }
+        return new Cable(pointList,level);
+    }
+    public void updateFromCable(Cable cable) {
+        avgTicksSinceUpdate = ticksSinceUpdate;
+        ticksSinceUpdate = 0;
+        List<Point> prevPoints = points;
+        this.points = cable.points;
+        for (int i = 0; i < points.size() && i < prevPoints.size(); i++) {
+            points.get(i).setPrevPosition(prevPoints.get(i).getPrevPosition());
+        }
+    }
 
     public static class Point {
         private Vec3 prevPosition;

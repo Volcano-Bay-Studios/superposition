@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -20,7 +19,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.util.Mth;
@@ -45,7 +43,7 @@ public class CableRenderer {
         poseStack.translate(translation.x,translation.y,translation.z);
         List<Cable> cables =  new ArrayList<>();
         cables.addAll(CableManager.getLevelCables(level));
-        cables.addAll(CableManager.getPlayersDraggingCables(level).values());
+        cables.addAll(CableManager.getPlayersDraggingCablesMap(level).values());
         for (Cable cable: cables) {
             poseStack.pushPose();
 //            poseStack.translate(origin.x,origin.y,origin.z);
@@ -59,8 +57,9 @@ public class CableRenderer {
                     point = cable.getPoints().get(i-1);
                     nextPoint = cable.getPoints().get(i); //TODO: render last point in the cable because when I do it start flickering for some reason :/
                 }
-                Vec3 normal = getPointsNormal(point.getPosition(),nextPoint.getPosition());;
-                renderCableFrustrum(poseStack,new Color(68, 68, 68), SuperpositionConstants.cableWidth +(i%5*.0001f), Mth.lerpVec3(point.getPrevPosition(),point.getPosition(),partialTicks),normal,Mth.lerpVec3(nextPoint.getPrevPosition(),nextPoint.getPosition(),partialTicks).add(normal.scale(.01f)),normal);
+                Vec3 normal = getPointsNormal(point.getPosition(),nextPoint.getPosition());
+                float delta = Math.min(1,cable.ticksSinceUpdate+partialTicks/Math.max(1,cable.avgTicksSinceUpdate));
+                renderCableFrustrum(poseStack,new Color(68, 68, 68), SuperpositionConstants.cableWidth +(i%5*.0001f), Mth.lerpVec3(point.getPrevPosition(),point.getPosition(),delta),normal,Mth.lerpVec3(nextPoint.getPrevPosition(),nextPoint.getPosition(),delta).add(normal.scale(.01f)),normal);
             }
 
             poseStack.popPose();
@@ -158,7 +157,7 @@ public class CableRenderer {
         Vec3 normal = vectors[0].cross(vectors[1]);
 
         Matrix4f m = ps.last().pose();
-        Vec2[] uvCorners = new Vec2[]{new Vec2(0,.9f),new Vec2(1,1),new Vec2(1,1),new Vec2(0,.9f)};
+        Vec2[] uvCorners = new Vec2[]{new Vec2(0,0),new Vec2(1,0),new Vec2(1,1),new Vec2(0,1)};
         int step = 0;
         for (Vec3 vec3 : vectors) {
             vertexConsumer.vertex(m, (float) vec3.x, (float) vec3.y, (float) vec3.z)
@@ -166,7 +165,7 @@ public class CableRenderer {
                     .uv(uvCorners[step].x, uvCorners[step].y)
                     .overlayCoords(OverlayTexture.NO_OVERLAY)
                     .uv2(light)
-                    .normal((float) normal.x, (float) normal.y, (float) normal.z)
+                    .normal((float) 0, (float) 0, (float) 0)
                     .endVertex();
             step++;
         }

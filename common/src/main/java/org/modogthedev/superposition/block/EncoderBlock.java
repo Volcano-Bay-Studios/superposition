@@ -23,14 +23,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
-import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock, IRedstoneConnectingBlock {
 
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
-    public static SignalGeneratorScreen signalGeneratorScreen = null;
     public EncoderBlock(Properties properties) {
         super(properties);
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
@@ -67,8 +65,6 @@ public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (pLevel.isClientSide) {
-            signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pPos);
-            Minecraft.getInstance().setScreen(signalGeneratorScreen);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.SUCCESS;

@@ -7,6 +7,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.FilterItemModificationC2SPacket;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
 
@@ -19,6 +20,7 @@ public class SuperpositionMessages {
         INSTANCE = net;
 
         net.register(SignalSyncS2CPacket.class, SignalSyncS2CPacket::toBytes, SignalSyncS2CPacket::new, SignalSyncS2CPacket::handle);
+        net.register(CableSyncS2CPacket.class, CableSyncS2CPacket::toBytes, CableSyncS2CPacket::new, CableSyncS2CPacket::handle);
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, Superposition.id("block_entity_modification"), (buf, ctx) -> new BlockEntityModificationC2SPacket(buf).handle(() -> ctx));
         net.register(BlockEntityModificationC2SPacket.class, BlockEntityModificationC2SPacket::toBytes, BlockEntityModificationC2SPacket::new, BlockEntityModificationC2SPacket::handle);
@@ -28,6 +30,7 @@ public class SuperpositionMessages {
     }
     public static void registerClient() {
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, Superposition.id("signal_sync"), (buf, ctx) -> new SignalSyncS2CPacket(buf).handle(() -> ctx));
+        NetworkManager.registerReceiver(NetworkManager.Side.S2C, Superposition.id("cable_sync"), (buf, ctx) -> new CableSyncS2CPacket(buf).handle(() -> ctx));
     }
 
     public static <MSG> void sendToServer(MSG message) {
