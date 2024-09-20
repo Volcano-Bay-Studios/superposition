@@ -55,7 +55,7 @@ public class CableRenderer {
                     nextPoint = cable.getPoints().get(i + 1);
                 } else {
                     point = cable.getPoints().get(i-1);
-                    nextPoint = cable.getPoints().get(i); //TODO: render last point in the cable because when I do it start flickering for some reason :/
+                    nextPoint = cable.getPoints().get(i);
                 }
                 Vec3 normal = getPointsNormal(point.getPosition(),nextPoint.getPosition());
                 float delta = Math.min(1,cable.ticksSinceUpdate+partialTicks/Math.max(1,cable.avgTicksSinceUpdate));
@@ -83,7 +83,7 @@ public class CableRenderer {
         List<Vec3> startCorners = getCornersFromNormal(direction, startPosition, startNormal, width);
         List<Vec3> endCorners = getCornersFromNormal(direction, endPosition, endNormal, width);
 
-        int light = LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(startPosition));
+        int light = Math.max(LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(endPosition)),LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(startPosition)));
 
 
         ps.pushPose();
@@ -157,7 +157,7 @@ public class CableRenderer {
         Vec3 normal = vectors[0].cross(vectors[1]);
 
         Matrix4f m = ps.last().pose();
-        Vec2[] uvCorners = new Vec2[]{new Vec2(0,0),new Vec2(1,0),new Vec2(1,1),new Vec2(0,1)};
+        Vec2[] uvCorners = new Vec2[]{new Vec2(1,0),new Vec2(1,1),new Vec2(0,1),new Vec2(0,0)};
         int step = 0;
         for (Vec3 vec3 : vectors) {
             vertexConsumer.vertex(m, (float) vec3.x, (float) vec3.y, (float) vec3.z)
