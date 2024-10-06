@@ -33,6 +33,7 @@ public class Superposition {
         TickEvent.SERVER_LEVEL_POST.register(SignalManager::tick);
         TickEvent.SERVER_LEVEL_POST.register(CableManager::tick);
         InteractionEvent.RIGHT_CLICK_BLOCK.register(CableManager::playerUseEvent);
+        InteractionEvent.CLIENT_RIGHT_CLICK_AIR.register(CableManager::playerDropCableEvent);
         LOGGER.info("Superposition has been initialized.");
     }
 

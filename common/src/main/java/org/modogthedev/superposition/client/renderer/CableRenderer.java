@@ -41,10 +41,7 @@ public class CableRenderer {
         Matrix4f matrix4f = poseStack.last().pose();
         Vec3 translation = camera.getPosition().scale(-1);
         poseStack.translate(translation.x,translation.y,translation.z);
-        List<Cable> cables =  new ArrayList<>();
-        cables.addAll(CableManager.getLevelCables(level));
-        cables.addAll(CableManager.getPlayersDraggingCablesMap(level).values());
-        for (Cable cable: cables) {
+        for (Cable cable: CableManager.getLevelCables(level)) {
             poseStack.pushPose();
 //            poseStack.translate(origin.x,origin.y,origin.z);
             for (int i = 0; i < cable.getPoints().size(); i++) {
@@ -58,8 +55,7 @@ public class CableRenderer {
                     nextPoint = cable.getPoints().get(i);
                 }
                 Vec3 normal = getPointsNormal(point.getPosition(),nextPoint.getPosition());
-                float delta = Math.min(1,cable.ticksSinceUpdate+partialTicks/Math.max(1,cable.avgTicksSinceUpdate));
-                renderCableFrustrum(poseStack,new Color(68, 68, 68), SuperpositionConstants.cableWidth +(i%5*.0001f), Mth.lerpVec3(point.getPrevPosition(),point.getPosition(),delta),normal,Mth.lerpVec3(nextPoint.getPrevPosition(),nextPoint.getPosition(),delta).add(normal.scale(.01f)),normal);
+                renderCableFrustrum(poseStack,new Color(155, 51, 51), SuperpositionConstants.cableWidth +(i%5*.0001f), Mth.lerpVec3(point.getPrevPosition(),point.getPosition(),partialTicks),normal,Mth.lerpVec3(nextPoint.getPrevPosition(),nextPoint.getPosition(),partialTicks).add(normal.scale(.01f)),normal);
             }
 
             poseStack.popPose();

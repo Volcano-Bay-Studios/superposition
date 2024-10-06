@@ -13,45 +13,44 @@ public class CableSyncS2CPacket {
 
     private Cable ourCable;
     private UUID ourUUID;
-    private boolean isPlayerTracked;
+    private boolean remove = false;
+
     public CableSyncS2CPacket(FriendlyByteBuf buf) {
-        isPlayerTracked = buf.readBoolean();
         ourUUID = buf.readUUID();
-        ourCable = Cable.fromBytes(buf,null);
+        remove = buf.readBoolean();
+        if (!remove)
+            ourCable = Cable.fromBytes(buf, null);
     }
 
-    public CableSyncS2CPacket(Cable cable, UUID uuid, boolean isPlayerTracked) {
+    public CableSyncS2CPacket(Cable cable, UUID uuid, boolean remove) {
         this.ourCable = cable;
         this.ourUUID = uuid;
-        this.isPlayerTracked = isPlayerTracked;
+        this.remove = remove;
     }
 
 
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeBoolean(isPlayerTracked);
         buf.writeUUID(ourUUID);
-        ourCable.toBytes(buf);
+        buf.writeBoolean(remove);
+        if (!remove)
+            ourCable.toBytes(buf);
     }
 
     public void handle(Supplier<NetworkManager.PacketContext> supplier) {
         var ctx = supplier.get();
 
         ctx.queue(() -> {
-            ourCable.setLevel(ctx.getPlayer().level());
-            if (!isPlayerTracked) {
+            if (!remove)
+                ourCable.setLevel(ctx.getPlayer().level());
+            if (!remove) {
                 if (CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).containsKey(ourUUID)) {
-                    Cable cable = CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).get(ourUUID); //TODO: Network Cables
+                    Cable cable = CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).get(ourUUID);
                     cable.updateFromCable(ourCable);
                 } else {
                     CableManager.addCable(ourCable, ctx.getPlayer().level(), ourUUID);
                 }
             } else {
-                Player player = ctx.getPlayer().level().getPlayerByUUID(ourUUID);
-                if (CableManager.getPlayersDraggingCablesMap(ctx.getPlayer().level()).containsKey(player)) {
-                    CableManager.getPlayersDraggingCablesMap(ctx.getPlayer().level()).get(player).updateFromCable(ourCable);
-                } else {
-                    CableManager.getPlayersDraggingCablesMap(ctx.getPlayer().level()).put(player,ourCable);
-                }
+                CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).remove(ourUUID);
             }
         });
     }

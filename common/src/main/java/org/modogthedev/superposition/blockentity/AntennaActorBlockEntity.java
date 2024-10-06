@@ -46,14 +46,6 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
 
     @Override
     public void tick() {
-        if (Superposition.DEBUG) {
-            int maxDist = 1;
-            for (Antenna antenna : AntennaManager.getAntennaList(level)) {
-                for (float i = 0; i < 361; i += 10f) {
-                    level.addParticle(ParticleTypes.WAX_ON, antenna.antennaActor.getCenter().x + (Math.sin(i) * maxDist), antenna.antennaActor.getCenter().y, antenna.antennaActor.getCenter().z + (Math.cos(i) * maxDist), 0, 0, 0);
-                }
-            }
-        }
         if (antenna == null) {
             Antenna getAntenna = AntennaManager.getAntennaActorAntenna(level, worldPosition);
             if (getAntenna != null)

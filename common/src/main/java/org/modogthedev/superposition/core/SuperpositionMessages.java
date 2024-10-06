@@ -6,10 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
-import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
-import org.modogthedev.superposition.networking.packet.FilterItemModificationC2SPacket;
-import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
+import org.modogthedev.superposition.networking.packet.*;
 
 public class SuperpositionMessages {
     private static NetworkChannel INSTANCE;
@@ -27,6 +24,9 @@ public class SuperpositionMessages {
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, Superposition.id("filter_item_modification"), (buf, ctx) -> new FilterItemModificationC2SPacket(buf).handle(() -> ctx));
         net.register(FilterItemModificationC2SPacket.class, FilterItemModificationC2SPacket::toBytes, FilterItemModificationC2SPacket::new, FilterItemModificationC2SPacket::handle);
+
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, Superposition.id("player_drop_cable"), (buf, ctx) -> new PlayerDropCableC2SPacket(buf).handle(() -> ctx));
+        net.register(PlayerDropCableC2SPacket.class, PlayerDropCableC2SPacket::toBytes, PlayerDropCableC2SPacket::new, PlayerDropCableC2SPacket::handle);
     }
     public static void registerClient() {
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, Superposition.id("signal_sync"), (buf, ctx) -> new SignalSyncS2CPacket(buf).handle(() -> ctx));

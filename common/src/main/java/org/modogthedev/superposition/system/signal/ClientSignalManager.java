@@ -28,14 +28,6 @@ public class ClientSignalManager {
         ifAbsent(level);
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
-        if (Superposition.DEBUG) {
-            int maxDist = 2;
-            for (Antenna antenna : AntennaManager.getAntennaList(level)) {
-                for (float i = 0; i < 361; i += 10f) {
-                    level.addParticle(ParticleTypes.ELECTRIC_SPARK, antenna.antennaActor.getCenter().x + (Math.sin(i) * maxDist),antenna.antennaActor.getCenter().y, antenna.antennaActor.getCenter().z + (Math.cos(i) * maxDist), 0, 0, 0);
-                }
-            }
-        }
         for (Signal signal : clientSignals.get(level).values()) {
             if (signal.tick()) {
                 signalsForRemoval.add(signal);

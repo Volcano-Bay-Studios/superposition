@@ -29,12 +29,6 @@ public class SignalManager {
         ifAbsent(level);
         AntennaManager.clearSignals(level);
         List<Signal> signalsForRemoval = new ArrayList<>();
-        if (Superposition.DEBUG) {
-            int maxDist = 2;
-            for (Antenna antenna : AntennaManager.getAntennaList(level)) {
-                    level.sendParticles(ParticleTypes.ELECTRIC_SPARK, antenna.antennaActor.getCenter().x,antenna.antennaActor.getCenter().y+1, antenna.antennaActor.getCenter().z, 10, 0, 0,0,0.1f);
-            }
-        }
          for (Signal signal : transmittedSignals.get(level)) {
             if (!signal.level.isClientSide) {
                 BlockState baseState = level.getBlockState(BlockPos.containing(signal.pos));

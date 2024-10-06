@@ -7,6 +7,7 @@ import foundry.veil.platform.VeilEventPlatform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
+import org.modogthedev.superposition.client.renderer.DebugRenderer;
 import org.modogthedev.superposition.client.renderer.block.AmplifierBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.FilterBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.SignalGeneratorBlockEntityRenderer;
@@ -27,6 +28,7 @@ public class SuperpositionClient {
         VeilEventPlatform.INSTANCE.onVeilRenderTypeStageRender((stage, levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
                 CableRenderer.renderCables(levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum);
+                DebugRenderer.renderDebug(levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum);
             }
         });
     }
