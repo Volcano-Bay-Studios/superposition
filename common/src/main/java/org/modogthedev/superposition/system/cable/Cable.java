@@ -65,29 +65,35 @@ public class Cable {
         }
     }
 
-    private void followPlayer() {
+    public void followPlayer() {
+        for (Point point : points) {
+            point.grabbed = false;
+        }
         for (UUID uuid : playerHoldingPointMap.keySet()) {
             Player player = level.getPlayerByUUID(uuid);
-            int index = playerHoldingPointMap.get(uuid);
-            Point heldPoint = points.get(index);
-            Point prevPoint;
-            if (index > 0) {
-                prevPoint = points.get(index - 1);
-            } else {
-                prevPoint = points.get(index + 1);
-            }
-            Vec3 playerOffset = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-            HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-            float delta = (float) Math.min(1, SuperpositionConstants.cableRadius / (hitResult.getLocation().distanceTo(prevPoint.position)) * 1.1f);
-            Vec3 result = (Mth.lerpVec3(prevPoint.position, hitResult.getLocation(), delta));
-            Vec3 moveVec = result.subtract(heldPoint.position);
-            if (heldPoint.position.distanceTo(result) < 10) {
-                heldPoint.position = heldPoint.position.add(moveVec.scale(1));
-            } else {
-                CableManager.playerFinishDraggingCable(player, heldPoint.position);
-            }
+            if (player != null) {
+                int index = playerHoldingPointMap.get(uuid);
+                Point heldPoint = points.get(index);
+                Point prevPoint;
+                if (index > 0) {
+                    prevPoint = points.get(index - 1);
+                } else {
+                    prevPoint = points.get(index + 1);
+                }
+                Vec3 playerOffset = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+                HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+                float delta = (float) Math.min(1.01, SuperpositionConstants.cableRadius / (hitResult.getLocation().distanceTo(prevPoint.position)) * 1.1f);
+                Vec3 result = (Mth.lerpVec3(prevPoint.position, hitResult.getLocation(), delta));
+                Vec3 moveVec = result.subtract(heldPoint.position);
+                heldPoint.grabbed = true;
+                if (heldPoint.position.distanceTo(result) < 10) {
+                    heldPoint.position = heldPoint.position.add(moveVec.scale(1));
+                } else {
+                    CableManager.playerFinishDraggingCable(player, heldPoint.position);
+                }
 //            if (radius*1.5f < points.get(points.size() - 1).position.subtract(points.get(points.size() - 2).position).length())
 //                addPoint(new Point(playerOffset));
+            }
         }
     }
 
@@ -95,12 +101,36 @@ public class Cable {
         ticksSinceUpdate++;
         updatePointsInBlocks();
         integrate();
+        followPlayer();
         update(false);
         update(true);
-        followPlayer();
+        freeStuckPoints();
         updateCollisions();
         lerpPos();
         sendSignal();
+    }
+
+
+    private void freeStuckPoints() {
+        for (int i = 1; i < points.size() - 1; i++) {
+            Point point = points.get(i);
+            Point lastPoint = points.get(i - 1);
+            Point nextPoint = points.get(i + 1);
+            float distanceBack = (float) point.getPosition().distanceTo(lastPoint.getPosition());
+            float distanceForward = (float) point.getPosition().distanceTo(lastPoint.getPosition());
+            if (distanceBack > SuperpositionConstants.cableRadius * 3) {
+                if (distanceBack > distanceForward) {
+                    point.setPosition(lastPoint.position);
+                } else {
+                    point.setPosition(nextPoint.position);
+                }
+                point.inBlock = true;
+            }
+            if (distanceForward > SuperpositionConstants.cableRadius * 3) {
+                point.setPosition(nextPoint.position);
+                point.inBlock = true;
+            }
+        }
     }
 
     private void sendSignal() {
@@ -134,7 +164,7 @@ public class Cable {
         if (isForwards) {
             for (int i = 1; i < (points.size()); i++) {
                 Point point = points.get(i);
-                if (point.inBlock)
+                if (point.inBlock || point.grabbed)
                     continue;
                 Point prevPoint = points.get(i - 1);
 
@@ -145,10 +175,13 @@ public class Cable {
                 point.setPosition(point.position.subtract(normal.scale(distanceToMove)));
             }
         } else {
-            for (int i = (points.size() - 2); i > 1; i--) {
+            for (int i = (points.size() - 2); i >= 0; i--) {
                 Point point = points.get(i);
-                if (point.inBlock)
+                if (point.inBlock || point.grabbed)
                     continue;
+//                if (i > 1 && (points.get(i - 1).grabbed))
+//                    continue;
+
                 Point prevPoint = points.get(i + 1);
 
                 point.backwordsLength = (float) point.position.subtract(prevPoint.position).length();
@@ -168,7 +201,7 @@ public class Cable {
     private void updateCollisions() {
         for (int i = 0; i < (points.size()); i++) {
             Point point = points.get(i);
-            if (point.lerpedPos == null && !point.inBlock) {
+            if (point.lerpedPos == null && !point.inBlock && !point.grabbed) {
                 Vec3 collision = Entity.collideBoundingBox((Entity) null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition.subtract(0, 0, 0), radius, radius, radius), level, List.of());
                 Vec3 velocity = point.position.subtract(point.prevPosition);
                 point.setInContact(false);
@@ -188,7 +221,7 @@ public class Cable {
     private void integrate() {
         for (int i = 0; i < (points.size()); i++) {
             Point point = points.get(i);
-            if (!point.inBlock) {
+            if (!point.inBlock && !point.grabbed) {
 //            if (i < points.size() - 1) {
                 Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -9.8, 0).scale(.05 * 0.05));
                 Vec3 normal = (nextPosition.subtract(point.position));
@@ -199,7 +232,7 @@ public class Cable {
                     point.position = point.position.add(normal.scale(0.9f));
 //            } else {
 //            }
-            } else  {
+            } else {
                 point.prevPosition = point.position;
             }
         }
@@ -253,6 +286,10 @@ public class Cable {
         }
     }
 
+    public HashMap<UUID, Integer> getPlayerHoldingPointMap() {
+        return playerHoldingPointMap;
+    }
+
     public static Cable fromBytes(FriendlyByteBuf buf, Level level) {
         int size = buf.readInt();
         List<Point> pointList = new ArrayList<>();
@@ -281,15 +318,18 @@ public class Cable {
 //            points.get(i).setPrevPosition(prevPoints.get(i).getPrevPosition());
         }
     }
+
     public void updatePointsInBlocks() {
         for (Point point : points) {
+            point.ownedCable = this;
             updatePointInBlock(point);
         }
     }
+
     public void updatePointInBlock(Point point) {
         Vec3 vec3 = point.getPosition();
         BlockPos pos = BlockPos.containing(vec3);
-        BlockHitResult blockHitResult = level.clip(new ClipContext(vec3.add(0.01f,0.01f,0.01f),vec3.subtract(0.01f,0.01f,0.01f), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,null));
+        BlockHitResult blockHitResult = level.clip(new ClipContext(vec3.add(0.01f, 0.01f, 0.01f), vec3.subtract(0.01f, 0.01f, 0.01f), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
         point.inBlock = blockHitResult.getType() == HitResult.Type.BLOCK;
     }
 
@@ -329,11 +369,14 @@ public class Cable {
     public static class Point {
         private Vec3 prevPosition;
         private Vec3 position;
+        private Vec3 tempPos;
         private boolean inContact = false;
         private boolean inBlock;
+        private boolean grabbed;
         private float forwardLength;
         private float backwordsLength;
         public Vec3LerpComponent lerpedPos = null;
+        private Cable ownedCable;
 
         public Point(Vec3 position) {
             this.position = position;
@@ -367,5 +410,6 @@ public class Cable {
         public void setInContact(boolean inContact) {
             this.inContact = inContact;
         }
+        public Cable getOwnedCable() { return ownedCable; }
     }
 }

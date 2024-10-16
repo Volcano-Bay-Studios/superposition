@@ -12,7 +12,7 @@
         "sources": "https://github.com/Volcano-Bay-Studios/superposition"
     },
     "license": "MIT",
-    "icon": "assets/superposition/icon.png",
+    "icon": "assets/superposition/superposition.png",
     "environment": "*",
     "entrypoints": {
         "main": [

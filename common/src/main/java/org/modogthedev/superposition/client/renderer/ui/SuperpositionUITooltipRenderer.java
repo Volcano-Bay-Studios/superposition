@@ -60,6 +60,9 @@ public class SuperpositionUITooltipRenderer {
                 tooltippable = tooltippable1;
             }
         }
+        if (tooltippable == null) {
+
+        }
         if (tooltippable == null || !tooltippable.isSuperpositionTooltipEnabled()) {
             hoverTicks = 0;
             lastHoveredPos = null;

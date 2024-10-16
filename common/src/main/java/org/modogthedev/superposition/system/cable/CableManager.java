@@ -10,9 +10,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
+import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
+import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
@@ -24,6 +27,7 @@ public class CableManager {
     private static final HashMap<Player, Cable> playersDraggingCables = new HashMap<>();
     private static final HashMap<Level, HashMap<UUID, Cable>> clientCables = new HashMap<>();
     private static final HashMap<Player, Cable> clientPlayersDraggingCables = new HashMap<>();
+    private static int grabTimer = 0;
 
     private static void ifAbsent(Level level) {
         if (!getCablesMap(level).containsKey(level)) {
@@ -61,6 +65,8 @@ public class CableManager {
     }
 
     public static void clientTick(Level level) {
+        if (grabTimer > 0)
+            grabTimer--;
         ifAbsent(level);
         for (Cable cable : getCables(level)) {
             cable.updatePhysics();
@@ -69,29 +75,19 @@ public class CableManager {
     }
 
     public static void dragPlayers(Level level) {
-//        for (Player player : getPlayersDraggingCablesMap(level).keySet()) {
-//            LivingEntity holder = (LivingEntity) player;
-//            Cable cable = getPlayersDraggingCablesMap(level).get(player);
-//            float longestSegment = 0f;
-//            for (int i = 1; i < (cable.getPoints().size()); i++) {
-//                if (longestSegment < cable.getPoints().get(i).getLength())
-//                    longestSegment = cable.getPoints().get(i).getLength();
-//            }
-//            Cable.Point playerPoint = cable.getPoints().get(cable.getPoints().size() - 1);
-//            Cable.Point lastFreePoint = cable.getPoints().get(cable.getPoints().size() - 2);
-//            Vec3 pointActual = lastFreePoint.getPosition().subtract(holder.getRopeHoldPosition(0)).add(holder.position());
-//            float cableDistanceToMove = (float) (longestSegment - cable.radius) * cable.elasticity;
-//            float distanceToMove = (float) (playerPoint.getPosition().distanceTo(lastFreePoint.getPrevPosition()) - cable.radius) * cable.elasticity;
-//            Vec3 normal = pointActual.add(0, 0, 0).subtract(player.position()).normalize();
-//            longestSegment = Math.max(1, Mth.getFromRange(1, 0, 1, 0, longestSegment));
-//            longestSegment = (float) Math.pow(longestSegment / 4, 3f);
-//            if (longestSegment > .1f) {
-//                longestSegment = net.minecraft.util.Mth.clamp(longestSegment, 2.5f, 4);
-//                Vec3 toAdd = normal.scale(longestSegment).scale(.1f);
-//                holder.setDeltaMovement(holder.getDeltaMovement().subtract(cable.playerDraggedLastDelta.scale(0.5f)).add(toAdd));
-//                cable.playerDraggedLastDelta = toAdd;
-//            }
-//        }
+        for (Cable cable : getCables(level)) {
+            for (UUID uuid : cable.getPlayerHoldingPointMap().keySet()) {
+                Player player = level.getPlayerByUUID(uuid);
+                float longestSegment = 0f;
+                for (int i = 1; i < (cable.getPoints().size()); i++) {
+                    if (longestSegment < cable.getPoints().get(i).getLength())
+                        longestSegment = cable.getPoints().get(i).getLength();
+                }
+                Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(uuid);
+                Cable.Point playerPoint = pointIndexPair.getA();
+                Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+            }
+        }
     }
 
     public static void playerUsesCable(Player player, Vec3 vec3) {
@@ -143,6 +139,38 @@ public class CableManager {
         return EventResult.interruptDefault();
     }
 
+    public static void playerDropCableEvent(Player player, InteractionHand hand) {
+        if (grabTimer == 0) {
+            grabTimer = 4;
+            if (player.isShiftKeyDown()) {
+                if (player.getItemInHand(hand).is(Items.AIR)) {
+                    for (Cable cable : getCables(player.level())) {
+                        if (cable.hasPlayerHolding(player.getUUID())) {
+                            cable.stopPlayerDrag(player.getUUID());
+                            SuperpositionMessages.sendToServer(new PlayerDropCableC2SPacket());
+                            return;
+                        }
+                    }
+                }
+                CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, player.level());
+                Pair<Cable, Cable.Point> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
+                if (rayCast != null) {
+                    SuperpositionMessages.sendToServer(new PlayerGrabCableC2SPacket());
+                    Cable cable = rayCast.getA();
+                    cable.addPlayerHoldingPoint(player.getUUID(), cable.getPointIndex(rayCast.getB()));
+                    if (!player.level().isClientSide) {
+                        CableSyncS2CPacket packet = new CableSyncS2CPacket(cable, getCableUUID(player.level(), cable), false);
+                        for (ServerPlayer player1 : player.level().getServer().getPlayerList().getPlayers()) {
+                            float maxDistance = cable.getPoints().size() + 100;
+                            if (cable.getPoints().get(0).getPosition().distanceTo(player.position()) < maxDistance)
+                                SuperpositionMessages.sendToPlayer(packet, player1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private static void playerStartCable(Vec3 pos, Level level, Player player) {
         if (player.level().isClientSide)
             return;
@@ -165,20 +193,6 @@ public class CableManager {
                         float maxDistance = cable.getPoints().size() + 100;
                         if (cable.getPoints().get(0).getPosition().distanceTo(player.position()) < maxDistance)
                             SuperpositionMessages.sendToPlayer(packet, player1);
-                    }
-                }
-            }
-        }
-    }
-
-    public static void playerDropCableEvent(Player player, InteractionHand hand) {
-        if (player.isShiftKeyDown()) {
-            if (player.getItemInHand(hand).is(Items.AIR)) {
-                for (Cable cable : getCables(player.level())) {
-                    if (cable.hasPlayerHolding(player.getUUID())) {
-                        cable.stopPlayerDrag(player.getUUID());
-                        SuperpositionMessages.sendToServer(new PlayerDropCableC2SPacket());
-                        return;
                     }
                 }
             }

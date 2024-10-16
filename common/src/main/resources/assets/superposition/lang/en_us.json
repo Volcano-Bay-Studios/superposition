@@ -4,7 +4,7 @@
   "block.superposition.transmitter" : "Transmitter",
   "block.superposition.antenna" : "Antenna Part",
   "block.superposition.receiver" : "Receiver",
-  "block.superposition.signal_readout" : "Signal Readout",
+  "block.superposition.signal_readout" : "Monitor",
   "block.superposition.filter" : "Filter",
   "block.superposition.casing" : "Insulated Casing",
 

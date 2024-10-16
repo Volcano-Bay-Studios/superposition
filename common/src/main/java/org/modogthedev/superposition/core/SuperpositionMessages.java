@@ -27,6 +27,9 @@ public class SuperpositionMessages {
 
         NetworkManager.registerReceiver(NetworkManager.Side.C2S, Superposition.id("player_drop_cable"), (buf, ctx) -> new PlayerDropCableC2SPacket(buf).handle(() -> ctx));
         net.register(PlayerDropCableC2SPacket.class, PlayerDropCableC2SPacket::toBytes, PlayerDropCableC2SPacket::new, PlayerDropCableC2SPacket::handle);
+
+        NetworkManager.registerReceiver(NetworkManager.Side.C2S, Superposition.id("player_grab_cable"), (buf, ctx) -> new PlayerGrabCableC2SPacket(buf).handle(() -> ctx));
+        net.register(PlayerGrabCableC2SPacket.class, PlayerGrabCableC2SPacket::toBytes, PlayerGrabCableC2SPacket::new, PlayerGrabCableC2SPacket::handle);
     }
     public static void registerClient() {
         NetworkManager.registerReceiver(NetworkManager.Side.S2C, Superposition.id("signal_sync"), (buf, ctx) -> new SignalSyncS2CPacket(buf).handle(() -> ctx));

@@ -9,6 +9,7 @@ import foundry.veil.api.client.color.ColorTheme;
 import net.minecraft.resources.ResourceLocation;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.slf4j.Logger;
 
@@ -32,6 +33,7 @@ public class Superposition {
         SuperpositionMessages.register();
         TickEvent.SERVER_LEVEL_POST.register(SignalManager::tick);
         TickEvent.SERVER_LEVEL_POST.register(CableManager::tick);
+        TickEvent.SERVER_LEVEL_POST.register(CarabinerManager::serverTick);
         InteractionEvent.RIGHT_CLICK_BLOCK.register(CableManager::playerUseEvent);
         InteractionEvent.CLIENT_RIGHT_CLICK_AIR.register(CableManager::playerDropCableEvent);
         LOGGER.info("Superposition has been initialized.");
