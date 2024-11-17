@@ -13,12 +13,16 @@ import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.util.SuperpositionConstants;
 
+import java.awt.*;
+
 public class CableItem extends Item {
     private Vec3 start;
     private Vec3 end;
+    private Color color;
 
-    public CableItem(Properties properties) {
+    public CableItem(Properties properties, Color color) {
         super(properties);
+        this.color = color;
     }
 
     private static final int SIZE = 3;
@@ -26,7 +30,7 @@ public class CableItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Vec3 anchorPosition = context.getClickedPos().getCenter().add(context.getClickedPos().getCenter().subtract(context.getClickedPos().relative(context.getClickedFace()).getCenter()).scale(-0.45));
-        CableManager.playerUsesCable(context.getPlayer(), anchorPosition);
+        CableManager.playerUsesCable(context.getPlayer(), anchorPosition,color);
         return InteractionResult.SUCCESS;
     }
 

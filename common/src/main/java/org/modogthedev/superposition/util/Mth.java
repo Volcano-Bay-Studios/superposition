@@ -30,8 +30,8 @@ public class Mth {
     public static String frequencyToHzReadable(float frequency) {
         if (frequency >=1000000000) {
             return Math.round(frequency/100000000)+"GHz";
-        } else if (frequency >=1000000) {
-            return Math.round(frequency/100000)+"MHz";
+        } else if (frequency >=10000) {
+            return String.format("%.3f",(frequency /100000f))+"MHz";
         } else if (frequency >=1000) {
             return Math.round(frequency/100)+"kHz";
         }

@@ -17,6 +17,7 @@ public class WidgetScreen extends Screen {
     public List<Dial> dials = new ArrayList<>();
     public boolean mouseDown;
     private float dialDistTraveled = 0;
+    public boolean freeSpin = false;
 
     protected WidgetScreen(Component pTitle) {
         super(pTitle);
@@ -62,7 +63,7 @@ public class WidgetScreen extends Screen {
                     else {
                         if (Math.abs(dial.scrolledAmount) > dial.maxScroll) {
                             dial.scrolledAmount = dial.maxScroll;
-                        } else if (dial.scrolledAmount < 0)
+                        } else if (!freeSpin && dial.scrolledAmount < 0)
                             dial.scrolledAmount = 0;
                         else {
                             dialDistTraveled += Math.abs(dial.lastAngle - angle);
@@ -109,7 +110,7 @@ public class WidgetScreen extends Screen {
                 dial.scrolledAmount += pDelta;
                 if (Math.abs(dial.scrolledAmount) > dial.maxScroll) {
                     dial.scrolledAmount = dial.maxScroll;
-                } else if (dial.scrolledAmount < 0)
+                } else if (!freeSpin && dial.scrolledAmount < 0)
                     dial.scrolledAmount = 0;
                 else {
                     if (pDelta > 0)

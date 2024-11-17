@@ -54,26 +54,7 @@ public class SignalManager {
             }
             CompoundTag wholeTag = new CompoundTag();
             ListTag list = new ListTag();
-            for (Signal signal : toSend) {
-                CompoundTag tag = new CompoundTag();
-                tag.putUUID("uuid", signal.uuid);
-                tag.putFloat("x", (float) signal.pos.x);
-                tag.putFloat("y", (float) signal.pos.y);
-                tag.putFloat("z", (float) signal.pos.z);
-                tag.putFloat("amp", signal.amplitude);
-                tag.putFloat("freq", signal.frequency);
-                tag.putFloat("source_freq",signal.sourceFrequency);
-                tag.putFloat("mod", signal.modulation);
-                tag.putBoolean("emit", signal.emitting);
-                tag.putInt("life", signal.lifetime);
-                tag.putInt("x1", signal.sourceAntennaPos.getX());
-                tag.putInt("y1", signal.sourceAntennaPos.getY());
-                tag.putInt("z1", signal.sourceAntennaPos.getZ());
-                tag.putInt("sourceAntennaSize",signal.sourceAntennaSize);
-                list.add(tag);
-            }
-            wholeTag.put("signals", list);
-            SignalSyncS2CPacket packet = new SignalSyncS2CPacket(wholeTag);
+            SignalSyncS2CPacket packet = new SignalSyncS2CPacket(toSend);
             SuperpositionMessages.sendToPlayer(packet, (ServerPlayer) player);
         }
     }

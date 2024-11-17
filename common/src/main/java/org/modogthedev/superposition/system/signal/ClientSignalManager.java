@@ -36,36 +36,20 @@ public class ClientSignalManager {
         clientSignals.get(level).values().removeAll(signalsForRemoval);
     }
 
-    public static void processTag(CompoundTag wholeTag) {
+    public static void processTag(List<Signal> signals) {
         Level level = Minecraft.getInstance().level;
         if (level == null)
             return;
         ifAbsent(level);
         List<UUID> included = new ArrayList<>(clientSignals.get(level).keySet());
-        ListTag list = wholeTag.getList("signals", Tag.TAG_COMPOUND);
-        for (Tag t : list) {
-            CompoundTag tag = (CompoundTag) t;
-            UUID uuid = tag.getUUID("uuid");
+        for (Signal signal : signals) {
+            UUID uuid = signal.uuid;
             included.remove(uuid);
-            Vec3 pos = new Vec3(tag.getFloat("x"), tag.getFloat("y"), tag.getFloat("z"));
-            Signal signal = new Signal(pos, level, tag.getFloat("freq"), tag.getFloat("amp"), tag.getFloat("source_freq"));
-            signal.modulation = tag.getFloat("mod");
-            signal.emitting = tag.getBoolean("emit");
-            signal.lifetime = tag.getInt("life");
             signal.level = level;
 
             if (clientSignals.get(level).containsKey(uuid)) {
                 Signal signal1 = clientSignals.get(level).get(uuid);
-                signal1.modulation = signal.modulation;
-                signal1.emitting = signal.emitting;
-                signal1.lifetime = signal.lifetime;
-                signal1.level = signal.level;
-                signal1.frequency = signal.frequency;
-                signal1.amplitude = signal.amplitude;
-                signal1.pos = signal.pos;
-                signal1.sourceFrequency = signal.sourceFrequency;
-                signal1.sourceAntennaPos = new BlockPos(tag.getInt("x1"),tag.getInt("y1"),tag.getInt("z1"));
-                signal1.sourceAntennaSize = tag.getInt("sourceAntennaSize");
+                signal1.copy(signal);
             } else
                 clientSignals.get(level).put(uuid, signal);
         }

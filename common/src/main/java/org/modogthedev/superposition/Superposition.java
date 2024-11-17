@@ -25,6 +25,7 @@ public class Superposition {
         initTheme();
         SuperpositionRegistries.register();
         SuperpositionFilters.FILTERS.register();
+        SuperpositionCards.CARDS.register();
         SuperpositionBlocks.BLOCKS.register();
         SuperpositionBlockEntities.BLOCK_ENTITIES.register();
         SuperpositionTabs.TABS.register();

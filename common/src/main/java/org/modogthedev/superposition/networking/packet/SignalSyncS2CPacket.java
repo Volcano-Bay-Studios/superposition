@@ -4,25 +4,32 @@ import dev.architectury.networking.NetworkManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
+import org.modogthedev.superposition.system.signal.Signal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class SignalSyncS2CPacket {
-    private final CompoundTag signals;
+    private List<Signal> signals = new ArrayList<>();
 
 
     public SignalSyncS2CPacket(FriendlyByteBuf buf) {
-        signals = buf.readNbt();
+        int size = buf.readInt();
+        for (int i = 0; i<size; i++)
+            signals.add(new Signal(buf));
     }
 
-    public SignalSyncS2CPacket(CompoundTag signals) {
+    public SignalSyncS2CPacket(List<Signal> signals) {
         this.signals = signals;
-
     }
 
 
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeNbt(signals);
+        buf.writeInt(signals.size());
+        for (Signal signal : signals) {
+            signal.save(buf);
+        }
     }
 
     public void handle(Supplier<NetworkManager.PacketContext> supplier) {

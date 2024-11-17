@@ -255,7 +255,13 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return putSignals;
     }
 
-
+    public void addSignals(List<Signal> list) {
+        if (ticksSinceSignal>0)
+            putSignals = list;
+        else
+            putSignals.addAll(list);
+        ticksSinceSignal = 0;
+    }
     public void putSignalList(Object nextCall, List<Signal> list) {
         putSignals = list;
         ticksSinceSignal = 0;

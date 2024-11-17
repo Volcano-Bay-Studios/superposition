@@ -44,6 +44,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
 
     public SignalGeneratorScreen(Component pTitle, BlockPos pos) {
         super(pTitle);
+        freeSpin = true;
         SignalGeneratorScreen.pos = pos;
         ticks = 0;
         addDial(-25, 0);

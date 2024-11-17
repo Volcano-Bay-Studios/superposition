@@ -53,6 +53,10 @@ public class DebugRenderer {
                     drawPosBox(poseStack, vertexConsumer, pos, width+.2f, 0.5f, 0.9f, 0.5f);
                 }
             }
+            Cable.Point point = cable.getPoints().get(cable.getPoints().size()-1);
+            Vec3 pos = point.getPosition();
+            float width = SuperpositionConstants.cableRadius / 2;
+            drawPosBox(poseStack, vertexConsumer, pos, width+.1f, 0.9f, 0.9f, 0.5f);
         }
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
         Pair<Cable, Cable.Point> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);

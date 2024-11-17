@@ -17,12 +17,14 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
+import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +35,14 @@ public class Cable {
     private HashMap<UUID, Integer> playerHoldingPointMap = new HashMap<>();
     private Level level;
     public float radius = SuperpositionConstants.cableRadius;
-    public float elasticity = 0.99f;
+    public float elasticity = 0.9f;
     private Player playerHolding;
+    private Color color;
     public Vec3 playerDraggedLastDelta = Vec3.ZERO;
     public int ticksSinceUpdate = 0;
     public int avgTicksSinceUpdate = 1;
 
-    public Cable(Vec3 starAnchor, Vec3 endAnchor, int points, Level level) {
+    public Cable(Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color) {
         addPoint(new Point(starAnchor));
         for (int i = 0; i < points; i++) {
             float delta = (float) i / points;
@@ -47,11 +50,13 @@ public class Cable {
         }
         addPoint(new Point(endAnchor));
         this.level = level;
+        this.color = color;
     }
 
-    private Cable(List<Point> points, Level level) {
+    private Cable(List<Point> points, Level level, Color color) {
         this.points = points;
         this.level = level;
+        this.color = color;
     }
 
     public void addPoint(Point point) {
@@ -81,17 +86,32 @@ public class Cable {
                     prevPoint = points.get(index + 1);
                 }
                 Vec3 playerOffset = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+
                 HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-                float delta = (float) Math.min(1.01, SuperpositionConstants.cableRadius / (hitResult.getLocation().distanceTo(prevPoint.position)) * 1.1f);
-                Vec3 result = (Mth.lerpVec3(prevPoint.position, hitResult.getLocation(), delta));
-                Vec3 moveVec = result.subtract(heldPoint.position);
-                heldPoint.grabbed = true;
-                if (heldPoint.position.distanceTo(result) < 10) {
-                    heldPoint.position = heldPoint.position.add(moveVec.scale(1));
-                } else {
-                    CableManager.playerFinishDraggingCable(player, heldPoint.position);
+
+                float maxLength = radius * points.size() * elasticity + radius * 2;
+                float actualLength = 0;
+                for (int i = 1; i < (points.size()); i++) {
+                    Vec3 start = index == i - 1 ? hitResult.getLocation() : points.get(i - 1).position;
+                    Vec3 end = index == i ? hitResult.getLocation() : points.get(i).position;
+                    actualLength += (float) start.distanceTo(end);
                 }
-//            if (radius*1.5f < points.get(points.size() - 1).position.subtract(points.get(points.size() - 2).position).length())
+                Vec3 result = (Mth.lerpVec3(heldPoint.prevPosition, hitResult.getLocation(), net.minecraft.util.Mth.clamp(maxLength / actualLength, 0, 1)));
+                heldPoint.grabbed = true;
+                float stretch = (float) result.distanceTo(hitResult.getLocation());
+                if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
+                    CableRenderer.stretch = net.minecraft.util.Mth.clamp((float) (Math.log(stretch)/4f+1f),0,1);
+                }
+                if (stretch > 1.5f) {
+                    if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
+                        CableRenderer.detachPos = heldPoint.position;
+                        CableRenderer.detachDelta = net.minecraft.util.Mth.clamp((float) (Math.log(stretch)/4f+1f),0,1);
+                    }
+                    CableManager.playerFinishDraggingCable(player, heldPoint.position);
+                    return;
+                }
+                heldPoint.position = result;
+
 //                addPoint(new Point(playerOffset));
             }
         }
@@ -102,8 +122,13 @@ public class Cable {
         updatePointsInBlocks();
         integrate();
         followPlayer();
+        points.get(points.size() - 1).tempPos = points.get(points.size() - 1).position;
         update(false);
         update(true);
+        for (Point point : points) {
+            if (point.tempPos != null)
+                point.position = Mth.lerpVec3(point.position, point.tempPos, 0.5f);
+        }
         freeStuckPoints();
         updateCollisions();
         lerpPos();
@@ -143,7 +168,7 @@ public class Cable {
                 if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
                     List<Signal> signalList = startSignalActor.getSignals();
                     if (signalList != null && !signalList.isEmpty()) {
-                        endSignalActor.putSignalList(new Object(), signalList);
+                        endSignalActor.addSignals(signalList);
                     }
                 }
             }
@@ -164,31 +189,33 @@ public class Cable {
         if (isForwards) {
             for (int i = 1; i < (points.size()); i++) {
                 Point point = points.get(i);
-                if (point.inBlock || point.grabbed)
+                if (point.inBlock)
                     continue;
+
                 Point prevPoint = points.get(i - 1);
 
-                point.forwardLength = (float) point.position.subtract(prevPoint.position).length();
+                point.forwardLength = (float) point.tempPos.subtract(prevPoint.tempPos).length();
 
-                float distanceToMove = (float) (point.position.distanceTo(prevPoint.position) - radius) * elasticity;
-                Vec3 normal = (point.position.subtract(prevPoint.position)).normalize();
-                point.setPosition(point.position.subtract(normal.scale(distanceToMove)));
+                float distanceToMove = (float) (point.tempPos.distanceTo(prevPoint.tempPos) - radius) * (elasticity);
+                Vec3 normal = (point.tempPos.subtract(prevPoint.tempPos)).normalize();
+                point.tempPos = (point.tempPos.subtract(normal.scale(distanceToMove)));
             }
         } else {
             for (int i = (points.size() - 2); i >= 0; i--) {
                 Point point = points.get(i);
-                if (point.inBlock || point.grabbed)
+                if (point.inBlock) {
+                    point.tempPos = point.position;
                     continue;
-//                if (i > 1 && (points.get(i - 1).grabbed))
-//                    continue;
+                }
 
                 Point prevPoint = points.get(i + 1);
 
                 point.backwordsLength = (float) point.position.subtract(prevPoint.position).length();
 
-                float distanceToMove = (float) (point.position.distanceTo(prevPoint.position) - radius) * elasticity;
+                float distanceToMove = (float) (point.position.distanceTo(prevPoint.position) - radius) * (elasticity);
                 Vec3 normal = (point.position.subtract(prevPoint.position)).normalize();
-                point.setPosition(point.position.subtract(normal.scale(distanceToMove)));
+                point.tempPos = point.position;
+                point.position = point.position.subtract(normal.scale(distanceToMove));
             }
         }
     }
@@ -202,7 +229,7 @@ public class Cable {
         for (int i = 0; i < (points.size()); i++) {
             Point point = points.get(i);
             if (point.lerpedPos == null && !point.inBlock && !point.grabbed) {
-                Vec3 collision = Entity.collideBoundingBox((Entity) null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition.subtract(0, 0, 0), radius, radius, radius), level, List.of());
+                Vec3 collision = Entity.collideBoundingBox((Entity) null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition, radius, radius, radius), level, List.of());
                 Vec3 velocity = point.position.subtract(point.prevPosition);
                 point.setInContact(false);
                 if (collision.subtract(velocity).length() != 0) {
@@ -253,6 +280,7 @@ public class Cable {
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(points.size());
+        buf.writeInt(color.getRGB());
         for (Point point : points) {
             buf.writeDouble(point.position.x);
             buf.writeDouble(point.position.y);
@@ -270,6 +298,7 @@ public class Cable {
 
     public void update(FriendlyByteBuf buf) {
         int size = buf.readInt();
+        color = new Color(buf.readInt());
         List<Point> pointList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Point newPoint = new Point(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
@@ -292,13 +321,14 @@ public class Cable {
 
     public static Cable fromBytes(FriendlyByteBuf buf, Level level) {
         int size = buf.readInt();
+        Color color1 = new Color(buf.readInt());
         List<Point> pointList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Point newPoint = new Point(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
             newPoint.setPrevPosition(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
             pointList.add(newPoint);
         }
-        Cable cable = new Cable(pointList, level);
+        Cable cable = new Cable(pointList, level, color1);
         int playerHoldingMapSize = buf.readInt();
         for (int i = 0; i < playerHoldingMapSize; i++) {
             UUID uuid = buf.readUUID();
@@ -311,12 +341,18 @@ public class Cable {
     public void updateFromCable(Cable cable) {
         avgTicksSinceUpdate = ticksSinceUpdate;
         ticksSinceUpdate = 0;
-        List<Point> prevPoints = points;
-        this.points = cable.points;
-        this.playerHoldingPointMap = cable.playerHoldingPointMap;
-        for (int i = 0; i < points.size() && i < prevPoints.size(); i++) {
-//            points.get(i).setPrevPosition(prevPoints.get(i).getPrevPosition());
+        color = cable.color;
+        if (points.size() >= cable.points.size() + 1) {
+            points.subList(cable.points.size() + 1, points.size() + 1).clear();
         }
+        if (cable.points.size() >= points.size() + 1) {
+            points.addAll(cable.points.subList(points.size() - 1, cable.points.size() - 1)); //TODO: Test this
+        }
+        for (int i = 0; i < points.size(); i++) {
+            points.get(i).setPosition(cable.points.get(i).getPosition());
+            points.get(i).setPrevPosition(cable.points.get(i).getPrevPosition());
+        }
+        this.playerHoldingPointMap = cable.playerHoldingPointMap;
     }
 
     public void updatePointsInBlocks() {
@@ -366,6 +402,10 @@ public class Cable {
         playerHoldingPointMap.remove(playerUUID);
     }
 
+    public Color getColor() {
+        return color;
+    }
+
     public static class Point {
         private Vec3 prevPosition;
         private Vec3 position;
@@ -410,6 +450,9 @@ public class Cable {
         public void setInContact(boolean inContact) {
             this.inContact = inContact;
         }
-        public Cable getOwnedCable() { return ownedCable; }
+
+        public Cable getOwnedCable() {
+            return ownedCable;
+        }
     }
 }

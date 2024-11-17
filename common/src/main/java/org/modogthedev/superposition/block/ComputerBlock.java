@@ -1,9 +1,7 @@
 package org.modogthedev.superposition.block;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -26,10 +24,10 @@ import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock, IRedstoneConnectingBlock {
+public class ComputerBlock extends SignalActorTickingBlock implements EntityBlock, IRedstoneConnectingBlock {
 
     public static IntegerProperty BASE_FREQUENCY = SuperpositionBlockStates.FREQUENCY;
-    public EncoderBlock(Properties properties) {
+    public ComputerBlock(Properties properties) {
         super(properties);
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
     }
@@ -41,7 +39,7 @@ public class EncoderBlock extends SignalActorTickingBlock implements EntityBlock
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.SIGNAL_GENERATOR.get().create(pos, state);
+        return SuperpositionBlockEntities.COMPUTER.get().create(pos, state);
     }
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {

@@ -11,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
@@ -20,6 +21,7 @@ import org.modogthedev.superposition.util.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
+import java.awt.*;
 import java.util.*;
 
 public class CableManager {
@@ -67,7 +69,10 @@ public class CableManager {
     public static void clientTick(Level level) {
         if (grabTimer > 0)
             grabTimer--;
+        if (CableRenderer.detachDelta > 0)
+            CableRenderer.detachDelta = CableRenderer.detachDelta - 0.2f;
         ifAbsent(level);
+        CableRenderer.stretch = 0;
         for (Cable cable : getCables(level)) {
             cable.updatePhysics();
         }
@@ -90,14 +95,14 @@ public class CableManager {
         }
     }
 
-    public static void playerUsesCable(Player player, Vec3 vec3) {
+    public static void playerUsesCable(Player player, Vec3 vec3, Color color) {
         for (Cable cable : getCables(player.level())) {
             if (cable.hasPlayerHolding(player.getUUID())) {
                 playerFinishDraggingCable(player, vec3);
                 return;
             }
         }
-        playerStartCable(vec3, player.level(), player);
+        playerStartCable(vec3, player.level(), player, color);
     }
 
     public static UUID getCableUUID(Level level, Cable cable) {
@@ -171,10 +176,10 @@ public class CableManager {
         }
     }
 
-    private static void playerStartCable(Vec3 pos, Level level, Player player) {
+    private static void playerStartCable(Vec3 pos, Level level, Player player, Color color) {
         if (player.level().isClientSide)
             return;
-        Cable newCable = new Cable(pos, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level);
+        Cable newCable = new Cable(pos, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color);
         newCable.setPlayerHolding(player);
         addCable(newCable, level, UUID.randomUUID());
     }
