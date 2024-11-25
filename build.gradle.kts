@@ -3,7 +3,7 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 plugins {
     id("java")
     id("architectury-plugin") version "3.4-SNAPSHOT"
-    id("dev.architectury.loom") version "1.6-SNAPSHOT" apply false
+    id("dev.architectury.loom") version "1.7.414" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -91,15 +91,21 @@ allprojects {
             url = uri("https://api.modrinth.com/maven")
         }
 
+
         maven {
             name = "CurseForge Maven"
             url = uri("https://cursemaven.com")
         }
+        maven {
+            name = "Neoforge"
+            url = uri("https://maven.neoforged.net/releases/")
+        }
+
     }
 
     tasks.withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release.set(17)
+        options.release.set(21)
     }
 
     java {
@@ -165,8 +171,20 @@ subprojects {
 
         @Suppress("UnstableApiUsage")
         "mappings"(loom.layered {
-            parchment("org.parchmentmc.data:parchment-${rootProject.property("minecraft_version")}:${rootProject.property("parchment_version")}@zip")
+            parchment("org.parchmentmc.data:parchment-${rootProject.property("parchment_minecraft")}:${rootProject.property("parchment_version")}@zip")
             officialMojangMappings()
         })
+    }
+
+    loom.apply {
+        runs {
+            named("client") {
+                vmArg("-Dmixin.debug.export=true")
+            }
+
+            named("server") {
+                vmArg("-Dmixin.debug.export=true")
+            }
+        }
     }
 }
