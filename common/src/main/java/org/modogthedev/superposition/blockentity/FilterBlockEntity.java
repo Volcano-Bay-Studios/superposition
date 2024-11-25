@@ -18,8 +18,6 @@ import java.util.List;
 
 public class FilterBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
 
-    private float minFilter = 0;
-    private float maxFilter = 64;
     public List<Signal> unmodulated;
     private Filter type = null;
 
@@ -61,17 +59,17 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     @Override
     public void tick() {
         preTick();
-        List<Component> tooltip = new ArrayList<>();
-        this.setTooltip(tooltip);
+        resetTooltip();
         if (level.isClientSide && getFilterType() != null) {
             addTooltip(Component.literal("Filter Status: "));
-            addTooltip(Component.literal(getFilterType().toString()));
+            addTooltip(Component.translatable(getFilterType().toString()));
         }
         super.tick();
     }
 
     public void setFilter(Filter filter) {
         this.type = filter;
+        sendData();
     }
 
     @Override
@@ -98,7 +96,6 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     public void loadSyncedData(CompoundTag tag) {
         if (tag.contains("swap"))
             super.loadSyncedData(tag);
-//        type = SuperpositionFilters.FILTERS.getRegistrar().get(new ResourceLocation(tag.getString("namespace"), tag.getString("path"))).create();
         if (type != null && tag.contains("path"))
             type.load(tag);
     }

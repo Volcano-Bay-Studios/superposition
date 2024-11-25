@@ -2,7 +2,9 @@ package org.modogthedev.superposition.client.renderer.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -11,6 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalReadoutBlockEntity;
@@ -18,12 +21,17 @@ import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 
+
 public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<SignalReadoutBlockEntity> {
 
+    public Font font;
+
     public SignalReadoutBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+        font = context.getFont();
     }
 
     static final int size = 12;
+
     @Override
     public void render(SignalReadoutBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
@@ -35,7 +43,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 
         ms.translate(0.5, 0.748, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
-        ms.translate(0,-.125,0);
+        ms.translate(0, -.125, 0);
 
 
         Matrix4f m = ms.last().pose();
@@ -50,20 +58,32 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 
         float uvOffsetx = 0f;
         int offset = 2;
-        float part = 1f / (size+4);
-        float totalpart = 1f / (size+4);
+        float part = 1f / (size + 4);
+        float totalPart = 1f / (size + 4);
+        ms.pushPose();
+        ms.translate(-.44f, .5, -.1);
+        ms.mulPose(new Quaternionf(0.07f,0,0,0.07f));
+        Matrix4f textPose = ms.last().pose();
+
+        int j = 0;
+        for (String text : be.text) { //TODO: Finish text system
+            this.font.drawInBatch(text, 1, j*9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+            j++;
+        }
+        ms.popPose();
 
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING), 1));
         for (int i = 0; i < size; i++) {
-            float x = (i * totalpart) + (offset / (size+4f)) - min;
+            float x = (i * totalPart) + (offset / (size + 4f)) - min;
             float y = .21f;
             float yinverse = .2f;
-            Signal[] signals = Mth.spaceArray(be.signals,size);
+            Signal[] signals = Mth.spaceArray(be.signals, size);
             if (signals != null && signals[i] != null) {
                 y = Math.max(-.061f, (float) ((((signals[i].amplitude) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)));
             }
+
             y += (float) (Math.random() / 64);
-            yinverse = -y+.4f;
+            yinverse = -y + .4f;
             buffer
                     .vertex(m, x, 0.5001f, yinverse)
                     .color(1f, 1f, 1f, alpha)
@@ -139,7 +159,6 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 //                .normal(n, 0, 1, 0)
 //                .endVertex();
     }
-
 
 
     private float getMaxPlaneExtent(SignalReadoutBlockEntity be) {

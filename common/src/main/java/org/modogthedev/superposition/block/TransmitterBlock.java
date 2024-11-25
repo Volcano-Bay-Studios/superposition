@@ -18,15 +18,27 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.bridge.CommonRedstone;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.util.AntennaActorTickingBlock;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class TransmitterBlock extends AntennaActorTickingBlock {
+public class TransmitterBlock extends AntennaActorTickingBlock implements CommonRedstone {
     public TransmitterBlock(Properties pProperties) {
         super(pProperties.isRedstoneConductor((state, getter, pos) -> true));
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
+    }
+
+    @Override
+    public boolean commonConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+        Direction swappedPos;
+        if (state.getValue(SWAP_SIDES)) {
+            swappedPos = state.getValue(SignalActorTickingBlock.FACING).getClockWise();
+        } else {
+            swappedPos = state.getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+        }
+        return swappedPos == direction;
     }
 
     @Override
@@ -65,6 +77,7 @@ public class TransmitterBlock extends AntennaActorTickingBlock {
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {

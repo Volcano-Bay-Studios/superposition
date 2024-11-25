@@ -26,6 +26,8 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     boolean updateNext = false;
     public int ticks = 0;
     public int step = 0;
+    public int lastStep = 1;
+    public static final int ticksToChange = 40;
 
     public AmplifierBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.AMPLIFIER.get(), pos, state);
@@ -78,7 +80,8 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
             this.setTooltip(tooltip);
             if (amplitude>0) {
                 ticks++;
-                if (ticks >Math.random()*10+10) {
+                if (ticks > ticksToChange) {
+                    lastStep = step;
                     step = (int) (Math.random()*3);
                     ticks = 0;
                 }

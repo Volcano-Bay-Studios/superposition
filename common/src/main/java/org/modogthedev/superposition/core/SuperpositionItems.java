@@ -5,10 +5,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.item.CableItem;
-import org.modogthedev.superposition.item.CarabinerItem;
-import org.modogthedev.superposition.item.FilterItem;
-import org.modogthedev.superposition.item.ScrewdriverItem;
+import org.modogthedev.superposition.item.*;
 import org.modogthedev.superposition.item.block.SignalReadoutBlockItem;
 
 import java.awt.*;
@@ -35,9 +32,11 @@ public class SuperpositionItems {
     public static final RegistrySupplier<CableItem> PURPLE_CABLE = registerItem("purple_cable", () -> new CableItem(new Item.Properties().arch$tab(SuperpositionTabs.TAB),new Color(137, 50, 184)));
     public static final RegistrySupplier<CableItem> MAGENTA_CABLE = registerItem("magenta_cable", () -> new CableItem(new Item.Properties().arch$tab(SuperpositionTabs.TAB),new Color(199, 78, 189)));
     public static final RegistrySupplier<CableItem> PINK_CABLE = registerItem("pink_cable", () -> new CableItem(new Item.Properties().arch$tab(SuperpositionTabs.TAB),new Color(243, 139, 170)));
+    // Filters
     public static final RegistrySupplier<FilterItem> HIGH_PASS_FILTER = registerItem("high_pass_filter", () -> new FilterItem(new FilterItem.Properties().type(SuperpositionFilters.HIGH_PASS.get()), new Item.Properties().stacksTo(1).arch$tab(SuperpositionTabs.TAB)));
     public static final RegistrySupplier<FilterItem> LOW_PASS_FILTER = registerItem("low_pass_filter", () -> new FilterItem(new FilterItem.Properties().type(SuperpositionFilters.LOW_PASS.get()), new Item.Properties().stacksTo(1).arch$tab(SuperpositionTabs.TAB)));
     public static final RegistrySupplier<FilterItem> BAND_PASS_FILTER = registerItem("band_pass_filter", () -> new FilterItem(new FilterItem.Properties().type(SuperpositionFilters.BAND_PASS.get()), new Item.Properties().stacksTo(1).arch$tab(SuperpositionTabs.TAB)));
+    // Cards
     // CRAFTING
     public static final RegistrySupplier<Item> INSULATED_SHEET = registerItem("insulated_sheet", () -> new Item(new Item.Properties().arch$tab(SuperpositionTabs.TAB)));
     // BLOCK ITEM

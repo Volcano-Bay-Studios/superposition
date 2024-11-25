@@ -18,7 +18,7 @@ public class SuperpositionRegistries {
     protected static final ResourceKey<Registry<Card>> CARD_REGISTRY = ResourceKey.createRegistryKey(new ResourceLocation(Superposition.MODID,"card"));
     public static void register() {
         Superposition.LOGGER.info("Registering Registries!");
-        RegistrationProvider.get(FILTER_REGISTRY, Superposition.MODID);
-        RegistrationProvider.get(CARD_REGISTRY, Superposition.MODID);
+//        RegistrationProvider.get(FILTER_REGISTRY, Superposition.MODID);
+//        RegistrationProvider.get(CARD_REGISTRY, Superposition.MODID);
     }
 }

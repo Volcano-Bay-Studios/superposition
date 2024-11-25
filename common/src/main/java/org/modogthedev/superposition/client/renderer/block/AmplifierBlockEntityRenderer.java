@@ -42,14 +42,53 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
         float uvMin = (-0.5f);
         float uvMax = (.5f);
 
-        float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/ ;
+        float lastStage = be.lastStep;
         float stage = be.step;
+        float delta = (float) be.ticks /AmplifierBlockEntity.ticksToChange;
         float stages = 3;
+        float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/ ;
 
         float offset = (stage / stages)+.5f;
+        float lastOffset = (lastStage / stages)+.5f;
 
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
 
+        buffer
+                .vertex(m, -0.1887f, 0.5001f, -0.15625f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(0, (uvMin/stages)+lastOffset)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
+
+        buffer
+                .vertex(m, -0.1887f, 0.5001f, 0.15825f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(0, (uvMax/stages)+lastOffset)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
+
+        buffer
+                .vertex(m, 0.1887f, 0.5001f, 0.15825f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(1, (uvMax/stages)+lastOffset)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
+
+        buffer
+                .vertex(m, 0.1887f, 0.5001f, -0.15625f)
+                .color(1f, 1f, 1f, alpha)
+                .uv(1, (uvMin/stages)+lastOffset)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(light)
+                .normal(n, 0, 1, 0)
+                .endVertex();
+        alpha = delta;
         buffer
                 .vertex(m, -0.1887f, 0.5001f, -0.15625f)
                 .color(1f, 1f, 1f, alpha)

@@ -16,8 +16,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
+import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.codecs.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SuperpositionConstants;
@@ -41,6 +44,8 @@ public class Cable {
     public Vec3 playerDraggedLastDelta = Vec3.ZERO;
     public int ticksSinceUpdate = 0;
     public int avgTicksSinceUpdate = 1;
+    public int sleepTimer = 20;
+    private float lastMovement;
 
     public Cable(Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color) {
         addPoint(new Point(starAnchor));
@@ -100,12 +105,12 @@ public class Cable {
                 heldPoint.grabbed = true;
                 float stretch = (float) result.distanceTo(hitResult.getLocation());
                 if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
-                    CableRenderer.stretch = net.minecraft.util.Mth.clamp((float) (Math.log(stretch)/4f+1f),0,1);
+                    CableRenderer.stretch = net.minecraft.util.Mth.clamp((float) (Math.log(stretch) / 4f + 1f), 0, 1);
                 }
                 if (stretch > 1.5f) {
                     if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
                         CableRenderer.detachPos = heldPoint.position;
-                        CableRenderer.detachDelta = net.minecraft.util.Mth.clamp((float) (Math.log(stretch)/4f+1f),0,1);
+                        CableRenderer.detachDelta = net.minecraft.util.Mth.clamp((float) (Math.log(stretch) / 4f + 1f), 0, 1);
                     }
                     CableManager.playerFinishDraggingCable(player, heldPoint.position);
                     return;
@@ -119,19 +124,32 @@ public class Cable {
 
     public void updatePhysics() {
         ticksSinceUpdate++;
-        updatePointsInBlocks();
-        integrate();
-        followPlayer();
-        points.get(points.size() - 1).tempPos = points.get(points.size() - 1).position;
-        update(false);
-        update(true);
-        for (Point point : points) {
-            if (point.tempPos != null)
-                point.position = Mth.lerpVec3(point.position, point.tempPos, 0.5f);
+        if (!playerHoldingPointMap.isEmpty())
+            sleepTimer = 20;
+        if (sleepTimer > 0) {
+            updatePointsInBlocks();
+            lastMovement = 0;
+            integrate();
+            if (lastMovement > 0.1f)
+                sleepTimer = 20;
+            else
+                sleepTimer--;
+            followPlayer();
+            points.get(points.size() - 1).tempPos = points.get(points.size() - 1).position;
+            update(false);
+            update(true);
+            for (Point point : points) {
+                if (point.tempPos != null)
+                    point.position = Mth.lerpVec3(point.position, point.tempPos, 0.5f);
+            }
+            freeStuckPoints();
+            updateCollisions();
+            lerpPos();
+        } else {
+            for (Point point : points) {
+                point.setPrevPosition(point.position);
+            }
         }
-        freeStuckPoints();
-        updateCollisions();
-        lerpPos();
         sendSignal();
     }
 
@@ -165,6 +183,18 @@ public class Cable {
             if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
                 BlockEntity start = level.getBlockEntity(startPos);
                 BlockEntity end = level.getBlockEntity(endPos);
+                if (start instanceof ComputerBlockEntity cbe) {
+                    Card card = cbe.getCard();
+                    if (card != null && card instanceof TickingCard tickingCard) {
+                        tickingCard.outputCablePos = endPos;
+                    }
+                }
+                if (end instanceof ComputerBlockEntity cbe) {
+                    Card card = cbe.getCard();
+                    if (card != null && card instanceof TickingCard tickingCard) {
+                        tickingCard.inputCablePos = startPos; //TODO: peripheral cables
+                    }
+                }
                 if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
                     List<Signal> signalList = startSignalActor.getSignals();
                     if (signalList != null && !signalList.isEmpty()) {
@@ -251,12 +281,13 @@ public class Cable {
             if (!point.inBlock && !point.grabbed) {
 //            if (i < points.size() - 1) {
                 Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -9.8, 0).scale(.05 * 0.05));
-                Vec3 normal = (nextPosition.subtract(point.position));
+                Vec3 offset = (nextPosition.subtract(point.position));
+                lastMovement += (float) offset.length();
                 point.prevPosition = point.position;
                 if (point.inContact)
-                    point.position = point.position.add(normal.scale(0.7f));
+                    point.position = point.position.add(offset.scale(0.7f));
                 else
-                    point.position = point.position.add(normal.scale(0.9f));
+                    point.position = point.position.add(offset.scale(0.9f));
 //            } else {
 //            }
             } else {
@@ -353,6 +384,7 @@ public class Cable {
             points.get(i).setPrevPosition(cable.points.get(i).getPrevPosition());
         }
         this.playerHoldingPointMap = cable.playerHoldingPointMap;
+        sleepTimer = 20;
     }
 
     public void updatePointsInBlocks() {

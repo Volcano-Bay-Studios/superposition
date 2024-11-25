@@ -63,6 +63,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public boolean isSuperpositionTooltipEnabled() {
         return true;
     }
+    public void resetTooltip() {
+        this.veil$tooltip.clear();
+    }
 
     public CompoundTag saveTooltipData() {
         CompoundTag tag = new CompoundTag();
@@ -251,17 +254,19 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public Signal getSignal() {
         return SignalManager.randomSignal(putSignals);
     }
+
     public List<Signal> getSignals() {
         return putSignals;
     }
 
     public void addSignals(List<Signal> list) {
-        if (ticksSinceSignal>0)
+        if (ticksSinceSignal > 0)
             putSignals = list;
         else
             putSignals.addAll(list);
         ticksSinceSignal = 0;
     }
+
     public void putSignalList(Object nextCall, List<Signal> list) {
         putSignals = list;
         ticksSinceSignal = 0;
@@ -286,9 +291,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
-        List<Signal> safeList = new ArrayList<>(signalList);
-        for (Signal signal : safeList) {
-            signal = this.modulateSignal(signal, updateTooltip);
+        List<Signal> safeList = new ArrayList<>();
+        for (Signal signal : signalList) {
+            Signal signal1 = this.modulateSignal(signal, updateTooltip);
+            if (signal1 != null)
+                safeList.add(signal1);
         }
         return safeList;
     }
@@ -325,13 +332,14 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
-        level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
+        level.setBlock(getBlockPos(), getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
     }
 
     public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {
         configurationTooltipString.add(name);
         configurationTooltipExecutable.add(configurationTooltip);
     }
+
     public void setupConfigTooltips() {
         configurationTooltipString.clear();
         configurationTooltipExecutable.clear();
@@ -347,29 +355,33 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             }
         });
     }
+
     private void finaliseConfigTooltips() {
         int i = 0;
-        for (String string: configurationTooltipString) {
+        for (String string : configurationTooltipString) {
             if (i == configSelection)
-                addTooltip(string+" ←");
+                addTooltip(string + " ←");
             else
                 addTooltip(string);
             i++;
         }
     }
+
     public void incrementConfigSelection() {
         stepNext = true;
         assert level != null;
-        level.playLocalSound(getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS,1,1,false);
+        level.playLocalSound(getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS, 1, 1, false);
     }
+
     public void interactConfig() {
         interactNext = true;
         assert level != null;
-        level.playLocalSound(getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS,1,1,false);
+        level.playLocalSound(getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS, 1, 1, false);
     }
+
     private void checkEvents() {
         if (stepNext) {
-            if (configurationTooltipString.size()>1) {
+            if (configurationTooltipString.size() > 1) {
                 configSelection++;
             } else {
                 configurationTooltipExecutable.get(configSelection).execute();
@@ -383,11 +395,13 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             interactNext = false;
         }
     }
+
     public void preTick() {
-        if (ticksSinceSignal>0)
+        if (ticksSinceSignal > 0)
             putSignals.clear();
         ticksSinceSignal++;
     }
+
     @Override
     public void tick() {
         if (level.isClientSide) {

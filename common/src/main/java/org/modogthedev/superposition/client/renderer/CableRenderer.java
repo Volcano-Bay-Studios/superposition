@@ -72,16 +72,19 @@ public class CableRenderer {
             cablePoints.add(cable.getPoints().get(size).getPosition());
             prevCablePoints.add(cable.getPoints().get(size).getPrevPosition());
             int numSegments = 4;
-            float segmentSize = 1f/numSegments;
+            float segmentSize = 1f / numSegments;
             List<Vec3> points = CatmulRomSpline.generateSpline(cablePoints, numSegments);
             List<Vec3> prevPoints = CatmulRomSpline.generateSpline(prevCablePoints, numSegments);
             for (int i = 0; i < points.size(); i++) {
-                float uv1 = i+1 % (numSegments+1) * segmentSize;
+                float uv1 = i + 1 % (numSegments + 1) * segmentSize;
                 float uv2 = uv1 + segmentSize;
                 Vec3 point;
                 Vec3 prevPoint;
                 Vec3 nextPoint;
+                Vec3 normalPoint = null;
                 Vec3 nextPrevPoint;
+                if (i < cable.getPoints().size() - 2)
+                    normalPoint = points.get(i + 2);
                 if (i < cable.getPoints().size() - 1) {
                     point = points.get(i);
                     nextPoint = points.get(i + 1);
@@ -94,12 +97,11 @@ public class CableRenderer {
                     nextPrevPoint = prevPoints.get(i - 1);
                 }
                 Vec3 normal = getPointsNormal(point, nextPoint);
-                Vec3 startNormal = normal;
-                if (i != 0)
-                    startNormal = getPointsNormal(points.get(i-1),point);
-                renderCableFrustrum(poseStack, cable.getColor(), uv1, uv2, SuperpositionConstants.cableWidth + (i % 5 * .0001f), Mth.lerpVec3(prevPoint, point, partialTicks), startNormal, Mth.lerpVec3(nextPrevPoint, nextPoint, partialTicks).add(normal.scale(.01f)), normal);
+                Vec3 nextNormal = normal;
+                if (normalPoint != null)
+                    nextNormal = nextPoint.subtract(normalPoint).normalize();
+                renderCableFrustrum(poseStack, cable.getColor(), uv1, uv2, SuperpositionConstants.cableWidth + (i % 5 * .0001f), Mth.lerpVec3(prevPoint, point, partialTicks), normal, Mth.lerpVec3(nextPrevPoint, nextPoint, partialTicks).add(normal.scale(.01f)), normal);
             }
-
             poseStack.popPose();
         }
         poseStack.popPose();
@@ -158,8 +160,15 @@ public class CableRenderer {
             Vec3 pointPos = cablePointPair.getB().getPosition();
             Vec3 prevPos = cablePointPair.getB().getPrevPosition();
             Vec3 pos = Mth.lerpVec3(prevPos, pointPos, partialTicks);
-            if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getUUID()))
-                DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
+            if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getUUID())) {
+                if (cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB())) {
+                    width -= 0.03f;
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.2f);
+                    width += 0.03f;
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
+                } else
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
+            }
         }
         poseStack.popPose();
         poseStack.popPose();
@@ -170,7 +179,7 @@ public class CableRenderer {
     }
 
     public static void renderCableFrustrum(
-            PoseStack ps, Color color,  float uv1, float uv2,
+            PoseStack ps, Color color, float uv1, float uv2,
             double width, Vec3 startPosition, Vec3 startNormal, Vec3 endPosition, Vec3 endNormal
     ) {
         if (startNormal.dot(endNormal) < 0)
@@ -182,7 +191,6 @@ public class CableRenderer {
         List<Vec3> endCorners = getCornersFromNormal(direction, endPosition, endNormal, width);
 
         int light = Math.max(LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(endPosition)), LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(startPosition)));
-
 
         ps.pushPose();
 
@@ -259,7 +267,10 @@ public class CableRenderer {
     }
 
     private static void consumeVectorsVertex(Color color, int light, float uv1, float uv2, PoseStack ps, Vec3... vectors) {
-        Vec3 normal = vectors[0].cross(vectors[1]);
+        Vec3 normal1 = vectors[1].subtract(vectors[0]).cross(vectors[2].subtract(vectors[0]));
+        Vec3 normal2 = vectors[2].subtract(vectors[1]).cross(vectors[3].subtract(vectors[2]));
+        Vec3 normal = normal1.add(normal2).scale(.5);
+
 
         Matrix4f m = ps.last().pose();
         Vec2[] uvCorners = new Vec2[]{new Vec2(1, uv1), new Vec2(1, uv2), new Vec2(0, uv2), new Vec2(0, uv1)};
@@ -270,7 +281,7 @@ public class CableRenderer {
                     .uv(uvCorners[step].x, uvCorners[step].y)
                     .overlayCoords(OverlayTexture.NO_OVERLAY)
                     .uv2(light)
-                    .normal((float) 0, (float) 0, (float) 0)
+                    .normal((float) normal.x, (float) normal.y, (float) normal.z)
                     .endVertex();
             step++;
         }

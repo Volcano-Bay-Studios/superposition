@@ -21,17 +21,26 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     private Card card;
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.AMPLIFIER.get(), pos, state);
+        super(SuperpositionBlockEntities.COMPUTER.get(), pos, state);
     }
 
     @Override
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
-        level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
-//        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
+        card = Card.loadNew(tag);
     }
+
     public static float getRedstoneOffset(Level level, BlockPos pos) {
-        return level.getSignal(pos,level.getBlockState(pos).getValue(AmplifierBlock.FACING).getOpposite());
+        return level.getSignal(pos, level.getBlockState(pos).getValue(AmplifierBlock.FACING).getOpposite());
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+        sendData();
     }
 
     @Override
@@ -40,6 +49,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         if (card != null)
             card.save(pTag);
     }
+
 
     @Override
     public void load(CompoundTag pTag) {
@@ -51,8 +61,31 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     public void tick() {
         preTick();
         if (level.isClientSide) {
+            resetTooltip();
+            if (card == null)
+                addTooltip(Component.literal("No Card"));
+            else {
+                addTooltip(Component.literal("Computer Status:"));
+                addTooltip(Component.literal("Card - ").append(Component.translatable("item.superposition." + getCard().getSelfReference().getPath())));
+            }
+        }
+        if (card != null) {
+            for (Signal signal : getSignals()) {
+                card.modulateSignal(signal);
+            }
         }
         super.tick();
+    }
+
+    @Override
+    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
+        if (card != null) {
+            boolean shouldThrow = card.modulateSignal(signal);
+            if (shouldThrow)
+                return null;
+        } else
+            return null;
+        return super.modulateSignal(signal, updateTooltip);
     }
 
     @Override

@@ -4,16 +4,22 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EncodedData extends ArrayList<Serializable> {
+public class EncodedData<T extends Serializable> {
+    public EncodedData(T obj) {
+        this.obj = obj;
+    }
+
+    T obj;
+
+    public T getObj() {
+        return obj;
+    }
 
     public byte[] encode() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         try (ObjectOutputStream out = new ObjectOutputStream(outputStream)) {
-            out.writeInt(size());
-            for (Serializable signalData : this) {
-                out.writeObject(signalData);
-            }
+            out.writeObject(obj);
             out.flush();
             return outputStream.toByteArray();
         } catch (Exception ex) {
@@ -22,19 +28,13 @@ public class EncodedData extends ArrayList<Serializable> {
     }
 
     public static EncodedData deserialize(byte[] bytes) {
-        EncodedData readData = new EncodedData();
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 
         try (ObjectInputStream in = new ObjectInputStream(bis)) {
-            int size = in.readInt();
-            for (int i = 0; i < size; i++) {
-                readData.add((Serializable) in.readObject());
-            }
+            Serializable object = (Serializable) in.readObject();
+            return new EncodedData<>(object);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-
-        return readData;
     }
-
 }

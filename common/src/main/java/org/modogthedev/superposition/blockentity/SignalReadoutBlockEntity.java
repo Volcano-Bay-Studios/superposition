@@ -3,12 +3,16 @@ package org.modogthedev.superposition.blockentity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.client.renderer.block.SignalReadoutBlockEntityRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +24,20 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
     public Signal[] signals = new Signal[12];
     public float highestValue = 0;
     public float lowestValue = 0;
+    public List<String> text = new ArrayList<>();
     @Override
     public void tick() {
         preTick();
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
         List<Signal> frequencySorted = getSignals();
+        text.clear();
+        for (Signal signal : getSignals()) {
+            EncodedData<? extends Serializable> encodedData = signal.getEncodedData();
+            if (encodedData != null && encodedData.getObj() instanceof String s) {
+                text.add(s);
+            }
+        }
 
         if (level.isClientSide) {
             if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
