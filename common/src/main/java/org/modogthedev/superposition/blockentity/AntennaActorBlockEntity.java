@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -38,7 +39,7 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
         BlockEntity blockEntity = level.getBlockEntity(sidedPos);
         if (blockEntity instanceof SignalGeneratorBlockEntity signalGeneratorBlockEntity) {
             if (signalGeneratorBlockEntity.getSwappedPos().equals(getBlockPos())) {
-                return signalGeneratorBlockEntity.getFrequency()*100000;
+                return signalGeneratorBlockEntity.getFrequency() * 100000;
             }
         }
         return 0;
@@ -73,10 +74,5 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
         Antenna getAntenna = AntennaManager.getAntennaActorAntenna(level, worldPosition);
         if (getAntenna != null)
             antenna = getAntenna;
-    }
-
-    @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
     }
 }

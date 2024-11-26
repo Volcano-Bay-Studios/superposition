@@ -12,7 +12,7 @@ public class SuperpositionMessages {
     private static NetworkChannel INSTANCE;
 
     public static void register() {
-        NetworkChannel net = NetworkChannel.create(new ResourceLocation(Superposition.MODID, "messages"));
+        NetworkChannel net = NetworkChannel.create(ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "messages"));
 
         INSTANCE = net;
 

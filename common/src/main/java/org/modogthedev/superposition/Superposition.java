@@ -50,6 +50,6 @@ public class Superposition {
     }
 
     public static ResourceLocation id(String loc) {
-        return new ResourceLocation(MODID, loc);
+        return ResourceLocation.fromNamespaceAndPath(MODID, loc);
     }
 }

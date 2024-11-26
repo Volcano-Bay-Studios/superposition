@@ -90,7 +90,7 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof FilterBlockEntity filterBlockEntity) {
             if (filterBlockEntity.getFilterType() != null) {
@@ -112,7 +112,7 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
                 }
             }
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return super.useWithoutItem(state, level, pos, player, hitResult);
     }
 
     @Override

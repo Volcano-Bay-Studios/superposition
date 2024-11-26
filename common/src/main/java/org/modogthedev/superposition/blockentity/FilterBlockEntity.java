@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -82,15 +83,25 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        super.saveAdditional(pTag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag,registries);
         if (type != null) {
-            pTag.putString("namespace", type.getSelfReference().getNamespace());
-            pTag.putString("path", type.getSelfReference().getPath());
-            type.save(pTag);
+            tag.putString("namespace", type.getSelfReference().getNamespace());
+            tag.putString("path", type.getSelfReference().getPath());
+            type.save(tag);
         }
     }
 
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+
+        type = SuperpositionFilters.FILTERS.getRegistrar().get(ResourceLocation.fromNamespaceAndPath(tag.getString("namespace"), tag.getString("path")));
+        if (type != null) {
+            type = type.create();
+            type.load(tag);
+        }
+    }
 
     @Override
     public void loadSyncedData(CompoundTag tag) {
@@ -98,15 +109,5 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
             super.loadSyncedData(tag);
         if (type != null && tag.contains("path"))
             type.load(tag);
-    }
-
-    @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        type = SuperpositionFilters.FILTERS.getRegistrar().get(new ResourceLocation(pTag.getString("namespace"), pTag.getString("path")));
-        if (type != null) {
-            type = type.create();
-            type.load(pTag);
-        }
     }
 }

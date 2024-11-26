@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -65,16 +66,13 @@ public class ComputerBlock extends SignalActorTickingBlock implements EntityBloc
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (pPlayer.isCrouching() && pPlayer.getItemInHand(pHand).isEmpty()) {
-            BlockEntity be = pLevel.getBlockEntity(pPos);
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (player.isCrouching()) {
+            BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof ComputerBlockEntity computerBlockEntity)
                 computerBlockEntity.setCard(null);
         }
-        if (pLevel.isClientSide) {
-            return InteractionResult.SUCCESS;
-        }
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return super.useWithoutItem(state, level, pos, player, hitResult);
     }
 
     @Override

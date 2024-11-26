@@ -129,16 +129,12 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     }
 
 
-
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!(pPlayer.getMainHandItem().getItem() instanceof ScrewdriverItem)) {
-            if (pLevel.isClientSide) {
-                ScreenManager.openModulatorScreen(pPos);
-            }
-            return InteractionResult.SUCCESS;
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide) {
+            ScreenManager.openModulatorScreen(pos);
         }
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
@@ -155,7 +151,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
         if (blockEntity instanceof AmplifierBlockEntity amplifierBlockEntity) {
             if (amplifierBlockEntity.temp > 40) {
-                if ((!pEntity.isSteppingCarefully() || amplifierBlockEntity.temp < 50) && pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) pEntity)) {
+                if ((!pEntity.isSteppingCarefully() || amplifierBlockEntity.temp < 50) && pEntity instanceof LivingEntity) {
                     pEntity.hurt(pLevel.damageSources().hotFloor(), (float) Math.floor(amplifierBlockEntity.temp / 4f) - 9);
                 }
             }

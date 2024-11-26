@@ -85,40 +85,36 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
             y += (float) (Math.random() / 64);
             yinverse = -y + .4f;
             buffer
-                    .vertex(m, x, 0.5001f, yinverse)
-                    .color(1f, 1f, 1f, alpha)
-                    .uv(uvMin + uvOffsetx, (uvMin / stages))
-                    .overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .uv2(light)
-                    .normal(n, 0, 1, 0)
-                    .endVertex();
+                    .addVertex(m, x, 0.5001f, yinverse)
+                    .setColor(1f, 1f, 1f, alpha)
+                    .setUv(uvMin + uvOffsetx, (uvMin / stages))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setUv2(light,0)
+                    .setNormal(ms.last(), 0, 1, 0);
 
             buffer
-                    .vertex(m, x, 0.5001f, y)
-                    .color(1f, 1f, 1f, alpha)
-                    .uv(uvMin + uvOffsetx, (uvMax / stages))
-                    .overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .uv2(light)
-                    .normal(n, 0, 1, 0)
-                    .endVertex();
+                    .addVertex(m, x, 0.5001f, y)
+                    .setColor(1f, 1f, 1f, alpha)
+                    .setUv(uvMin + uvOffsetx, (uvMax / stages))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setUv2(light,0)
+                    .setNormal(ms.last(), 0, 1, 0);
 
             buffer
-                    .vertex(m, x + part, 0.5001f, y)
-                    .color(1f, 1f, 1f, alpha)
-                    .uv(uvMax + uvOffsetx, (uvMax / stages))
-                    .overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .uv2(light)
-                    .normal(n, 0, 1, 0)
-                    .endVertex();
+                    .addVertex(m, x + part, 0.5001f, y)
+                    .setColor(1f, 1f, 1f, alpha)
+                    .setUv(uvMax + uvOffsetx, (uvMin / stages))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setUv2(light,0)
+                    .setNormal(ms.last(), 0, 1, 0);
 
             buffer
-                    .vertex(m, x + part, 0.5001f, yinverse)
-                    .color(1f, 1f, 1f, alpha)
-                    .uv(uvMax + uvOffsetx, (uvMin / stages))
-                    .overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .uv2(light)
-                    .normal(n, 0, 1, 0)
-                    .endVertex();
+                    .addVertex(m, x + part, 0.5001f, yinverse)
+                    .setColor(1f, 1f, 1f, alpha)
+                    .setUv(uvMax + uvOffsetx, (uvMin / stages))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setUv2(light,0)
+                    .setNormal(ms.last(), 0, 1, 0);
         }
 //        ms.translate(0,-.00025,.22);
 //        alpha = .4f;

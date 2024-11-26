@@ -16,40 +16,40 @@ import java.util.function.Supplier;
 public class SuperpositionBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Superposition.MODID, Registries.BLOCK);
     public static final RegistrySupplier<AntennaBlock> ANTENNA = registerBlock("antenna",
-            () -> new AntennaBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS)
+            () -> new AntennaBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS)
                     .strength(2.0f, 8f).noOcclusion().lightLevel(value -> AntennaBlock.isCap(value) ? 4 : 0)
             ));
     public static final RegistrySupplier<SignalGeneratorBlock> SIGNAL_GENERATOR = registerBlock("signal_generator",
-            () -> new SignalGeneratorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new SignalGeneratorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-    public static final RegistrySupplier<SignalReadoutBlock> SIGNAL_READOUT = BLOCKS.register("signal_readout",
-            () -> new SignalReadoutBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR)
+    public static final RegistrySupplier<SignalReadoutBlock> SIGNAL_READOUT = registerBlock("signal_readout",
+            () -> new SignalReadoutBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<TransmitterBlock> TRANSMITTER = registerBlock("transmitter",
-            () -> new TransmitterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new TransmitterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<ReceiverBlock> RECEIVER = registerBlock("receiver",
-            () -> new ReceiverBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new ReceiverBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<AmplifierBlock> AMPLIFIER = registerBlock("amplifier",
-            () -> new AmplifierBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new AmplifierBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
 
     public static final RegistrySupplier<FilterBlock> FILTER = registerBlock("filter",
-            () -> new FilterBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new FilterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<ComputerBlock> COMPUTER = registerBlock("computer",
-            () -> new ComputerBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new ComputerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<CasingBlock> CASING = registerBlock("casing",
-            () -> new CasingBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)
+            () -> new CasingBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
 

@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,18 +40,16 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        pTag.putFloat("frequency", frequency);
-        super.saveAdditional(pTag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putFloat("frequency", frequency);
+        super.saveAdditional(tag, registries);
     }
 
     @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        this.frequency = pTag.getFloat("frequency");
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        this.frequency = tag.getFloat("frequency");
+        super.loadAdditional(tag, registries);
     }
-
-
 
     @Override
     public void tick() {

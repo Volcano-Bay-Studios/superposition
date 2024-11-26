@@ -103,7 +103,7 @@ public class WidgetScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double scrollX ,double pDelta) {
         getTouching((int) pMouseX, (int) pMouseY);
         for (Dial dial : dials) {
             if (dial.mouseOver) {
@@ -121,7 +121,7 @@ public class WidgetScreen extends Screen {
                 dialUpdated();
             }
         }
-        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
+        return super.mouseScrolled(pMouseX, pMouseY, scrollX, pDelta);
     }
 
     public void playScrollSound(SoundManager pHandler) {
@@ -147,6 +147,9 @@ public class WidgetScreen extends Screen {
 
     public void dialUpdated() {
     }
+
+    @Override
+    protected void renderBlurredBackground(float partialTick) {}
 
     public static class Dial {
         public Dial(int x, int y) {

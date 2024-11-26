@@ -63,40 +63,36 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
 
         buffer
-                .vertex(m, -0.1887f, 0.5001f, -0.15525f)
-                .color(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .uv(0, (uvMin/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, -0.1887f, 0.5001f, -0.15525f)
+                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setUv(1, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, -0.1887f, 0.5001f, 0.21825f)
-                .color(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .uv(0, (uvMax/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, -0.1887f, 0.5001f, 0.21825f)
+                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setUv(1, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, 0.1887f, 0.5001f, 0.21825f)
-                .color(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .uv(1, (uvMax/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, 0.1887f, 0.5001f, 0.21825f)
+                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setUv(1, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, 0.1887f, 0.5001f, -0.15525f)
-                .color(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .uv(1, (uvMin/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, 0.1887f, 0.5001f, -0.15525f)
+                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setUv(1, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
     }
     private float getMaxPlaneExtent(FilterBlockEntity be) {

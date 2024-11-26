@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,8 +26,8 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
     boolean antennaBrokenLastTick = false;
 
     @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (antenna != null)
             if (level.isClientSide)
                 ClientSignalManager.postSignalsToAntenna(antenna);

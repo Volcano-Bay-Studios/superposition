@@ -26,12 +26,12 @@ import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2
 import org.modogthedev.superposition.util.Mth;
 
 public class SignalGeneratorScreen extends WidgetScreen {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/signal_generator_background.png");
-    private static final ResourceLocation PIXEL = new ResourceLocation(Superposition.MODID, "textures/screen/pixel.png");
-    private static final ResourceLocation WARN_ON = new ResourceLocation(Superposition.MODID, "textures/screen/warn_on.png");
-    private static final ResourceLocation WARN_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/warn_off.png");
-    private static final ResourceLocation SWITCH_ON = new ResourceLocation(Superposition.MODID, "textures/screen/switch_on.png");
-    private static final ResourceLocation SWITCH_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/switch_off.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/signal_generator_background.png");
+    private static final ResourceLocation PIXEL = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/pixel.png");
+    private static final ResourceLocation WARN_ON = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/warn_on.png");
+    private static final ResourceLocation WARN_OFF = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/warn_off.png");
+    private static final ResourceLocation SWITCH_ON = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/switch_on.png");
+    private static final ResourceLocation SWITCH_OFF = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/switch_off.png");
     public static final int imageWidth = 176;
     public static final int imageHeight = 224;
     public static BlockPos pos;
@@ -82,10 +82,10 @@ public class SignalGeneratorScreen extends WidgetScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMinY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMinY, 0.0f).setColor(f, f1, f2, f3);
     }
 
     public void renderSine(GuiGraphics pGuiGraphics) {
@@ -128,11 +128,6 @@ public class SignalGeneratorScreen extends WidgetScreen {
     @Override
     public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
         return super.mouseReleased(pMouseX, pMouseY, pButton);
-    }
-
-    @Override
-    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
-        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
     }
 
     private void flush(GuiGraphics graphics) { // In ryan we trust

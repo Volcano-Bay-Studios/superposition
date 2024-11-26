@@ -4,8 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
+import foundry.veil.api.client.render.MatrixStack;
 import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -24,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.cable.Cable;
@@ -50,15 +53,15 @@ public class CableRenderer {
     public static Vec3 detachPos;
     public static float detachDelta;
 
-    public static void renderCables(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Matrix4f projectionMatrix, int renderTick, float partialTicks, Camera camera, Frustum frustum) {
-        poseStack.pushPose();
+    public static void renderCables(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack poseStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
+        poseStack.matrixPush();
+        float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
         vertexConsumer = bufferSource.getBuffer(RenderType.entitySolid(CABLE));
         ClientLevel level = Minecraft.getInstance().level;
-        Matrix4f matrix4f = poseStack.last().pose();
         Vec3 translation = camera.getPosition().scale(-1);
         poseStack.translate(translation.x, translation.y, translation.z);
         for (Cable cable : CableManager.getLevelCables(level)) {
-            poseStack.pushPose();
+            poseStack.matrixPush();
 //            poseStack.translate(origin.x,origin.y,origin.z);
             int size = cable.getPoints().size() - 1;
             List<Vec3> cablePoints = new ArrayList<>();
@@ -102,9 +105,9 @@ public class CableRenderer {
                     nextNormal = nextPoint.subtract(normalPoint).normalize();
                 renderCableFrustrum(poseStack, cable.getColor(), uv1, uv2, SuperpositionConstants.cableWidth + (i % 5 * .0001f), Mth.lerpVec3(prevPoint, point, partialTicks), normal, Mth.lerpVec3(nextPrevPoint, nextPoint, partialTicks).add(normal.scale(.01f)), normal);
             }
-            poseStack.popPose();
+            poseStack.matrixPop();
         }
-        poseStack.popPose();
+        poseStack.matrixPop();
         vertexConsumer = null;
     }
 
@@ -115,16 +118,16 @@ public class CableRenderer {
 
     }
 
-    public static void renderCableHeldPoint(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, Matrix4f projectionMatrix, int renderTick, float partialTicks, Camera camera, Frustum frustum) {
-        poseStack.pushPose();
+    public static void renderCableHeldPoint(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
+        matrixStack.matrixPush();
+        float partialTicks = deltaTracker.getRealtimeDeltaTicks();
         RenderSystem.setShaderTexture(0, CABLE);
         ClientLevel level = Minecraft.getInstance().level;
-        Matrix4f matrix4f = poseStack.last().pose();
         Vec3 translation = camera.getPosition().scale(-1);
-        poseStack.translate(translation.x, translation.y, translation.z);
+        matrixStack.translate(translation.x, translation.y, translation.z);
         float width = 0.12f;
         for (Cable cable : CableManager.getLevelCables(level)) {
-            poseStack.pushPose();
+            matrixStack.matrixPush();
             for (UUID uuid : cable.getPlayerHoldingPointMap().keySet()) {
                 int i = cable.getPlayerHoldingPointMap().get(uuid);
                 Player player = level.getPlayerByUUID(uuid);
@@ -133,27 +136,27 @@ public class CableRenderer {
                 Vec3 prevPos = cable.getPoints().get(i).getPrevPosition();
                 Vec3 pos = Mth.lerpVec3(prevPos, pointPos, partialTicks);
                 if (Minecraft.getInstance().player.equals(player)) {
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
+                    DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
                     width += stretch / 32;
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 6, 0.5f + stretch / 6);
+                    DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 6, 0.5f + stretch / 6);
                 } else
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.5f);
+                    DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.5f);
             }
-            poseStack.popPose();
+            matrixStack.matrixPop();
         }
         if (detachDelta > 0) {
             float delta = net.minecraft.util.Mth.lerp(partialTicks, detachDelta, detachDelta - 0.2f);
             stretch = 1;
             width = 0.12f - Mth.getFromRange(1, 0, 0, 1, delta) * 0.15125f;
             if (width > 0) {
-                poseStack.pushPose();
-                DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(detachPos.x - width, detachPos.y - width, detachPos.z - width, detachPos.x + width, detachPos.y + width, detachPos.z + width), 1f, 0.4f, 0.3f, 0.8f);
+                matrixStack.matrixPush();
+                DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(detachPos.x - width, detachPos.y - width, detachPos.z - width, detachPos.x + width, detachPos.y + width, detachPos.z + width), 1f, 0.4f, 0.3f, 0.8f);
                 width += 0.03125f;
-                DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(detachPos.x - width, detachPos.y - width, detachPos.z - width, detachPos.x + width, detachPos.y + width, detachPos.z + width), 1f, 0.4f, 0.3f, 0.5f);
-                poseStack.popPose();
+                DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(detachPos.x - width, detachPos.y - width, detachPos.z - width, detachPos.x + width, detachPos.y + width, detachPos.z + width), 1f, 0.4f, 0.3f, 0.5f);
+                matrixStack.matrixPop();
             }
         }
-        poseStack.pushPose();
+        matrixStack.matrixPush();
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
         oshi.util.tuples.Pair<Cable, Cable.Point> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
         if (cablePointPair != null) {
@@ -163,15 +166,15 @@ public class CableRenderer {
             if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getUUID())) {
                 if (cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB())) {
                     width -= 0.03f;
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.2f);
+                    DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.2f);
                     width += 0.03f;
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
+                    DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
                 } else
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
+                    DebugRenderer.renderFilledBox((PoseStack) matrixStack, bufferSource, new AABB(pos.x - width, pos.y - width, pos.z - width, pos.x + width, pos.y + width, pos.z + width), 0.5f, 0.9f, 0.5f, 0.4f);
             }
         }
-        poseStack.popPose();
-        poseStack.popPose();
+        matrixStack.matrixPop();
+        matrixStack.matrixPop();
     }
 
     public static Vec3 getPointsNormal(Vec3 from, Vec3 to) {
@@ -179,7 +182,7 @@ public class CableRenderer {
     }
 
     public static void renderCableFrustrum(
-            PoseStack ps, Color color, float uv1, float uv2,
+            MatrixStack ps, Color color, float uv1, float uv2,
             double width, Vec3 startPosition, Vec3 startNormal, Vec3 endPosition, Vec3 endNormal
     ) {
         if (startNormal.dot(endNormal) < 0)
@@ -192,7 +195,7 @@ public class CableRenderer {
 
         int light = Math.max(LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(endPosition)), LevelRenderer.getLightColor(Minecraft.getInstance().level, BlockPos.containing(startPosition)));
 
-        ps.pushPose();
+        ps.matrixPush();
 
         //Render both sides because I don't know why normals are being a bit strange
 //        Camera camera = getCamera();
@@ -252,7 +255,7 @@ public class CableRenderer {
                 endCorners.get(3)
         );
 
-        ps.popPose();
+        ps.matrixPop();
         RenderSystem.setShaderColor(1, 1, 1, 1);
 
     }
@@ -262,27 +265,26 @@ public class CableRenderer {
         return Minecraft.getInstance().gameRenderer.getMainCamera();
     }
 
-    private static void renderBeamPlane(Color color, int light, float uv1, float uv2, PoseStack ps, Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4) {
+    private static void renderBeamPlane(Color color, int light, float uv1, float uv2, MatrixStack ps, Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4) {
         consumeVectorsVertex(color, light, uv1, uv2, ps, v1, v2, v3, v4);
     }
 
-    private static void consumeVectorsVertex(Color color, int light, float uv1, float uv2, PoseStack ps, Vec3... vectors) {
+    private static void consumeVectorsVertex(Color color, int light, float uv1, float uv2, MatrixStack ps, Vec3... vectors) {
         Vec3 normal1 = vectors[1].subtract(vectors[0]).cross(vectors[2].subtract(vectors[0]));
         Vec3 normal2 = vectors[2].subtract(vectors[1]).cross(vectors[3].subtract(vectors[2]));
         Vec3 normal = normal1.add(normal2).scale(.5);
 
 
-        Matrix4f m = ps.last().pose();
+        Matrix4f m = ps.position();
         Vec2[] uvCorners = new Vec2[]{new Vec2(1, uv1), new Vec2(1, uv2), new Vec2(0, uv2), new Vec2(0, uv1)};
         int step = 0;
         for (Vec3 vec3 : vectors) {
-            vertexConsumer.vertex(m, (float) vec3.x, (float) vec3.y, (float) vec3.z)
-                    .color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f)
-                    .uv(uvCorners[step].x, uvCorners[step].y)
-                    .overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .uv2(light)
-                    .normal((float) normal.x, (float) normal.y, (float) normal.z)
-                    .endVertex();
+            vertexConsumer.addVertex(m, (float) vec3.x, (float) vec3.y, (float) vec3.z)
+                    .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1f)
+                    .setUv(uvCorners[step].x, uvCorners[step].y)
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setUv2(light,0)
+                    .setNormal((float) normal.x, (float) normal.y, (float) normal.z);
             step++;
         }
     }
@@ -357,20 +359,20 @@ public class CableRenderer {
         float j = (float) maxY;
         float k = (float) maxZ;
 
-        builder.vertex(f, 1, 1).endVertex(); // Front-top-left
-        builder.vertex(1, 1, 1).endVertex(); // Front-top-right
-        builder.vertex(f, -1, 1).endVertex(); // Front-bottom-left
-        builder.vertex(1, -1, 1).endVertex(); // Front-bottom-right
-        builder.vertex(1, -1, -1).endVertex(); // Back-bottom-right
-        builder.vertex(1, 1, 1).endVertex(); // Front-top-right
-        builder.vertex(1, 1, -1).endVertex(); // Back-top-right
-        builder.vertex(-1, 1, 1).endVertex(); // Front-top-left
-        builder.vertex(-1, 1, -1).endVertex(); // Back-top-left
-        builder.vertex(-1, -1, 1).endVertex(); // Front-bottom-left
-        builder.vertex(-1, -1, -1).endVertex(); // Back-bottom-left
-        builder.vertex(1, -1, -1).endVertex(); // Back-bottom-right
-        builder.vertex(-1, 1, -1).endVertex(); // Back-top-left
-        builder.vertex(1, 1, -1).endVertex(); // Back-top-right
+        builder.addVertex(f, 1, 1); // Front-top-left
+        builder.addVertex(1, 1, 1); // Front-top-right
+        builder.addVertex(f, -1, 1); // Front-bottom-left
+        builder.addVertex(1, -1, 1); // Front-bottom-right
+        builder.addVertex(1, -1, -1); // Back-bottom-right
+        builder.addVertex(1, 1, 1); // Front-top-right
+        builder.addVertex(1, 1, -1); // Back-top-right
+        builder.addVertex(-1, 1, 1); // Front-top-left
+        builder.addVertex(-1, 1, -1); // Back-top-left
+        builder.addVertex(-1, -1, 1); // Front-bottom-left
+        builder.addVertex(-1, -1, -1); // Back-bottom-left
+        builder.addVertex(1, -1, -1); // Back-bottom-right
+        builder.addVertex(-1, 1, -1); // Back-top-left
+        builder.addVertex(1, 1, -1); // Back-top-right
     }
 
     // The minimum axis deviance before it is rounded and counted as an inaccuracy

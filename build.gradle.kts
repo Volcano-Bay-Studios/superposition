@@ -171,8 +171,8 @@ subprojects {
 
         @Suppress("UnstableApiUsage")
         "mappings"(loom.layered {
-            parchment("org.parchmentmc.data:parchment-${rootProject.property("parchment_minecraft")}:${rootProject.property("parchment_version")}@zip")
             officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${rootProject.property("parchment_minecraft")}:${rootProject.property("parchment_version")}@zip")
         })
     }
 

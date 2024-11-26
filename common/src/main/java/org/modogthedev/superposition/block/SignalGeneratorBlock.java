@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
@@ -65,12 +66,9 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (!(pPlayer.getMainHandItem().getItem() instanceof ScrewdriverItem)) {
-            if (pLevel.isClientSide) {
-                ScreenManager.openSignalGenerator(pPos);
-            }
-            return InteractionResult.SUCCESS;
+    protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide) {
+            ScreenManager.openSignalGenerator(pos);
         }
         return InteractionResult.PASS;
     }

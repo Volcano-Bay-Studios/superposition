@@ -30,12 +30,13 @@ dependencies {
     include ("foundry.veil:veil-fabric-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
     include ("com.jamieswhiteshirt:reach-entity-attributes:2.5.0")
     modApi("mezz.jei:jei-${rootProject.property("minecraft_version")}-fabric-api:${rootProject.property("jei_version")}")
-    modImplementation("com.jamieswhiteshirt:reach-entity-attributes:2.4.0")
+//    modImplementation("com.jamieswhiteshirt:reach-entity-attributes:2.5.0")
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
-    modRuntimeOnly("maven.modrinth:yeetus-experimentus:2.3.1")
-    modRuntimeOnly("maven.modrinth:spark:1.10.53-fabric")
-    modRuntimeOnly("curse.maven:worldedit-225608:4586218")
+    modRuntimeOnly("maven.modrinth:yeetus-experimentus:87.0.0")
+    modRuntimeOnly("maven.modrinth:fabric-permissions-api:0.3.2")
+    modRuntimeOnly("maven.modrinth:spark:1.10.109-fabric")
+//    modRuntimeOnly("maven.modrinth:axiom:4.3.3")
     modRuntimeOnly("mezz.jei:jei-${rootProject.property("minecraft_version")}-fabric:${rootProject.property("jei_version")}")
 }
 

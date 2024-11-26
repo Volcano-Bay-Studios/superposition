@@ -1,10 +1,12 @@
 package org.modogthedev.superposition.networking.packet;
 
 import dev.architectury.networking.NetworkManager;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.item.FilterItem;
@@ -38,7 +40,7 @@ public class FilterItemModificationC2SPacket {
             if (!(itemStack.getItem() instanceof FilterItem))
                 itemStack = player.getOffhandItem();
             if (itemStack.getItem() instanceof FilterItem filterItem) {
-                itemStack.addTagElement("filter",tag);
+                itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
             }
         });
     }

@@ -27,11 +27,11 @@ public class SuperpositionClient {
         ClientTickEvent.CLIENT_LEVEL_POST.register(ClientSignalManager::tick);
         ClientTickEvent.CLIENT_LEVEL_POST.register(CableManager::clientTick);
         ClientTickEvent.CLIENT_LEVEL_POST.register(CarabinerManager::clientTick);
-        VeilEventPlatform.INSTANCE.onVeilRenderTypeStageRender((stage, levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum) -> {
+        VeilEventPlatform.INSTANCE.onVeilRenderTypeStageRender((stage, levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
-                CableRenderer.renderCables(levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum);
-                CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum);
-                DebugRenderer.renderDebug(levelRenderer, bufferSource, poseStack, projectionMatrix, renderTick, partialTicks, camera, frustum);
+                CableRenderer.renderCables(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
+                CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
+                DebugRenderer.renderDebug(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
             }
         });
     }

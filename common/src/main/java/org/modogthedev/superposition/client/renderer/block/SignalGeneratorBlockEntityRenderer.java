@@ -49,40 +49,36 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
 
         buffer
-                .vertex(m, min, 0.5001f, min)
-                .color(1f, 1f, 1f, alpha)
-                .uv(uvMin+uvOffsetx, (uvMin/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, min, 0.5001f, min)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, min, 0.5001f, max)
-                .color(1f, 1f, 1f, alpha)
-                .uv(uvMin+uvOffsetx, (uvMax/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, min, 0.5001f, max)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, max, 0.5001f, max)
-                .color(1f, 1f, 1f, alpha)
-                .uv(uvMax+uvOffsetx, (uvMax/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, max, 0.5001f, max)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, max, 0.5001f, min)
-                .color(1f, 1f, 1f, alpha)
-                .uv(uvMax+uvOffsetx, (uvMin/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, max, 0.5001f, min)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
     }
     private float getMaxPlaneExtent(SignalGeneratorBlockEntity be) {

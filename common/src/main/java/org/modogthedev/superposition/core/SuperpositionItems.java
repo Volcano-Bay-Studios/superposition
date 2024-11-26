@@ -6,7 +6,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.item.*;
-import org.modogthedev.superposition.item.block.SignalReadoutBlockItem;
 
 import java.awt.*;
 import java.util.function.Supplier;
@@ -40,7 +39,6 @@ public class SuperpositionItems {
     // CRAFTING
     public static final RegistrySupplier<Item> INSULATED_SHEET = registerItem("insulated_sheet", () -> new Item(new Item.Properties().arch$tab(SuperpositionTabs.TAB)));
     // BLOCK ITEM
-    public static final RegistrySupplier<SignalReadoutBlockItem> SIGNAL_READOUT = registerItem("signal_readout", () -> new SignalReadoutBlockItem(SuperpositionBlocks.SIGNAL_READOUT.get(), new Item.Properties().arch$tab(SuperpositionTabs.TAB)));
 
     private static <T extends Item> RegistrySupplier<T> registerItem(String name, Supplier<T> item) {
         return ITEMS.register(name, item);

@@ -18,7 +18,7 @@ public class Card {
         pTag.putString("path", selfReference.getPath());
     }
     public static Card loadNew(CompoundTag pTag) {
-        Card card = SuperpositionCards.CARDS.getRegistrar().get(new ResourceLocation(pTag.getString("namespace"), pTag.getString("path")));
+        Card card = SuperpositionCards.CARDS.getRegistrar().get(ResourceLocation.fromNamespaceAndPath(pTag.getString("namespace"), pTag.getString("path")));
         if (card != null)
             card.load(pTag);
         return  card;

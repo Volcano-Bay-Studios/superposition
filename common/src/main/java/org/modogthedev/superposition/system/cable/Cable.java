@@ -15,6 +15,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
@@ -397,7 +398,7 @@ public class Cable {
     public void updatePointInBlock(Point point) {
         Vec3 vec3 = point.getPosition();
         BlockPos pos = BlockPos.containing(vec3);
-        BlockHitResult blockHitResult = level.clip(new ClipContext(vec3.add(0.01f, 0.01f, 0.01f), vec3.subtract(0.01f, 0.01f, 0.01f), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+        BlockHitResult blockHitResult = level.clip(new ClipContext(vec3.add(0.01f, 0.01f, 0.01f), vec3.subtract(0.01f, 0.01f, 0.01f), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
         point.inBlock = blockHitResult.getType() == HitResult.Type.BLOCK;
     }
 

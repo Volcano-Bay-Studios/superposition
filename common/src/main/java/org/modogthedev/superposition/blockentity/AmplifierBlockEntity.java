@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -47,17 +48,17 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        pTag.putFloat("modRate", modRate);
-        pTag.putFloat("redstoneMod",redstoneMod);
-        super.saveAdditional(pTag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putFloat("modRate", modRate);
+        tag.putFloat("redstoneMod",redstoneMod);
+        super.saveAdditional(tag,registries);
     }
 
     @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        this.modRate = pTag.getFloat("modRate");
-        this.redstoneMod = pTag.getFloat("redstoneMod");
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag,registries);
+        this.modRate = tag.getFloat("modRate");
+        this.redstoneMod = tag.getFloat("redstoneMod");
     }
 
     @Override

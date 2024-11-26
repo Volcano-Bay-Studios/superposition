@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -16,15 +17,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements TickableBlockEntity {
+public class SignalReadoutBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     public SignalReadoutBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.SIGNAL_READOUT.get(), pos, state);
     }
+
     private BlockPos linkedPos = null;
     public Signal[] signals = new Signal[12];
     public float highestValue = 0;
     public float lowestValue = 0;
     public List<String> text = new ArrayList<>();
+
     @Override
     public void tick() {
         preTick();
@@ -63,22 +66,26 @@ public class SignalReadoutBlockEntity  extends SignalActorBlockEntity implements
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (linkedPos != null) {
-            pTag.putInt("linkedPosx", linkedPos.getX());
-            pTag.putInt("linkedPosy", linkedPos.getY());
-            pTag.putInt("linkedPosz", linkedPos.getZ());
+            tag.putInt("linkedPosx", linkedPos.getX());
+            tag.putInt("linkedPosy", linkedPos.getY());
+            tag.putInt("linkedPosz", linkedPos.getZ());
         }
-        super.saveAdditional(pTag);
+        super.saveAdditional(tag, registries);
     }
+
     public void loadLinkedPos(CompoundTag pTag) {
-        linkedPos = new BlockPos(pTag.getInt("linkedPosx"),pTag.getInt("linkedPosy"),pTag.getInt("linkedPosz"));
+        linkedPos = new BlockPos(
+                pTag.getInt("linkedPosx"),
+                pTag.getInt("linkedPosy"),
+                pTag.getInt("linkedPosz")
+        );
     }
 
     @Override
-    public void load(CompoundTag pTag) {
-        loadLinkedPos(pTag);
-        super.load(pTag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        loadLinkedPos(tag);
+        super.loadAdditional(tag, registries);
     }
-
 }

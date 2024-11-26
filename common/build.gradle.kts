@@ -3,7 +3,7 @@ import net.fabricmc.loom.build.nesting.JarNester
 import net.fabricmc.loom.build.nesting.NestableJarGenerationTask
 
 tasks.register<RemapJarTask>("remapJar") {
-//    nestedJars.setFrom()
+    nestedJars.setFrom()
 }
 
 tasks.register<NestableJarGenerationTask>("processIncludeJars")

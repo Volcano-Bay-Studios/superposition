@@ -7,6 +7,7 @@ import foundry.veil.api.client.tooltip.anim.TooltipTimeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -188,13 +189,15 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        pTag.put("tooltipData", this.saveTooltipData());
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.put("tooltipData", this.saveTooltipData());
+        super.saveAdditional(tag, registries);
     }
 
     @Override
-    public void load(CompoundTag pTag) {
-        this.loadTooltipData(pTag.getCompound("tooltipData"));
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        this.loadTooltipData(tag.getCompound("tooltipData"));
+        super.loadAdditional(tag, registries);
     }
 
     Object lastCall;

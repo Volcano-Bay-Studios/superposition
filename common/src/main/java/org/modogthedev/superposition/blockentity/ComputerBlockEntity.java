@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -44,17 +45,15 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        super.saveAdditional(pTag);
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag,registries);
         if (card != null)
-            card.save(pTag);
+            card.save(tag);
     }
-
-
     @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        card = Card.loadNew(pTag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        card = Card.loadNew(tag);
     }
 
     @Override
@@ -93,3 +92,5 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         return getBlockPos().relative(level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getOpposite(), 1);
     }
 }
+
+

@@ -50,14 +50,6 @@ public class InterfaceBlock extends SignalActorTickingBlock implements EntityBlo
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (pLevel.isClientSide) {
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
         stateBuilder.add(new Property[]{FACING, SWAP_SIDES});
     }

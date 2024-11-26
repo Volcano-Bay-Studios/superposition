@@ -27,9 +27,9 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 
 public class AmplifierScreen extends WidgetScreen {
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/amplifier_screen.png");
-    private static final ResourceLocation SWITCH_ON = new ResourceLocation(Superposition.MODID, "textures/screen/switch_on.png");
-    private static final ResourceLocation SWITCH_OFF = new ResourceLocation(Superposition.MODID, "textures/screen/switch_off.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/amplifier_screen.png");
+    private static final ResourceLocation SWITCH_ON = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/switch_on.png");
+    private static final ResourceLocation SWITCH_OFF = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/switch_off.png");
     public static final int imageWidth = 176;
     public static final int imageHeight = 224;
     public static BlockPos pos;
@@ -116,10 +116,10 @@ public class AmplifierScreen extends WidgetScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMinY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMinY, 0.0f).setColor(f, f1, f2, f3);
     }
     public void fillExact(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
         // In ryan we trust
@@ -130,10 +130,10 @@ public class AmplifierScreen extends WidgetScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMinY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMinY, 0.0f).setColor(f, f1, f2, f3);
     }
 
 
@@ -154,11 +154,6 @@ public class AmplifierScreen extends WidgetScreen {
     @Override
     public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
         return super.mouseReleased(pMouseX, pMouseY, pButton);
-    }
-
-    @Override
-    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
-        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
     }
 
     private void flush(GuiGraphics guiGraphics) { // In ryan we trust

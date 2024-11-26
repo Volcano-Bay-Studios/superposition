@@ -44,7 +44,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
 
         float lastStage = be.lastStep;
         float stage = be.step;
-        float delta = (float) be.ticks /AmplifierBlockEntity.ticksToChange;
+        float delta = (float) (be.ticks+pPartialTick) /AmplifierBlockEntity.ticksToChange;
         float stages = 3;
         float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/ ;
 
@@ -54,76 +54,68 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
 
         buffer
-                .vertex(m, -0.1887f, 0.5001f, -0.15625f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(0, (uvMin/stages)+lastOffset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, -0.1887f, 0.5001f, -0.15625f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, -0.1887f, 0.5001f, 0.15825f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(0, (uvMax/stages)+lastOffset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, -0.1887f, 0.5001f, 0.15825f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, 0.1887f, 0.5001f, 0.15825f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(1, (uvMax/stages)+lastOffset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, 0.1887f, 0.5001f, 0.15825f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, 0.1887f, 0.5001f, -0.15625f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(1, (uvMin/stages)+lastOffset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, 0.1887f, 0.5001f, -0.15625f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+offset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
         alpha = delta;
         buffer
-                .vertex(m, -0.1887f, 0.5001f, -0.15625f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(0, (uvMin/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, -0.1887f, 0.5001f, -0.15625f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+lastOffset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, -0.1887f, 0.5001f, 0.15825f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(0, (uvMax/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, -0.1887f, 0.5001f, 0.15825f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+lastOffset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, 0.1887f, 0.5001f, 0.15825f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(1, (uvMax/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, 0.1887f, 0.5001f, 0.15825f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+lastOffset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
         buffer
-                .vertex(m, 0.1887f, 0.5001f, -0.15625f)
-                .color(1f, 1f, 1f, alpha)
-                .uv(1, (uvMin/stages)+offset)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(light)
-                .normal(n, 0, 1, 0)
-                .endVertex();
+                .addVertex(m, 0.1887f, 0.5001f, -0.15625f)
+                .setColor(1f, 1f, 1f, alpha)
+                .setUv(0, (uvMin/stages)+lastOffset)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setUv2(light,0)
+                .setNormal(ms.last(), 0, 1, 0);
 
     }
     private float getMaxPlaneExtent(AmplifierBlockEntity be) {

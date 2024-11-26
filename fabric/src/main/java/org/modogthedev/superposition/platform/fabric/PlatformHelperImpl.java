@@ -1,9 +1,10 @@
 package org.modogthedev.superposition.platform.fabric;
 
-import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityAttachment;
+import net.minecraft.world.entity.EntityAttachments;
 import net.minecraft.world.entity.player.Player;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 
@@ -19,6 +20,6 @@ public class PlatformHelperImpl {
     }
 
     public static double getPlayerReach(ServerPlayer player) {
-        return Objects.requireNonNull(player.getAttribute(ReachEntityAttributes.REACH)).getValue();
+        return 5; //TODO: find actual value
     }
 }

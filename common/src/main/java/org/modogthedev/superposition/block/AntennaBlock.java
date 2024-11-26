@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
@@ -25,6 +26,11 @@ import org.modogthedev.superposition.util.BlockHelper;
 
 public class AntennaBlock extends CrossCollisionBlock {
     public static BooleanProperty SHORT = SuperpositionBlockStates.SHORT;
+    public static final MapCodec<IronBarsBlock> CODEC = simpleCodec(IronBarsBlock::new);
+    @Override
+    protected MapCodec<? extends CrossCollisionBlock> codec() {
+        return CODEC;
+    }
     public AntennaBlock(Properties p_54198_) {
         super(2F, 1.0F, 16.0F, 16.0F, 16.0F, p_54198_);
         this.registerDefaultState((this.stateDefinition.any()).setValue(SHORT,false));
@@ -111,5 +117,6 @@ public class AntennaBlock extends CrossCollisionBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         pBuilder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED,SHORT);
     }
+
 
 }

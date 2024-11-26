@@ -6,6 +6,7 @@ import foundry.veil.Veil;
 import foundry.veil.api.client.tooltip.Tooltippable;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.client.util.UIUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.GameRenderer;
@@ -21,8 +22,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static foundry.veil.api.client.util.UIUtils.drawGradientRect;
-import static foundry.veil.api.client.util.UIUtils.gatherTooltipComponents;
+import static foundry.veil.api.client.util.UIUtils.*;
 
 public class SPUIUtils {
     public static void drawHoverText(SPTooltipable tooltippable, float pticks, final ItemStack stack, PoseStack pStack, List<? extends FormattedText> textLines, int mouseX, int mouseY, int screenWidth, int screenHeight,
@@ -99,7 +99,6 @@ public class SPUIUtils {
             if (textLines.size() > titleLinesCount)
                 tooltipHeight += 2; // gap between title lines and next lines
         }
-
         if (tooltipY < 4)
             tooltipY = 4;
         else if (tooltipY + tooltipHeight + 4 > screenHeight)
@@ -110,7 +109,7 @@ public class SPUIUtils {
         tooltipHeight += tooltipTextHeightBonus;
 
 
-//        SuperpositionUITooltipRenderer.drawConnectionLine(pStack, tooltippable, tooltipX, tooltipY, desiredX, desiredY);
+        SuperpositionUITooltipRenderer.drawConnectionLine(pStack, tooltippable, tooltipX, tooltipY, desiredX, desiredY);
         drawTooltipRects(pticks, pStack, zLevel, backgroundColor, borderColorStart, borderColorEnd, font, list, tooltipTextWidth, titleLinesCount, tooltipX, tooltipY, tooltipHeight, items);
     }
     private static void drawTooltipRects(float pticks, PoseStack pStack, int z, int backgroundColor, int borderColorStart, int borderColorEnd, Font font, List<ClientTooltipComponent> list, int tooltipTextWidth, int titleLinesCount, int tooltipX, int tooltipY, int tooltipHeight, List<VeilUIItemTooltipDataHolder> items) {
@@ -127,7 +126,6 @@ public class SPUIUtils {
         drawGradientRect(mat, z, tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColorStart, borderColorStart);
         drawGradientRect(mat, z, tooltipX - 3, tooltipY + tooltipHeight + 2, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColorEnd, borderColorEnd);
 
-        UIUtils.drawTexturedRect(pStack.last().pose(), z + 100, tooltipX, tooltipY, 16, 16, 0, 0, 0, 0, 16, 16, Veil.veilPath("textures/gui/item_shadow.png"));
         int itemY = tooltipY;
         for (int lineNumber = 0; lineNumber < list.size(); ++lineNumber) {
             if (lineNumber + 1 == titleLinesCount) {
@@ -140,22 +138,19 @@ public class SPUIUtils {
         pStack.translate(0, 0, 300);
         if (items != null && !items.isEmpty()) {
             for (VeilUIItemTooltipDataHolder item : items) {
-//                renderAndDecorateItem(item.getItemStack(), tooltipX + item.getX().apply(pticks), itemY + item.getY().apply(pticks));
-//                drawTexturedRect(pStack.last().pose(), z + 100, tooltipX + item.getX().apply(pticks), itemY + item.getY().apply(pticks), 16, 16, 0, 0, 0, 0, 16, 16, Veil.veilPath("textures/gui/item_shadow.png"));
+                renderAndDecorateItem(item.getItemStack(), tooltipX + item.getX().apply(pticks), itemY + item.getY().apply(pticks));
+                drawTexturedRect(pStack.last().pose(), z + 100, tooltipX + item.getX().apply(pticks), itemY + item.getY().apply(pticks), 16, 16, 0, 0, 0, 0, 16, 16, Veil.veilPath("textures/gui/item_shadow.png"));
             }
         }
-        UIUtils.renderAndDecorateItem(SuperpositionItems.SCREWDRIVER.get().asItem().getDefaultInstance(),tooltipX,tooltipY);
         pStack.popPose();
 
-        MultiBufferSource.BufferSource renderType = MultiBufferSource.immediate(Tesselator.getInstance()
-                .getBuilder());
+        MultiBufferSource.BufferSource renderType = Minecraft.getInstance().renderBuffers().bufferSource();
         pStack.translate(0.0D, 0.0D, z);
 
         for (int lineNumber = 0; lineNumber < list.size(); ++lineNumber) {
             ClientTooltipComponent line = list.get(lineNumber);
-
+            RenderSystem.setShaderColor(.5f,1,.5f,1f);
             if (line != null) {
-                RenderSystem.setShaderColor(.5f,1,.5f,1);
                 line.renderText(font, tooltipX, tooltipY, mat, renderType);
             }
 
@@ -170,8 +165,8 @@ public class SPUIUtils {
         renderType.endBatch();
         pStack.popPose();
 
-        RenderSystem.setShaderColor(1,1,1,1);
         RenderSystem.enableDepthTest();
+        RenderSystem.setShaderColor(1,1,1,1);
     }
     public static void drawGradientRect(Matrix4f mat, int zLevel, int left, int top, int right, int bottom, int startColor, int endColor) {
         float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
@@ -188,14 +183,12 @@ public class SPUIUtils {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(mat, right, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat, left, top, zLevel).color(startRed, startGreen, startBlue, startAlpha).endVertex();
-        buffer.vertex(mat, left, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        buffer.vertex(mat, right, bottom, zLevel).color(endRed, endGreen, endBlue, endAlpha).endVertex();
-        tessellator.end();
+        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.addVertex(mat, right, top, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
+        buffer.addVertex(mat, left, top, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
+        buffer.addVertex(mat, left, bottom, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
+        buffer.addVertex(mat, right, bottom, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         RenderSystem.disableBlend();
     }

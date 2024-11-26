@@ -6,7 +6,7 @@ import foundry.veil.api.client.color.theme.NumberThemeProperty;
 import foundry.veil.api.client.tooltip.Tooltippable;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.client.util.SpaceHelper;
-import foundry.veil.api.client.util.UIUtils;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,7 +25,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.util.SPTooltipable;
 
 import java.util.List;
@@ -36,7 +35,7 @@ public class SuperpositionUITooltipRenderer {
     public static Vec3 currentPos = null;
     public static Vec3 desiredPos = null;
 
-    public static void renderOverlay(Gui gui, GuiGraphics graphics, float partialTicks, int width, int height) {
+    public static void renderOverlay(Gui gui, GuiGraphics graphics, DeltaTracker deltaTracker, int width, int height) {
         PoseStack stack = graphics.pose();
         stack.pushPose();
         Minecraft mc = Minecraft.getInstance();
@@ -44,6 +43,7 @@ public class SuperpositionUITooltipRenderer {
             return;
         }
 
+        float partialTicks = deltaTracker.getRealtimeDeltaTicks();
         HitResult result = mc.hitResult;
         Vec3 pos = null;
         SPTooltipable tooltippable = null;
@@ -147,7 +147,7 @@ public class SuperpositionUITooltipRenderer {
         return (color.lightenCopy(.1f).multiply(1,1,1,10f).lightenCopy(-.1f));
     }
 
-    public static void drawConnectionLine(PoseStack stack, Tooltippable tooltippable, int tooltipX, int tooltipY, int desiredX, int desiredY) {
+    public static void drawConnectionLine(PoseStack stack, SPTooltipable tooltippable, int tooltipX, int tooltipY, int desiredX, int desiredY) {
         if (tooltippable.getTheme().getColor("connectingLine") != null) {
             stack.pushPose();
             Color color = tooltippable.getTheme().getColor("connectingLine");
@@ -160,14 +160,13 @@ public class SuperpositionUITooltipRenderer {
             RenderSystem.defaultBlendFunc();
             RenderSystem.lineWidth(2);
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+            BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             // draw a quad of thickness thickness from desiredX, desiredY to tooltipX, tooltipY with a z value of 399, starting from the top right corner and going anti-clockwise
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            buffer.vertex(mat, desiredX + thickness, desiredY, 399).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-            buffer.vertex(mat, desiredX - thickness, desiredY, 399).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-            buffer.vertex(mat, tooltipX - thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-            buffer.vertex(mat, tooltipX + thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha()).endVertex();
-            Tesselator.getInstance().end();
+            buffer.addVertex(mat, desiredX + thickness, desiredY, 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            buffer.addVertex(mat, desiredX - thickness, desiredY, 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            buffer.addVertex(mat, tooltipX - thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            buffer.addVertex(mat, tooltipX + thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            BufferUploader.drawWithShader(buffer.buildOrThrow());
             RenderSystem.disableBlend();
             stack.popPose();
         }

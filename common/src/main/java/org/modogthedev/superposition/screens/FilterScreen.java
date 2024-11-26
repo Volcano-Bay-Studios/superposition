@@ -35,8 +35,8 @@ import java.util.List;
 public class FilterScreen extends WidgetScreen {
     public static final Minecraft mc = Minecraft.getInstance();
     private VertexConsumer lineConsumer;
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Superposition.MODID, "textures/screen/filter_screen.png");
-    private static final ResourceLocation BAR = new ResourceLocation(Superposition.MODID, "textures/screen/filter_bar.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/filter_screen.png");
+    private static final ResourceLocation BAR = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/filter_bar.png");
     private Filter filterType;
     private float value1;
     private float value2;
@@ -225,10 +225,10 @@ public class FilterScreen extends WidgetScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMinY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMinY, 0.0f).setColor(f, f1, f2, f3);
     }
 
     public void fillExact(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
@@ -240,10 +240,10 @@ public class FilterScreen extends WidgetScreen {
 
         Matrix4f matrix4f = graphics.pose().last().pose();
 
-        this.lineConsumer.vertex(matrix4f, pMinX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMinX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMaxY, 0.0f).color(f, f1, f2, f3).endVertex();
-        this.lineConsumer.vertex(matrix4f, pMaxX, pMinY, 0.0f).color(f, f1, f2, f3).endVertex();
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMinY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMinX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
+        this.lineConsumer.addVertex(matrix4f, pMaxX, pMinY, 0.0f).setColor(f, f1, f2, f3);
     }
 
     private void flush(GuiGraphics graphics) { // In ryan we trust
