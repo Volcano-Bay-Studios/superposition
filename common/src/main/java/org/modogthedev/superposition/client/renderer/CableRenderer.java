@@ -120,7 +120,7 @@ public class CableRenderer {
 
     public static void renderCableHeldPoint(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
         matrixStack.matrixPush();
-        float partialTicks = deltaTracker.getRealtimeDeltaTicks();
+        float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
         RenderSystem.setShaderTexture(0, CABLE);
         ClientLevel level = Minecraft.getInstance().level;
         Vec3 translation = camera.getPosition().scale(-1);
