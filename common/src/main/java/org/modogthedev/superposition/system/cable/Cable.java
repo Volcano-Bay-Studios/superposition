@@ -93,7 +93,7 @@ public class Cable {
 
                 HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
 
-                float maxLength = radius * points.size() * elasticity + radius * 2;
+                float maxLength = this.getMaxLength();
                 float actualLength = 0;
                 for (int i = 1; i < (points.size()); i++) {
                     Vec3 start = index == i - 1 ? hitResult.getLocation() : points.get(i - 1).position;
@@ -121,25 +121,32 @@ public class Cable {
         }
     }
 
+    public float getMaxLength() {
+        return radius * points.size() * elasticity + radius * 2;
+    }
+
     public void updatePhysics() {
         ticksSinceUpdate++;
-        if (!playerHoldingPointMap.isEmpty())
+        if (!playerHoldingPointMap.isEmpty()) {
             sleepTimer = 20;
+        }
         if (sleepTimer > 0) {
             updatePointsInBlocks();
             lastMovement = 0;
             integrate();
-            if (lastMovement > 0.1f)
+            if (lastMovement > 0.1f) {
                 sleepTimer = 20;
-            else
+            } else {
                 sleepTimer--;
+            }
             followPlayer();
             points.getLast().tempPos = points.getLast().position;
             update(false);
             update(true);
             for (Point point : points) {
-                if (point.tempPos != null)
+                if (point.tempPos != null) {
                     point.position = Mth.lerpVec3(point.position, point.tempPos, 0.5f);
+                }
             }
             freeStuckPoints();
             updateCollisions();
@@ -208,8 +215,9 @@ public class Cable {
         for (Point point : points) {
             if (point.lerpedPos != null) {
                 point.position = point.lerpedPos.stepAndGather();
-                if (point.lerpedPos.isComplete())
+                if (point.lerpedPos.isComplete()) {
                     point.lerpedPos = null;
+                }
             }
         }
     }
@@ -218,8 +226,9 @@ public class Cable {
         if (isForwards) {
             for (int i = 1; i < points.size(); i++) {
                 Point point = points.get(i);
-                if (point.inBlock)
+                if (point.inBlock) {
                     continue;
+                }
 
                 Point prevPoint = points.get(i - 1);
 
@@ -250,8 +259,9 @@ public class Cable {
     }
 
     public void shrink() {
-        if (points.size() > 4)
+        if (points.size() > 4) {
             points.remove(points.getLast());
+        }
     }
 
     private void updateCollisions() {
@@ -280,10 +290,11 @@ public class Cable {
                 Vec3 offset = (nextPosition.subtract(point.position));
                 lastMovement += (float) offset.length();
                 point.prevPosition = point.position;
-                if (point.inContact)
+                if (point.inContact) {
                     point.position = point.position.add(offset.scale(0.7f));
-                else
+                } else {
                     point.position = point.position.add(offset.scale(0.9f));
+                }
             } else {
                 point.prevPosition = point.position;
             }
@@ -390,8 +401,9 @@ public class Cable {
     public Pair<Point, Integer> getPlayerHeldPoint(int playerUUID) {
         if (playerHoldingPointMap.containsKey(playerUUID)) {
             int index = playerHoldingPointMap.get(playerUUID);
-            if (points.size() > index)
+            if (points.size() > index) {
                 return new Pair<>(points.get(index), index);
+            }
         }
         return null;
     }

@@ -3,7 +3,7 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 plugins {
     id("java")
     id("architectury-plugin") version "3.4-SNAPSHOT"
-    id("dev.architectury.loom") version "1.7.414" apply false
+    id("dev.architectury.loom") version "1.7-SNAPSHOT" apply false
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 

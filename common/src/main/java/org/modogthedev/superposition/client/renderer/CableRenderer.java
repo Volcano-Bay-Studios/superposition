@@ -16,7 +16,9 @@ import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.joml.*;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
@@ -25,7 +27,6 @@ import org.modogthedev.superposition.util.CatmulRomSpline;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.SuperpositionConstants;
 
-import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,21 +61,25 @@ public class CableRenderer {
             CABLE_POINTS.clear();
             PREV_CABLE_POINTS.clear();
             LIGHT_COLORS.clear();
-            CABLE_POINTS.add(cable.getPoints().getFirst().getPosition());
-            PREV_CABLE_POINTS.add(cable.getPoints().getFirst().getPrevPosition());
             for (Cable.Point point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 CABLE_POINTS.add(pos);
                 PREV_CABLE_POINTS.add(point.getPrevPosition());
-                LIGHT_COLORS.add(LevelRenderer.getLightColor(level, LIGHT_POS.set(pos.x,pos.y,pos.z)));
+                LIGHT_COLORS.add(LevelRenderer.getLightColor(level, LIGHT_POS.set(pos.x, pos.y, pos.z)));
             }
-            CABLE_POINTS.add(cable.getPoints().getLast().getPosition());
-            PREV_CABLE_POINTS.add(cable.getPoints().getLast().getPrevPosition());
             List<Vec3> points = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
             List<Vec3> prevPoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
-            int color = 0xFF000000 | cable.getColor().getRGB();
+            points.addFirst(cable.getPoints().getFirst().getPosition());
+            prevPoints.addFirst(cable.getPoints().getFirst().getPrevPosition());
+            points.add(cable.getPoints().getLast().getPosition());
+            prevPoints.add(cable.getPoints().getLast().getPrevPosition());
 
-            calculateOrientation(ORIENTATION, prevPoints.getFirst(), points.getFirst(), prevPoints.get(1), points.get(1), partialTicks);
+            int color = 0xFF000000 | cable.getColor().getRGB();
+            float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
+            float v = 0;
+            float nextV;
+
+            renderCableStart(vertexConsumer, matrixStack, cameraPos, color, prevPoints.getFirst(), points.getFirst(), prevPoints.get(1), points.get(1), partialTicks);
             for (int i = 0; i < points.size() - 1; i++) {
                 Vec3 prevPoint = prevPoints.get(i);
                 Vec3 point = points.get(i);
@@ -94,10 +99,10 @@ public class CableRenderer {
                     NEXT_ORIENTATION.set(ORIENTATION);
                 }
 
-                int lightStart = LIGHT_COLORS.getInt(i / SuperpositionConstants.cableSegments);
-                int lightEnd = LIGHT_COLORS.getInt((i+1) / SuperpositionConstants.cableSegments);
-
-                float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
+                int lightStart = LIGHT_COLORS.getInt(net.minecraft.util.Mth.clamp(i / SuperpositionConstants.cableSegments, 0, LIGHT_COLORS.size()));
+                int lightEnd = LIGHT_COLORS.getInt(net.minecraft.util.Mth.clamp((i + 1) / SuperpositionConstants.cableSegments, 0, LIGHT_COLORS.size()));
+                double length = Math.sqrt((nextX - x) * (nextX - x) + (nextY - y) * (nextY - y) + (nextZ - z) * (nextZ - z));
+                nextV = v + (float) (length * 16.0 / 6.0);
 
                 // Down
                 ORIENTATION.transform(NORMAL.set(0, -1, 0));
@@ -106,28 +111,28 @@ public class CableRenderer {
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
@@ -138,28 +143,28 @@ public class CableRenderer {
                 ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
@@ -170,28 +175,28 @@ public class CableRenderer {
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
@@ -202,43 +207,123 @@ public class CableRenderer {
                 ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 0)
+                        .setUv(0.25F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(1, 1)
+                        .setUv(0.25F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.set(NEXT_ORIENTATION);
+                v = nextV;
             }
+            renderCableEnd(vertexConsumer, matrixStack, cameraPos, color, prevPoints.getLast(), points.getLast(), prevPoints.get(prevPoints.size() - 2), points.get(points.size() - 2), partialTicks);
         }
+        bufferSource.endBatch();
     }
 
-    private static Quaternionf calculateOrientation(Quaternionf store, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
-        double dx = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - net.minecraft.util.Mth.lerp(partialTicks, prevPoint.x, point.x));
-        double dy = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - net.minecraft.util.Mth.lerp(partialTicks, prevPoint.y, point.y));
-        double dz = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - net.minecraft.util.Mth.lerp(partialTicks, prevPoint.z, point.z));
-        return store.identity()
-                .rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0)
-                .rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0);
+    private static void renderCableStart(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+        PoseStack.Pose pose = matrixStack.pose();
+        float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
+        double x = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.x, point.x);
+        double y = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.y, point.y);
+        double z = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.z, point.z);
+
+        // TODO attach to block face
+        calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
+
+        // Draw first face
+        int startLight = LIGHT_COLORS.getInt(0);
+        ORIENTATION.transform(NORMAL.set(0, 0, -1));
+        ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(0.5F, 0.5F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+
+        ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(0.5F, 1.0F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+
+        ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(1.0F, 1.0F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+
+        ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(1.0F, 0.5F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+    }
+
+
+    private static void renderCableEnd(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+        PoseStack.Pose pose = matrixStack.pose();
+        float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
+        double x = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.x, point.x);
+        double y = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.y, point.y);
+        double z = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.z, point.z);
+
+        // TODO attach to block face
+        calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
+        ORIENTATION.rotateAxis((float) Math.PI, 0, 1, 0);
+
+        // Draw first face
+        int startLight = LIGHT_COLORS.getInt(0);
+        ORIENTATION.transform(NORMAL.set(0, 0, 1));
+        ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(0.5F, 0.5F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+
+        ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(0.5F, 1.0F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+
+        ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(1.0F, 1.0F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+
+        ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
+        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
+                .setColor(color)
+                .setUv(1.0F, 0.5F)
+                .setLight(startLight)
+                .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
     }
 
     private static Quaternionf calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
@@ -301,8 +386,9 @@ public class CableRenderer {
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f, 0.9f, 0.5f, 0.2f);
                     width += 0.03f;
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f, 0.9f, 0.5f, 0.4f);
-                } else
+                } else {
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f, 0.9f, 0.5f, 0.4f);
+                }
             }
         }
     }
