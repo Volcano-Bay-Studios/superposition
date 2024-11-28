@@ -29,15 +29,14 @@ public class CableItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        Vec3 anchorPosition = context.getClickedPos().getCenter().add(context.getClickedPos().getCenter().subtract(context.getClickedPos().relative(context.getClickedFace()).getCenter()).scale(-0.45));
-        CableManager.playerUsesCable(context.getPlayer(), anchorPosition,color);
+        CableManager.playerUsesCable(context.getPlayer(), context.getClickedPos(),color, context.getClickedFace());
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        for (Cable cable : CableManager.getCables(level)) {
-            if (cable.hasPlayerHolding(player.getUUID())) {
+        for (Cable cable : CableManager.getLevelCables(level)) {
+            if (cable.hasPlayerHolding(player.getId())) {
                 if (!player.isShiftKeyDown())
                     CableManager.playerExtendsCable(player, SuperpositionConstants.cableSpawnAmount);
                 else

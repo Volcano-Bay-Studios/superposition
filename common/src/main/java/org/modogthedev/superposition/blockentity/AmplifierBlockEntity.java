@@ -81,7 +81,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
             this.setTooltip(tooltip);
             if (amplitude>0) {
                 ticks++;
-                if (ticks > ticksToChange) {
+                if (ticks > ticksToChange-1) {
                     lastStep = step;
                     step = (int) (Math.random()*3);
                     ticks = 0;

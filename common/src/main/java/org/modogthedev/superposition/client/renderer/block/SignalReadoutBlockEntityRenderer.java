@@ -3,12 +3,10 @@ package org.modogthedev.superposition.client.renderer.block;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -36,7 +34,6 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
     public void render(SignalReadoutBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/screen/pixel.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
@@ -62,17 +59,18 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
         float totalPart = 1f / (size + 4);
         ms.pushPose();
         ms.translate(-.44f, .5, -.1);
-        ms.mulPose(new Quaternionf(0.07f,0,0,0.07f));
+        ms.mulPose(new Quaternionf(0.07f, 0, 0, 0.07f));
         Matrix4f textPose = ms.last().pose();
 
         int j = 0;
         for (String text : be.text) { //TODO: Finish text system
-            this.font.drawInBatch(text, 1, j*9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+            this.font.drawInBatch(text, 1, j * 9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
             j++;
         }
-        ms.popPose();
 
-        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING), 1));
+        ms.popPose();
+        light = LightTexture.FULL_BRIGHT;
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
         for (int i = 0; i < size; i++) {
             float x = (i * totalPart) + (offset / (size + 4f)) - min;
             float y = .21f;
@@ -88,32 +86,28 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
                     .addVertex(m, x, 0.5001f, yinverse)
                     .setColor(1f, 1f, 1f, alpha)
                     .setUv(uvMin + uvOffsetx, (uvMin / stages))
-                    .setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setUv2(light,0)
+                    .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
 
             buffer
                     .addVertex(m, x, 0.5001f, y)
                     .setColor(1f, 1f, 1f, alpha)
                     .setUv(uvMin + uvOffsetx, (uvMax / stages))
-                    .setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setUv2(light,0)
+                    .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
 
             buffer
                     .addVertex(m, x + part, 0.5001f, y)
                     .setColor(1f, 1f, 1f, alpha)
                     .setUv(uvMax + uvOffsetx, (uvMin / stages))
-                    .setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setUv2(light,0)
+                    .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
 
             buffer
                     .addVertex(m, x + part, 0.5001f, yinverse)
                     .setColor(1f, 1f, 1f, alpha)
                     .setUv(uvMax + uvOffsetx, (uvMin / stages))
-                    .setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setUv2(light,0)
+                    .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
         }
 //        ms.translate(0,-.00025,.22);

@@ -60,11 +60,10 @@ public class AntennaManager {
         float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency;
 
         if (dist < signal.maxDist && dist > signal.minDist) {
-            Signal signal1 = new Signal(signal.pos, signal.level, signal.frequency, signal.amplitude, signal.sourceFrequency);
+            Signal signal1 = new Signal(signal);
 
             Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level,signal.sourceAntennaPos);
             signal1.amplitude /= Math.max(1, dist / (1000000000 / signal.frequency));
-//            signal1.amplitude /= Math.max(1, (Math.abs(antennaFrequency - signal.frequency) / 40000));
             signal1.amplitude /= Math.max(1, 1f/(Mth.resonanceAlgorithm(antenna.antennaParts.size(),Math.max(1,signal.sourceAntennaSize))));
 
             if (signal1.amplitude > 1)

@@ -9,11 +9,11 @@ public class CatmulRomSpline {
     public static List<Vec3> generateSpline(List<Vec3> controlPoints, int numSegments) {
         List<Vec3> splinePoints = new ArrayList<>();
 
-        for (int i = 0; i < controlPoints.size() - 3; i++) {
-            for (int j = 0; j <= numSegments; j++) {
+        for (int i = 1; i < controlPoints.size() - 2; i++) {
+            for (int j = 0; j < numSegments; j++) {
                 double t = j / (double) numSegments;
-                Vec3 point = interpolate(controlPoints.get(i), controlPoints.get(i + 1),
-                        controlPoints.get(i + 2), controlPoints.get(i + 3), t);
+                Vec3 point = interpolate(controlPoints.get(i-1), controlPoints.get(i),
+                        controlPoints.get(i + 1), controlPoints.get(i + 2), t);
                 splinePoints.add(point);
             }
         }

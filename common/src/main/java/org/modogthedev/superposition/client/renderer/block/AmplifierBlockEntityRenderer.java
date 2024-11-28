@@ -2,11 +2,10 @@ package org.modogthedev.superposition.client.renderer.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -26,7 +25,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
             return;
         if (be.ticks == -1)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
@@ -51,70 +50,62 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
         float offset = (stage / stages)+.5f;
         float lastOffset = (lastStage / stages)+.5f;
 
-        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
+        light = LightTexture.FULL_BRIGHT; //TODO: make the light pulse
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, -0.15625f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0, (uvMin/stages)+lastOffset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, 0.15825f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0, (uvMax/stages)+lastOffset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, 0.15825f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(1, (uvMax/stages)+lastOffset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, -0.15625f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(1, (uvMin/stages)+lastOffset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
         alpha = delta;
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, -0.15625f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+lastOffset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0, (uvMin/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, 0.15825f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+lastOffset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0, (uvMax/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, 0.15825f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+lastOffset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(1, (uvMax/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, -0.15625f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+lastOffset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(1, (uvMin/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
     }

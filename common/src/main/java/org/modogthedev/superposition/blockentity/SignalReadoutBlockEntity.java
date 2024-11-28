@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.blockentity;
 
+import foundry.veil.api.client.render.light.AreaLight;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -87,5 +88,18 @@ public class SignalReadoutBlockEntity extends SignalActorBlockEntity implements 
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         loadLinkedPos(tag);
         super.loadAdditional(tag, registries);
+    }
+
+    @Override
+    public boolean lightEnabled() {
+        return true;
+    }
+
+    @Override
+    public void configureAreaLight(AreaLight light) {
+        super.configureAreaLight(light);
+        light.setSize(0.317,0.244);
+        light.setColor(3979870);
+        light.setDistance(5);
     }
 }

@@ -6,16 +6,12 @@ import foundry.veil.api.client.render.MatrixStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.cable.Cable;
@@ -23,11 +19,8 @@ import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.SuperpositionConstants;
 import oshi.util.tuples.Pair;
-
-import java.util.List;
 
 public class DebugRenderer {
     public static void renderDebug(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
@@ -45,12 +38,12 @@ public class DebugRenderer {
         for (Antenna antenna : AntennaManager.getAntennaList(level)) {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getRelativeCenter(), 0.5f, 0.5f, 0.9f, 0.5f);
         }
-        for (Cable cable : CableManager.getCables(level)) {
+        for (Cable cable : CableManager.getLevelCables(level)) {
             for (Cable.Point point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 float width = SuperpositionConstants.cableRadius / 2;
                 drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, 0.9f, 0.5f, 0.5f);
-                Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getUUID());
+                Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getId());
                 if (pointIndexPair != null && pointIndexPair.getA().equals(point)) {
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.5f, 0.9f, 0.5f);
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .2f, 0.5f, 0.9f, 0.5f);

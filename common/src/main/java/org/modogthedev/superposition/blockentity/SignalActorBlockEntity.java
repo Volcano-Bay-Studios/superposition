@@ -2,6 +2,11 @@ package org.modogthedev.superposition.blockentity;
 
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.light.AreaLight;
+import foundry.veil.api.client.render.light.Light;
+import foundry.veil.api.client.render.light.PointLight;
+import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.client.tooltip.anim.TooltipTimeline;
 import net.minecraft.client.Minecraft;
@@ -13,10 +18,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionSounds;
@@ -26,11 +33,14 @@ import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.*;
 
 public class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
+    private static final Logger log = LoggerFactory.getLogger(SignalActorBlockEntity.class);
     @Unique
     private List<Component> veil$tooltip = new ArrayList<>();
     @Unique
@@ -52,6 +62,12 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
     int ticksSinceSignal = 0;
 
+    private Object lastCall;
+    private Object lastCallList;
+    private final List<Signal> putSignals = new ArrayList<>();
+    private LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+    private Light light;
+
     public List<Component> getTooltip() {
         return this.veil$tooltip;
     }
@@ -64,6 +80,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public boolean isSuperpositionTooltipEnabled() {
         return true;
     }
+
     public void resetTooltip() {
         this.veil$tooltip.clear();
     }
@@ -101,10 +118,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             }
 
             CompoundTag themeTag = tag.getCompound("theme");
-            Iterator var3 = themeTag.getAllKeys().iterator();
-
-            while (var3.hasNext()) {
-                String key = (String) var3.next();
+            for (String key : themeTag.getAllKeys()) {
                 this.veil$theme.addColor(key, Color.of(themeTag.getInt(key)));
             }
         }
@@ -200,10 +214,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         super.loadAdditional(tag, registries);
     }
 
-    Object lastCall;
-    Object lastCallList;
-    List<Signal> putSignals = new ArrayList<>();
-
     public SignalActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
@@ -213,7 +223,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public BlockPos getSwappedPos() {
-        BlockPos sidedPos2 = new BlockPos(0, 0, 0);
+        BlockPos sidedPos2;
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
             sidedPos2 = getBlockPos().relative(level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise(), 1);
         } else {
@@ -262,18 +272,49 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return putSignals;
     }
 
-    public void addSignals(List<Signal> list) {
-        if (ticksSinceSignal > 0)
-            putSignals = list;
-        else
-            putSignals.addAll(list);
+    public void addSignals(List<Signal> signals) {
+        if (ticksSinceSignal > 0) {
+            updatePutSignals(signals);
+        } else {
+            for (Signal signal : signals) {
+                putSignals.add(new Signal(signal));
+            }
+        }
         ticksSinceSignal = 0;
     }
 
+    public void updatePutSignals(List<Signal> signals) {
+        if (putSignals.size() == signals.size()) {
+            for (int i = 0; i < signals.size(); i++) {
+                putSignals.get(i).copy(signals.get(i));
+            }
+        } else if (putSignals.size() > signals.size()) {
+            ListIterator<Signal> iterator = putSignals.listIterator();
+            while (iterator.hasNext()) {
+                int i = iterator.nextIndex();
+                Signal signal = iterator.next();
+                if (i >= signals.size()) {
+                    iterator.remove();
+                    continue;
+                }
+                signal.copy(signals.get(i));
+            }
+        } else {
+            for (int i = 0; i < signals.size(); i++) {
+                Signal signal = signals.get(i);
+                if (i >= putSignals.size()) {
+                    putSignals.add(new Signal(signal));
+                    continue;
+                }
+                putSignals.get(i).copy(signal);
+            }
+        }
+    }
+
     public void putSignalList(Object nextCall, List<Signal> list) {
-        putSignals = list;
+        updatePutSignals(list);
         ticksSinceSignal = 0;
-        if (!(lastCallList == null || !lastCallList.equals(nextCall)) || level == null) {
+        if ((lastCallList != null && lastCallList.equals(nextCall)) || level == null) {
             return;
         }
         BlockPos sidedPos = getSwappedPos();
@@ -306,7 +347,12 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         return signal;
     }
-
+    @Override
+    public void setRemoved() {
+        if (level.isClientSide && light != null)
+            lightRenderer.removeLight(light);
+        super.setRemoved();
+    }
     public Signal createSignal(Object nextCall) {
         Level level = getLevel();
         if (level == null)
@@ -408,12 +454,33 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void tick() {
         if (level.isClientSide) {
+            if (lightEnabled() && light == null) {
+                createLight();
+                lightRenderer.addLight(light);
+                if (light instanceof AreaLight areaLight)
+                    configureAreaLight(areaLight);
+                if (light instanceof PointLight pointLight)
+                    configurePointLight(pointLight);
+            }
             if (Minecraft.getInstance().player.getMainHandItem().getItem() instanceof ScrewdriverItem) {
                 setupConfigTooltips();
                 checkEvents();
                 finaliseConfigTooltips();
             }
         }
+    }
+    public boolean lightEnabled() { return false; }
+    public void createLight() {
+        light = new AreaLight();
+    }
+    public void configureAreaLight(AreaLight light) {
+        Vec3 center = getBlockPos().getCenter();
+        Direction facing = getBlockState().getValue(SignalActorTickingBlock.FACING);
+        light.setPosition(center.x, center.y, center.z);
+        light.setOrientation(facing.getRotation().rotateX((float) (Math.PI/2f)).rotateY((float) Math.PI));
+
+    }
+    public void configurePointLight(PointLight light) {
     }
     //TODO: Weak power checking method PLEASE
 

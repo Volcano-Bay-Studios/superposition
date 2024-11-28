@@ -6,17 +6,14 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
-import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
-import org.modogthedev.superposition.item.FilterItem;
 
 import java.awt.*;
 
@@ -30,7 +27,7 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
             return;
         if (be.getFilterType() == null)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/screen/filter_block_screen.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
@@ -65,33 +62,29 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, -0.15525f)
                 .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .setUv(1, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0, (uvMin/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, 0.21825f)
                 .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .setUv(1, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0, (uvMin/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, 0.21825f)
                 .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
                 .setUv(1, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, -0.15525f)
                 .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
                 .setUv(1, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
     }

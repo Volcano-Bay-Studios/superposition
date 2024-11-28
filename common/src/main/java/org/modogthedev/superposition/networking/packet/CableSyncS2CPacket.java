@@ -3,9 +3,11 @@ package org.modogthedev.superposition.networking.packet;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -28,7 +30,6 @@ public class CableSyncS2CPacket {
         this.remove = remove;
     }
 
-
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeUUID(ourUUID);
         buf.writeBoolean(remove);
@@ -40,18 +41,23 @@ public class CableSyncS2CPacket {
         var ctx = supplier.get();
 
         ctx.queue(() -> {
-            if (!remove)
-                ourCable.setLevel(ctx.getPlayer().level());
-            if (!remove) {
-                if (CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).containsKey(ourUUID)) {
-                    Cable cable = CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).get(ourUUID);
-                    cable.updateFromCable(ourCable);
-                } else {
-                    CableManager.addCable(ourCable, ctx.getPlayer().level(), ourUUID);
-                }
-            } else {
-                CableManager.getCablesMap(ctx.getPlayer().level()).get(ctx.getPlayer().level()).remove(ourUUID);
+            Level level = ctx.getPlayer().level();
+            if (remove) {
+                CableManager.removeCable(ourUUID);
+                return;
             }
+
+            ourCable.setLevel(level);
+            Map<UUID, Cable> cables = CableManager.getCables(level);
+            if (cables != null) {
+                Cable cable = cables.get(ourUUID);
+                if (cable != null) {
+                    cable.updateFromCable(ourCable);
+                    return;
+                }
+            }
+
+            CableManager.addCable(ourCable, level, ourUUID);
         });
     }
 }

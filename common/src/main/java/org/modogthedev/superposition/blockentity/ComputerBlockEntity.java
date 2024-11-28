@@ -78,7 +78,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (card != null) {
+        if (card != null && signal != null) {
             boolean shouldThrow = card.modulateSignal(signal);
             if (shouldThrow)
                 return null;

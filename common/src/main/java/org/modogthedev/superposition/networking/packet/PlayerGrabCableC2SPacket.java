@@ -32,12 +32,12 @@ public class PlayerGrabCableC2SPacket {
             Pair<Cable, Cable.Point> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
             if (rayCast != null) {
                 Cable cable = rayCast.getA();
-                cable.addPlayerHoldingPoint(player.getUUID(), cable.getPointIndex(rayCast.getB()));
+                cable.addPlayerHoldingPoint(player.getId(), cable.getPointIndex(rayCast.getB()));
                 if (!player.level().isClientSide) {
                     CableSyncS2CPacket packet = new CableSyncS2CPacket(cable, CableManager.getCableUUID(player.level(), cable), false);
                     for (ServerPlayer player1 : player.level().getServer().getPlayerList().getPlayers()) {
                         float maxDistance = cable.getPoints().size() + 100;
-                        if (cable.getPoints().get(0).getPosition().distanceTo(player.position()) < maxDistance)
+                        if (cable.getPoints().getFirst().getPosition().distanceTo(player.position()) < maxDistance)
                             SuperpositionMessages.sendToPlayer(packet, player1);
                     }
                 }

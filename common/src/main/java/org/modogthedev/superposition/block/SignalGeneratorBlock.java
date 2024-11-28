@@ -70,7 +70,7 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
         if (level.isClientSide) {
             ScreenManager.openSignalGenerator(pos);
         }
-        return InteractionResult.PASS;
+        return InteractionResult.CONSUME;
     }
 
     @Override

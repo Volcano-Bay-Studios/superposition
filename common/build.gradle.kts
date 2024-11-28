@@ -18,6 +18,8 @@ loom {
 }
 
 dependencies {
+    compileOnly("org.jetbrains:annotations:24.0.1")
+
     compileOnly("net.fabricmc:fabric-loader:${rootProject.property("fabric_loader_version")}")
     compileOnly("foundry.veil:veil-common-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
 

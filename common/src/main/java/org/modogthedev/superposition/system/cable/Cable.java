@@ -1,11 +1,12 @@
 package org.modogthedev.superposition.system.cable;
 
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -16,7 +17,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
@@ -30,13 +30,11 @@ import oshi.util.tuples.Pair;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class Cable {
     private List<Point> points = new ArrayList<>();
-    private HashMap<UUID, Integer> playerHoldingPointMap = new HashMap<>();
+    private Int2IntMap playerHoldingPointMap = new Int2IntArrayMap();
     private Level level;
     public float radius = SuperpositionConstants.cableRadius;
     public float elasticity = 0.9f;
@@ -80,10 +78,10 @@ public class Cable {
         for (Point point : points) {
             point.grabbed = false;
         }
-        for (UUID uuid : playerHoldingPointMap.keySet()) {
-            Player player = level.getPlayerByUUID(uuid);
-            if (player != null) {
-                int index = playerHoldingPointMap.get(uuid);
+        for (int id : playerHoldingPointMap.keySet()) {
+            Entity entity = level.getEntity(id);
+            if (entity instanceof Player player) {
+                int index = playerHoldingPointMap.get(id);
                 Point heldPoint = points.get(index);
                 Point prevPoint;
                 if (index > 0) {
@@ -113,7 +111,7 @@ public class Cable {
                         CableRenderer.detachPos = heldPoint.position;
                         CableRenderer.detachDelta = net.minecraft.util.Mth.clamp((float) (Math.log(stretch) / 4f + 1f), 0, 1);
                     }
-                    CableManager.playerFinishDraggingCable(player, heldPoint.position);
+                    CableManager.playerFinishDraggingCable(player, BlockPos.containing(heldPoint.position), null);
                     return;
                 }
                 heldPoint.position = result;
@@ -136,7 +134,7 @@ public class Cable {
             else
                 sleepTimer--;
             followPlayer();
-            points.get(points.size() - 1).tempPos = points.get(points.size() - 1).position;
+            points.getLast().tempPos = points.getLast().position;
             update(false);
             update(true);
             for (Point point : points) {
@@ -179,26 +177,26 @@ public class Cable {
 
     private void sendSignal() {
         if (level != null && playerHolding == null) {
-            BlockPos startPos = BlockPos.containing(points.get(0).getPosition());
-            BlockPos endPos = BlockPos.containing(points.get(points.size() - 1).getPosition());
+            BlockPos startPos = BlockPos.containing(points.getFirst().getPosition());
+            BlockPos endPos = BlockPos.containing(points.getLast().getPosition());
             if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
                 BlockEntity start = level.getBlockEntity(startPos);
                 BlockEntity end = level.getBlockEntity(endPos);
                 if (start instanceof ComputerBlockEntity cbe) {
                     Card card = cbe.getCard();
-                    if (card != null && card instanceof TickingCard tickingCard) {
+                    if (card instanceof TickingCard tickingCard) {
                         tickingCard.outputCablePos = endPos;
                     }
                 }
                 if (end instanceof ComputerBlockEntity cbe) {
                     Card card = cbe.getCard();
-                    if (card != null && card instanceof TickingCard tickingCard) {
+                    if (card instanceof TickingCard tickingCard) {
                         tickingCard.inputCablePos = startPos; //TODO: peripheral cables
                     }
                 }
                 if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
                     List<Signal> signalList = startSignalActor.getSignals();
-                    if (signalList != null && !signalList.isEmpty()) {
+                    if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
                         endSignalActor.addSignals(signalList);
                     }
                 }
@@ -218,7 +216,7 @@ public class Cable {
 
     private void update(boolean isForwards) {
         if (isForwards) {
-            for (int i = 1; i < (points.size()); i++) {
+            for (int i = 1; i < points.size(); i++) {
                 Point point = points.get(i);
                 if (point.inBlock)
                     continue;
@@ -253,14 +251,13 @@ public class Cable {
 
     public void shrink() {
         if (points.size() > 4)
-            points.remove(points.get(points.size() - 1));
+            points.remove(points.getLast());
     }
 
     private void updateCollisions() {
-        for (int i = 0; i < (points.size()); i++) {
-            Point point = points.get(i);
+        for (Point point : points) {
             if (point.lerpedPos == null && !point.inBlock && !point.grabbed) {
-                Vec3 collision = Entity.collideBoundingBox((Entity) null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition, radius, radius, radius), level, List.of());
+                Vec3 collision = Entity.collideBoundingBox(null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition, radius, radius, radius), level, List.of());
                 Vec3 velocity = point.position.subtract(point.prevPosition);
                 point.setInContact(false);
                 if (collision.subtract(velocity).length() != 0) {
@@ -277,10 +274,8 @@ public class Cable {
     }
 
     private void integrate() {
-        for (int i = 0; i < (points.size()); i++) {
-            Point point = points.get(i);
+        for (Point point : points) {
             if (!point.inBlock && !point.grabbed) {
-//            if (i < points.size() - 1) {
                 Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -9.8, 0).scale(.05 * 0.05));
                 Vec3 offset = (nextPosition.subtract(point.position));
                 lastMovement += (float) offset.length();
@@ -289,8 +284,6 @@ public class Cable {
                     point.position = point.position.add(offset.scale(0.7f));
                 else
                     point.position = point.position.add(offset.scale(0.9f));
-//            } else {
-//            }
             } else {
                 point.prevPosition = point.position;
             }
@@ -299,7 +292,7 @@ public class Cable {
 
     public void setPlayerHolding(Player player) {
         addPoint(new Point(player.position()));
-        addPlayerHoldingPoint(player.getUUID(), points.size() - 1);
+        addPlayerHoldingPoint(player.getId(), points.size() - 1);
     }
 
     public void setLevel(Level level) {
@@ -311,63 +304,47 @@ public class Cable {
     }
 
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(points.size());
         buf.writeInt(color.getRGB());
+        buf.writeVarInt(points.size());
         for (Point point : points) {
-            buf.writeDouble(point.position.x);
-            buf.writeDouble(point.position.y);
-            buf.writeDouble(point.position.z);
-            buf.writeDouble(point.prevPosition.x);
-            buf.writeDouble(point.prevPosition.y);
-            buf.writeDouble(point.prevPosition.z);
+            buf.writeVec3(point.position);
+            buf.writeVec3(point.prevPosition);
+            boolean hasFace = point.attachedPoint != null && point.attachedFace != null;
+            buf.writeBoolean(hasFace);
+            if (hasFace) {
+                buf.writeBlockPos(point.attachedPoint);
+                buf.writeEnum(point.attachedFace);
+            }
         }
-        buf.writeInt(playerHoldingPointMap.size());
-        for (UUID uuid : playerHoldingPointMap.keySet()) {
-            buf.writeUUID(uuid);
-            buf.writeInt(playerHoldingPointMap.get(uuid));
+        buf.writeVarInt(playerHoldingPointMap.size());
+        for (Int2IntMap.Entry entry : playerHoldingPointMap.int2IntEntrySet()) {
+            buf.writeVarInt(entry.getIntKey());
+            buf.writeVarInt(entry.getIntValue());
         }
-    }
-
-    public void update(FriendlyByteBuf buf) {
-        int size = buf.readInt();
-        color = new Color(buf.readInt());
-        List<Point> pointList = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            Point newPoint = new Point(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
-            newPoint.setPrevPosition(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
-            pointList.add(newPoint);
-        }
-        points = pointList;
-        playerHoldingPointMap.clear();
-        int playerHoldingMapSize = buf.readInt();
-        for (int i = 0; i < playerHoldingMapSize; i++) {
-            UUID uuid = buf.readUUID();
-            int pointIndex = buf.readInt();
-            playerHoldingPointMap.put(uuid, pointIndex);
-        }
-    }
-
-    public HashMap<UUID, Integer> getPlayerHoldingPointMap() {
-        return playerHoldingPointMap;
     }
 
     public static Cable fromBytes(FriendlyByteBuf buf, Level level) {
-        int size = buf.readInt();
         Color color1 = new Color(buf.readInt());
-        List<Point> pointList = new ArrayList<>();
+        int size = buf.readVarInt();
+        List<Point> pointList = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            Point newPoint = new Point(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
-            newPoint.setPrevPosition(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
+            Point newPoint = new Point(buf.readVec3());
+            newPoint.setPrevPosition(buf.readVec3());
+            if (buf.readBoolean()) {
+                newPoint.setAnchor(buf.readBlockPos(), buf.readEnum(Direction.class));
+            }
             pointList.add(newPoint);
         }
         Cable cable = new Cable(pointList, level, color1);
-        int playerHoldingMapSize = buf.readInt();
+        int playerHoldingMapSize = buf.readVarInt();
         for (int i = 0; i < playerHoldingMapSize; i++) {
-            UUID uuid = buf.readUUID();
-            int pointIndex = buf.readInt();
-            cable.addPlayerHoldingPoint(uuid, pointIndex);
+            cable.addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
         }
         return cable;
+    }
+
+    public Int2IntMap getPlayerHoldingPointMap() {
+        return playerHoldingPointMap;
     }
 
     public void updateFromCable(Cable cable) {
@@ -402,15 +379,15 @@ public class Cable {
         point.inBlock = blockHitResult.getType() == HitResult.Type.BLOCK;
     }
 
-    public void addPlayerHoldingPoint(UUID playerUUID, int pointIndex) {
+    public void addPlayerHoldingPoint(int playerUUID, int pointIndex) {
         playerHoldingPointMap.putIfAbsent(playerUUID, pointIndex);
     }
 
-    public boolean hasPlayerHolding(UUID playerUUID) {
+    public boolean hasPlayerHolding(int playerUUID) {
         return playerHoldingPointMap.containsKey(playerUUID);
     }
 
-    public Pair<Point, Integer> getPlayerHeldPoint(UUID playerUUID) {
+    public Pair<Point, Integer> getPlayerHeldPoint(int playerUUID) {
         if (playerHoldingPointMap.containsKey(playerUUID)) {
             int index = playerHoldingPointMap.get(playerUUID);
             if (points.size() > index)
@@ -431,12 +408,16 @@ public class Cable {
         return points.indexOf(point);
     }
 
-    public void stopPlayerDrag(UUID playerUUID) {
+    public void stopPlayerDrag(int playerUUID) {
         playerHoldingPointMap.remove(playerUUID);
     }
 
     public Color getColor() {
         return color;
+    }
+
+    public static Vec3 getAnchoredPoint(BlockPos pos, Direction face) {
+        return pos.getCenter().add(pos.getCenter().subtract(pos.relative(face).getCenter()).scale(-0.45));
     }
 
     public static class Point {
@@ -450,10 +431,33 @@ public class Cable {
         private float backwordsLength;
         public Vec3LerpComponent lerpedPos = null;
         private Cable ownedCable;
+        private Direction attachedFace;
+        private BlockPos attachedPoint;
 
         public Point(Vec3 position) {
             this.position = position;
             this.prevPosition = position;
+        }
+
+        public void setAnchor(BlockPos pos, Direction attachedFace) {
+            this.attachedPoint = pos;
+            this.attachedFace = attachedFace;
+        }
+
+        public void setAttachedFace(Direction attachedFace) {
+            this.attachedFace = attachedFace;
+        }
+
+        public void setAttachedPoint(BlockPos attachedPoint) {
+            this.attachedPoint = attachedPoint;
+        }
+
+        public BlockPos getAttachedPoint() {
+            return attachedPoint;
+        }
+
+        public Direction getAttachedFace() {
+            return attachedFace;
         }
 
         public Vec3 getPrevPosition() {

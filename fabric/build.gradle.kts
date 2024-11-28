@@ -25,7 +25,6 @@ dependencies {
     shadowCommon(project(":common", "transformProductionFabric")) { isTransitive = false }
 
     modApi("dev.architectury:architectury-fabric:${rootProject.property("architectury_version")}")
-    modApi("com.terraformersmc:modmenu:${rootProject.property("modmenu_version")}")
     modImplementation("foundry.veil:veil-fabric-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
     include ("foundry.veil:veil-fabric-${rootProject.property("minecraft_version")}:${rootProject.property("veil_version")}")
     include ("com.jamieswhiteshirt:reach-entity-attributes:2.5.0")

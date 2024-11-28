@@ -1,5 +1,8 @@
 package org.modogthedev.superposition.blockentity;
 
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.light.AreaLight;
+import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -12,16 +15,20 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
+    private static final Logger log = LoggerFactory.getLogger(SignalGeneratorBlockEntity.class);
     Vec3 pos = new Vec3(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
     private float frequency;
     public float dial = 0;
     Signal connectedSignal;
     public boolean transmitting;
+    private AreaLight light;
 
 
     public SignalGeneratorBlockEntity(BlockPos pos, BlockState state) {
@@ -53,10 +60,10 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public void tick() {
+
         preTick();
         putSignal(getSignal());
         if (this.level.isClientSide) {
-
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(Component.literal("Signal Generator Status:"));
             tooltip.add(Component.literal("Frequency - "+Mth.frequencyToHzReadable(frequency*100000)));
@@ -96,6 +103,8 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     public float getFrequency() {
         return frequency;
     }
+
+
 
     public void updateSignal() {
         if (connectedSignal == null || !connectedSignal.emitting)

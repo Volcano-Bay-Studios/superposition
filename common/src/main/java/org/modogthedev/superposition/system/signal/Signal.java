@@ -94,8 +94,10 @@ public class Signal {
         } else
             buf.writeBoolean(false);
     }
-
-
+    private Signal() {}
+    public Signal(Signal signal) {
+        copy(signal);
+    }
     public void copy(Signal signal) {
         this.modulation = signal.modulation;
         this.emitting = signal.emitting;

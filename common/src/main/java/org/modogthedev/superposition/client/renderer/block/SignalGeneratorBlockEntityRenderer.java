@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -24,7 +23,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
     public void render(SignalGeneratorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.polygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
@@ -46,38 +45,34 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         float offset = (stage / stages);
         float uvOffsetx = 0f;
 
-        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
+        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING)));
 
         buffer
                 .addVertex(m, min, 0.5001f, min)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0+uvOffsetx, (uvMin/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, min, 0.5001f, max)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(0+uvOffsetx, (uvMax/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, max, 0.5001f, max)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(1+uvOffsetx, (uvMax/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, max, 0.5001f, min)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(uvMin+uvOffsetx, (uvMin/stages)+offset)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setUv2(light,0)
+                .setUv(1+uvOffsetx, (uvMin/stages)+offset)
+                .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
     }
