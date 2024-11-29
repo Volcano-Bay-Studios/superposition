@@ -3,12 +3,12 @@ package org.modogthedev.superposition.system.cable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionConstants;
 import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CableClipResult {
     private HashMap<Cable, List<Cable.Point>> cablePointMap = new HashMap<>();
@@ -50,7 +50,8 @@ public class CableClipResult {
             Vec3 stepPos = Mth.lerpVec3(sourcePos, toPos, Mth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
             int i = 0;
             for (Pair<Cable, Cable.Point> cablePointPair : rayCast) {
-                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos);
+                boolean isAnEndPoint = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
+                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
                 float storedDistance = distancePointPairMap.get(i).getA();
                 if (distance < storedDistance)
                     distancePointPairMap.set(i, new Pair<>(distance, cablePointPair.getB()));

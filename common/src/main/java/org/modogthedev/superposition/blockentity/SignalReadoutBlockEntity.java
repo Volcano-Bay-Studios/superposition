@@ -5,10 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.block.state.BlockState;
-import org.modogthedev.superposition.client.renderer.block.SignalReadoutBlockEntityRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
@@ -100,6 +97,7 @@ public class SignalReadoutBlockEntity extends SignalActorBlockEntity implements 
         super.configureAreaLight(light);
         light.setSize(0.317,0.244);
         light.setColor(3979870);
-        light.setDistance(5);
+        light.setDistance(10);
+        light.setBrightness(1.5f);
     }
 }
