@@ -35,7 +35,7 @@ dependencies {
     modRuntimeOnly("maven.modrinth:yeetus-experimentus:87.0.0")
     modRuntimeOnly("maven.modrinth:fabric-permissions-api:0.3.2")
     modRuntimeOnly("maven.modrinth:spark:1.10.109-fabric")
-//    modRuntimeOnly("maven.modrinth:axiom:4.3.3")
+//    modRuntimeOnly("maven.modrinth:worldedit:7.3.8")
     modRuntimeOnly("mezz.jei:jei-${rootProject.property("minecraft_version")}-fabric:${rootProject.property("jei_version")}")
 }
 
