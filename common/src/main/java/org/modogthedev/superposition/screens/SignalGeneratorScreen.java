@@ -95,12 +95,12 @@ public class SignalGeneratorScreen extends WidgetScreen {
         int width = this.width;
         float resolution = 0.5f;
         for (float i = 0; i < 158; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * 25);
-            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) / frequency) * 25);
+            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80)) * 25);
+            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) * (frequency / 80)) * 25);
             fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
         }
         flush(pGuiGraphics);
-        if (frequency < .72f || frequency > 40) {
+        if (frequency < .72f || frequency > 150) {
             pGuiGraphics.blit(WARN_ON, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
         } else {
             pGuiGraphics.blit(WARN_OFF, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);

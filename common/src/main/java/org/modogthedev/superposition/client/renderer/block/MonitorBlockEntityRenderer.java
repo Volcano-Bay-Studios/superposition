@@ -14,24 +14,24 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
-import org.modogthedev.superposition.blockentity.SignalReadoutBlockEntity;
+import org.modogthedev.superposition.blockentity.MonitorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 
 
-public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<SignalReadoutBlockEntity> {
+public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBlockEntity> {
 
     public Font font;
 
-    public SignalReadoutBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+    public MonitorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         font = context.getFont();
     }
 
     static final int size = 12;
 
     @Override
-    public void render(SignalReadoutBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
+    public void render(MonitorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
 
@@ -53,6 +53,8 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
         float stage = Math.round(1.5f);
         float stages = 25;
 
+        float transformDown = Math.max(0,(-be.transformState/10f)+1);
+        float transformUp = Mth.clamp(((be.transformState-10)/10f),0,1);
         float uvOffsetx = 0f;
         int offset = 2;
         float part = 1f / (size + 4);
@@ -64,7 +66,7 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
 
         int j = 0;
         for (String text : be.text) { //TODO: Finish text system
-            this.font.drawInBatch(text, 1, j * 9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+            this.font.drawInBatch(text.substring(0, (int) (text.length()*transformUp)), 1, j * 9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
             j++;
         }
 
@@ -74,14 +76,14 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
         for (int i = 0; i < size; i++) {
             float x = (i * totalPart) + (offset / (size + 4f)) - min;
             float y = .21f;
-            float yinverse = .2f;
+            float yinverse;
             Signal[] signals = Mth.spaceArray(be.signals, size);
             if (signals != null && signals[i] != null) {
-                y = Math.max(-.061f, (float) ((((signals[i].amplitude) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)));
+                y = Math.max(-.061f, (float) ((((signals[i].amplitude) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)))*transformDown;
+                y = Mth.lerp(-(transformDown-1),y,.21f);
             }
-
-            y += (float) (Math.random() / 64);
-            yinverse = -y + .4f;
+            y += (float) (Math.random() / 64)*transformDown;
+            yinverse = -y + .42f +(.05f*transformDown);
             buffer
                     .addVertex(m, x, 0.5001f, yinverse)
                     .setColor(1f, 1f, 1f, alpha)
@@ -151,21 +153,21 @@ public class SignalReadoutBlockEntityRenderer implements BlockEntityRenderer<Sig
     }
 
 
-    private float getMaxPlaneExtent(SignalReadoutBlockEntity be) {
+    private float getMaxPlaneExtent(MonitorBlockEntity be) {
         return -(0.5f);
     }
 
-    private float getMinPlaneExtent(SignalReadoutBlockEntity be) {
+    private float getMinPlaneExtent(MonitorBlockEntity be) {
         return 0.5f;
     }
 
-    public boolean isInvalid(SignalReadoutBlockEntity be) {
+    public boolean isInvalid(MonitorBlockEntity be) {
         return !be.hasLevel() || be.getBlockState()
                 .getBlock() == Blocks.AIR;
     }
 
     @Override
-    public boolean shouldRender(SignalReadoutBlockEntity pBlockEntity, Vec3 pCameraPos) {
+    public boolean shouldRender(MonitorBlockEntity pBlockEntity, Vec3 pCameraPos) {
         return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos));
     }
 }

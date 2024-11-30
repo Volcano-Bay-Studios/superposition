@@ -1,15 +1,18 @@
 package org.modogthedev.superposition.system.cards;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionCards;
-import org.modogthedev.superposition.core.SuperpositionFilters;
 import org.modogthedev.superposition.system.cards.config.CardConfig;
-import org.modogthedev.superposition.system.cards.config.CardConfigPart;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class Card {
     private ResourceLocation selfReference;
+    public ComputerBlockEntity computerBlockEntity;
+    public BlockPos peripherialPosition;
+    public int timeSincePeriphrealUpdated = 0;
     public Card(ResourceLocation card) {
         this.selfReference = card;
     }
@@ -40,7 +43,5 @@ public class Card {
      * @param signal
      * @return This boolean tells the computer whether it should throw away this signal
      */
-    public boolean modulateSignal(Signal signal) {
-        return false;
-    }
+    public void modulateSignal(Signal signal) {}
 }

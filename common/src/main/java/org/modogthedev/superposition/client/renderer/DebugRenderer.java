@@ -19,7 +19,7 @@ import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import oshi.util.tuples.Pair;
 
 public class DebugRenderer {

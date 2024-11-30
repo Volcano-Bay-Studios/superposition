@@ -7,9 +7,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.modogthedev.superposition.system.signal.Signal;
 
-import static net.minecraft.util.Mth.lerp;
-
-public class Mth {
+public class Mth extends net.minecraft.util.Mth {
     public static float getFromRange(float OldMax, float OldMin, float NewMax, float NewMin, float OldValue) {
         float OldRange = (OldMax - OldMin);
         float NewRange = (NewMax - NewMin);

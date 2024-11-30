@@ -23,8 +23,8 @@ public class SuperpositionBlocks {
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-    public static final RegistrySupplier<SignalReadoutBlock> SIGNAL_READOUT = registerBlock("signal_readout",
-            () -> new SignalReadoutBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR)
+    public static final RegistrySupplier<MonitorBlock> SIGNAL_READOUT = registerBlock("signal_readout",
+            () -> new MonitorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<TransmitterBlock> TRANSMITTER = registerBlock("transmitter",
@@ -46,6 +46,10 @@ public class SuperpositionBlocks {
             ));
     public static final RegistrySupplier<ComputerBlock> COMPUTER = registerBlock("computer",
             () -> new ComputerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+    public static final RegistrySupplier<AnalyserBlock> ANALYSER = registerBlock("analyser",
+            () -> new AnalyserBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistrySupplier<CasingBlock> CASING = registerBlock("casing",

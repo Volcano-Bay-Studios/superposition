@@ -18,13 +18,14 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
+import org.modogthedev.superposition.blockentity.PeriphrealBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.codecs.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
@@ -100,7 +101,8 @@ public class Cable {
                     Vec3 end = index == i ? hitResult.getLocation() : points.get(i).position;
                     actualLength += (float) start.distanceTo(end);
                 }
-                Vec3 result = (Mth.lerpVec3(heldPoint.prevPosition, hitResult.getLocation(), net.minecraft.util.Mth.clamp(maxLength / actualLength, 0, 1)));
+                boolean isEndPoint = heldPoint.equals(points.getFirst()) || heldPoint.equals(points.getLast());
+                Vec3 result = (Mth.lerpVec3(heldPoint.prevPosition, hitResult.getLocation(), net.minecraft.util.Mth.clamp((maxLength + (isEndPoint ? 0 : 1)) / (actualLength), 0, 1)));
                 heldPoint.grabbed = true;
                 float stretch = (float) result.distanceTo(hitResult.getLocation());
                 if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
@@ -197,6 +199,10 @@ public class Cable {
                 }
                 if (end instanceof ComputerBlockEntity cbe) {
                     Card card = cbe.getCard();
+                    if (card != null && start instanceof PeriphrealBlockEntity) {
+                        card.peripherialPosition = startPos;
+                        card.timeSincePeriphrealUpdated = 0;
+                    }
                     if (card instanceof TickingCard tickingCard) {
                         tickingCard.inputCablePos = startPos; //TODO: peripheral cables
                     }
@@ -226,7 +232,7 @@ public class Cable {
         if (isForwards) {
             for (int i = 1; i < points.size(); i++) {
                 Point point = points.get(i);
-                if (point.inBlock) {
+                if (point.getAttachedFace() != null) {
                     continue;
                 }
 
@@ -241,7 +247,7 @@ public class Cable {
         } else {
             for (int i = (points.size() - 2); i >= 0; i--) {
                 Point point = points.get(i);
-                if (point.inBlock) {
+                if (point.getAttachedFace() != null) {
                     point.tempPos = point.position;
                     continue;
                 }
@@ -362,8 +368,10 @@ public class Cable {
         avgTicksSinceUpdate = ticksSinceUpdate;
         ticksSinceUpdate = 0;
         color = cable.color;
-        if (points.size() >= cable.points.size() + 1) {
-            points.subList(cable.points.size() + 1, points.size() + 1).clear();
+        if (points.size() > cable.points.size()) {
+            for (int i = cable.points.size() - 1; i < cable.points.size(); i++) {
+                points.removeLast();
+            }
         }
         if (cable.points.size() >= points.size() + 1) {
             points.addAll(cable.points.subList(points.size() - 1, cable.points.size() - 1)); //TODO: Test this

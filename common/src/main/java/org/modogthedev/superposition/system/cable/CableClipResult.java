@@ -3,7 +3,7 @@ package org.modogthedev.superposition.system.cable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;

@@ -7,6 +7,8 @@
   "block.superposition.signal_readout" : "Monitor",
   "block.superposition.filter" : "Filter",
   "block.superposition.casing" : "Insulated Casing",
+  "block.superposition.analyser" : "Analyser",
+  "block.superposition.computer" : "Computer",
 
   "item.superposition.screwdriver" : "Screwdriver",
   "item.superposition.insulated_sheet" : "Insulated Sheet",
@@ -29,6 +31,10 @@
   "item.superposition.purple_cable" : "Purple Cable",
   "item.superposition.magenta_cable" : "Magenta Cable",
   "item.superposition.pink_cable" : "Pink Cable",
+
+  "item.superposition.redstone_card" : "Redstone Card",
+  "item.superposition.string_card" : "String Card",
+  "item.superposition.sign_card" : "Sign Card",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

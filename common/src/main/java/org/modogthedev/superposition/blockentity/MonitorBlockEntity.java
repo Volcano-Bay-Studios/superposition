@@ -6,6 +6,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.text.WordUtils;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
@@ -15,8 +16,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SignalReadoutBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
-    public SignalReadoutBlockEntity(BlockPos pos, BlockState state) {
+public class MonitorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
+    public MonitorBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.SIGNAL_READOUT.get(), pos, state);
     }
 
@@ -25,6 +26,7 @@ public class SignalReadoutBlockEntity extends SignalActorBlockEntity implements 
     public float highestValue = 0;
     public float lowestValue = 0;
     public List<String> text = new ArrayList<>();
+    public int transformState;
 
     @Override
     public void tick() {
@@ -32,12 +34,30 @@ public class SignalReadoutBlockEntity extends SignalActorBlockEntity implements 
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
         List<Signal> frequencySorted = getSignals();
-        text.clear();
+        text = new ArrayList<>();
+        boolean stateData = false;
         for (Signal signal : getSignals()) {
             EncodedData<? extends Serializable> encodedData = signal.getEncodedData();
             if (encodedData != null && encodedData.getObj() instanceof String s) {
                 text.add(s);
+                stateData = true;
             }
+        }
+        if (!text.isEmpty()) {
+            StringBuilder whole = new StringBuilder();
+            for (String string : text) {
+                whole.append(" ").append(string);
+            }
+            String[] strings = (WordUtils.wrap(whole.toString(), 14,"\n",true)).split("\n"+"");
+            text = List.of(strings);
+        }
+
+        if (stateData) {
+            if (transformState < 20)
+                transformState++;
+        } else {
+            if (transformState > 0)
+                transformState--;
         }
 
         if (level.isClientSide) {

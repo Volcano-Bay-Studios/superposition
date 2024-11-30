@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
-import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.awt.*;
 

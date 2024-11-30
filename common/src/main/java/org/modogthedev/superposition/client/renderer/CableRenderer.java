@@ -25,7 +25,7 @@ import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.util.CatmulRomSpline;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.util.ArrayList;
 import java.util.List;

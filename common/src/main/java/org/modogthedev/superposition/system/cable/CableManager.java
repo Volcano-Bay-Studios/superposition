@@ -16,7 +16,7 @@ import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
 import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
-import org.modogthedev.superposition.util.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
@@ -134,6 +134,7 @@ public class CableManager {
                 if (rayCast != null) {
                     Cable cable = rayCast.getA();
                     cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
+                    rayCast.getB().setAnchor(null,null);
                     if (!player.level().isClientSide) {
                         CableSyncS2CPacket packet = new CableSyncS2CPacket(cable, getCableUUID(player.level(), cable), false);
                         for (ServerPlayer player1 : player.level().getServer().getPlayerList().getPlayers()) {

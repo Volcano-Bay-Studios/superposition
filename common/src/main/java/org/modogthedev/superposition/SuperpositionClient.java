@@ -11,7 +11,7 @@ import org.modogthedev.superposition.client.renderer.DebugRenderer;
 import org.modogthedev.superposition.client.renderer.block.AmplifierBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.FilterBlockEntityRenderer;
 import org.modogthedev.superposition.client.renderer.block.SignalGeneratorBlockEntityRenderer;
-import org.modogthedev.superposition.client.renderer.block.SignalReadoutBlockEntityRenderer;
+import org.modogthedev.superposition.client.renderer.block.MonitorBlockEntityRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.platform.PlatformHelper;
@@ -38,7 +38,7 @@ public class SuperpositionClient {
 
     public static void registerBlockEntityRenderers() {
         BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_GENERATOR.get(), SignalGeneratorBlockEntityRenderer::new);
-        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_READOUT.get(), SignalReadoutBlockEntityRenderer::new);
+        BlockEntityRendererRegistry.register(SuperpositionBlockEntities.SIGNAL_READOUT.get(), MonitorBlockEntityRenderer::new);
         BlockEntityRendererRegistry.register(SuperpositionBlockEntities.AMPLIFIER.get(), AmplifierBlockEntityRenderer::new);
         BlockEntityRendererRegistry.register(SuperpositionBlockEntities.FILTER.get(), FilterBlockEntityRenderer::new);
     }

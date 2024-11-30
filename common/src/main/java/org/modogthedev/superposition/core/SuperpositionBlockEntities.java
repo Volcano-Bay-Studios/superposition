@@ -2,11 +2,7 @@ package org.modogthedev.superposition.core;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.modogthedev.superposition.Superposition;
@@ -34,9 +30,12 @@ public class SuperpositionBlockEntities {
     public static final RegistrySupplier<BlockEntityType<ComputerBlockEntity>> COMPUTER =
             registerBlockEntity("computer",
                     () -> BlockEntityType.Builder.of(ComputerBlockEntity::new, SuperpositionBlocks.COMPUTER.get()));
-    public static final RegistrySupplier<BlockEntityType<SignalReadoutBlockEntity>> SIGNAL_READOUT =
+    public static final RegistrySupplier<BlockEntityType<MonitorBlockEntity>> SIGNAL_READOUT =
             registerBlockEntity("signal_readout",
-                    () -> BlockEntityType.Builder.of(SignalReadoutBlockEntity::new, SuperpositionBlocks.SIGNAL_READOUT.get()));
+                    () -> BlockEntityType.Builder.of(MonitorBlockEntity::new, SuperpositionBlocks.SIGNAL_READOUT.get()));
+    public static final RegistrySupplier<BlockEntityType<AnalyserBlockEntity>> ANALYSER =
+            registerBlockEntity("analyser",
+                    () -> BlockEntityType.Builder.of(AnalyserBlockEntity::new, SuperpositionBlocks.ANALYSER.get()));
 
     // T extends Item, so the cast is fine. We're also registering T, so it's also fine there.
     private static <T extends BlockEntity> RegistrySupplier<BlockEntityType<T>> registerBlockEntity(String name, Supplier<BlockEntityType.Builder<T>> blockEntity) {

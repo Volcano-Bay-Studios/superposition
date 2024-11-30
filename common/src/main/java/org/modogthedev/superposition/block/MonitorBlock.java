@@ -19,7 +19,7 @@ import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 import java.util.stream.Stream;
 
-public class SignalReadoutBlock extends SignalActorTickingBlock implements EntityBlock {
+public class MonitorBlock extends SignalActorTickingBlock implements EntityBlock {
     public static final VoxelShape SHAPE_COMMON = Stream.of(
             Block.box(2, 0, 2, 14, 2, 11),
             Block.box(0, 2, 1, 16, 15, 12),
@@ -52,7 +52,7 @@ public class SignalReadoutBlock extends SignalActorTickingBlock implements Entit
     ).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
 
 
-    public SignalReadoutBlock(Properties properties) {
+    public MonitorBlock(Properties properties) {
         super(properties);
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
