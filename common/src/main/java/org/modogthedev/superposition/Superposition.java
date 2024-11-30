@@ -2,7 +2,6 @@ package org.modogthedev.superposition;
 
 import com.mojang.logging.LogUtils;
 import dev.architectury.event.events.common.InteractionEvent;
-import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
@@ -24,9 +23,9 @@ public class Superposition {
 
         initTheme();
         SuperpositionRegistries.register();
+        SuperpositionBlocks.BLOCKS.register();
         SuperpositionFilters.FILTERS.register();
         SuperpositionCards.CARDS.register();
-        SuperpositionBlocks.BLOCKS.register();
         SuperpositionBlockEntities.BLOCK_ENTITIES.register();
         SuperpositionTabs.TABS.register();
         SuperpositionItems.ITEMS.register();

@@ -8,12 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
-import org.modogthedev.superposition.blockentity.FilterBlockEntity;
-import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.screens.ScreenManager;
-import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.filter.Filter;
 
 import java.util.function.Consumer;
 
@@ -58,7 +53,7 @@ public class CardItem extends Item {
         if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof ComputerBlockEntity computerBlockEntity) {
             boolean creative = context.getPlayer().getAbilities().instabuild;
             if (computerBlockEntity.getCard() == null) {
-                computerBlockEntity.setCard(card);
+                computerBlockEntity.setCard(card.copy());
                 if (!creative)
                     return InteractionResult.CONSUME;
                 else

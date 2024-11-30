@@ -25,8 +25,10 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
         card = Card.loadNew(tag);
-        if (card != null)
+        if (card != null) {
+            card = card.copy();
             card.computerBlockEntity = this;
+        }
     }
 
     public static float getRedstoneOffset(Level level, BlockPos pos) {
@@ -54,8 +56,10 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         card = Card.loadNew(tag);
-        if (card != null)
+        if (card != null) {
+            card = card.copy();
             card.computerBlockEntity = this;
+        }
     }
 
     @Override
@@ -75,7 +79,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 addTooltip(Component.literal("Computer Status:"));
                 addTooltip(Component.literal("Card - ").append(Component.translatable("item.superposition." + getCard().getSelfReference().getPath())));
                 if (card.peripherialPosition != null && level.getBlockEntity(card.peripherialPosition) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
-                    addTooltip("Peripheral Attached - "+ level.getBlockState(card.peripherialPosition).getBlock().getName().getString());
+                    addTooltip("Peripheral Attached - " + level.getBlockState(card.peripherialPosition).getBlock().getName().getString());
                 }
             }
         }
@@ -86,7 +90,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             if (card instanceof TickingCard tickingCard) {
                 tickingCard.tick(getBlockPos(), level, this);
             }
-            if (card.timeSincePeriphrealUpdated>1)
+            if (card.timeSincePeriphrealUpdated > 1)
                 card.peripherialPosition = null;
             card.timeSincePeriphrealUpdated++;
         }

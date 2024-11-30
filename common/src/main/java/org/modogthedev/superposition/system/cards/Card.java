@@ -16,6 +16,9 @@ public class Card {
     public Card(ResourceLocation card) {
         this.selfReference = card;
     }
+    public Card(Card card) {
+        this.selfReference = card.selfReference;
+    }
     public void save(CompoundTag pTag) {
         pTag.putString("namespace", selfReference.getNamespace());
         pTag.putString("path", selfReference.getPath());
@@ -38,7 +41,9 @@ public class Card {
     public CardConfig getCardConfig() {
         return runCardConfig(new CardConfig());
     }
-
+    public Card copy() {
+        return new Card(this);
+    }
     /**
      * @param signal
      * @return This boolean tells the computer whether it should throw away this signal
