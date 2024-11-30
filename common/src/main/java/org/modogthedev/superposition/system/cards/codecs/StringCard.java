@@ -12,10 +12,18 @@ public class StringCard extends Card {
         super(card);
     }
 
+    public StringCard(Card card) {
+        super(card);
+    }
+
     @Override
     public void modulateSignal(Signal signal) {
         EncodedData<? extends Serializable> data = signal.getEncodedData();
         if (data != null)
             signal.encode(String.valueOf(data.getObj()));
+    }
+    @Override
+    public Card copy() {
+        return new StringCard(this);
     }
 }

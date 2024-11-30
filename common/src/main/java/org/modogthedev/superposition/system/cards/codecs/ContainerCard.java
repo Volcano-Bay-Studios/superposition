@@ -18,6 +18,10 @@ public class ContainerCard extends Card {
         super(card);
     }
 
+    public ContainerCard(Card card) {
+        super(card);
+    }
+
     @Override
     public void modulateSignal(Signal signal) {
         if (peripherialPosition != null) {
@@ -50,5 +54,9 @@ public class ContainerCard extends Card {
             }
         }
         return stacks;
+    }
+    @Override
+    public Card copy() {
+        return new ContainerCard(this);
     }
 }

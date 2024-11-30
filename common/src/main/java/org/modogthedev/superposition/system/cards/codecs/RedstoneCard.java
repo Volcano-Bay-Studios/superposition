@@ -11,6 +11,10 @@ public class RedstoneCard extends Card {
         super(card);
     }
 
+    public RedstoneCard(Card card) {
+        super(card);
+    }
+
     @Override
     public void modulateSignal(Signal signal) {
         int value = 0;
@@ -21,5 +25,9 @@ public class RedstoneCard extends Card {
             }
         }
         signal.encode(value);
+    }
+    @Override
+    public Card copy() {
+        return new RedstoneCard(this);
     }
 }

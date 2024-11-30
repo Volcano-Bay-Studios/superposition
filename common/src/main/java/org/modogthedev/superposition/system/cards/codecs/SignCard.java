@@ -13,6 +13,10 @@ public class SignCard extends Card {
         super(card);
     }
 
+    public SignCard(Card card) {
+        super(card);
+    }
+
     @Override
     public void modulateSignal(Signal signal) {
         String orignalText = "";
@@ -36,5 +40,10 @@ public class SignCard extends Card {
         }
         if (!orignalText.isEmpty())
             signal.encode(orignalText);
+    }
+
+    @Override
+    public Card copy() {
+        return new SignCard(this);
     }
 }
