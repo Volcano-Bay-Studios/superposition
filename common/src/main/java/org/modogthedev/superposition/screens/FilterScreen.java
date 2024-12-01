@@ -2,6 +2,7 @@ package org.modogthedev.superposition.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
@@ -14,12 +15,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.block.FilterBlock;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.core.SuperpositionFilters;
-import org.modogthedev.superposition.core.SuperpositionMessages;
-import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.networking.packet.FilterItemModificationC2SPacket;
 import org.modogthedev.superposition.system.filter.BandPassFilter;
@@ -30,6 +27,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class FilterScreen extends WidgetScreen {
@@ -127,18 +125,18 @@ public class FilterScreen extends WidgetScreen {
         float highestValue = 0;
         float lowestValue = 0;
         if (signals != null) {
-            signals.sort((o1, o2) -> Float.compare(o1.frequency, o2.frequency));
+            signals.sort(Comparator.comparingDouble(Signal::getFrequency));
             List<Signal> amplitudeSorted = new ArrayList<>(signals);
-            amplitudeSorted.sort((o1, o2) -> Float.compare(o1.amplitude, o2.amplitude));
+            amplitudeSorted.sort((o1, o2) -> Float.compare(o1.getAmplitude(), o2.getAmplitude()));
             if (!amplitudeSorted.isEmpty()) {
-                highestValue = amplitudeSorted.get(amplitudeSorted.size() - 1).amplitude;
-                lowestValue = amplitudeSorted.get(0).amplitude;
+                highestValue = amplitudeSorted.getLast().getAmplitude();
+                lowestValue = amplitudeSorted.getFirst().getAmplitude();
                 if (amplitudeSorted.size() == 1)
                     lowestValue = lowestValue / 2;
             }
             for (Signal signal : signals) {
-                float frequency = signal.frequency / 100000;
-                float size = (float) (Mth.getFromRange(150, 0, 11, 0, signal.amplitude) + Math.random());
+                float frequency = signal.getFrequency() / 100000;
+                float size = (float) (Mth.getFromRange(150, 0, 11, 0, signal.getAmplitude()) + Math.random());
                 fillExact(guiGraphics, i + frequency + 9, j + barOffset + 11 - size, i + frequency + 10f, j + barOffset + 24 - 11 + size, 0xFF56d156);
             }
             for (int x = 0; x < 158; x++) {
@@ -192,7 +190,7 @@ public class FilterScreen extends WidgetScreen {
             super.onClose();
         } else {
             filterType.updateFromDials(dials);
-            SuperpositionMessages.sendToServer(new FilterItemModificationC2SPacket(filterType));
+            VeilPacketManager.server().sendPacket(new FilterItemModificationC2SPacket(filterType));
             super.onClose();
         }
     }
@@ -204,7 +202,7 @@ public class FilterScreen extends WidgetScreen {
             filterType.save(tag);
             tag.putString("namespace", filterType.getSelfReference().getNamespace());
             tag.putString("path", filterType.getSelfReference().getPath());
-            SuperpositionMessages.sendToServer(new BlockEntityModificationC2SPacket(tag, pos));
+            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, pos));
         }
     }
 

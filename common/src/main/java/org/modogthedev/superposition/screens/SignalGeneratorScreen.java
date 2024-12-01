@@ -2,6 +2,7 @@ package org.modogthedev.superposition.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
@@ -21,7 +22,6 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
-import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.util.Mth;
 
@@ -34,21 +34,22 @@ public class SignalGeneratorScreen extends WidgetScreen {
     private static final ResourceLocation SWITCH_OFF = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/switch_off.png");
     public static final int imageWidth = 176;
     public static final int imageHeight = 224;
-    public static BlockPos pos;
-    public static int ticks = 0;
-    public float frequency;
-    public float startFrequency = 1;
-    public boolean mute = true;
-    public boolean swap = false;
-    public VertexConsumer lineConsumer;
+
+    private final BlockPos pos;
+    private int ticks = 0;
+    private float frequency;
+    private float startFrequency = 1;
+    private boolean mute = true;
+    private boolean swap = false;
+    private VertexConsumer lineConsumer;
 
     public SignalGeneratorScreen(Component pTitle, BlockPos pos) {
         super(pTitle);
         freeSpin = true;
-        SignalGeneratorScreen.pos = pos;
+        this.pos = pos;
         ticks = 0;
-        addDial(-25, 0);
-        addDial(25, 0);
+        this.addDial(-25, 0);
+        this.addDial(25, 0);
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalGeneratorBlockEntity generatorBlockEntity) {
@@ -70,7 +71,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
         if (pMinY > pMaxY) {
             float minY = pMinY;
             pMinY = pMaxY;
-            pMaxY = minY+3;
+            pMaxY = minY + 3;
         } else {
             pMaxY += 3;
         }
@@ -96,10 +97,10 @@ public class SignalGeneratorScreen extends WidgetScreen {
         float resolution = 0.5f;
         for (float i = 0; i < 158; i += resolution) {
             float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80)) * 25);
-            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) * (frequency / 80)) * 25);
-            fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80)) * 25);
+            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
         }
-        flush(pGuiGraphics);
+        this.flush(pGuiGraphics);
         if (frequency < .72f || frequency > 150) {
             pGuiGraphics.blit(WARN_ON, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
         } else {
@@ -108,19 +109,19 @@ public class SignalGeneratorScreen extends WidgetScreen {
     }
 
     public void calculateWavelength() {
-        frequency = Math.abs((dials.get(0).scrolledAmount / 10) + (dials.get(1).scrolledAmount)+(startFrequency));
+        frequency = Math.abs((dials.get(0).scrolledAmount / 10) + (dials.get(1).scrolledAmount) + (startFrequency));
     }
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
-            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),mute);
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(), mute);
             mute = !mute;
         }
         if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
-            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),swap);
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(), swap);
             swap = !swap;
-            updateBlock();
+            this.updateBlock();
         }
         return super.mouseClicked(pMouseX, pMouseY, pButton);
     }
@@ -139,11 +140,11 @@ public class SignalGeneratorScreen extends WidgetScreen {
 
     @Override
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        calculateWavelength();
+        this.calculateWavelength();
         int i = (this.width - imageWidth) / 2;
         int j = (this.height - imageHeight) / 2;
         pGuiGraphics.blit(BACKGROUND, i, j, 0, 0, imageWidth, imageHeight);
-        renderSine(pGuiGraphics);
+        this.renderSine(pGuiGraphics);
 //        frequency = 5;
         if (mute) {
             pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
@@ -164,9 +165,9 @@ public class SignalGeneratorScreen extends WidgetScreen {
     public void tick() {
         super.tick();
         if (!mute && frequency > .72f) {
-            float pitch = Mth.getFromRange(0,30,2,.72f,frequency);
+            float pitch = 1.0F / Mth.map(0, 30, 2, .72f, frequency);
             // TODO make it work pls
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(),pitch));
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
         }
         ticks++;
     }
@@ -174,20 +175,20 @@ public class SignalGeneratorScreen extends WidgetScreen {
     @Override
     public void onClose() {
         super.onClose();
-        updateBlock();
+        this.updateBlock();
     }
 
     @Override
     public void dialUpdated() {
         super.dialUpdated();
-        updateBlock();
+        this.updateBlock();
     }
 
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
         tag.putFloat("frequency", frequency);
-        tag.putBoolean("swap",swap);
-        SuperpositionMessages.sendToServer(new BlockEntityModificationC2SPacket(tag,pos));
+        tag.putBoolean("swap", swap);
+        VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, pos));
     }
 
     @Override

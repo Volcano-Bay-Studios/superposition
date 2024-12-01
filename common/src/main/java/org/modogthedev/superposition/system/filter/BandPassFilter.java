@@ -3,7 +3,6 @@ package org.modogthedev.superposition.system.filter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -26,8 +25,7 @@ public class BandPassFilter extends Filter {
 
     @Override
     public boolean passSignal(Signal signal) {
-        return (signal.frequency) > (lowFrequency * 100000) && signal.frequency < (Math.abs(158 - highFrequency) * 100000);
-
+        return (signal.getFrequency()) > (lowFrequency * 100000) && signal.getFrequency() < (Math.abs(158 - highFrequency) * 100000);
     }
 
     @Override
@@ -58,7 +56,7 @@ public class BandPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "Band Pass Filter - " + Mth.frequencyToHzReadable(lowFrequency) + " - " + Mth.frequencyToHzReadable(Math.abs(158-highFrequency));
+        return "Band Pass Filter - " + Mth.frequencyToHzReadable(lowFrequency) + " - " + Mth.frequencyToHzReadable(Math.abs(158 - highFrequency));
     }
 
     @Override

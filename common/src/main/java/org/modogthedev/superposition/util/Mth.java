@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Vector3dc;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class Mth extends net.minecraft.util.Mth {
@@ -15,6 +16,9 @@ public class Mth extends net.minecraft.util.Mth {
     }
     public static BlockPos blockPosFromVec3(Vec3 vec3) {
         return new BlockPos((int) vec3.x, (int) vec3.y, (int) vec3.z);
+    }
+    public static BlockPos blockPosFromVec3(Vector3dc vec3) {
+        return new BlockPos((int) vec3.x(), (int) vec3.y(), (int) vec3.z());
     }
     public static Vec3 lerpVec3(Vec3 start, Vec3 end, float delta) {
         return new Vec3(lerp(delta,start.x,end.x),lerp(delta,start.y,end.y),lerp(delta,start.z,end.z));

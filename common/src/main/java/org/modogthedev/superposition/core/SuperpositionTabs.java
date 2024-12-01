@@ -1,20 +1,24 @@
 package org.modogthedev.superposition.core;
 
-import dev.architectury.registry.CreativeTabRegistry;
-import dev.architectury.registry.registries.DeferredRegister;
-import dev.architectury.registry.registries.RegistrySupplier;
+import foundry.veil.platform.registry.RegistrationProvider;
+import foundry.veil.platform.registry.RegistryObject;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.platform.PlatformHelper;
 
 public class SuperpositionTabs {
-    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Superposition.MODID, Registries.CREATIVE_MODE_TAB);
-    public static final RegistrySupplier<CreativeModeTab> TAB = TABS.register(Superposition.id("tab"),
-            () -> CreativeTabRegistry.create(
-                    Component.translatable("creativemodetab.superposition"),
-                    () -> new ItemStack(SuperpositionItems.LIME_CABLE.get())
-            )
-    );
+
+    public static final RegistrationProvider<CreativeModeTab> TABS = RegistrationProvider.get(Registries.CREATIVE_MODE_TAB, Superposition.MODID);
+    public static final RegistryObject<CreativeModeTab> TAB = TABS.register("tab",
+            () -> PlatformHelper.INSTANCE.creativeTabBuilder()
+                    .title(Component.translatable("creativemodetab.superposition"))
+                    .icon(() -> new ItemStack(SuperpositionItems.LIME_CABLE.get()))
+                    .displayItems(SuperpositionItems::fillTab)
+                    .build());
+
+    public static void bootstrap(){
+    }
 }

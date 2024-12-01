@@ -2,7 +2,7 @@ package org.modogthedev.superposition.system.antenna;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.ArrayList;
@@ -14,11 +14,11 @@ public class Antenna {
     public List<Signal> signals = new ArrayList<>();
     public BlockPos antennaActor;
     public boolean reading;
-    public Vec3 avg;
-    public Vec3 size;
-    public Vec3 lowSize;
-    public Vec3 highSize;
-    public Vec3 relativeCenter;
+    public Vector3d avg;
+    public Vector3d size;
+    public Vector3d lowSize;
+    public Vector3d highSize;
+    public Vector3d relativeCenter;
 
     public Antenna(List<BlockPos> antennaParts, BlockPos antennaActor, Level level) {
         this.antennaParts = antennaParts;
@@ -30,54 +30,60 @@ public class Antenna {
         return antennaActor.equals(pos);
     }
 
-    public Vec3 getAvg() {
-        Vec3 avg = Vec3.ZERO;
-        for (BlockPos pos : antennaParts) {
-           BlockPos relative = antennaActor.subtract(pos);
-           BlockPos abs = new BlockPos(Math.abs(relative.getX()),Math.abs(relative.getY()),Math.abs(relative.getZ()));
-           avg = avg.add(Vec3.atLowerCornerOf(abs));
+    public Vector3d getAvg(Vector3d store) {
+        store.set(0.0);
+        for (BlockPos pos : this.antennaParts) {
+            store.add(Math.abs(pos.getX() - this.antennaActor.getX()), Math.abs(pos.getY() - this.antennaActor.getY()), Math.abs(pos.getZ() - this.antennaActor.getZ()));
         }
-        avg = avg.scale((double) 1f /antennaParts.size());
-        return avg;
+        return store.div(this.antennaParts.size());
     }
-    public Vec3 getSize() {
+
+    private void getSize() {
         int largestX = 0;
         int largestY = 0;
         int largestZ = 0;
         int smallestX = 0;
         int smallestY = 0;
         int smallestZ = 0;
-        for (BlockPos pos : antennaParts) {
-            BlockPos relative = antennaActor.subtract(pos);
-            if (relative.getX() > largestX)
+
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (BlockPos part : this.antennaParts) {
+            BlockPos relative = pos.setWithOffset(this.antennaActor, -part.getX(), -part.getY(), -part.getZ());
+            if (relative.getX() > largestX) {
                 largestX = relative.getX();
-            if (relative.getY() > largestY)
+            }
+            if (relative.getY() > largestY) {
                 largestY = relative.getY();
-            if (relative.getZ() > largestZ)
+            }
+            if (relative.getZ() > largestZ) {
                 largestZ = relative.getZ();
-            if (relative.getX() < smallestX)
+            }
+            if (relative.getX() < smallestX) {
                 smallestX = relative.getX();
-            if (relative.getY() < smallestY)
+            }
+            if (relative.getY() < smallestY) {
                 smallestY = relative.getY();
-            if (relative.getZ() < smallestZ)
+            }
+            if (relative.getZ() < smallestZ) {
                 smallestZ = relative.getZ();
+            }
         }
-        lowSize = new Vec3(smallestX,smallestY,smallestZ);
-        highSize = new Vec3(largestX,largestY,largestZ);
-        return new Vec3(largestX-smallestX,largestY-smallestY,largestZ-smallestZ);
+        this.lowSize.set(smallestX, smallestY, smallestZ);
+        this.highSize.set(largestX, largestY, largestZ);
+        this.size.set(largestX - smallestX, largestY - smallestY, largestZ - smallestZ);
     }
-    public Vec3 getRelativeCenter() {
-        Vec3 avg = new Vec3(0,0,0);
-        for (BlockPos pos : antennaParts) {
-            BlockPos relative = pos.subtract(antennaActor);
-            avg = avg.add(Vec3.atLowerCornerOf(relative));
+
+    public Vector3d getRelativeCenter(Vector3d store) {
+        store.set(0.0);
+        for (BlockPos pos : this.antennaParts) {
+            store.add(pos.getX() - this.antennaActor.getX(), pos.getY() - this.antennaActor.getY(), pos.getZ() - this.antennaActor.getZ());
         }
-        avg = avg.scale((double)1f /antennaParts.size());
-        return avg;
+        return store.div(this.antennaParts.size());
     }
+
     public void updateDimensions() {
-        relativeCenter = getRelativeCenter();
-        avg = getAvg();
-        size = getSize();
+        this.getRelativeCenter(this.relativeCenter);
+        this.getAvg(this.avg);
+        this.getSize();
     }
 }

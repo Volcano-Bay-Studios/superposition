@@ -1,45 +1,46 @@
 package org.modogthedev.superposition.networking.packet;
 
-import dev.architectury.networking.NetworkManager;
-import net.minecraft.nbt.CompoundTag;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import org.modogthedev.superposition.system.signal.ClientSignalManager;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.signal.Signal;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
+import java.util.Collection;
 
-public class SignalSyncS2CPacket {
-    private List<Signal> signals = new ArrayList<>();
+public class SignalSyncS2CPacket implements CustomPacketPayload {
 
+    public static final CustomPacketPayload.Type<SignalSyncS2CPacket> TYPE = new CustomPacketPayload.Type<>(Superposition.id("signal_sync"));
+    public static final StreamCodec<ByteBuf, SignalSyncS2CPacket> CODEC = ByteBufCodecs.BYTE_ARRAY.map(SignalSyncS2CPacket::new, SignalSyncS2CPacket::getData);
+    private final byte[] data;
 
-    public SignalSyncS2CPacket(FriendlyByteBuf buf) {
-        int size = buf.readInt();
-        for (int i = 0; i<size; i++)
-            signals.add(new Signal(buf));
-    }
-
-    public SignalSyncS2CPacket(List<Signal> signals) {
-        this.signals = signals;
-    }
-
-
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(signals.size());
+    public SignalSyncS2CPacket(Collection<Signal> signals) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeVarInt(signals.size());
         for (Signal signal : signals) {
-            signal.save(buf);
+            signal.write(buf);
         }
+        this.data = new byte[buf.writerIndex()];
+        buf.readBytes(this.data);
     }
 
-    public void handle(Supplier<NetworkManager.PacketContext> supplier) {
-        var ctx = supplier.get();
+    private SignalSyncS2CPacket(byte[] data) {
+        this.data = data;
+    }
 
-        ctx.queue(() -> {
-            // Here we are client side.
-            // Be very careful not to access client-only classes here! (like Minecraft) because
-            // this packet needs to be available server-side too
-            ClientSignalManager.processTag(signals);
-        });
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
+
+    public FriendlyByteBuf getBuf() {
+        return new FriendlyByteBuf(Unpooled.wrappedBuffer(this.data));
+    }
+
+    public byte[] getData() {
+        return this.data;
     }
 }

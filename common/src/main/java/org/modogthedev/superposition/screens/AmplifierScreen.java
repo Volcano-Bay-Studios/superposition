@@ -2,6 +2,7 @@ package org.modogthedev.superposition.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
@@ -21,7 +22,6 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
-import org.modogthedev.superposition.core.SuperpositionMessages;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
@@ -204,7 +204,7 @@ public class AmplifierScreen extends WidgetScreen {
         if (blockEntity instanceof AmplifierBlockEntity signalActorBlockEntity) {
             Signal blockSignal = signalActorBlockEntity.getSignal();
             if (blockSignal != null) {
-                this.frequency = blockSignal.sourceFrequency; //TODO Explode if signal to high
+                this.frequency = blockSignal.getSourceFrequency(); //TODO Explode if signal to high
                 this.readAmplitude = signalActorBlockEntity.lastAmplitude;
 //                this.signalAmplitude = blockSignal.amplitude;
             } else {
@@ -234,7 +234,7 @@ public class AmplifierScreen extends WidgetScreen {
         tag.putFloat("modRate", Math.min(76, Math.abs((int) dials.get(1).scrolledAmount)));
         tag.putFloat("redstoneMod", Math.min(76, Math.abs((int) dials.get(0).scrolledAmount)));
         tag.putBoolean("swap", swap);
-        SuperpositionMessages.sendToServer(new BlockEntityModificationC2SPacket(tag, pos));
+        VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, pos));
     }
 
     @Override

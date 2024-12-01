@@ -42,15 +42,10 @@ public class ContainerCard extends Card {
     }
     private static List<ItemStack> getItems(Container container, Direction direction) {
         List<ItemStack> stacks = new ArrayList<>();
-        int[] is = getSlots(container, direction);
-        if (is != null) {
-            int[] var3 = is;
-            int var4 = is.length;
-
-            for (int var5 = 0; var5 < var4; ++var5) {
-                int i = var3[var5];
-                ItemStack itemStack = container.getItem(i);
-                stacks.add(itemStack);
+        int[] slots = getSlots(container, direction);
+        if (slots != null) {
+            for (int slot : slots) {
+                stacks.add(container.getItem(slot));
             }
         }
         return stacks;

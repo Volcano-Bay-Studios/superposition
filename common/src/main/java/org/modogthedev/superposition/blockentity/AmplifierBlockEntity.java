@@ -6,7 +6,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AmplifierBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
-    Vec3 pos = new Vec3(this.getBlockPos().getX(),this.getBlockPos().getY(),this.getBlockPos().getZ());
+
     public float modRate;
     public float redstoneMod;
     public float temp = 26;
@@ -40,23 +39,24 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         this.modRate = tag.getFloat("modRate");
         this.redstoneMod = tag.getFloat("redstoneMod");
 
-        level.setBlock(getBlockPos(),getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES,tag.getBoolean("swap")),2);
+        level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
 //        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
     }
+
     public static float getRedstoneOffset(Level level, BlockPos pos) {
-        return level.getSignal(pos,level.getBlockState(pos).getValue(AmplifierBlock.FACING).getOpposite());
+        return level.getSignal(pos, level.getBlockState(pos).getValue(AmplifierBlock.FACING).getOpposite());
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putFloat("modRate", modRate);
-        tag.putFloat("redstoneMod",redstoneMod);
-        super.saveAdditional(tag,registries);
+        tag.putFloat("redstoneMod", redstoneMod);
+        super.saveAdditional(tag, registries);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag,registries);
+        super.loadAdditional(tag, registries);
         this.modRate = tag.getFloat("modRate");
         this.redstoneMod = tag.getFloat("redstoneMod");
     }
@@ -64,47 +64,51 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         if (signal != null) {
-            signal.amplitude += (modRate + (getRedstoneOffset(level, getBlockPos()) * ((float) redstoneMod / 15)));
-            if (amplitude != signal.amplitude)
-                level.updateNeighbourForOutputSignal(getBlockPos(),getBlockState().getBlock());
-            if (updateTooltip)
-                amplitude = signal.amplitude;
+            signal.modulate(modRate + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneMod / 15)));
+            if (amplitude != signal.getAmplitude()) {
+                level.updateNeighbourForOutputSignal(this.getBlockPos(), this.getBlockState().getBlock());
+            }
+            if (updateTooltip) {
+                amplitude = signal.getAmplitude();
+            }
         }
         return signal;
     }
 
     @Override
     public void tick() {
-        preTick();
+        this.preTick();
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
             this.setTooltip(tooltip);
-            if (amplitude>0) {
+            if (amplitude > 0) {
                 ticks++;
-                if (ticks > ticksToChange-1) {
+                if (ticks > ticksToChange - 1) {
                     lastStep = step;
-                    step = (int) (Math.random()*3);
+                    step = (int) (Math.random() * 3);
                     ticks = 0;
                 }
-                addTooltip(Component.literal("Amplifier Status: "));
-                addTooltip(Component.literal("Amplitude - "+Math.floor(amplitude*10)/10));
+                this.addTooltip(Component.literal("Amplifier Status: "));
+                this.addTooltip(Component.literal("Amplitude - " + Math.floor(amplitude * 10) / 10));
             } else {
                 ticks = -1;
-                addTooltip(Component.literal("No Signal"));
+                this.addTooltip(Component.literal("No Signal"));
             }
-            if (temp > 26.1)
-                addTooltip(Component.literal("Temperature - "+Math.floor(temp*10)/10+"°C"));
+            if (temp > 26.1) {
+                this.addTooltip(Component.literal("Temperature - " + Math.floor(temp * 10) / 10 + "°C"));
+            }
         }
-        float tempGoal = (amplitude/10f)+26;
-        if (temp>(tempGoal+.1f)) {
+        float tempGoal = (amplitude / 10f) + 26;
+        if (temp > (tempGoal + .1f)) {
             temp -= .01f;
-        } else if (temp<(tempGoal-.1f)) {
+        } else if (temp < (tempGoal - .1f)) {
             temp += .05f;
         }
-        if (lastAmplitude != amplitude)
+        if (lastAmplitude != amplitude) {
             updateNext = true;
+        }
         if (updateNext) {
-            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
             updateNext = true;
         }
 
@@ -115,7 +119,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public BlockPos getDataPos() {
-        return getBlockPos().relative(level.getBlockState(getBlockPos()).getValue(SignalActorTickingBlock.FACING).getOpposite(), 1);
+        return this.getBlockPos().relative(this.level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getOpposite(), 1);
     }
-
 }

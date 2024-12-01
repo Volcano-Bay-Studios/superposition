@@ -1,16 +1,12 @@
 package org.modogthedev.superposition.platform;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.CreativeModeTab;
 
-public class PlatformHelper {
-    @ExpectPlatform
-    public static void register() {
-        throw new AssertionError();
-    }
+import java.util.ServiceLoader;
 
-    @ExpectPlatform
-    public static double getPlayerReach(ServerPlayer player) {
-        throw new AssertionError();
-    }
+public interface PlatformHelper {
+
+    PlatformHelper INSTANCE = ServiceLoader.load(PlatformHelper.class).findFirst().orElseThrow(() -> new RuntimeException("Expected platform"));
+
+    CreativeModeTab.Builder creativeTabBuilder();
 }

@@ -12,8 +12,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class MonitorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
@@ -37,8 +37,8 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
         text = new ArrayList<>();
         boolean stateData = false;
         for (Signal signal : getSignals()) {
-            EncodedData<? extends Serializable> encodedData = signal.getEncodedData();
-            if (encodedData != null && encodedData.getObj() instanceof String s) {
+            EncodedData<?> encodedData = signal.getEncodedData();
+            if (encodedData != null && encodedData.value() instanceof String s) {
                 text.add(s);
                 stateData = true;
             }
@@ -64,18 +64,18 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
             if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
                 frequencySorted = signalActorBlockEntity.getSignals();
             if (frequencySorted != null) {
-                frequencySorted.sort((o1, o2) -> Float.compare(o1.frequency, o2.frequency));
+                frequencySorted.sort(Comparator.comparingDouble(Signal::getFrequency));
                 List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
-                amplitudeSorted.sort((o1, o2) -> Float.compare(o1.amplitude, o2.amplitude));
+                amplitudeSorted.sort(Comparator.comparingDouble(Signal::getAmplitude));
                 if (!amplitudeSorted.isEmpty()) {
-                    highestValue = amplitudeSorted.get(amplitudeSorted.size() - 1).amplitude;
-                    lowestValue = amplitudeSorted.get(0).amplitude;
+                    highestValue = amplitudeSorted.getLast().getAmplitude();
+                    lowestValue = amplitudeSorted.getFirst().getAmplitude();
                     if (amplitudeSorted.size() == 1)
                         lowestValue = lowestValue / 2;
                 }
                 while (amplitudeSorted.size() > 12) {
-                    amplitudeSorted.remove(amplitudeSorted.get(amplitudeSorted.size() - 1));
-                    frequencySorted.remove(frequencySorted.get(frequencySorted.size() - 1));
+                    amplitudeSorted.remove(amplitudeSorted.getLast());
+                    frequencySorted.remove(frequencySorted.getLast());
                 }
                 signals = frequencySorted.toArray(new Signal[12]);
             }
@@ -103,7 +103,7 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        loadLinkedPos(tag);
+        this.loadLinkedPos(tag);
         super.loadAdditional(tag, registries);
     }
 

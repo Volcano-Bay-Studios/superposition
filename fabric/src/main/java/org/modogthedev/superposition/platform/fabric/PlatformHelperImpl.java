@@ -1,25 +1,13 @@
 package org.modogthedev.superposition.platform.fabric;
 
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityAttachment;
-import net.minecraft.world.entity.EntityAttachments;
-import net.minecraft.world.entity.player.Player;
-import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.minecraft.world.item.CreativeModeTab;
+import org.modogthedev.superposition.platform.PlatformHelper;
 
-import java.util.Objects;
+public class PlatformHelperImpl implements PlatformHelper {
 
-public class PlatformHelperImpl {
-    public static void register() {
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
-            Minecraft client = Minecraft.getInstance();
-
-            SuperpositionUITooltipRenderer.renderOverlay(client.gui, matrices, tickDelta, client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
-        });
-    }
-
-    public static double getPlayerReach(ServerPlayer player) {
-        return 5; //TODO: find actual value
+    @Override
+    public CreativeModeTab.Builder creativeTabBuilder() {
+        return FabricItemGroup.builder();
     }
 }

@@ -3,7 +3,6 @@ package org.modogthedev.superposition.system.filter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -25,7 +24,7 @@ public class LowPassFilter extends Filter {
 
     @Override
     public boolean passSignal(Signal signal) {
-        return signal.frequency < (Math.abs(158-frequency) * 100000);
+        return signal.getFrequency() < (Math.abs(158 - frequency) * 100000);
     }
 
     @Override
@@ -35,8 +34,9 @@ public class LowPassFilter extends Filter {
 
     @Override
     public void load(CompoundTag tag) {
-        if (tag != null)
+        if (tag != null) {
             frequency = tag.getFloat("frequency");
+        }
     }
 
     @Override
@@ -53,6 +53,7 @@ public class LowPassFilter extends Filter {
     public void updateDials(List<WidgetScreen.Dial> dials) {
         dials.get(0).scrolledAmount = frequency;
     }
+
     @Override
     public Color getColor() {
         return new Color(40, 68, 164);
@@ -62,6 +63,7 @@ public class LowPassFilter extends Filter {
     public ItemStack getItem() {
         return new ItemStack(SuperpositionItems.LOW_PASS_FILTER.get());
     }
+
     @Override
     public Filter create() {
         return new LowPassFilter(getSelfReference());

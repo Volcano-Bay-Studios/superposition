@@ -1,40 +1,36 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.light.AreaLight;
-import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.Mth;
 import org.modogthedev.superposition.util.TickableBlockEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
-    private static final Logger log = LoggerFactory.getLogger(SignalGeneratorBlockEntity.class);
-    Vec3 pos = new Vec3(this.getBlockPos().getX(), this.getBlockPos().getY(), this.getBlockPos().getZ());
+
     private float frequency;
     public float dial = 0;
     Signal connectedSignal;
     public boolean transmitting;
     private AreaLight light;
 
+    private final Vector3d pos = new Vector3d();
 
     public SignalGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.SIGNAL_GENERATOR.get(), pos, state);
+        this.pos.set(pos.getX(), pos.getY() + 0.5, pos.getZ() + 0.5);
     }
-
 
     @Override
     public void loadSyncedData(CompoundTag tag) {
@@ -42,8 +38,8 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         this.frequency = tag.getFloat("frequency");
         boolean animated = frequency > .7f;
 
-        level.setBlock(getBlockPos(), getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")).setValue(SignalGeneratorBlock.ON, animated), 2);
-        updateSignal();
+        this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")).setValue(SignalGeneratorBlock.ON, animated), 2);
+        this.updateSignal();
     }
 
     @Override
@@ -60,15 +56,14 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public void tick() {
-
-        preTick();
-        putSignal(getSignal());
-        if (this.level.isClientSide) {
+        this.preTick();
+        this.putSignal(this.getSignal());
+        if (this.level.isClientSide()) {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(Component.literal("Signal Generator Status:"));
-            tooltip.add(Component.literal("Frequency - "+Mth.frequencyToHzReadable(frequency*100000)));
+            tooltip.add(Component.literal("Frequency - " + Mth.frequencyToHzReadable(frequency * 100000)));
 
-            float speed = Mth.getFromRange(64,0,.1f,3,frequency);
+            float speed = Mth.getFromRange(64, 0, .1f, 3, frequency);
             if (frequency < .72f || frequency > 64) {
                 speed = 0;
             }
@@ -76,14 +71,13 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             if (dial > 24) {
                 dial = 0;
             }
-            setTooltip(tooltip);
-            super.tick();
+            this.setTooltip(tooltip);
         }
+        super.tick();
     }
+
     public void endSignal(Object object) {
         if (connectedSignal != null) {
-            connectedSignal.endTime = connectedSignal.lifetime;
-            connectedSignal.emitting = false;
             SignalManager.stopSignal(connectedSignal);
             connectedSignal = null;
         }
@@ -91,29 +85,29 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public Signal getSignal() {
-        updateSignal();
+        this.updateSignal();
         return connectedSignal;
     }
 
     @Override
     public Signal createSignal(Object nextObject) {
-        updateSignal();
+        this.updateSignal();
         return connectedSignal;
     }
+
     public float getFrequency() {
         return frequency;
     }
 
 
-
     public void updateSignal() {
-        if (connectedSignal == null || !connectedSignal.emitting)
-            connectedSignal = new Signal(pos,level,frequency*100000,1,frequency);
-        else {
+        if (connectedSignal == null || !connectedSignal.isEmitting()) {
+            connectedSignal = new Signal(this.pos, level, frequency * 100000, 1, frequency);
+        } else {
             connectedSignal.level = level;
-            connectedSignal.frequency = frequency*100000;
-            connectedSignal.sourceFrequency = frequency;
-            connectedSignal.amplitude = 1;
+            connectedSignal.setFrequency(frequency * 100000);
+            connectedSignal.setSourceFrequency(frequency);
+            connectedSignal.setAmplitude(1);
             connectedSignal.clearEncodedData();
         }
     }

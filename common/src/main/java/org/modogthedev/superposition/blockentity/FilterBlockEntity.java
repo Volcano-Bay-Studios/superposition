@@ -5,11 +5,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionFilters;
-import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.system.filter.Filter;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.TickableBlockEntity;
@@ -96,7 +94,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
 
-        type = SuperpositionFilters.FILTERS.getRegistrar().get(ResourceLocation.fromNamespaceAndPath(tag.getString("namespace"), tag.getString("path")));
+        type = SuperpositionFilters.FILTERS.asVanillaRegistry().get(ResourceLocation.fromNamespaceAndPath(tag.getString("namespace"), tag.getString("path")));
         if (type != null) {
             type = type.create();
             type.load(tag);

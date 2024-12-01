@@ -12,6 +12,9 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.cable.Cable;
@@ -19,24 +22,27 @@ import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.core.SuperpositionConstants;
 import oshi.util.tuples.Pair;
 
 public class DebugRenderer {
+
+    private static final Vector3d POS = new Vector3d();
+
     public static void renderDebug(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
-        if (!Minecraft.getInstance().getDebugOverlay().showDebugScreen())
+        if (!Minecraft.getInstance().getDebugOverlay().showDebugScreen()) {
             return;
-        float partialTicks = deltaTracker.getRealtimeDeltaTicks();
+        }
+
         matrixStack.matrixPush();
         Level level = Minecraft.getInstance().level;
         Vec3 translation = camera.getPosition().scale(-1);
         matrixStack.translate(translation.x, translation.y, translation.z);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.lines());
         for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
-            drawPosBox((PoseStack) matrixStack, vertexConsumer, signal.pos.add(0, 1, 0), 0.3f, 0.5f, 0.5f, 0.9f);
+            drawPosBox((PoseStack) matrixStack, vertexConsumer, signal.getPos().add(0, 1, 0, POS), 0.3f, 0.5f, 0.5f, 0.9f);
         }
         for (Antenna antenna : AntennaManager.getAntennaList(level)) {
-            drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getRelativeCenter(), 0.5f, 0.5f, 0.9f, 0.5f);
+            drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getRelativeCenter(POS), 0.5f, 0.5f, 0.9f, 0.5f);
         }
         for (Cable cable : CableManager.getLevelCables(level)) {
             for (Cable.Point point : cable.getPoints()) {
@@ -49,7 +55,7 @@ public class DebugRenderer {
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .2f, 0.5f, 0.9f, 0.5f);
                 }
             }
-            Cable.Point point = cable.getPoints().get(cable.getPoints().size() - 1);
+            Cable.Point point = cable.getPoints().getLast();
             Vec3 pos = point.getPosition();
             float width = SuperpositionConstants.cableRadius / 2;
             drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.9f, 0.9f, 0.5f);
@@ -65,12 +71,16 @@ public class DebugRenderer {
     }
 
     public static void drawPosBox(PoseStack poseStack, VertexConsumer vertexConsumer, Vec3 pos, float width, float red, float green, float blue) {
-        float x1 = (float) pos.x - width;
-        float y1 = (float) pos.y - width;
-        float z1 = (float) pos.z - width;
-        float x2 = (float) pos.x + width;
-        float y2 = (float) pos.y + width;
-        float z2 = (float) pos.z + width;
+        drawPosBox(poseStack, vertexConsumer, POS.set(pos.x, pos.y, pos.z), width, red, green, blue);
+    }
+
+    public static void drawPosBox(PoseStack poseStack, VertexConsumer vertexConsumer, Vector3dc pos, float width, float red, float green, float blue) {
+        float x1 = (float) pos.x() - width;
+        float y1 = (float) pos.y() - width;
+        float z1 = (float) pos.z() - width;
+        float x2 = (float) pos.x() + width;
+        float y2 = (float) pos.y() + width;
+        float z2 = (float) pos.z() + width;
         LevelRenderer.renderLineBox(poseStack, vertexConsumer, x1, y1, z1, x2, y2, z2, red, green, blue, 1.0F, red, green, blue);
     }
 }

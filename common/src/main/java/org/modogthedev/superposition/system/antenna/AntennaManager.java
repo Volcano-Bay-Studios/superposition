@@ -24,14 +24,16 @@ public class AntennaManager {
             antennas.put(level, new ArrayList<>());
         }
     }
+
     public static List<Antenna> getAntennaList(Level level) {
         ifAbsent(level);
         return antennas.get(level);
     }
 
     public static void clearSignals(Level level) {
-        if (antennas.get(level) == null)
+        if (antennas.get(level) == null) {
             return;
+        }
         for (Antenna antenna : antennas.get(level)) {
             antenna.signals.clear();
         }
@@ -39,17 +41,18 @@ public class AntennaManager {
 
     public static void postSignal(Signal signal) {
         Level level = signal.level;
-        BlockPos pos = Mth.blockPosFromVec3(signal.pos);
+        BlockPos pos = Mth.blockPosFromVec3(signal.getPos());
         for (Antenna antenna : antennas.get(level)) {
             postSignalToAntenna(signal, antenna);
         }
     }
 
     public static void postSignalToAntenna(Signal signal, Antenna antenna) {
-        BlockPos pos = Mth.blockPosFromVec3(signal.pos);
+        BlockPos pos = Mth.blockPosFromVec3(signal.getPos());
 
-        if (!antenna.reading)
+        if (!antenna.reading) {
             return;
+        }
         float bonusFrequency = 0;
         BlockEntity blockEntity = signal.level.getBlockEntity(antenna.antennaActor);
         if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
@@ -57,17 +60,18 @@ public class AntennaManager {
         }
 
         float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
-        float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency;
+        float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size()) + bonusFrequency;
 
-        if (dist < signal.maxDist && dist > signal.minDist) {
+        if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
             Signal signal1 = new Signal(signal);
 
-            Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level,signal.sourceAntennaPos);
-            signal1.amplitude /= Math.max(1, dist / (1000000000 / signal.frequency));
-            signal1.amplitude /= Math.max(1, 1f/(Mth.resonanceAlgorithm(antenna.antennaParts.size(),Math.max(1,signal.sourceAntennaSize))));
+            Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level, signal.getSourceAntennaPos());
+            signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
+            signal1.mulAmplitude(1.0F / Math.max(1, 1f / (Mth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
 
-            if (signal1.amplitude > 1)
+            if (signal1.getAmplitude() > 1) {
                 antenna.signals.add(signal1);
+            }
         }
     }
 
@@ -101,10 +105,12 @@ public class AntennaManager {
 
     public static void antennaPartUpdate(LevelReader reader, BlockPos pos) {
         Level level = (Level) reader;
-        if (pos == null)
+        if (pos == null) {
             return;
-        if (reader.getBlockEntity(pos.below()) instanceof AntennaActorBlockEntity)
+        }
+        if (reader.getBlockEntity(pos.below()) instanceof AntennaActorBlockEntity) {
             pos = pos.below();
+        }
         BlockHelper.AntennaPart thisPart = BlockHelper.getAntennaPart(reader, pos);
         if (thisPart.base() != null) {
             int ordinal = get(thisPart.base(), level);
@@ -130,8 +136,9 @@ public class AntennaManager {
                 }
             } else {
                 List<BlockPos> parts = new ArrayList<>(thisPart.parts());
-                if (parts.size() < 2)
+                if (parts.size() < 2) {
                     return;
+                }
                 Antenna newAntenna = new Antenna(parts, thisPart.base(), level);
                 newAntenna.reading = (level.getBlockState(thisPart.base()).getBlock().equals(SuperpositionBlocks.RECEIVER.get()));
                 newAntenna.updateDimensions();

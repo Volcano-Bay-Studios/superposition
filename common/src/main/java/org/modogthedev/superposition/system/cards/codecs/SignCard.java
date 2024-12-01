@@ -9,6 +9,7 @@ import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class SignCard extends Card {
+
     public SignCard(ResourceLocation card) {
         super(card);
     }
@@ -20,26 +21,30 @@ public class SignCard extends Card {
     @Override
     public void modulateSignal(Signal signal) {
         String orignalText = "";
-        if (signal.getEncodedData() != null && signal.getEncodedData().getObj() instanceof String text)
+        if (signal.getEncodedData() != null && signal.getEncodedData().value() instanceof String text) {
             orignalText = text;
+        }
         if (peripherialPosition != null) {
             BlockEntity blockEntity = computerBlockEntity.getLevel().getBlockEntity(peripherialPosition);
             if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
                 BlockEntity blockEntity1 = computerBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
                 if (blockEntity1 instanceof SignBlockEntity signBlockEntity) {
                     for (Component component : signBlockEntity.getFrontText().getMessages(true)) {
-                        if (!component.getString().isEmpty())
-                            orignalText = orignalText.concat((orignalText.isEmpty() ? "": " ")+component.getString());
+                        if (!component.getString().isEmpty()) {
+                            orignalText = orignalText.concat((orignalText.isEmpty() ? "" : " ") + component.getString());
+                        }
                     }
                     for (Component component : signBlockEntity.getBackText().getMessages(true)) {
-                        if (!component.getString().isEmpty())
-                            orignalText = orignalText.concat((orignalText.isEmpty() ? "": " ")+component.getString());
+                        if (!component.getString().isEmpty()) {
+                            orignalText = orignalText.concat((orignalText.isEmpty() ? "" : " ") + component.getString());
+                        }
                     }
                 }
             }
         }
-        if (!orignalText.isEmpty())
+        if (!orignalText.isEmpty()) {
             signal.encode(orignalText);
+        }
     }
 
     @Override

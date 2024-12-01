@@ -1,18 +1,13 @@
 package org.modogthedev.superposition.item;
 
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.modogthedev.superposition.core.SuperpositionMessages;
-import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
-import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
-import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
 import oshi.util.tuples.Pair;
 

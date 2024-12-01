@@ -8,10 +8,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CrossCollisionBlock;
-import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -22,11 +20,10 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
-import org.modogthedev.superposition.util.BlockHelper;
 
 public class AntennaBlock extends CrossCollisionBlock {
     public static BooleanProperty SHORT = SuperpositionBlockStates.SHORT;
-    public static final MapCodec<IronBarsBlock> CODEC = simpleCodec(IronBarsBlock::new);
+    public static final MapCodec<AntennaBlock> CODEC = simpleCodec(AntennaBlock::new);
     @Override
     protected MapCodec<? extends CrossCollisionBlock> codec() {
         return CODEC;

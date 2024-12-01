@@ -1,63 +1,63 @@
 package org.modogthedev.superposition.networking.packet;
 
-import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.cable.Cable;
-import org.modogthedev.superposition.system.cable.CableManager;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.function.Supplier;
 
-public class CableSyncS2CPacket {
+public class CableSyncS2CPacket implements CustomPacketPayload {
 
-    private Cable ourCable;
-    private UUID ourUUID;
-    private boolean remove = false;
+    public static final CustomPacketPayload.Type<CableSyncS2CPacket> TYPE = new CustomPacketPayload.Type<>(Superposition.id("cable_sync"));
+    public static final StreamCodec<FriendlyByteBuf, CableSyncS2CPacket> CODEC = StreamCodec.of((buffer, value) -> value.toBytes(buffer), CableSyncS2CPacket::new);
 
-    public CableSyncS2CPacket(FriendlyByteBuf buf) {
-        ourUUID = buf.readUUID();
-        remove = buf.readBoolean();
-        if (!remove)
-            ourCable = Cable.fromBytes(buf, null);
+    private final UUID id;
+    private final Cable cable;
+    private final boolean remove;
+
+    public CableSyncS2CPacket(UUID id) {
+        this.id = id;
+        this.cable = null;
+        this.remove = true;
     }
 
-    public CableSyncS2CPacket(Cable cable, UUID uuid, boolean remove) {
-        this.ourCable = cable;
-        this.ourUUID = uuid;
-        this.remove = remove;
+    public CableSyncS2CPacket(Cable cable) {
+        this.id = cable.getId();
+        this.cable = cable;
+        this.remove = false;
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
-        buf.writeUUID(ourUUID);
-        buf.writeBoolean(remove);
-        if (!remove)
-            ourCable.toBytes(buf);
+    private CableSyncS2CPacket(FriendlyByteBuf buf) {
+        this.id = buf.readUUID();
+        this.remove = buf.readBoolean();
+        this.cable = this.remove ? null : Cable.fromBytes(this.id, buf, null);
     }
 
-    public void handle(Supplier<NetworkManager.PacketContext> supplier) {
-        var ctx = supplier.get();
+    private void toBytes(FriendlyByteBuf buf) {
+        buf.writeUUID(this.id);
+        buf.writeBoolean(this.remove);
+        if (!this.remove) {
+            this.cable.toBytes(buf);
+        }
+    }
 
-        ctx.queue(() -> {
-            Level level = ctx.getPlayer().level();
-            if (remove) {
-                CableManager.removeCable(ourUUID);
-                return;
-            }
+    public UUID getId() {
+        return this.id;
+    }
 
-            ourCable.setLevel(level);
-            Map<UUID, Cable> cables = CableManager.getCables(level);
-            if (cables != null) {
-                Cable cable = cables.get(ourUUID);
-                if (cable != null) {
-                    cable.updateFromCable(ourCable);
-                    return;
-                }
-            }
+    public boolean isRemove() {
+        return this.remove;
+    }
 
-            CableManager.addCable(ourCable, level, ourUUID);
-        });
+    public @Nullable Cable getCable() {
+        return this.cable;
+    }
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

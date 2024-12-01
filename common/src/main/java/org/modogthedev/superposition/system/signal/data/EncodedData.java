@@ -1,40 +1,51 @@
 package org.modogthedev.superposition.system.signal.data;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
-public class EncodedData<T extends Serializable> {
-    public EncodedData(T obj) {
-        this.obj = obj;
-    }
+public sealed interface EncodedData<T> {
 
-    T obj;
+    record IntData(Integer value) implements EncodedData<Integer> {
 
-    public T getObj() {
-        return obj;
-    }
-
-    public byte[] encode() {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        try (ObjectOutputStream out = new ObjectOutputStream(outputStream)) {
-            out.writeObject(obj);
-            out.flush();
-            return outputStream.toByteArray();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        @Override
+        public Type type() {
+            return Type.INT;
         }
     }
 
-    public static EncodedData deserialize(byte[] bytes) {
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+    record StringData(String value) implements EncodedData<String> {
 
-        try (ObjectInputStream in = new ObjectInputStream(bis)) {
-            Serializable object = (Serializable) in.readObject();
-            return new EncodedData<>(object);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        @Override
+        public Type type() {
+            return Type.STRING;
+        }
+    }
+
+    static EncodedData<Integer> of(int value) {
+        return new IntData(value);
+    }
+
+    static EncodedData<String> of(String value) {
+        return new StringData(value);
+    }
+
+    T value();
+
+    Type type();
+
+    enum Type {
+        INT(ByteBufCodecs.INT.map(IntData::new, data -> ((IntData) data).value)),
+        STRING(ByteBufCodecs.STRING_UTF8.map(StringData::new, data -> ((StringData) data).value));
+
+        private final StreamCodec<ByteBuf, EncodedData<?>> codec;
+
+        Type(StreamCodec<ByteBuf, EncodedData<?>> codec) {
+            this.codec = codec;
+        }
+
+        public StreamCodec<ByteBuf, EncodedData<?>> getCodec() {
+            return this.codec;
         }
     }
 }

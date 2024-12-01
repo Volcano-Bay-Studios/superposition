@@ -1,17 +1,13 @@
 package org.modogthedev.superposition.client.renderer.ui;
-import com.mojang.blaze3d.platform.Window;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Axis;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.theme.NumberThemeProperty;
-import foundry.veil.api.client.tooltip.Tooltippable;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.client.util.SpaceHelper;
-import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
@@ -19,7 +15,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,7 +23,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.util.SPTooltipable;
 
@@ -40,7 +34,9 @@ public class SuperpositionUITooltipRenderer {
     public static Vec3 currentPos = null;
     public static Vec3 desiredPos = null;
 
-    public static void renderOverlay(Gui gui, GuiGraphics graphics, DeltaTracker deltaTracker, int width, int height) {
+    public static void renderOverlay(GuiGraphics graphics, DeltaTracker deltaTracker) {
+        int width = graphics.guiWidth();
+        int height = graphics.guiHeight();
         PoseStack stack = graphics.pose();
         stack.pushPose();
         Minecraft mc = Minecraft.getInstance();
@@ -127,7 +123,7 @@ public class SuperpositionUITooltipRenderer {
             Vec3i playerPosInt = new Vec3i((int) Math.round(result.getLocation().x), (int) result.getLocation().y, (int) Math.round(result.getLocation().z+1));
             Vec3i cornerInt = new Vec3i((int) pos.x, (int) pos.y, (int) pos.z);
             Vec3i diff = playerPosInt.subtract(cornerInt);
-            desiredPos = pos.add(Math.round(Mth.clamp(Math.round(diff.getX()), -1, 1) * 0.5f) - 0.5f, 0.5, Math.round(Mth.clamp(Math.round(diff.getZ()), -1, 1) * 0.5f) - 0.5f);
+            desiredPos = pos.add(Math.round(Mth.clamp(diff.getX(), -1, 1) * 0.5f) - 0.5f, 0.5, Math.round(Mth.clamp(diff.getZ(), -1, 1) * 0.5f) - 0.5f);
             if (hoverTicks == 1) {
                 currentPos = desiredPos.add(0, -0.15f, 0);
             }
@@ -176,6 +172,7 @@ public class SuperpositionUITooltipRenderer {
             stack.popPose();
         }
     }
+
 //    public static Vector3f worldToScreenSpace(Vec3 pos, float partialTicks) {
 //        Minecraft mc = Minecraft.getInstance();
 //        Camera camera = mc.gameRenderer.getMainCamera();

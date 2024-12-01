@@ -79,7 +79,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             float yinverse;
             Signal[] signals = Mth.spaceArray(be.signals, size);
             if (signals != null && signals[i] != null) {
-                y = Math.max(-.061f, (float) ((((signals[i].amplitude) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)))*transformDown;
+                y = Math.max(-.061f, (float) ((((signals[i].getAmplitude()) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)))*transformDown;
                 y = Mth.lerp(-(transformDown-1),y,.21f);
             }
             y += (float) (Math.random() / 64)*transformDown;

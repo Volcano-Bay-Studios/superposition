@@ -7,6 +7,7 @@ import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class RedstoneCard extends Card {
+
     public RedstoneCard(ResourceLocation card) {
         super(card);
     }
@@ -26,6 +27,7 @@ public class RedstoneCard extends Card {
         }
         signal.encode(value);
     }
+
     @Override
     public Card copy() {
         return new RedstoneCard(this);

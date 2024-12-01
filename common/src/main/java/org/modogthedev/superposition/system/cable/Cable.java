@@ -21,19 +21,21 @@ import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.PeriphrealBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.codecs.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Cable {
+
+    private final UUID id;
     private List<Point> points = new ArrayList<>();
     private Int2IntMap playerHoldingPointMap = new Int2IntArrayMap();
     private Level level;
@@ -47,18 +49,20 @@ public class Cable {
     public int sleepTimer = 20;
     private float lastMovement;
 
-    public Cable(Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color) {
-        addPoint(new Point(starAnchor));
+    public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color) {
+        this.id = id;
+        this.addPoint(new Point(starAnchor));
         for (int i = 0; i < points; i++) {
             float delta = (float) i / points;
-            addPoint(new Point(Mth.lerpVec3(starAnchor, endAnchor, delta)));
+            this.addPoint(new Point(Mth.lerpVec3(starAnchor, endAnchor, delta)));
         }
-        addPoint(new Point(endAnchor));
+        this.addPoint(new Point(endAnchor));
         this.level = level;
         this.color = color;
     }
 
-    private Cable(List<Point> points, Level level, Color color) {
+    private Cable(UUID id, List<Point> points, Level level, Color color) {
+        this.id = id;
         this.points = points;
         this.level = level;
         this.color = color;
@@ -133,32 +137,32 @@ public class Cable {
             sleepTimer = 20;
         }
         if (sleepTimer > 0) {
-            updatePointsInBlocks();
+            this.updatePointsInBlocks();
             lastMovement = 0;
-            integrate();
+            this.integrate();
             if (lastMovement > 0.1f) {
                 sleepTimer = 20;
             } else {
                 sleepTimer--;
             }
-            followPlayer();
+            this.followPlayer();
             points.getLast().tempPos = points.getLast().position;
-            update(false);
-            update(true);
+            this.update(false);
+            this.update(true);
             for (Point point : points) {
                 if (point.tempPos != null) {
                     point.position = Mth.lerpVec3(point.position, point.tempPos, 0.5f);
                 }
             }
-            freeStuckPoints();
-            updateCollisions();
-            lerpPos();
+            this.freeStuckPoints();
+            this.updateCollisions();
+            this.lerpPos();
         } else {
             for (Point point : points) {
                 point.setPrevPosition(point.position);
             }
         }
-        sendSignal();
+        this.sendSignal();
     }
 
 
@@ -191,20 +195,11 @@ public class Cable {
             if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
                 BlockEntity start = level.getBlockEntity(startPos);
                 BlockEntity end = level.getBlockEntity(endPos);
-                if (start instanceof ComputerBlockEntity cbe) {
-                    Card card = cbe.getCard();
-                    if (card instanceof TickingCard tickingCard) {
-                        tickingCard.outputCablePos = endPos;
-                    }
-                }
                 if (end instanceof ComputerBlockEntity cbe) {
                     Card card = cbe.getCard();
                     if (card != null && start instanceof PeriphrealBlockEntity) {
                         card.peripherialPosition = startPos;
                         card.timeSincePeriphrealUpdated = 0;
-                    }
-                    if (card instanceof TickingCard tickingCard) {
-                        tickingCard.inputCablePos = startPos; //TODO: peripheral cables
                     }
                 }
                 if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
@@ -278,10 +273,7 @@ public class Cable {
                 point.setInContact(false);
                 if (collision.subtract(velocity).length() != 0) {
                     point.setInContact(true);
-                    if (level.isClientSide) {
-                        assert Minecraft.getInstance().level != null;
-//                    Minecraft.getInstance().level.addParticle(ParticleTypes.WAX_ON, point.position.x, point.position.y, point.position.z, 0, 0, 0);
-                    }
+                    assert !level.isClientSide || Minecraft.getInstance().level != null;
                 }
                 point.position = point.position.add(collision.subtract(velocity));
 //            }
@@ -308,8 +300,8 @@ public class Cable {
     }
 
     public void setPlayerHolding(Player player) {
-        addPoint(new Point(player.position()));
-        addPlayerHoldingPoint(player.getId(), points.size() - 1);
+        this.addPoint(new Point(player.position()));
+        this.addPlayerHoldingPoint(player.getId(), points.size() - 1);
     }
 
     public void setLevel(Level level) {
@@ -340,7 +332,7 @@ public class Cable {
         }
     }
 
-    public static Cable fromBytes(FriendlyByteBuf buf, Level level) {
+    public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level) {
         Color color1 = new Color(buf.readInt());
         int size = buf.readVarInt();
         List<Point> pointList = new ArrayList<>(size);
@@ -352,7 +344,7 @@ public class Cable {
             }
             pointList.add(newPoint);
         }
-        Cable cable = new Cable(pointList, level, color1);
+        Cable cable = new Cable(id, pointList, level, color1);
         int playerHoldingMapSize = buf.readVarInt();
         for (int i = 0; i < playerHoldingMapSize; i++) {
             cable.addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
@@ -387,7 +379,7 @@ public class Cable {
     public void updatePointsInBlocks() {
         for (Point point : points) {
             point.ownedCable = this;
-            updatePointInBlock(point);
+            this.updatePointInBlock(point);
         }
     }
 
@@ -396,6 +388,10 @@ public class Cable {
         BlockPos pos = BlockPos.containing(vec3);
         BlockHitResult blockHitResult = level.clip(new ClipContext(vec3.add(0.01f, 0.01f, 0.01f), vec3.subtract(0.01f, 0.01f, 0.01f), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
         point.inBlock = blockHitResult.getType() == HitResult.Type.BLOCK;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public void addPlayerHoldingPoint(int playerUUID, int pointIndex) {
