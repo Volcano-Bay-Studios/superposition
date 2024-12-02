@@ -45,10 +45,11 @@ public class DebugRenderer {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getRelativeCenter(POS), 0.5f, 0.5f, 0.9f, 0.5f);
         }
         for (Cable cable : CableManager.getLevelCables(level)) {
+            boolean isSleeping = cable.sleepTimer <= 0;
             for (Cable.Point point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 float width = SuperpositionConstants.cableRadius / 2;
-                drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, 0.9f, 0.5f, 0.5f);
+                drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, isSleeping ? 0.5f : 0.9f, isSleeping ? 0.9f : 0.5f, 0.5f);
                 Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getId());
                 if (pointIndexPair != null && pointIndexPair.getA().equals(point)) {
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.5f, 0.9f, 0.5f);

@@ -55,7 +55,7 @@ public class SuperpositionItems {
         }
     }
 
-    private static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item) {
+    public static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item) {
         RegistryObject<T> object = ITEMS.register(name, item);
         ITEM_ORDER.add(object);
         return object;

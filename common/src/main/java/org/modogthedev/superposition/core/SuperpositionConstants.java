@@ -7,4 +7,5 @@ public class SuperpositionConstants {
     public static final int cableSegments = 4;
     public static final float endPreference = 1f;
     public static final int analyserRange = 16;
+    public static final float periphrealFrequency = 42f;
 }

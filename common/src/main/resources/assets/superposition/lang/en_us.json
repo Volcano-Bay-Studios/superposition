@@ -33,8 +33,9 @@
   "item.superposition.pink_cable" : "Pink Cable",
 
   "item.superposition.redstone_card" : "Redstone Card",
-  "item.superposition.string_card" : "String Card",
   "item.superposition.sign_card" : "Sign Card",
+  "item.superposition.distance_card" : "Distance Card",
+  "item.superposition.identity_card" : "Identity Card",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

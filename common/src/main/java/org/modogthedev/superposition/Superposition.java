@@ -23,8 +23,8 @@ public class Superposition {
         SuperpositionFilters.bootstrap();
         SuperpositionCards.bootstrap();
         SuperpositionBlockEntities.bootstrap();
-        SuperpositionTabs.bootstrap();
         SuperpositionItems.bootstrap();
+        SuperpositionTabs.bootstrap();
         SuperpositionSounds.bootstrap();
         SuperpositionMessages.register();
         LOGGER.info("Superposition has been initialized.");
