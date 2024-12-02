@@ -24,22 +24,21 @@ public class ContainerCard extends Card {
 
     @Override
     public void modulateSignal(Signal signal) {
-        if (peripherialPosition != null) {
-            BlockEntity blockEntity = computerBlockEntity.getLevel().getBlockEntity(peripherialPosition);
-            if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
-                BlockEntity blockEntity1 = computerBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
-                if (blockEntity1 instanceof WorldlyContainer worldlyContainer) {
-                    List<ItemStack> stacks = getItems(worldlyContainer,analyserBlockEntity.getFacing().getOpposite());
-                }
+        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
+            BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
+            if (blockEntity1 instanceof WorldlyContainer worldlyContainer) {
+                List<ItemStack> stacks = getItems(worldlyContainer, analyserBlockEntity.getFacing().getOpposite());
             }
         }
     }
+
     private static int[] getSlots(Container container, Direction direction) {
         if (container instanceof WorldlyContainer worldlyContainer) {
             return worldlyContainer.getSlotsForFace(direction);
         }
         return null;
     }
+
     private static List<ItemStack> getItems(Container container, Direction direction) {
         List<ItemStack> stacks = new ArrayList<>();
         int[] slots = getSlots(container, direction);
@@ -49,6 +48,10 @@ public class ContainerCard extends Card {
             }
         }
         return stacks;
+    }
+    @Override
+    public boolean requiresPeriphreal() {
+        return true;
     }
     @Override
     public Card copy() {

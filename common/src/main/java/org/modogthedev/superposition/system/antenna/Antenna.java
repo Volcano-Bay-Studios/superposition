@@ -14,11 +14,11 @@ public class Antenna {
     public List<Signal> signals = new ArrayList<>();
     public BlockPos antennaActor;
     public boolean reading;
-    public Vector3d avg;
-    public Vector3d size;
-    public Vector3d lowSize;
-    public Vector3d highSize;
-    public Vector3d relativeCenter;
+    public Vector3d avg = new Vector3d();
+    public Vector3d size = new Vector3d();
+    public Vector3d lowSize = new Vector3d();
+    public Vector3d highSize = new Vector3d();
+    public Vector3d relativeCenter = new Vector3d();
 
     public Antenna(List<BlockPos> antennaParts, BlockPos antennaActor, Level level) {
         this.antennaParts = antennaParts;

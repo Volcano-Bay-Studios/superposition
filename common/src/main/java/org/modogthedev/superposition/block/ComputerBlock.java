@@ -2,11 +2,10 @@ package org.modogthedev.superposition.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -17,14 +16,13 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
-import org.modogthedev.superposition.core.SuperpositionBlockStates;
+import org.modogthedev.superposition.item.CardItem;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
@@ -69,8 +67,14 @@ public class ComputerBlock extends SignalActorTickingBlock implements EntityBloc
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (player.isCrouching()) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ComputerBlockEntity computerBlockEntity)
-                computerBlockEntity.setCard(null);
+            if (be instanceof ComputerBlockEntity computerBlockEntity) {
+                Item item = BuiltInRegistries.ITEM.get(computerBlockEntity.getCard().getSelfReference());
+                if (item != null && item instanceof CardItem cardItem) {
+                    cardItem.card = computerBlockEntity.getCard();
+                    player.getInventory().add(cardItem.getDefaultInstance().copy());
+                    computerBlockEntity.setCard(null);
+                }
+            }
         }
         return super.useWithoutItem(state, level, pos, player, hitResult);
     }

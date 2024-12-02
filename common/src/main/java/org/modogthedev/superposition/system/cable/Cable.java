@@ -17,10 +17,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import org.joml.Vector3dc;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
-import org.modogthedev.superposition.blockentity.PeriphrealBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
+import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -195,14 +196,22 @@ public class Cable {
             if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
                 BlockEntity start = level.getBlockEntity(startPos);
                 BlockEntity end = level.getBlockEntity(endPos);
-                if (end instanceof ComputerBlockEntity cbe) {
+                if (points.getFirst().attachedFace == Direction.UP && start instanceof ComputerBlockEntity cbe) {
                     Card card = cbe.getCard();
-                    if (card != null && start instanceof PeriphrealBlockEntity) {
-                        card.peripherialPosition = startPos;
-                        card.timeSincePeriphrealUpdated = 0;
+                    if (card != null && end instanceof SignalActorBlockEntity signalActorBlockEntity) { // Tells a periphreal what card is being used
+                        float frequency = 0;
+                        if (!cbe.getSignals().isEmpty())
+                            frequency = cbe.getSignal().getFrequency();
+                        Signal periphrealSignal = new Signal((Vector3dc) cbe.getBlockPos().getCenter(), level, frequency, 1, frequency / 100000);
+                        periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
+                        signalActorBlockEntity.putSignal(periphrealSignal);
                     }
-                }
-                if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
+                } else if (points.getLast().attachedFace == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as periphreal
+                    Card card = cbe.getCard();
+                    if (card != null && start instanceof SignalActorBlockEntity signalActorBlockEntity) {
+                        cbe.acceptPeriphrealSignal(signalActorBlockEntity.getSignal());
+                    }
+                } else if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
                     List<Signal> signalList = startSignalActor.getSignals();
                     if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
                         endSignalActor.addSignals(signalList);
@@ -224,10 +233,12 @@ public class Cable {
     }
 
     private void update(boolean isForwards) {
+        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         if (isForwards) {
             for (int i = 1; i < points.size(); i++) {
                 Point point = points.get(i);
-                if (point.getAttachedFace() != null) {
+                blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
+                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
                     continue;
                 }
 
@@ -242,7 +253,8 @@ public class Cable {
         } else {
             for (int i = (points.size() - 2); i >= 0; i--) {
                 Point point = points.get(i);
-                if (point.getAttachedFace() != null) {
+                blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
+                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
                     point.tempPos = point.position;
                     continue;
                 }
@@ -282,16 +294,18 @@ public class Cable {
     }
 
     private void integrate() {
+        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         for (Point point : points) {
-            if (!point.inBlock && !point.grabbed) {
-                Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -9.8, 0).scale(.05 * 0.05));
+            blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
+            if (!point.inBlock && !point.grabbed && level.isLoaded(blockPos)) {
+                Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -13.8, 0).scale(.05 * 0.05));
                 Vec3 offset = (nextPosition.subtract(point.position));
                 lastMovement += (float) offset.length();
                 point.prevPosition = point.position;
                 if (point.inContact) {
                     point.position = point.position.add(offset.scale(0.7f));
                 } else {
-                    point.position = point.position.add(offset.scale(0.9f));
+                    point.position = point.position.add(offset.scale(0.999f));
                 }
             } else {
                 point.prevPosition = point.position;

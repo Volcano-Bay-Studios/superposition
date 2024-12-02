@@ -5,9 +5,13 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.codecs.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -16,6 +20,8 @@ import org.modogthedev.superposition.util.TickableBlockEntity;
 
 public class ComputerBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     private Card card;
+    private Signal periphrealSignal;
+    public boolean updatedLastTick = false;
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.COMPUTER.get(), pos, state);
@@ -27,7 +33,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         card = Card.loadNew(tag);
         if (card != null) {
             card = card.copy();
-            card.computerBlockEntity = this;
         }
     }
 
@@ -41,7 +46,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     public void setCard(Card card) {
         this.card = card;
-        card.computerBlockEntity = this;
         sendData();
     }
 
@@ -58,7 +62,16 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         card = Card.loadNew(tag);
         if (card != null) {
             card = card.copy();
-            card.computerBlockEntity = this;
+        }
+    }
+
+    public void acceptPeriphrealSignal(Signal signal) {
+        if (signal != null) {
+            if (periphrealSignal == null)
+                periphrealSignal = new Signal(signal);
+            else
+                periphrealSignal.copy(signal);
+            updatedLastTick = true;
         }
     }
 
@@ -70,18 +83,22 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             if (card == null)
                 addTooltip(Component.literal("No Card"));
             else {
-                if (level.getBlockEntity(getBlockPos().above()) instanceof PeriphrealBlockEntity) {
-                    if (card.peripherialPosition == null) {
-                        card.peripherialPosition = getBlockPos().above();
-                    }
-                    card.timeSincePeriphrealUpdated = 0;
-                }
                 addTooltip(Component.literal("Computer Status:"));
                 addTooltip(Component.literal("Card - ").append(Component.translatable("item.superposition." + getCard().getSelfReference().getPath())));
-                if (card.peripherialPosition != null && level.getBlockEntity(card.peripherialPosition) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
-                    addTooltip("Peripheral Attached - " + level.getBlockState(card.peripherialPosition).getBlock().getName().getString());
-                }
             }
+        }
+        if (card != null && !level.getBlockState(getBlockPos().above()).is(Blocks.AIR) && level.getBlockEntity(getBlockPos().above()) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
+            float frequency = 0; // Put data signal
+            if (!getSignals().isEmpty())
+                frequency = getSignal().getFrequency();
+            Vec3 center = getBlockPos().getCenter();
+            Signal periphrealSignal = new Signal(new Vector3d(center.x,center.y,center.z), level, frequency, 1, frequency / 100000);
+            periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
+            periphrealBlockEntity.putSignal(periphrealSignal);
+
+            Signal fromSignal = periphrealBlockEntity.getSignal();
+            if (fromSignal != null && fromSignal.getEncodedData() != null)
+                acceptPeriphrealSignal(fromSignal);
         }
         if (card != null) {
             for (Signal signal : getSignals()) {
@@ -90,19 +107,22 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             if (card instanceof TickingCard tickingCard) {
                 tickingCard.tick(getBlockPos(), level, this);
             }
-            if (card.timeSincePeriphrealUpdated > 1)
-                card.peripherialPosition = null;
-            card.timeSincePeriphrealUpdated++;
         }
+        if (!updatedLastTick && periphrealSignal != null) {
+            periphrealSignal.clearEncodedData();
+        }
+        updatedLastTick = false;
         super.tick();
     }
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (card != null && signal != null) {
+        if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
+            signal.setEncodedData(periphrealSignal.getEncodedData());
+        }
+        if (card != null && !card.requiresPeriphreal()) {
             card.modulateSignal(signal);
-        } else
-            return null;
+        }
         return super.modulateSignal(signal, updateTooltip);
     }
 

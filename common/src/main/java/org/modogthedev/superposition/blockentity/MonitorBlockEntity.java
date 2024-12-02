@@ -38,8 +38,8 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
         boolean stateData = false;
         for (Signal signal : getSignals()) {
             EncodedData<?> encodedData = signal.getEncodedData();
-            if (encodedData != null && encodedData.value() instanceof String s) {
-                text.add(s);
+            if (encodedData != null) {
+                text.add(encodedData.stringValue());
                 stateData = true;
             }
         }

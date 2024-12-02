@@ -5,25 +5,20 @@ import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class RedstoneCard extends Card {
-
-    public RedstoneCard(ResourceLocation card) {
+public class DistanceCard extends Card {
+    public DistanceCard(ResourceLocation card) {
         super(card);
     }
 
-    public RedstoneCard(Card card) {
+    public DistanceCard(Card card) {
         super(card);
     }
 
     @Override
     public void modulateSignal(Signal signal) {
-        int value = 0;
-        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
-            value = periphrealBlockEntity.getLevel().getBestNeighborSignal(analyserBlockEntity.getAnalysisPosition());
-        }
-        signal.encode(value);
+        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
+            signal.encode(analyserBlockEntity.distance);
     }
-
 
     @Override
     public boolean requiresPeriphreal() {
@@ -32,6 +27,6 @@ public class RedstoneCard extends Card {
 
     @Override
     public Card copy() {
-        return new RedstoneCard(this);
+        return new DistanceCard(this);
     }
 }

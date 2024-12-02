@@ -64,7 +64,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     private Object lastCall;
     private Object lastCallList;
-    private final List<Signal> putSignals = new ArrayList<>();
+    protected final List<Signal> putSignals = new ArrayList<>();
     private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
     private Light light;
 
@@ -266,7 +266,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public Signal getSignal() {
-        return SignalManager.randomSignal(putSignals);
+        return SignalManager.randomSignal(getSignals());
     }
 
     public List<Signal> getSignals() {
@@ -311,6 +311,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
                 putSignals.get(i).copy(signal);
             }
         }
+        modulateSignals(putSignals,true);
     }
 
     public void putSignalList(Object nextCall, List<Signal> list) {
@@ -339,7 +340,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
         List<Signal> safeList = new ArrayList<>();
         for (Signal signal : signalList) {
-            Signal signal1 = this.modulateSignal(signal, updateTooltip);
+            Signal signal1 = modulateSignal(signal, updateTooltip);
             if (signal1 != null) {
                 safeList.add(signal1);
             }

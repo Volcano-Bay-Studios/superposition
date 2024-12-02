@@ -22,10 +22,9 @@ import java.awt.*;
 import java.util.*;
 
 public class CableManager {
+    private static int grabTimer = 0;
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> cables = new HashMap<>();
-    private static final Map<Player, Cable> playersDraggingCables = new HashMap<>();
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> clientCables = new HashMap<>();
-    private static final Map<Player, Cable> clientPlayersDraggingCables = new HashMap<>();
 
     public static Map<ResourceKey<Level>, Map<UUID, Cable>> getCablesMap(Level level) {
         return level.isClientSide() ? clientCables : cables;
@@ -42,10 +41,6 @@ public class CableManager {
 
     public static @Nullable Map<UUID, Cable> getCables(Level level) {
         return level.isClientSide() ? clientCables.get(level.dimension()) : cables.get(level.dimension());
-    }
-
-    public static Map<Player, Cable> getPlayersDraggingCablesMap(Level level) {
-        return level.isClientSide() ? playersDraggingCables : clientPlayersDraggingCables;
     }
 
     private static void syncCable(ServerLevel level, Cable cable) {

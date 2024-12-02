@@ -124,6 +124,10 @@ public class Signal {
         this.encodedData = EncodedData.of(string);
     }
 
+    public void setEncodedData(EncodedData<?> encodedData) {
+        this.encodedData = encodedData;
+    }
+
     public void encode(int integer) {
         this.encodedData = EncodedData.of(integer);
     }

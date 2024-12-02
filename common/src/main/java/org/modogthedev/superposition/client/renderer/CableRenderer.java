@@ -15,10 +15,15 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
@@ -392,6 +397,30 @@ public class CableRenderer {
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f, 0.9f, 0.5f, 0.4f);
                 }
             }
+        }
+    }
+
+    public static void renderOverlays(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
+        if (Minecraft.getInstance().options.hideGui) {
+            return;
+        }
+        Level level = Minecraft.getInstance().level;
+        Player player = Minecraft.getInstance().player;
+        Vec3 cameraPos = camera.getPosition();
+        float width = 0.12f;
+        BlockHitResult hitResult = level.clip(new ClipContext(camera.getPosition(),player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+        if (hitResult.getType() == HitResult.Type.BLOCK && level.getBlockEntity(hitResult.getBlockPos()) instanceof AnalyserBlockEntity analyserBlockEntity && analyserBlockEntity.startDistance != 0) {
+            matrixStack.matrixPush();
+            BlockPos startPos = analyserBlockEntity.getDistancePosition(analyserBlockEntity.startDistance);
+            BlockPos endPos = analyserBlockEntity.getDistancePosition(analyserBlockEntity.endDistance);
+            DebugRenderer.renderFilledBox(matrixStack.toPoseStack(),bufferSource,startPos,endPos,0.5f,0.9f,0.5f,0.5f);
+            if (analyserBlockEntity.startDistance > 1) {
+                DebugRenderer.renderFilledBox(matrixStack.toPoseStack(),bufferSource,analyserBlockEntity.getDistancePosition(1),analyserBlockEntity.getDistancePosition(analyserBlockEntity.startDistance-1),0.9f,0.3f,0.3f,0.5f);
+            }
+            BlockPos selectedPos = analyserBlockEntity.getDistancePosition(analyserBlockEntity.distance);
+//            DebugRenderer.renderFilledBox(matrixStack.toPoseStack(),bufferSource,selectedPos,selectedPos,0.3f,0.3f,0.9f,0.5f);
+            DebugRenderer.renderFilledBox(matrixStack.toPoseStack(),bufferSource,Math.min(selectedPos.getX(), selectedPos.getX()) - cameraPos.x - width, (double)Math.min(selectedPos.getY(), selectedPos.getY())- cameraPos.y - width, (double)Math.min(selectedPos.getZ(), selectedPos.getZ())- cameraPos.z - width, (double)(Math.max(selectedPos.getX(), selectedPos.getX()) + 1)- cameraPos.x + width, (double)(Math.max(selectedPos.getY(), selectedPos.getY()) + 1)- cameraPos.y + width, (double)(Math.max(selectedPos.getZ(), selectedPos.getZ()) + 1)- cameraPos.z + width,0.3f,0.3f,0.9f,0.5f);
+            matrixStack.matrixPop();
         }
     }
 }
