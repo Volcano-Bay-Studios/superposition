@@ -394,8 +394,8 @@ public class Cable {
         return id;
     }
 
-    public void addPlayerHoldingPoint(int playerUUID, int pointIndex) {
-        playerHoldingPointMap.putIfAbsent(playerUUID, pointIndex);
+    public void addPlayerHoldingPoint(int playerId, int pointIndex) {
+        playerHoldingPointMap.putIfAbsent(playerId, pointIndex);
     }
 
     public boolean hasPlayerHolding(int playerUUID) {

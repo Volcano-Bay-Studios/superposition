@@ -28,7 +28,6 @@ public class SuperpositionFabricClient implements ClientModInitializer {
         });
 
         HudRenderCallback.EVENT.register(SuperpositionUITooltipRenderer::renderOverlay);
-        UseItemCallback.EVENT.register(CableManager::playerGrabDropCableEvent);
 
         this.registerBlockRenderLayers();
     }

@@ -19,6 +19,5 @@ public class SuperpositionFabric implements ModInitializer {
             CableManager.tick(level);
             CarabinerManager.tick(level);
         });
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> CableManager.playerUseEvent(player, hand, hitResult.getBlockPos(), hitResult.getDirection()));
     }
 }

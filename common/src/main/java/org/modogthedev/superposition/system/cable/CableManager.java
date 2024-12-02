@@ -5,11 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +26,6 @@ public class CableManager {
     private static final Map<Player, Cable> playersDraggingCables = new HashMap<>();
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> clientCables = new HashMap<>();
     private static final Map<Player, Cable> clientPlayersDraggingCables = new HashMap<>();
-    private static int grabTimer = 0;
 
     public static Map<ResourceKey<Level>, Map<UUID, Cable>> getCablesMap(Level level) {
         return level.isClientSide() ? clientCables : cables;
@@ -73,9 +69,6 @@ public class CableManager {
     }
 
     public static void clientTick(Level level) {
-        if (grabTimer > 0) {
-            grabTimer--;
-        }
         if (CableRenderer.detachDelta > 0) {
             CableRenderer.detachDelta = CableRenderer.detachDelta - 0.2f;
         }
@@ -117,31 +110,31 @@ public class CableManager {
         playerStartCable(pos, face, player.level(), player, color);
     }
 
-    public static UUID getCableUUID(Level level, Cable cable) {
-        Map<UUID, Cable> cables = getCablesMap(level).get(level.dimension());
-        if (cables == null) {
-            return null;
-        }
-
-        for (Map.Entry<UUID, Cable> entry : cables.entrySet()) {
-            if (cable.equals(entry.getValue())) {
-                return entry.getKey();
+    public static InteractionResult playerUseEvent(Player player, BlockPos pos, Direction face) {
+        if (!player.isShiftKeyDown()) {
+            int id = player.getId();
+            Level level = player.level();
+            for (Cable cable : getLevelCables(level)) {
+                if (cable.hasPlayerHolding(id)) {
+                    playerFinishDraggingCable(player, pos, face);
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
             }
         }
-        return null;
+
+        return InteractionResult.PASS;
     }
 
-    public static InteractionResult playerUseEvent(Player player, InteractionHand hand, BlockPos pos, Direction face) {
-        if (!player.isShiftKeyDown() || !player.getItemInHand(hand).isEmpty()) {
-            return InteractionResult.PASS;
-        }
-
+    public static InteractionResult playerEmptyClickEvent(Player player, Level level) {
         int id = player.getId();
-        Level level = player.level();
-        for (Cable cable : getLevelCables(level)) {
-            if (cable.hasPlayerHolding(id)) {
-                playerFinishDraggingCable(player, pos, face);
-                return InteractionResult.sidedSuccess(level.isClientSide());
+        Map<UUID, Cable> cables = getCables(level);
+        if (cables != null) {
+            for (Cable cable : cables.values()) {
+                if (cable.hasPlayerHolding(id)) {
+                    cable.stopPlayerDrag(id);
+                    VeilPacketManager.server().sendPacket(PlayerDropCableC2SPacket.INSTANCE);
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
             }
         }
 
@@ -150,50 +143,18 @@ public class CableManager {
         if (rayCast != null) {
             Cable cable = rayCast.getA();
             cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
-            rayCast.getB().setAnchor(null, null);
-            if (level instanceof ServerLevel serverLevel) {
-                syncCable(serverLevel, cable);
-            }
+            VeilPacketManager.server().sendPacket(new PlayerGrabCableC2SPacket(cable.getId()));
             return InteractionResult.sidedSuccess(level.isClientSide());
         }
 
         return InteractionResult.PASS;
     }
 
-    public static InteractionResultHolder<ItemStack> playerGrabDropCableEvent(Player player, Level level, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (grabTimer == 0) {
-            grabTimer = 4;
-            if (player.isShiftKeyDown()) {
-                int id = player.getId();
-                Map<UUID, Cable> cables = getCables(level);
-                if (cables != null) {
-                    for (Cable cable : cables.values()) {
-                        if (cable.hasPlayerHolding(id)) {
-                            cable.stopPlayerDrag(id);
-                            VeilPacketManager.server().sendPacket(PlayerDropCableC2SPacket.INSTANCE);
-                            return InteractionResultHolder.consume(stack);
-                        }
-                    }
-                }
-
-                CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, level);
-                Pair<Cable, Cable.Point> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
-                if (rayCast != null) {
-                    Cable cable = rayCast.getA();
-                    cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
-                    VeilPacketManager.server().sendPacket(new PlayerGrabCableC2SPacket(cable.getId()));
-                    return InteractionResultHolder.consume(stack);
-                }
-            }
-        }
-        return InteractionResultHolder.fail(stack);
-    }
-
     private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color) {
         if (player.level().isClientSide) {
             return;
         }
+
         Vec3 anchorPosition = Cable.getAnchoredPoint(pos, face);
         Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color);
         newCable.getPoints().getFirst().setAnchor(pos, face);

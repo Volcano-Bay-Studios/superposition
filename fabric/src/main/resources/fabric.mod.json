@@ -9,9 +9,10 @@
   ],
   "contact": {
     "homepage": "https://github.com/Volcano-Bay-Studios/superposition",
-    "sources": "https://github.com/Volcano-Bay-Studios/superposition"
+    "sources": "https://github.com/Volcano-Bay-Studios/superposition",
+    "issues": "https://github.com/Volcano-Bay-Studios/superposition/issues"
   },
-  "license": "MIT",
+  "license": "${mod_license}",
   "icon": "assets/superposition/superposition.png",
   "environment": "*",
   "entrypoints": {

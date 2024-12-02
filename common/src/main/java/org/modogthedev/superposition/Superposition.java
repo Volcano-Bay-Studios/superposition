@@ -9,6 +9,7 @@ import org.modogthedev.superposition.networking.SuperpositionMessages;
 import org.slf4j.Logger;
 
 public class Superposition {
+
     public static final String MODID = "superposition";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final ColorTheme SUPERPOSITION_THEME = new ColorTheme();
