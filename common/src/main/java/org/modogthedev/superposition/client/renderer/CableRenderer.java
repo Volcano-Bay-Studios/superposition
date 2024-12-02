@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import foundry.veil.api.client.render.MatrixStack;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -19,29 +17,30 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.util.CatmulRomSpline;
 import org.modogthedev.superposition.util.Mth;
-import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CableRenderer {
 
+    private static final Quaternionf POSITIVE_Y = new Quaternionf().setAngleAxis(Math.PI / 2, 1, 0, 0);
+    private static final Quaternionf NEGATIVE_Y = new Quaternionf().setAngleAxis(-Math.PI / 2, 1, 0, 0);
+
     private static final Quaternionf ORIENTATION = new Quaternionf();
     private static final Quaternionf NEXT_ORIENTATION = new Quaternionf();
     private static final Vector3f POS = new Vector3f();
     private static final Vector3f NORMAL = new Vector3f();
     private static final Vector3f NEXT_NORMAL = new Vector3f();
-    private static final IntList LIGHT_COLORS = new IntArrayList();
 
     private static final List<Vec3> CABLE_POINTS = new ArrayList<>();
     private static final List<Vec3> PREV_CABLE_POINTS = new ArrayList<>();
-
 
     // Overstrech drop cable animation
     public static float stretch = 0f;
@@ -60,12 +59,10 @@ public class CableRenderer {
         for (Cable cable : CableManager.getLevelCables(level)) {
             CABLE_POINTS.clear();
             PREV_CABLE_POINTS.clear();
-            LIGHT_COLORS.clear();
             for (Cable.Point point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 CABLE_POINTS.add(pos);
                 PREV_CABLE_POINTS.add(point.getPrevPosition());
-                LIGHT_COLORS.add(LevelRenderer.getLightColor(level, LIGHT_POS.set(pos.x, pos.y, pos.z)));
             }
             List<Vec3> points = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
             List<Vec3> prevPoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
@@ -99,8 +96,8 @@ public class CableRenderer {
                     NEXT_ORIENTATION.set(ORIENTATION);
                 }
 
-                int lightStart = LIGHT_COLORS.getInt(net.minecraft.util.Mth.clamp(i / SuperpositionConstants.cableSegments, 0, LIGHT_COLORS.size()));
-                int lightEnd = LIGHT_COLORS.getInt(net.minecraft.util.Mth.clamp((i + 1) / SuperpositionConstants.cableSegments, 0, LIGHT_COLORS.size()));
+                int lightStart = LevelRenderer.getLightColor(level, LIGHT_POS.set(x, y, z));
+                int lightEnd = LevelRenderer.getLightColor(level, LIGHT_POS.set(nextX, nextY, nextZ));
                 double length = Math.sqrt((nextX - x) * (nextX - x) + (nextY - y) * (nextY - y) + (nextZ - z) * (nextZ - z));
                 nextV = v + (float) (length * 16.0 / 6.0);
 
@@ -251,7 +248,7 @@ public class CableRenderer {
         calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
 
         // Draw first face
-        int startLight = LIGHT_COLORS.getInt(0);
+        int startLight = LevelRenderer.getLightColor(Minecraft.getInstance().level, LIGHT_POS.set(x, y, z));
         ORIENTATION.transform(NORMAL.set(0, 0, -1));
         ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
         vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
@@ -295,7 +292,7 @@ public class CableRenderer {
         ORIENTATION.rotateAxis((float) Math.PI, 0, 1, 0);
 
         // Draw first face
-        int startLight = LIGHT_COLORS.getInt(0);
+        int startLight = LevelRenderer.getLightColor(Minecraft.getInstance().level, LIGHT_POS.set(x, y, z));
         ORIENTATION.transform(NORMAL.set(0, 0, 1));
         ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
         vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
@@ -330,9 +327,11 @@ public class CableRenderer {
         double dx = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
         double dy = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
         double dz = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
+        float factor = (float) Math.exp(-100 * (dx * dx + dz * dz - dy * dy));
         return store.identity()
                 .rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0)
-                .rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0);
+                .rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0)
+                .slerp(dy < 0 ? POSITIVE_Y : NEGATIVE_Y, factor);
     }
 
     public static void renderCableHeldPoint(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
@@ -367,7 +366,7 @@ public class CableRenderer {
         if (detachDelta > 0) {
             float delta = net.minecraft.util.Mth.lerp(partialTicks, detachDelta, detachDelta - 0.2f);
             stretch = 1;
-            width = 0.12f - Mth.getFromRange(1, 0, 0, 1, delta) * 0.15125f;
+            width = 0.12f - Mth.map(1, 0, 0, 1, delta) * 0.15125f;
             if (width > 0) {
                 DebugRenderer.renderFilledBox(poseStack, bufferSource, detachPos.x - cameraPos.x - width, detachPos.y - cameraPos.y - width, detachPos.z - cameraPos.z - width, detachPos.x - cameraPos.x + width, detachPos.y - cameraPos.y + width, detachPos.z - cameraPos.z + width, 1f, 0.4f, 0.3f, 0.8f);
                 width += 0.03125f;

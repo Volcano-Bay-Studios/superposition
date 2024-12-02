@@ -188,9 +188,9 @@ public class CableManager {
             int id = player.getId();
             if (cable.hasPlayerHolding(id)) {
                 int index = cable.getPlayerHeldPoint(id).getB();
-                cable.stopPlayerDrag(id);
+                Vec3 pos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(3));
                 for (int i = 0; i < amount; i++) {
-                    cable.addPointAtIndex(index, new Cable.Point(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(3))));
+                    cable.addPointAtIndex(index, new Cable.Point(pos));
                 }
                 cable.addPlayerHoldingPoint(id, index + amount);
             }

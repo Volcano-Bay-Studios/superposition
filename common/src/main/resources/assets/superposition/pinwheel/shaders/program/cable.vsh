@@ -23,24 +23,12 @@ out vec2 texCoord0;
 out vec2 texCoord2;
 out vec3 normal;
 
-// TODO use Veil block light API
-float getBrightness() {
-    float darkFromD = pow(clamp(-Normal.y, 0.0, 1.0), 3) * 0.5;
-    float darkFromU = pow(clamp(Normal.y, 0.0, 1.0), 3) * 0.0;
-    float darkFromN = pow(clamp(-Normal.z, 0.0, 1.0), 2) * 0.2;
-    float darkFromS = pow(clamp(Normal.z, 0.0, 1.0), 2) * 0.2;
-    float darkFromW = pow(clamp(-Normal.x, 0.0, 1.0), 2) * 0.4;
-    float darkFromE = pow(clamp(Normal.x, 0.0, 1.0), 2) * 0.4;
-
-    return 1.0 - (darkFromD + darkFromU + darkFromN + darkFromS + darkFromW + darkFromE);
-}
-
 void main() {
     vec3 pos = Position + ChunkOffset;
     gl_Position = RenderProjMat * RenderModelViewMat * vec4(pos, 1.0);
 
     vertexDistance = fog_distance(pos, FogShape);
-    vertexColor = Color * getBrightness();
+    vertexColor = Color * block_brightness(Normal);
     lightmapColor = minecraft_sample_lightmap(Sampler2, UV2).rgb;
     texCoord0 = UV0;
     texCoord2 = minecraft_sample_lightmap_coords(UV2);
