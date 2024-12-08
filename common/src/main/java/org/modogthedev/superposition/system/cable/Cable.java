@@ -46,8 +46,7 @@ public class Cable {
     private Color color;
     public Vec3 playerDraggedLastDelta = Vec3.ZERO;
     public int ticksSinceUpdate = 0;
-    public int avgTicksSinceUpdate = 1;
-    public int sleepTimer = 60;
+    public int sleepTimer = 20;
     private float lastMovement;
     private float averageMovement = 0;
 
@@ -375,7 +374,6 @@ public class Cable {
     }
 
     public void updateFromCable(Cable cable) {
-        avgTicksSinceUpdate = ticksSinceUpdate;
         ticksSinceUpdate = 0;
         color = cable.color;
         if (points.size() > cable.points.size()) {
@@ -383,8 +381,8 @@ public class Cable {
                 points.removeLast();
             }
         }
-        if (cable.points.size() >= points.size() + 1) {
-            points.addAll(cable.points.subList(points.size() - 1, cable.points.size() - 1)); //TODO: Test this
+        if (cable.points.size() > points.size()) {
+            points.addAll(cable.points.subList(points.size(), cable.points.size())); //TODO: Test this
         }
         for (int i = 0; i < points.size(); i++) {
             points.get(i).setPosition(cable.points.get(i).getPosition());
@@ -412,7 +410,7 @@ public class Cable {
     }
 
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
-        playerHoldingPointMap.putIfAbsent(playerId, pointIndex);
+        playerHoldingPointMap.put(playerId, pointIndex);
     }
 
     public boolean hasPlayerHolding(int playerUUID) {

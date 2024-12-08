@@ -1,16 +1,16 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "org.modogthedev.superposition.mixin",
-    "compatibilityLevel": "JAVA_17",
-    "mixins": [
-        "RedstoneCommonMixin",
-        "ServerGameModeMixin"
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    },
-    "client": [
-        "MultiPlayerGameModeMixin"
-    ]
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.modogthedev.superposition.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "RedstoneCommonMixin",
+    "ServerGameModeMixin"
+  ],
+  "client": [
+    "MultiPlayerGameModeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

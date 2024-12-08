@@ -41,9 +41,9 @@ public class SuperpositionItems {
     public static final RegistryObject<CableItem> MAGENTA_CABLE = registerItem("magenta_cable", () -> new CableItem(new Item.Properties(), new Color(199, 78, 189)));
     public static final RegistryObject<CableItem> PINK_CABLE = registerItem("pink_cable", () -> new CableItem(new Item.Properties(), new Color(243, 139, 170)));
     // Filters
-    public static final RegistryObject<FilterItem> HIGH_PASS_FILTER = registerItem("high_pass_filter", () -> new FilterItem(new FilterItem.Properties().type(SuperpositionFilters.HIGH_PASS.get()), new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<FilterItem> LOW_PASS_FILTER = registerItem("low_pass_filter", () -> new FilterItem(new FilterItem.Properties().type(SuperpositionFilters.LOW_PASS.get()), new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<FilterItem> BAND_PASS_FILTER = registerItem("band_pass_filter", () -> new FilterItem(new FilterItem.Properties().type(SuperpositionFilters.BAND_PASS.get()), new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<FilterItem> HIGH_PASS_FILTER = registerItem("high_pass_filter", () -> new FilterItem(SuperpositionFilters.HIGH_PASS, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<FilterItem> LOW_PASS_FILTER = registerItem("low_pass_filter", () -> new FilterItem(SuperpositionFilters.LOW_PASS, new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<FilterItem> BAND_PASS_FILTER = registerItem("band_pass_filter", () -> new FilterItem(SuperpositionFilters.BAND_PASS, new Item.Properties().stacksTo(1)));
     // Cards
     // CRAFTING
     public static final RegistryObject<Item> INSULATED_SHEET = registerItem("insulated_sheet", () -> new Item(new Item.Properties()));

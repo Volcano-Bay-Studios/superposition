@@ -14,10 +14,15 @@ logoFile = "superposition.png"
 authors = "${mod_author}"
 description = '''${description}'''
 
+[[mixins]]
+config="${mod_id}-common.mixins.json"
+[[mixins]]
+config="${mod_id}.mixins.json"
+
 [[dependencies.superposition]]
-modId = "forge"
+modId = "neoforge"
 mandatory = true
-versionRange = "${neoforge_loader_version_range}"
+versionRange = "${neoforge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 

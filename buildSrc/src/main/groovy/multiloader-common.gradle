@@ -115,6 +115,7 @@ processResources {
             mod_license                    : mod_license,
             'description'                  : project.description,
             'neoforge_version'             : neoforge_version,
+            'neoforge_version_range'       : neoforge_version_range,
             'neoforge_loader_version_range': neoforge_loader_version_range,
             'credits'                      : credits,
             'java_version'                 : java_version,

@@ -8,8 +8,8 @@ dependencies {
         exclude group: "maven.modrinth"
     }
 
-    compileOnly "mezz.jei:jei-${project.minecraft_version}-forge-api:${project.jei_version}"
-    runtimeOnly("mezz.jei:jei-${project.minecraft_version}-forge:${project.jei_version}")
+    compileOnly "mezz.jei:jei-${project.minecraft_version}-neoforge-api:${project.jei_version}"
+    runtimeOnly("mezz.jei:jei-${project.minecraft_version}-neoforge:${project.jei_version}")
 
 //    modRuntimeOnly("me.djtheredstoner:DevAuth-neoforge-latest:1.2.1")
     //modRuntimeOnly("maven.modrinth:spark:1.10.53-forge")

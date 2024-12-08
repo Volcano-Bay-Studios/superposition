@@ -2,40 +2,36 @@ package org.modogthedev.superposition.item;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
-import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.core.SuperpositionFilters;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.filter.Filter;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FilterItem extends Item {
-    public Filter type;
 
-    public FilterItem(Properties pProperties, Item.Properties properties) {
+    public Supplier<Filter> filter;
+
+    public FilterItem(Supplier<Filter> filter, Item.Properties properties) {
         super(properties);
-        type = pProperties.type;
+        this.filter = filter;
     }
 
     @Override
     public ItemStack getDefaultInstance() {
         ItemStack itemStack = super.getDefaultInstance();
         CompoundTag tag = new CompoundTag();
-        type.save(tag);
+        this.filter.get().save(tag);
         itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         return super.getDefaultInstance();
     }
@@ -43,9 +39,9 @@ public class FilterItem extends Item {
     public Filter readFilterData(ItemStack itemStack) {
         CustomData data = itemStack.get(DataComponents.CUSTOM_DATA);
         if (data != null) {
-            CompoundTag tag = data.copyTag();
-            type.load(tag);
-            return type;
+//            CompoundTag tag = data.copyTag();
+//            type.load(tag);
+//            return type;
         }
         return null;
     }
@@ -53,11 +49,11 @@ public class FilterItem extends Item {
     public void putData(ItemStack itemStack, Filter filter) {
         CompoundTag tag = new CompoundTag();
         filter.save(tag);
-        itemStack.set(DataComponents.CUSTOM_DATA,CustomData.of(tag));
+        itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 
     public void runIfHasData(ItemStack stack, Consumer<CompoundTag> tagConsumer) {
-        CompoundTag tag = getTagElement(stack);
+        CompoundTag tag = this.getTagElement(stack);
         if (tag != null) {
             tagConsumer.accept(tag);
         }
@@ -73,11 +69,10 @@ public class FilterItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        Filter type = this.filter.get();
         InteractionResultHolder<ItemStack> result = super.use(level, player, usedHand);
         if (result.getObject().getItem() instanceof FilterItem) {
-            runIfHasData(result.getObject(),(tag) -> {
-                type.load(tag);
-            });
+            this.runIfHasData(result.getObject(), type::load);
         }
         if (result.getResult() == InteractionResult.PASS) {
             if (level.isClientSide) {
@@ -93,19 +88,21 @@ public class FilterItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getItemInHand().getItem() instanceof FilterItem)
-            runIfHasData(context.getItemInHand(),(tag) -> {
-                type.load(tag);
-            });
-        if (!context.getPlayer().isCrouching()) {
+        Filter type = this.filter.get();
+        if (context.getItemInHand().getItem() instanceof FilterItem) {
+            this.runIfHasData(context.getItemInHand(), type::load);
+        }
+        if (!context.getPlayer().isShiftKeyDown()) {
             if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity filterBlockEntity) {
                 boolean creative = context.getPlayer().getAbilities().instabuild;
                 if (filterBlockEntity.getFilterType() == null || creative) {
                     filterBlockEntity.setFilter(type);
-                    if (context.getLevel().isClientSide)
+                    if (context.getLevel().isClientSide) {
                         return InteractionResult.SUCCESS;
-                    if (!creative)
+                    }
+                    if (!creative) {
                         context.getPlayer().getItemInHand(context.getHand()).shrink(1);
+                    }
                     return InteractionResult.CONSUME;
                 }
             }
@@ -119,15 +116,6 @@ public class FilterItem extends Item {
             return InteractionResult.SUCCESS;
         }
         return super.useOn(context);
-    }
-
-    public static class Properties {
-        public Filter type;
-
-        public FilterItem.Properties type(Filter type) {
-            this.type = type;
-            return this;
-        }
     }
 
     public static boolean isPassFilter(Filter type) {
