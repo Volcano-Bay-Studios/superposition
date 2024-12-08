@@ -67,7 +67,7 @@ public class ComputerBlock extends SignalActorTickingBlock implements EntityBloc
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (player.isCrouching()) {
             BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof ComputerBlockEntity computerBlockEntity) {
+            if (be instanceof ComputerBlockEntity computerBlockEntity && computerBlockEntity.getCard() != null) {
                 Item item = BuiltInRegistries.ITEM.get(computerBlockEntity.getCard().getSelfReference());
                 if (item != null && item instanceof CardItem cardItem) {
                     cardItem.card = computerBlockEntity.getCard();

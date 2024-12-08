@@ -53,6 +53,10 @@ public class SuperpositionBlocks {
             () -> new AnalyserBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistryObject<CombinatorBlock> COMBINATOR = registerBlock("combinator",
+            () -> new CombinatorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
     public static final RegistryObject<CasingBlock> CASING = registerBlock("casing",
             () -> new CasingBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()

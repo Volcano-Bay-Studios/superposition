@@ -17,7 +17,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import org.joml.Vector3dc;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
@@ -47,8 +47,9 @@ public class Cable {
     public Vec3 playerDraggedLastDelta = Vec3.ZERO;
     public int ticksSinceUpdate = 0;
     public int avgTicksSinceUpdate = 1;
-    public int sleepTimer = 20;
+    public int sleepTimer = 60;
     private float lastMovement;
+    private float averageMovement = 0;
 
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color) {
         this.id = id;
@@ -135,14 +136,15 @@ public class Cable {
     public void updatePhysics() {
         ticksSinceUpdate++;
         if (!playerHoldingPointMap.isEmpty()) {
-            sleepTimer = 20;
+            sleepTimer = 60;
         }
         if (sleepTimer > 0) {
             this.updatePointsInBlocks();
             lastMovement = 0;
             this.integrate();
-            if (lastMovement > 0.1f) {
-                sleepTimer = 20;
+            averageMovement = (lastMovement + (averageMovement*19)) / 20f;
+            if (averageMovement > 0.8f) {
+                sleepTimer = 60;
             } else {
                 sleepTimer--;
             }
@@ -202,7 +204,9 @@ public class Cable {
                         float frequency = 0;
                         if (!cbe.getSignals().isEmpty())
                             frequency = cbe.getSignal().getFrequency();
-                        Signal periphrealSignal = new Signal((Vector3dc) cbe.getBlockPos().getCenter(), level, frequency, 1, frequency / 100000);
+                        BlockPos blockPos = cbe.getBlockPos();
+                        Vector3d pos = new Vector3d(blockPos.getX(),blockPos.getY(),blockPos.getZ());
+                        Signal periphrealSignal = new Signal(pos, level, frequency, 1, frequency / 100000);
                         periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
                         signalActorBlockEntity.putSignal(periphrealSignal);
                     }
@@ -305,7 +309,7 @@ public class Cable {
                 if (point.inContact) {
                     point.position = point.position.add(offset.scale(0.7f));
                 } else {
-                    point.position = point.position.add(offset.scale(0.999f));
+                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : Mth.map(sleepTimer,60,0,0.999f,0.9f)));
                 }
             } else {
                 point.prevPosition = point.position;
@@ -387,7 +391,6 @@ public class Cable {
             points.get(i).setPrevPosition(cable.points.get(i).getPrevPosition());
         }
         this.playerHoldingPointMap = cable.playerHoldingPointMap;
-        sleepTimer = 20;
     }
 
     public void updatePointsInBlocks() {

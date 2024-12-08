@@ -1,6 +1,8 @@
 package org.modogthedev.superposition.system.cards.codecs;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
@@ -28,6 +30,11 @@ public class ContainerCard extends Card {
             BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof WorldlyContainer worldlyContainer) {
                 List<ItemStack> stacks = getItems(worldlyContainer, analyserBlockEntity.getFacing().getOpposite());
+                CompoundTag tag = new CompoundTag();
+                for (ItemStack stack : stacks) {
+                    tag.putInt(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString(),stack.getCount());
+                }
+                signal.encode(tag.getAsString());
             }
         }
     }

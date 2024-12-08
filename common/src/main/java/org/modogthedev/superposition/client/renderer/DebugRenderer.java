@@ -49,7 +49,7 @@ public class DebugRenderer {
             for (Cable.Point point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 float width = SuperpositionConstants.cableRadius / 2;
-                drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, isSleeping ? 0.5f : 0.9f, isSleeping ? 0.9f : 0.5f, 0.5f);
+                drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, isSleeping ? 0.5f : 0.9f, 0.5f, isSleeping ? 0.9f : 0.5f);
                 Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getId());
                 if (pointIndexPair != null && pointIndexPair.getA().equals(point)) {
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.5f, 0.9f, 0.5f);
