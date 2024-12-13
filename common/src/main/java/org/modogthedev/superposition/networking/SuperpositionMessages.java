@@ -1,13 +1,14 @@
 package org.modogthedev.superposition.networking;
 
 import foundry.veil.api.network.VeilPacketManager;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.networking.handler.SuperpositionClientPacketHandler;
 import org.modogthedev.superposition.networking.handler.SuperpositionServerPacketHandler;
 import org.modogthedev.superposition.networking.packet.*;
 
 public class SuperpositionMessages {
 
-    private static final VeilPacketManager INSTANCE = VeilPacketManager.create("1");
+    private static final VeilPacketManager INSTANCE = VeilPacketManager.create(Superposition.MODID, "1");
 
     public static void register() {
         INSTANCE.registerClientbound(SignalSyncS2CPacket.TYPE,SignalSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleSignalSync);

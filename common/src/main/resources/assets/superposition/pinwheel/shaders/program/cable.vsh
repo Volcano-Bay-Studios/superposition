@@ -10,8 +10,8 @@ layout(location = 4) in vec3 Normal;
 
 uniform sampler2D Sampler2;
 
-uniform mat4 RenderModelViewMat;
-uniform mat4 RenderProjMat;
+uniform mat4 ModelViewMat;
+uniform mat4 ProjMat;
 uniform mat3 NormalMat;
 uniform vec3 ChunkOffset;
 uniform int FogShape;
@@ -25,7 +25,7 @@ out vec3 normal;
 
 void main() {
     vec3 pos = Position + ChunkOffset;
-    gl_Position = RenderProjMat * RenderModelViewMat * vec4(pos, 1.0);
+    gl_Position = ProjMat * ModelViewMat * vec4(pos, 1.0);
 
     vertexDistance = fog_distance(pos, FogShape);
     vertexColor = Color * block_brightness(Normal);

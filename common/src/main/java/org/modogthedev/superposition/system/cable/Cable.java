@@ -89,12 +89,6 @@ public class Cable {
             if (entity instanceof Player player) {
                 int index = playerHoldingPointMap.get(id);
                 Point heldPoint = points.get(index);
-                Point prevPoint;
-                if (index > 0) {
-                    prevPoint = points.get(index - 1);
-                } else {
-                    prevPoint = points.get(index + 1);
-                }
                 Vec3 playerOffset = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
 
                 HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
@@ -299,6 +293,7 @@ public class Cable {
     private void integrate() {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         for (Point point : points) {
+            point.oRenderPosition = point.position;
             blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
             if (!point.inBlock && !point.grabbed && level.isLoaded(blockPos)) {
                 Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -13.8, 0).scale(.05 * 0.05));
@@ -401,8 +396,7 @@ public class Cable {
     public void updatePointInBlock(Point point) {
         Vec3 vec3 = point.getPosition();
         BlockPos pos = BlockPos.containing(vec3);
-        BlockHitResult blockHitResult = level.clip(new ClipContext(vec3.add(0.01f, 0.01f, 0.01f), vec3.subtract(0.01f, 0.01f, 0.01f), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
-        point.inBlock = blockHitResult.getType() == HitResult.Type.BLOCK;
+        point.inBlock = !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
     }
 
     public UUID getId() {
@@ -452,6 +446,7 @@ public class Cable {
     }
 
     public static class Point {
+        private Vec3 oRenderPosition;
         private Vec3 prevPosition;
         private Vec3 position;
         private Vec3 tempPos;
@@ -466,8 +461,9 @@ public class Cable {
         private BlockPos attachedPoint;
 
         public Point(Vec3 position) {
-            this.position = position;
+            this.oRenderPosition = position;
             this.prevPosition = position;
+            this.position = position;
         }
 
         public void setAnchor(BlockPos pos, Direction attachedFace) {
@@ -493,6 +489,10 @@ public class Cable {
 
         public Vec3 getPrevPosition() {
             return prevPosition;
+        }
+
+        public Vec3 getPrevRenderPosition() {
+            return oRenderPosition;
         }
 
         public Vec3 getPosition() {

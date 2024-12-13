@@ -55,7 +55,7 @@ public class CableRenderer {
     private static final BlockPos.MutableBlockPos LIGHT_POS = new BlockPos.MutableBlockPos();
 
     public static void renderCables(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
-        float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(false);
+        float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(SuperpositionRenderTypes.cable());
         ClientLevel level = Minecraft.getInstance().level;
         Vec3 cameraPos = camera.getPosition();
@@ -67,14 +67,14 @@ public class CableRenderer {
             for (Cable.Point point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 CABLE_POINTS.add(pos);
-                PREV_CABLE_POINTS.add(point.getPrevPosition());
+                PREV_CABLE_POINTS.add(point.getPrevRenderPosition());
             }
             List<Vec3> points = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
             List<Vec3> prevPoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
             points.addFirst(cable.getPoints().getFirst().getPosition());
-            prevPoints.addFirst(cable.getPoints().getFirst().getPrevPosition());
+            prevPoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
             points.add(cable.getPoints().getLast().getPosition());
-            prevPoints.add(cable.getPoints().getLast().getPrevPosition());
+            prevPoints.add(cable.getPoints().getLast().getPrevRenderPosition());
 
             int color = 0xFF000000 | cable.getColor().getRGB();
             float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
@@ -88,12 +88,12 @@ public class CableRenderer {
                 Vec3 prevNextPoint = prevPoints.get(i + 1);
                 Vec3 nextPoint = points.get(i + 1);
 
-                double x = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.x, point.x);
-                double y = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.y, point.y);
-                double z = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.z, point.z);
-                double nextX = net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
-                double nextY = net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
-                double nextZ = net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
+                double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+                double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+                double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
+                double nextX = Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
+                double nextY = Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
+                double nextZ = Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
 
                 if (i < points.size() - 2) {
                     calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevPoints.get(i + 2), points.get(i + 2), partialTicks);
@@ -245,9 +245,9 @@ public class CableRenderer {
     private static void renderCableStart(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         PoseStack.Pose pose = matrixStack.pose();
         float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
-        double x = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.x, point.x);
-        double y = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.y, point.y);
-        double z = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.z, point.z);
+        double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+        double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+        double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
 
         // TODO attach to block face
         calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
@@ -288,9 +288,9 @@ public class CableRenderer {
     private static void renderCableEnd(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         PoseStack.Pose pose = matrixStack.pose();
         float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
-        double x = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.x, point.x);
-        double y = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.y, point.y);
-        double z = net.minecraft.util.Mth.lerp(partialTicks, prevPoint.z, point.z);
+        double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+        double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+        double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
 
         // TODO attach to block face
         calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
@@ -329,10 +329,10 @@ public class CableRenderer {
     }
 
     private static Quaternionf calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
-        double dx = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
-        double dy = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
-        double dz = (net.minecraft.util.Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
-        float factor = (float) Math.exp(-100 * (dx * dx + dz * dz - dy * dy));
+        double dx = (Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
+        double dy = (Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
+        double dz = (Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
+        float factor = 0;//(float) Mth.smoothstep(1.0-Mth.clamp(8*Math.sqrt(dx * dx + dz * dz), 0.0, 1.0));
         return store.identity()
                 .rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0)
                 .rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0)
@@ -356,7 +356,7 @@ public class CableRenderer {
                     int i = entry.getIntValue();
 
                     Vec3 pointPos = cable.getPoints().get(i).getPosition();
-                    Vec3 prevPos = cable.getPoints().get(i).getPrevPosition();
+                    Vec3 prevPos = cable.getPoints().get(i).getPrevRenderPosition();
                     Vec3 pos = Mth.lerpVec3(prevPos, pointPos, partialTicks);
                     if (Minecraft.getInstance().player.equals(player)) {
                         DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
@@ -369,7 +369,7 @@ public class CableRenderer {
             }
         }
         if (detachDelta > 0) {
-            float delta = net.minecraft.util.Mth.lerp(partialTicks, detachDelta, detachDelta - 0.2f);
+            float delta = Mth.lerp(partialTicks, detachDelta, detachDelta - 0.2f);
             stretch = 1;
             width = 0.12f - Mth.map(1, 0, 0, 1, delta) * 0.15125f;
             if (width > 0) {
@@ -382,7 +382,7 @@ public class CableRenderer {
         oshi.util.tuples.Pair<Cable, Cable.Point> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
         if (cablePointPair != null) {
             Vec3 pointPos = cablePointPair.getB().getPosition();
-            Vec3 prevPos = cablePointPair.getB().getPrevPosition();
+            Vec3 prevPos = cablePointPair.getB().getPrevRenderPosition();
             Vec3 pos = Mth.lerpVec3(prevPos, pointPos, partialTicks);
             if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getId())) {
                 boolean isLast = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB());
