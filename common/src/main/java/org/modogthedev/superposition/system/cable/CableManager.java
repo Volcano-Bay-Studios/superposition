@@ -15,16 +15,19 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
 import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
+import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class CableManager {
     private static int grabTimer = 0;
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> cables = new HashMap<>();
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> clientCables = new HashMap<>();
+    private static final Map<BlockPos, List<Signal>> cableSignalRelays = new HashMap<>();
 
     public static Map<ResourceKey<Level>, Map<UUID, Cable>> getCablesMap(Level level) {
         return level.isClientSide() ? clientCables : cables;

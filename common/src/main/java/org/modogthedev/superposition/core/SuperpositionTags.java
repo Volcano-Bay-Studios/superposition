@@ -7,4 +7,5 @@ import net.minecraft.world.level.block.Block;
 
 public class SuperpositionTags {
     public static final TagKey<Block> GLASS_BLOCKS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "glass_blocks"));
+    public static final TagKey<Block> SIGNAL_ACTORS = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("superposition", "signal_actors"));
 }

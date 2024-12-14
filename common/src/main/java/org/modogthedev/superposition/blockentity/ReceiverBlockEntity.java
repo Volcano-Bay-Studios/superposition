@@ -56,7 +56,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
 
     @Override
     public void tick() {
-        preTick();
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(Component.literal("Receiver Status:"));
         if (antenna != null) {

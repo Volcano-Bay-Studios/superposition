@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -77,7 +78,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public void tick() {
-        preTick();
         if (level.isClientSide) {
             resetTooltip();
             if (card == null)
@@ -94,7 +94,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             Vec3 center = getBlockPos().getCenter();
             Signal periphrealSignal = new Signal(new Vector3d(center.x,center.y,center.z), level, frequency, 1, frequency / 100000);
             periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
-            periphrealBlockEntity.putSignal(periphrealSignal);
+            periphrealBlockEntity.putSignalFace(periphrealSignal, Direction.UP);
 
             Signal fromSignal = periphrealBlockEntity.getSignal();
             if (fromSignal != null && fromSignal.getEncodedData() != null)

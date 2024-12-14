@@ -9,6 +9,7 @@
   "block.superposition.casing" : "Insulated Casing",
   "block.superposition.analyser" : "Analyser",
   "block.superposition.computer" : "Computer",
+  "block.superposition.combinator" : "Combinator",
 
   "item.superposition.screwdriver" : "Screwdriver",
   "item.superposition.insulated_sheet" : "Insulated Sheet",

@@ -64,7 +64,7 @@ public class SuperpositionBlocks {
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
-        SuperpositionItems.ITEMS.register(name, () -> new BlockItem(toReturn.get(), new Item.Properties()));
+        SuperpositionItems.registerItem(name, () -> new BlockItem(toReturn.get(), new Item.Properties()));
         return toReturn;
     }
 

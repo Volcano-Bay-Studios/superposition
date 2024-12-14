@@ -73,5 +73,4 @@ public class BandPassFilter extends Filter {
     public Filter create() {
         return new BandPassFilter(getSelfReference());
     }
-
 }

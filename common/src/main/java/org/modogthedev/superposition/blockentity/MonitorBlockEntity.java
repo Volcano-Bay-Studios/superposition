@@ -30,7 +30,6 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
 
     @Override
     public void tick() {
-        preTick();
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
         List<Signal> frequencySorted = getSignals();

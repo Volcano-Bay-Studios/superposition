@@ -56,7 +56,6 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public void tick() {
-        this.preTick();
         this.putSignal(this.getSignal());
         if (this.level.isClientSide()) {
             List<Component> tooltip = new ArrayList<>();

@@ -21,7 +21,6 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
 
     @Override
     public void tick() {
-        this.preTick();
         List<Component> tooltip = new ArrayList<>();
 //        System.out.println(SignalManager.transmittedSignals.get(level).size());
         BlockPos sidedPos = this.getSwappedPos();

@@ -3,6 +3,7 @@ package org.modogthedev.superposition.system.signal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
@@ -132,6 +133,10 @@ public class Signal {
         this.encodedData = EncodedData.of(integer);
     }
 
+    public void encode(float f) {
+        this.encodedData = EncodedData.of(f);
+    }
+
     public void clearEncodedData() {
         this.encodedData = null;
     }
@@ -190,7 +195,7 @@ public class Signal {
     public int getSourceAntennaSize() {
         return this.sourceAntennaSize;
     }
-
+    @Nullable
     public EncodedData<?> getEncodedData() {
         return this.encodedData;
     }

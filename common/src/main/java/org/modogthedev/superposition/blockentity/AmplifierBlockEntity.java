@@ -77,7 +77,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public void tick() {
-        this.preTick();
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
             this.setTooltip(tooltip);

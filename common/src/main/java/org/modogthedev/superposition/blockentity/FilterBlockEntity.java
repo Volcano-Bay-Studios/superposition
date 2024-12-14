@@ -57,7 +57,6 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     @Override
     public void tick() {
-        preTick();
         resetTooltip();
         if (level.isClientSide && getFilterType() != null) {
             addTooltip(Component.literal("Filter Status: "));

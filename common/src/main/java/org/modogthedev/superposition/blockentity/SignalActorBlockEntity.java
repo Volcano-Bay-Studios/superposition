@@ -60,7 +60,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private boolean stepNext = false;
     private final List<String> configurationTooltipString = new ArrayList<>();
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
-    int ticksSinceSignal = 0;
+    int signalsReceived = 0;
 
     private Object lastCall;
     private Object lastCallList;
@@ -269,23 +269,32 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return SignalManager.randomSignal(getSignals());
     }
 
+    public Signal getSideSignal(Direction face) {
+        return getSignal();
+    }
+
     public List<Signal> getSignals() {
         return putSignals;
     }
 
-    public void addSignals(List<Signal> signals) {
+    public List<Signal> getSideSignals(Direction face) {
+        return putSignals;
+    }
+
+    public void addSignals(List<Signal> signals, Direction face) {
         this.modulateSignals(signals, true);
-        if (ticksSinceSignal > 0) {
+        if (signalsReceived == 0) {
             this.updatePutSignals(signals);
         } else {
             for (Signal signal : signals) {
                 putSignals.add(new Signal(signal));
             }
+            signalsReceived++;
         }
-        ticksSinceSignal = 0;
     }
 
     public void updatePutSignals(List<Signal> signals) {
+        signalsReceived++;
         if (putSignals.size() == signals.size()) {
             for (int i = 0; i < signals.size(); i++) {
                 putSignals.get(i).copy(signals.get(i));
@@ -311,12 +320,15 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
                 putSignals.get(i).copy(signal);
             }
         }
-        modulateSignals(putSignals,true);
+        modulateSignals(putSignals, true);
+    }
+
+    public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
+        putSignalList(nextCall, signals);
     }
 
     public void putSignalList(Object nextCall, List<Signal> list) {
         this.updatePutSignals(list);
-        ticksSinceSignal = 0;
         if ((lastCallList != null && lastCallList.equals(nextCall)) || level == null) {
             return;
         }
@@ -326,9 +338,15 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             if (signalActorBlockEntity.getInvertedSwappedPos().equals(this.getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
                 lastCallList = nextCall;
-                signalActorBlockEntity.putSignalList(nextCall, list);
+                signalActorBlockEntity.putSignalsFace(nextCall, list,getInvertedSwappedSide());
             }
         }
+    }
+
+    public void putSignalFace(Signal signal, Direction face) {
+        List<Signal> signals = new ArrayList<>();
+        signals.add(signal);
+        this.putSignalsFace(new Object(), signals, face);
     }
 
     public void putSignal(Signal signal) {
@@ -336,6 +354,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         signals.add(signal);
         this.putSignalList(new Object(), signals);
     }
+
 
     public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
         List<Signal> safeList = new ArrayList<>();
@@ -390,7 +409,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
-        this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
+        if (tag.contains("swap"))
+            this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
     }
 
     public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {
@@ -454,13 +474,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
     }
 
-    public void preTick() {
-        if (ticksSinceSignal > 0) {
-            putSignals.clear();
-        }
-        ticksSinceSignal++;
-    }
-
     @Override
     public void tick() {
         if (this.level.isClientSide) {
@@ -480,6 +493,10 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
                 this.finaliseConfigTooltips();
             }
         }
+        if (signalsReceived == 0) {
+            putSignals.clear();
+        }
+        signalsReceived = 0;
     }
 
     public boolean lightEnabled() {

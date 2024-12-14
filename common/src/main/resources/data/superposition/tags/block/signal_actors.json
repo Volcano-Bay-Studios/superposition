@@ -7,6 +7,8 @@
     "superposition:antenna",
     "superposition:transmitter",
     "superposition:receiver",
-    "superposition:filter"
+    "superposition:filter",
+    "superposition:computer",
+    "superposition:combinator"
   ]
 }
