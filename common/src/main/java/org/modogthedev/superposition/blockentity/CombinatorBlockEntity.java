@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class CombinatorBlockEntity extends PeriphrealBlockEntity {
+public class CombinatorBlockEntity extends SignalActorBlockEntity {
     public CombinatorBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.COMBINATOR.get(), pos, state);
     }
@@ -135,6 +136,10 @@ public class CombinatorBlockEntity extends PeriphrealBlockEntity {
             rightSignals.clear();
         }
         rightSignalsReceived = 0;
+        BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
+            signalActorBlockEntity.putSignalFace(outputSignal,Direction.UP);
+        }
         super.tick();
     }
 
@@ -223,6 +228,10 @@ public class CombinatorBlockEntity extends PeriphrealBlockEntity {
         });
     }
 
+    public Modes getMode() {
+        return mode;
+    }
+
     public Direction getFacing() {
         return getBlockState().getValue(SignalActorTickingBlock.FACING);
     }
@@ -234,91 +243,91 @@ public class CombinatorBlockEntity extends PeriphrealBlockEntity {
                 value += floats[i];
             }
             return value;
-        }, Types.ARITHMETIC),
+        }, Types.ARITHMETIC, "+"),
         SUBTRACT((floats) -> {
             float value = floats[0];
             for (int i = 1; i < floats.length; i++) {
                 value -= floats[i];
             }
             return value;
-        }, Types.ARITHMETIC),
+        }, Types.ARITHMETIC, "-"),
         MULTIPLY((floats) -> {
             float value = floats[0];
             for (int i = 1; i < floats.length; i++) {
                 value *= floats[i];
             }
             return value;
-        }, Types.ARITHMETIC),
+        }, Types.ARITHMETIC, "x"),
         DIVIDE((floats) -> {
             float value = floats[0];
             for (int i = 1; i < floats.length; i++) {
                 value /= floats[i];
             }
             return value;
-        }, Types.ARITHMETIC),
+        }, Types.ARITHMETIC, "/"),
         SIN((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.sin(f);
             }
             return value;
-        }, Types.TRIGONOMETRIC),
+        }, Types.TRIGONOMETRIC, "SIN"),
         COS((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.cos(f);
             }
             return value;
-        }, Types.TRIGONOMETRIC),
+        }, Types.TRIGONOMETRIC, "COS"),
         TAN((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.tan(f);
             }
             return value;
-        }, Types.TRIGONOMETRIC),
+        }, Types.TRIGONOMETRIC,"TAN"),
         ASIN((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.asin(f);
             }
             return value;
-        }, Types.TRIGONOMETRIC),
+        }, Types.TRIGONOMETRIC,"ASIN"),
         ACOS((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.acos(f);
             }
             return value;
-        }, Types.TRIGONOMETRIC),
+        }, Types.TRIGONOMETRIC,"ACOS"),
         ATAN((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.atan(f);
             }
             return value;
-        }, Types.TRIGONOMETRIC),
+        }, Types.TRIGONOMETRIC,"ATAN"),
         SQR((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += f * f;
             }
             return value;
-        }, Types.SCIENTIFIC),
+        }, Types.SCIENTIFIC,"^2"),
         ROOT((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.sqrt(f);
             }
             return value;
-        }, Types.SCIENTIFIC),
+        }, Types.SCIENTIFIC, "ROOT"),
         FACTORIAL((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += 0;
             }
             return value;
-        }, Types.SCIENTIFIC),
+        }, Types.SCIENTIFIC, "!"),
         EQUAL((floats) -> {
             float value = floats[0];
             for (int i = 1; i < floats.length; i++) {
@@ -326,13 +335,15 @@ public class CombinatorBlockEntity extends PeriphrealBlockEntity {
                     return 0f;
             }
             return 1f;
-        }, Types.COMPARISON);
+        }, Types.COMPARISON, "==");
         private MathFunction function;
         public Types type;
+        private String displayText;
 
-        Modes(MathFunction function, Types type) {
+        Modes(MathFunction function, Types type, String displayText) {
             this.function = function;
             this.type = type;
+            this.displayText = displayText;
         }
 
         public float evaluate(float[] floats) {
@@ -344,6 +355,10 @@ public class CombinatorBlockEntity extends PeriphrealBlockEntity {
             } catch (ArithmeticException arithmeticException) {
                 return 0;
             }
+        }
+
+        public String getDisplayText() {
+            return displayText;
         }
     }
 

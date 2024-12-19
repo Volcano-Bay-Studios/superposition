@@ -62,8 +62,8 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             tooltip.add(Component.literal("Signal Generator Status:"));
             tooltip.add(Component.literal("Frequency - " + Mth.frequencyToHzReadable(frequency * 100000)));
 
-            float speed = Mth.getFromRange(64, 0, .1f, 3, frequency);
-            if (frequency < .72f || frequency > 64) {
+            float speed = Mth.getFromRange(150, 0, 3, .1f, frequency);
+            if (frequency < 0 || frequency > 150) {
                 speed = 0;
             }
             dial += speed;

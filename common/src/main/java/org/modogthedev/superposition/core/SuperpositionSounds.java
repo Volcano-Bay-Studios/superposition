@@ -11,6 +11,7 @@ public class SuperpositionSounds {
     public static final RegistrationProvider<SoundEvent> SOUNDS = RegistrationProvider.get(Registries.SOUND_EVENT, Superposition.MODID);
     public static final RegistryObject<SoundEvent> SINE = registerSoundEvent("sine");
     public static final RegistryObject<SoundEvent> SCREWDRIVER = registerSoundEvent("screwdriver");
+    public static final RegistryObject<SoundEvent> DOWN = registerSoundEvent("down");
     public static final RegistryObject<SoundEvent> SWITCH_ON = registerSoundEvent("switch_on");
     public static final RegistryObject<SoundEvent> SWITCH_OFF = registerSoundEvent("switch_off");
     public static final RegistryObject<SoundEvent> SCROLL = registerSoundEvent("scroll");

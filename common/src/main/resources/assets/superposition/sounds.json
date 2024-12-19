@@ -12,6 +12,14 @@
       "superposition:screwdriver_2"
     ]
   },
+  "down": {
+    "subtitles": "sounds.superposition.screwdriver",
+    "sounds": [
+      "superposition:down_1",
+      "superposition:down_2",
+      "superposition:down_3"
+    ]
+  },
   "switch_on": {
     "subtitles": "sounds.superposition.switch_on",
     "sounds": [

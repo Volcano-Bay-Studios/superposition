@@ -447,7 +447,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public void incrementConfigSelection() {
         stepNext = true;
         assert level != null;
-        level.playLocalSound(this.getBlockPos(), SuperpositionSounds.SCREWDRIVER.get(), SoundSource.BLOCKS, 1, 1, false);
+        level.playLocalSound(this.getBlockPos(), SuperpositionSounds.DOWN.get(), SoundSource.BLOCKS, 3, 1, false);
     }
 
     public void interactConfig() {

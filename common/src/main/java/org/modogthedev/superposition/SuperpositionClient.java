@@ -6,10 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.client.renderer.DebugRenderer;
-import org.modogthedev.superposition.client.renderer.block.AmplifierBlockEntityRenderer;
-import org.modogthedev.superposition.client.renderer.block.FilterBlockEntityRenderer;
-import org.modogthedev.superposition.client.renderer.block.MonitorBlockEntityRenderer;
-import org.modogthedev.superposition.client.renderer.block.SignalGeneratorBlockEntityRenderer;
+import org.modogthedev.superposition.client.renderer.block.*;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.platform.BlockEntityRegistry;
 
@@ -31,6 +28,8 @@ public class SuperpositionClient {
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.SIGNAL_READOUT.get(), MonitorBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.AMPLIFIER.get(), AmplifierBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.FILTER.get(), FilterBlockEntityRenderer::new);
+        registry.registerBlockEntityRenderer(SuperpositionBlockEntities.COMBINATOR.get(), CombinatorBlockEntityRenderer::new);
+        registry.registerBlockEntityRenderer(SuperpositionBlockEntities.CONSTANT_COMBINATOR.get(), ConstantCombinatorBlockEntityRenderer::new);
     }
 
     public static void setScreen(Screen screen) {

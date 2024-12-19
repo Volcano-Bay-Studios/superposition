@@ -11,6 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -277,10 +278,14 @@ public class Cable {
     private void updateCollisions() {
         for (Point point : points) {
             if (point.lerpedPos == null && !point.inBlock && !point.grabbed) {
+                float restitution = 0.3f;
+                if (level.getBlockState(BlockPos.containing(point.position)).is(Blocks.SLIME_BLOCK))
+                    restitution = 0.9f;
                 Vec3 collision = Entity.collideBoundingBox(null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition, radius, radius, radius), level, List.of());
                 Vec3 velocity = point.position.subtract(point.prevPosition);
                 point.setInContact(false);
                 if (collision.subtract(velocity).length() != 0) {
+                    velocity = velocity.scale(1+restitution);
                     point.setInContact(true);
                     assert !level.isClientSide || Minecraft.getInstance().level != null;
                 }
