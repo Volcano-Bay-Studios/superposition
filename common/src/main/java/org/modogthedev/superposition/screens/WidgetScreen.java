@@ -8,7 +8,7 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.modogthedev.superposition.core.SuperpositionSounds;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class WidgetScreen extends Screen {
                 if (dial.mouseOver) {
                     float angle = (float) Math.toDegrees(Math.atan2(pMouseY - dial.y, pMouseX - dial.x));
                     if (angle < 0) {
-                        angle = Mth.getFromRange(0, -180, 180, 0, angle) + 180;
+                        angle = SuperpositionMth.getFromRange(0, -180, 180, 0, angle) + 180;
                     }
                     if (dial.lastAngle == 0 || Math.abs(dial.lastAngle - angle) > 300)
                         dial.lastAngle = angle;

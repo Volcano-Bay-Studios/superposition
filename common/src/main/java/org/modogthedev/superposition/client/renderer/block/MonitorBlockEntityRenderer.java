@@ -17,7 +17,7 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.MonitorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 
 public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBlockEntity> {
@@ -54,7 +54,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
         float stages = 25;
 
         float transformDown = Math.max(0,(-be.transformState/10f)+1);
-        float transformUp = Mth.clamp(((be.transformState-10)/10f),0,1);
+        float transformUp = SuperpositionMth.clamp(((be.transformState-10)/10f),0,1);
         float uvOffsetx = 0f;
         int offset = 2;
         float part = 1f / (size + 4);
@@ -77,10 +77,10 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             float x = (i * totalPart) + (offset / (size + 4f)) - min;
             float y = .21f;
             float yinverse;
-            Signal[] signals = Mth.spaceArray(be.signals, size);
+            Signal[] signals = SuperpositionMth.spaceArray(be.signals, size);
             if (signals != null && signals[i] != null) {
                 y = Math.max(-.061f, (float) ((((signals[i].getAmplitude()) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)))*transformDown;
-                y = Mth.lerp(-(transformDown-1),y,.21f);
+                y = SuperpositionMth.lerp(-(transformDown-1),y,.21f);
             }
             y += (float) (Math.random() / 64)*transformDown;
             yinverse = -y + .42f +(.05f*transformDown);

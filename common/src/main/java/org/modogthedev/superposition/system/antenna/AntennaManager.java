@@ -9,7 +9,7 @@ import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.BlockHelper;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,14 +41,14 @@ public class AntennaManager {
 
     public static void postSignal(Signal signal) {
         Level level = signal.level;
-        BlockPos pos = Mth.blockPosFromVec3(signal.getPos());
+        BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
         for (Antenna antenna : antennas.get(level)) {
             postSignalToAntenna(signal, antenna);
         }
     }
 
     public static void postSignalToAntenna(Signal signal, Antenna antenna) {
-        BlockPos pos = Mth.blockPosFromVec3(signal.getPos());
+        BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
 
         if (!antenna.reading) {
             return;
@@ -60,14 +60,14 @@ public class AntennaManager {
         }
 
         float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
-        float antennaFrequency = Mth.antennaSizeToHz(antenna.antennaParts.size()) + bonusFrequency;
+        float antennaFrequency = SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()) + bonusFrequency;
 
         if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
             Signal signal1 = new Signal(signal);
 
             Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level, signal.getSourceAntennaPos());
             signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
-            signal1.mulAmplitude(1.0F / Math.max(1, 1f / (Mth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
+            signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
 
             if (signal1.getAmplitude() > 1) {
                 antenna.signals.add(signal1);

@@ -24,7 +24,7 @@ import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class AmplifierScreen extends WidgetScreen {
     private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/amplifier_screen.png");
@@ -194,7 +194,7 @@ public class AmplifierScreen extends WidgetScreen {
     public void tick() {
         super.tick();
         if (!mute && frequency > .72f) {
-            float pitch = Mth.getFromRange(0, 30, 2, .72f, frequency);
+            float pitch = SuperpositionMth.getFromRange(0, 30, 2, .72f, frequency);
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
         }
         ticks++;

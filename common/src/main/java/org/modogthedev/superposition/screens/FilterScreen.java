@@ -24,7 +24,7 @@ import org.modogthedev.superposition.system.filter.Filter;
 import org.modogthedev.superposition.system.filter.HighPassFilter;
 import org.modogthedev.superposition.system.filter.LowPassFilter;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -94,20 +94,20 @@ public class FilterScreen extends WidgetScreen {
         int j = (this.height - imageHeight) / 2;
         if (filterType instanceof LowPassFilter) {
             renderBar(guiGraphics, 167, 10, Math.abs((int) dials.get(0).scrolledAmount), true);
-            drawFrequencyText(Mth.frequencyToHzReadable(Math.abs(158 - Math.min(158, dials.get(0).scrolledAmount)) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.abs(158 - Math.min(158, dials.get(0).scrolledAmount)) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
 
         }
         if (filterType instanceof HighPassFilter) {
             renderBar(guiGraphics, 9, 10, Math.abs((int) dials.get(0).scrolledAmount), false);
-            drawFrequencyText(Mth.frequencyToHzReadable(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 15, j + 50, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 15, j + 50, 0xFF56d156, guiGraphics);
         }
         if (filterType instanceof BandPassFilter) {
             dials.get(0).maxScroll = (int) (158 - dials.get(1).scrolledAmount);
             dials.get(1).maxScroll = (int) (158 - dials.get(0).scrolledAmount);
             renderBar(guiGraphics, 9, 10, Math.abs((int) dials.get(0).scrolledAmount), false);
             renderBar(guiGraphics, 167, 10, Math.abs((int) dials.get(1).scrolledAmount), true);
-            drawFrequencyText(Mth.frequencyToHzReadable(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
-            drawFrequencyText(Mth.frequencyToHzReadable(Math.abs(158 - Math.min(158, dials.get(1).scrolledAmount)) * 100000), i + 15, j + 82, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.abs(158 - Math.min(158, dials.get(1).scrolledAmount)) * 100000), i + 15, j + 82, 0xFF56d156, guiGraphics);
 
         }
     }
@@ -136,7 +136,7 @@ public class FilterScreen extends WidgetScreen {
             }
             for (Signal signal : signals) {
                 float frequency = signal.getFrequency() / 100000;
-                float size = (float) (Mth.getFromRange(150, 0, 11, 0, signal.getAmplitude()) + Math.random());
+                float size = (float) (SuperpositionMth.getFromRange(150, 0, 11, 0, signal.getAmplitude()) + Math.random());
                 fillExact(guiGraphics, i + frequency + 9, j + barOffset + 11 - size, i + frequency + 10f, j + barOffset + 24 - 11 + size, 0xFF56d156);
             }
             for (int x = 0; x < 158; x++) {

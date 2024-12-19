@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +27,11 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
         tooltip.add(Component.literal("Transmitter Status:"));
         float frequency = 0;
         if (antenna != null) {
-            frequency = Mth.antennaSizeToHz(antenna.antennaParts.size());
+            frequency = SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size());
         }
         if (antenna != null && level.isClientSide) {
             tooltip.add(Component.literal("Antenna Classification - " + this.classifyAntenna()));
-            tooltip.add(Component.literal("Antenna Frequency - " + Mth.frequencyToHzReadable(frequency)));
+            tooltip.add(Component.literal("Antenna Frequency - " + SuperpositionMth.frequencyToHzReadable(frequency)));
         }
         boolean noSignal = false;
         if (antenna != null) {
@@ -47,7 +47,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     SignalManager.addSignal(signalForBroadcast);
                     signal = signalForBroadcast;
                     if (level.isClientSide) {
-                        tooltip.add(Component.literal("Broadcast Frequency - " + Mth.frequencyToHzReadable(signalForBroadcast.getFrequency())));
+                        tooltip.add(Component.literal("Broadcast Frequency - " + SuperpositionMth.frequencyToHzReadable(signalForBroadcast.getFrequency())));
                     }
                 } else if (signal != null) {
                     this.stopTransmission();

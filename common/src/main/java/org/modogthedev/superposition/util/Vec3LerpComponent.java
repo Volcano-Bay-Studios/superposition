@@ -23,7 +23,7 @@ public class Vec3LerpComponent {
     }
 
     public Vec3 getLerpedPos() {
-        return Mth.lerpVec3(from, to, (float) step / steps);
+        return SuperpositionMth.lerpVec3(from, to, (float) step / steps);
     }
 
     public Vec3 stepAndGather() {

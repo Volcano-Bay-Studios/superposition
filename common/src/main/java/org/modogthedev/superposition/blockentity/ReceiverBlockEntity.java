@@ -10,7 +10,7 @@ import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +61,10 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         if (antenna != null) {
             if (level.isClientSide) {
                 tooltip.add(Component.literal("Antenna Classification - " + classifyAntenna()));
-                tooltip.add(Component.literal("Antenna Frequency - " + Mth.frequencyToHzReadable(Mth.antennaSizeToHz(antenna.antennaParts.size()))));
+                tooltip.add(Component.literal("Antenna Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()))));
                 float bonusFrequency = getBounusFrequency();
                 if (bonusFrequency != 0) {
-                    tooltip.add(Component.literal("Actual Frequency - " + Mth.frequencyToHzReadable(Mth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency)));
+                    tooltip.add(Component.literal("Actual Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency)));
                 }
             }
             List<Signal> signals = getSignals();

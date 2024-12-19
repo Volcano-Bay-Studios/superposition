@@ -9,7 +9,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class Mth extends net.minecraft.util.Mth {
+public class SuperpositionMth extends net.minecraft.util.Mth {
     public static float getFromRange(float OldMax, float OldMin, float NewMax, float NewMin, float OldValue) {
         float OldRange = (OldMax - OldMin);
         float NewRange = (NewMax - NewMin);
@@ -139,7 +139,7 @@ public class Mth extends net.minecraft.util.Mth {
         Signal[] signals1 = new Signal[size];
         int count = 0;
         for (int i = 0; i < size; i++) {
-            if (signals[(int) Mth.getFromRange(size,0,12,0,i)] != null)
+            if (signals[(int) SuperpositionMth.getFromRange(size,0,12,0,i)] != null)
                 count++;
         }
         boolean[] booleans = findIndexes(size, count);

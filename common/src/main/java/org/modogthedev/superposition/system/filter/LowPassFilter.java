@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.awt.*;
 import java.util.List;
@@ -41,7 +41,7 @@ public class LowPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "Low Pass Filter - " + Mth.frequencyToHzReadable(frequency);
+        return "Low Pass Filter - " + SuperpositionMth.frequencyToHzReadable(frequency);
     }
 
     @Override

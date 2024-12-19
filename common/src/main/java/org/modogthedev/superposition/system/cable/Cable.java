@@ -24,7 +24,7 @@ import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
@@ -54,7 +54,7 @@ public class Cable {
         this.addPoint(new Point(starAnchor));
         for (int i = 0; i < points; i++) {
             float delta = (float) i / points;
-            this.addPoint(new Point(Mth.lerpVec3(starAnchor, endAnchor, delta)));
+            this.addPoint(new Point(SuperpositionMth.lerpVec3(starAnchor, endAnchor, delta)));
         }
         this.addPoint(new Point(endAnchor));
         this.level = level;
@@ -100,7 +100,7 @@ public class Cable {
                     actualLength += (float) start.distanceTo(end);
                 }
                 boolean isEndPoint = heldPoint.equals(points.getFirst()) || heldPoint.equals(points.getLast());
-                Vec3 result = (Mth.lerpVec3(heldPoint.prevPosition, hitResult.getLocation(), net.minecraft.util.Mth.clamp((maxLength + (isEndPoint ? 0 : 1)) / (actualLength), 0, 1)));
+                Vec3 result = (SuperpositionMth.lerpVec3(heldPoint.prevPosition, hitResult.getLocation(), net.minecraft.util.Mth.clamp((maxLength + (isEndPoint ? 0 : 1)) / (actualLength), 0, 1)));
                 heldPoint.grabbed = true;
                 float stretch = (float) result.distanceTo(hitResult.getLocation());
                 if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
@@ -146,7 +146,7 @@ public class Cable {
             this.update(true);
             for (Point point : points) {
                 if (point.tempPos != null) {
-                    point.position = Mth.lerpVec3(point.position, point.tempPos, 0.5f);
+                    point.position = SuperpositionMth.lerpVec3(point.position, point.tempPos, 0.5f);
                 }
             }
             this.freeStuckPoints();
@@ -308,7 +308,7 @@ public class Cable {
                 if (point.inContact) {
                     point.position = point.position.add(offset.scale(0.7f));
                 } else {
-                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : Mth.map(sleepTimer,60,0,0.999f,0.9f)));
+                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : SuperpositionMth.map(sleepTimer,60,0,0.999f,0.9f)));
                 }
             } else {
                 point.prevPosition = point.position;

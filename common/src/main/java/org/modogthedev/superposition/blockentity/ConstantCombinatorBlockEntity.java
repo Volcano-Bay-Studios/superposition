@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity {
@@ -22,7 +22,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity {
     @Override
     public void tick() {
         if (outputSignal == null) {
-            outputSignal = new Signal(Mth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
+            outputSignal = new Signal(SuperpositionMth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
         }
         if (outputString != null)
             outputSignal.encode(outputString);

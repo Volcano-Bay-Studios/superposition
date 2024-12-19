@@ -3,7 +3,7 @@ package org.modogthedev.superposition.system.cable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.core.SuperpositionConstants;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 import oshi.util.tuples.Pair;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class CableClipResult {
             distancePointPairMap.add(new Pair<>(999f, cablePointPair.getB()));
         }
         for (float delta = 0; delta < sourcePos.distanceTo(toPos); delta += range) {
-            Vec3 stepPos = Mth.lerpVec3(sourcePos, toPos, Mth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
+            Vec3 stepPos = SuperpositionMth.lerpVec3(sourcePos, toPos, SuperpositionMth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
             int i = 0;
             for (Pair<Cable, Cable.Point> cablePointPair : rayCast) {
                 boolean isAnEndPoint = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
@@ -75,7 +75,7 @@ public class CableClipResult {
     public List<Pair<Cable, Cable.Point>> rayCast(Vec3 toPos, float range) {
         List<Pair<Cable, Cable.Point>> pointPairList = new ArrayList<>();
         for (float delta = 0; delta < sourcePos.distanceTo(toPos); delta += range) {
-            Vec3 stepPos = Mth.lerpVec3(sourcePos, toPos, Mth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
+            Vec3 stepPos = SuperpositionMth.lerpVec3(sourcePos, toPos, SuperpositionMth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
             for (Cable cable : cablePointMap.keySet()) {
                 for (Cable.Point point : cablePointMap.get(cable)) {
                     if (point.getPosition().distanceTo(stepPos) < range) {

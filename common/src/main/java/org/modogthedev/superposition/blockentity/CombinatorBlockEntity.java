@@ -12,7 +12,7 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.MathFunction;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 import java.util.ArrayList;
@@ -96,7 +96,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
     @Override
     public void tick() {
         if (outputSignal == null) {
-            outputSignal = new Signal(Mth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
+            outputSignal = new Signal(SuperpositionMth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
         }
         resetTooltip();
         addTooltip("Combinator Status:");

@@ -11,7 +11,7 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 import java.util.ArrayList;
@@ -60,9 +60,9 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         if (this.level.isClientSide()) {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(Component.literal("Signal Generator Status:"));
-            tooltip.add(Component.literal("Frequency - " + Mth.frequencyToHzReadable(frequency * 100000)));
+            tooltip.add(Component.literal("Frequency - " + SuperpositionMth.frequencyToHzReadable(frequency * 100000)));
 
-            float speed = Mth.getFromRange(150, 0, 3, .1f, frequency);
+            float speed = SuperpositionMth.getFromRange(150, 0, 3, .1f, frequency);
             if (frequency < 0 || frequency > 150) {
                 speed = 0;
             }

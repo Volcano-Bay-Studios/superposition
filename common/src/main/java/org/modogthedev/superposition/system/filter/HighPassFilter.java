@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.Mth;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.awt.*;
 import java.util.List;
@@ -42,7 +42,7 @@ public class HighPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "High Pass Filter - " + Mth.frequencyToHzReadable(frequency);
+        return "High Pass Filter - " + SuperpositionMth.frequencyToHzReadable(frequency);
     }
 
     @Override
