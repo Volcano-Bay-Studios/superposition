@@ -1,11 +1,13 @@
 package org.modogthedev.superposition.client.renderer.ui;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.theme.NumberThemeProperty;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
-import foundry.veil.api.client.util.SpaceHelper;
+import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,6 +17,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,6 +26,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.util.SPTooltipable;
 
@@ -100,9 +104,9 @@ public class SuperpositionUITooltipRenderer {
         tooltipY = Math.min(tooltipY, height - tooltipHeight - 20);
 
         float fade = Mth.clamp((hoverTicks + partialTicks) / 24f, 0, 1);
-        Color background = new Color(50, 168, 82,150);
-        Color borderTop = new Color(60, 186, 94,255);
-        Color borderBottom =new Color(44, 150, 72,255);
+        Color background = new Color(50, 168, 82, 150);
+        Color borderTop = new Color(60, 186, 94, 255);
+        Color borderBottom = new Color(44, 150, 72, 255);
 //        background = resetAlpha(background).multiply(1,1,1,.7f);
 //        borderBottom = resetAlpha(borderBottom);
 //        borderTop = resetAlpha(borderTop);
@@ -120,7 +124,7 @@ public class SuperpositionUITooltipRenderer {
         if (tooltippable.getWorldspace()) {
             currentPos = currentPos == null ? pos : currentPos;
             Vec3 playerPos = mc.gameRenderer.getMainCamera().getPosition();
-            Vec3i playerPosInt = new Vec3i((int) Math.round(result.getLocation().x), (int) result.getLocation().y, (int) Math.round(result.getLocation().z+1));
+            Vec3i playerPosInt = new Vec3i((int) Math.round(result.getLocation().x), (int) result.getLocation().y, (int) Math.round(result.getLocation().z + 1));
             Vec3i cornerInt = new Vec3i((int) pos.x, (int) pos.y, (int) pos.z);
             Vec3i diff = playerPosInt.subtract(cornerInt);
             desiredPos = pos.add(Math.round(Mth.clamp(diff.getX(), -1, 1) * 0.5f) - 0.5f, 0.5, Math.round(Mth.clamp(diff.getZ(), -1, 1) * 0.5f) - 0.5f);
@@ -131,11 +135,11 @@ public class SuperpositionUITooltipRenderer {
             borderTop = borderTop.multiply(1, 1, 1, fade);
             borderBottom = borderBottom.multiply(1, 1, 1, fade);
             currentPos = currentPos.lerp(desiredPos, 0.05f);
-            Vector3f screenSpacePos = SpaceHelper.worldToScreenSpace(currentPos, partialTicks);
-            Vector3f desiredScreenSpacePos = SpaceHelper.worldToScreenSpace(desiredPos, partialTicks);
+            Vector3f screenSpacePos = worldToScreenSpace(currentPos, partialTicks);
+            Vector3f desiredScreenSpacePos = worldToScreenSpace(desiredPos, partialTicks);
             screenSpacePos = new Vector3f(Mth.clamp(screenSpacePos.x(), 0, width), Mth.clamp(screenSpacePos.y(), 0, height - (mc.font.lineHeight * tooltip.size())), screenSpacePos.z());
             desiredScreenSpacePos = new Vector3f(Mth.clamp(desiredScreenSpacePos.x(), 0, width), Mth.clamp(desiredScreenSpacePos.y(), 0, height - (mc.font.lineHeight * tooltip.size())), desiredScreenSpacePos.z());
-            tooltipX = (int) screenSpacePos.x()-(tooltipTextWidth/2);
+            tooltipX = (int) screenSpacePos.x() - (tooltipTextWidth / 2);
             tooltipY = (int) screenSpacePos.y();
             desiredX = (int) desiredScreenSpacePos.x();
             desiredY = (int) desiredScreenSpacePos.y();
@@ -144,8 +148,9 @@ public class SuperpositionUITooltipRenderer {
         SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.getHex(), borderTop.getHex(), borderBottom.getHex(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
         stack.popPose();
     }
+
     public static Color resetAlpha(Color color) {
-        return (color.lightenCopy(.1f).multiply(1,1,1,10f).lightenCopy(-.1f));
+        return (color.lightenCopy(.1f).multiply(1, 1, 1, 10f).lightenCopy(-.1f));
     }
 
     public static void drawConnectionLine(PoseStack stack, SPTooltipable tooltippable, int tooltipX, int tooltipY, int desiredX, int desiredY) {
@@ -173,38 +178,39 @@ public class SuperpositionUITooltipRenderer {
         }
     }
 
-//    public static Vector3f worldToScreenSpace(Vec3 pos, float partialTicks) {
-//        Minecraft mc = Minecraft.getInstance();
-//        Camera camera = mc.gameRenderer.getMainCamera();
-//        Vec3 cameraPosition = camera.getPosition();
-//
-//        Vector3f position = new Vector3f((float) (cameraPosition.x - pos.x), (float) (cameraPosition.y - pos.y), (float) (cameraPosition.z - pos.z));
-//        Quaternionf cameraRotation = camera.rotation();
-//        cameraRotation.conjugate();
-//        //cameraRotation = restrictAxis(new Vec3(1, 1, 0), cameraRotation);
-//        cameraRotation.transform(position);
-//
-//        // Account for view bobbing
-//        if (mc.options.bobView().get() && mc.getCameraEntity() instanceof Player) {
-//            Player player = (Player) mc.getCameraEntity();
-//            float playerStep = player.walkDist - player.walkDistO;
-//            float stepSize = -(player.walkDist + playerStep * partialTicks);
-//            float viewBob = Mth.lerp(partialTicks, player.oBob, player.bob);
-//
-//            Quaternionf bobXRotation = Axis.XP.rotationDegrees(Math.abs(Mth.cos(stepSize * (float) Math.PI - 0.2f) * viewBob) * 5f);
-//            Quaternionf bobZRotation = Axis.ZP.rotationDegrees(Mth.sin(stepSize * (float) Math.PI) * viewBob * 3f);
-//            bobXRotation.conjugate();
-//            bobZRotation.conjugate();
-//            bobXRotation.transform(position);
-//            bobZRotation.transform(position);
-//            position.add(Mth.sin(stepSize * (float) Math.PI) * viewBob * 0.5f, Math.abs(Mth.cos(stepSize * (float) Math.PI) * viewBob), 0f);
-//        }
-//
-//        Window window = mc.getWindow();
-//        float screenSize = window.getGuiScaledHeight() / 2f / position.z() / (float) Math.tan(Math.toRadians(mc.gameRenderer.getFov(camera, partialTicks, true) / 2f));
-//        position.mul(-screenSize, -screenSize, 1f);
-//        position.add(window.getGuiScaledWidth() / 2f, window.getGuiScaledHeight() / 2f, 0f);
-//
-//        return position;
-//    }
+    public static Vector3f worldToScreenSpace(Vec3 pos, float partialTicks) {
+        Minecraft mc = Minecraft.getInstance();
+        Camera camera = mc.gameRenderer.getMainCamera();
+        Vec3 cameraPosition = camera.getPosition();
+
+        Vector3f position = new Vector3f((float) (cameraPosition.x - pos.x), (float) (cameraPosition.y - pos.y), (float) (cameraPosition.z - pos.z));
+        Quaternionf cameraRotation = camera.rotation();
+        cameraRotation.conjugate();
+//        cameraRotation = restrictAxis(new Vec3(1, 1, 0), cameraRotation);
+        cameraRotation.transform(position);
+        position.y = -position.y;
+
+        // Account for view bobbing
+        if (mc.options.bobView().get() && mc.getCameraEntity() instanceof Player) {
+            Player player = (Player) mc.getCameraEntity();
+            float playerStep = player.walkDist - player.walkDistO;
+            float stepSize = -(player.walkDist + playerStep * partialTicks);
+            float viewBob = Mth.lerp(partialTicks, player.oBob, player.bob);
+
+            Quaternionf bobXRotation = Axis.XP.rotationDegrees(Math.abs(Mth.cos(stepSize * (float) Math.PI - 0.2f) * viewBob) * 5f);
+            Quaternionf bobZRotation = Axis.ZP.rotationDegrees(Mth.sin(stepSize * (float) Math.PI) * viewBob * 3f);
+            bobXRotation.conjugate();
+            bobZRotation.conjugate();
+            bobXRotation.transform(position);
+            bobZRotation.transform(position);
+            position.add(Mth.sin(stepSize * (float) Math.PI) * viewBob * 0.5f, Math.abs(Mth.cos(stepSize * (float) Math.PI) * viewBob), 0f);
+        }
+
+        Window window = mc.getWindow();
+        float screenSize = window.getGuiScaledHeight() / 2f / position.z() / (float) Math.tan(Math.toRadians(mc.gameRenderer.getFov(camera, partialTicks, true) / 2f));
+        position.mul(-screenSize, -screenSize, 1f);
+        position.add(window.getGuiScaledWidth() / 2f, window.getGuiScaledHeight() / 2f, 0f);
+
+        return position;
+    }
 }
