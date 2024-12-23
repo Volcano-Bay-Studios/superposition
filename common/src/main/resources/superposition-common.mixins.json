@@ -8,6 +8,7 @@
     "ServerGameModeMixin"
   ],
   "client": [
+    "KeyboardHandlerMixin",
     "MultiPlayerGameModeMixin"
   ],
   "injectors": {

@@ -10,6 +10,7 @@
   "block.superposition.analyser" : "Analyser",
   "block.superposition.computer" : "Computer",
   "block.superposition.combinator" : "Combinator",
+  "block.superposition.constant_combinator" : "Constant Combinator",
 
   "item.superposition.screwdriver" : "Screwdriver",
   "item.superposition.insulated_sheet" : "Insulated Sheet",

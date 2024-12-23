@@ -4,7 +4,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import org.modogthedev.superposition.SuperpositionClient;
@@ -25,6 +24,7 @@ public class SuperpositionFabricClient implements ClientModInitializer {
             ClientSignalManager.tick(level);
             CableManager.clientTick(level);
             CarabinerManager.tick(level);
+            SuperpositionUITooltipRenderer.clientTick(level);
         });
 
         HudRenderCallback.EVENT.register(SuperpositionUITooltipRenderer::renderOverlay);

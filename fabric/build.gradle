@@ -20,6 +20,8 @@ dependencies {
     modRuntimeOnly "maven.modrinth:yeetus-experimentus:87.0.0"
     modRuntimeOnly "maven.modrinth:fabric-permissions-api:0.3.2"
     modRuntimeOnly "maven.modrinth:spark:1.10.109-fabric"
+    modImplementation "maven.modrinth:sodium:mc1.21.1-0.6.1-fabric"
+//    modImplementation "maven.modrinth:iris:1.8.1+1.21.1-fabric"
 //    modRuntimeOnly "maven.modrinth:worldedit:7.3.8"
     modRuntimeOnly "mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}"
 }

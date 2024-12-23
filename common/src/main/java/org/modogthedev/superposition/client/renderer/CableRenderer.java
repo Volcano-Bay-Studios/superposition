@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -408,16 +407,19 @@ public class CableRenderer {
         Player player = Minecraft.getInstance().player;
         Vec3 cameraPos = camera.getPosition();
         float width = 0.12f;
-        BlockHitResult hitResult = level.clip(new ClipContext(camera.getPosition(), player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-        if (hitResult.getType() == HitResult.Type.BLOCK) {
-            if (level.getBlockEntity(hitResult.getBlockPos()) instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
+        HitResult hitResult = Minecraft.getInstance().hitResult;
+        if (hitResult instanceof BlockHitResult blockHitResult) {
+            Vec3 pos1 = Vec3.atCenterOf(blockHitResult.getBlockPos());
+            if (level.getBlockEntity(BlockPos.containing(pos1)) instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
                 matrixStack.matrixPush();
-                for (BlockPos pos : antennaActorBlockEntity.antenna.antennaParts) {
-                    DebugRenderer.renderFilledBox(matrixStack.toPoseStack(),bufferSource,pos,-0.2f,0.5f, 0.9f, 0.5f, 0.5f);
+                if (antennaActorBlockEntity.antenna != null) {
+                    for (BlockPos pos : antennaActorBlockEntity.antenna.antennaParts) {
+                        DebugRenderer.renderFilledBox(matrixStack.toPoseStack(), bufferSource, pos, -0.2f, 0.5f, 0.9f, 0.5f, 0.5f);
+                    }
                 }
                 matrixStack.matrixPop();
             }
-            if (level.getBlockEntity(hitResult.getBlockPos()) instanceof AnalyserBlockEntity analyserBlockEntity && analyserBlockEntity.startDistance != 0) {
+            if (level.getBlockEntity(BlockPos.containing(pos1)) instanceof AnalyserBlockEntity analyserBlockEntity && analyserBlockEntity.startDistance != 0) {
                 matrixStack.matrixPush();
                 BlockPos startPos = analyserBlockEntity.getDistancePosition(analyserBlockEntity.startDistance);
                 BlockPos endPos = analyserBlockEntity.getDistancePosition(analyserBlockEntity.endDistance);

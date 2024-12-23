@@ -7,19 +7,24 @@ import com.mojang.math.Axis;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.theme.NumberThemeProperty;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -28,15 +33,127 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
+import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SPTooltipable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SuperpositionUITooltipRenderer {
+    private static final ResourceLocation SAVE = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/save.png");
     public static int hoverTicks = 0;
     public static Vec3 lastHoveredPos = null;
     public static Vec3 currentPos = null;
     public static Vec3 desiredPos = null;
+    public static EditableTooltip editableTooltip;
+    public static boolean editingEditable = true;
+    public static int cursorPos = 0;
+    public static int flash;
+    public static BlockPos.MutableBlockPos editPos = new BlockPos.MutableBlockPos();
+    public static boolean selected;
+
+    public static void keyPress(long windowPointer, int key, int scanCode, int action, int modifiers) {
+        if (editableTooltip != null && action != GLFW.GLFW_RELEASE) {
+            cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
+            switch (key) {
+                case 256 -> {
+                    if (selected)
+                        selected = false;
+                    else
+                        editingEditable = false;
+                }
+                case 259, 261 -> {
+                    if (editingEditable) {
+                        if (selected) {
+                            editableTooltip.replaceText("");
+                            selected = false;
+                        } else {
+                            editableTooltip.replaceText(editableTooltip.getText().substring(0, Math.max(0, editableTooltip.getText().length() - 1)));
+                        }
+                    }
+                }
+
+                case 263 -> {
+                    if (editingEditable) {
+                        if (Screen.hasControlDown()) {
+                            cursorPos = 0;
+                        } else {
+                            cursorPos--;
+                        }
+                    }
+                }
+
+                case 262 -> {
+                    if (editingEditable) {
+                        if (Screen.hasControlDown()) {
+                            cursorPos = editableTooltip.getText().length() - 1;
+                        } else {
+                            cursorPos++;
+                        }
+                    }
+                }
+
+                case 268 -> {
+                    if (editingEditable)
+                        cursorPos = 0;
+                }
+                case 269 -> {
+                    if (editingEditable)
+                        cursorPos = editableTooltip.getText().length() - 1;
+                }
+                default -> {
+                    if (Screen.isCopy(key)) {
+                        Minecraft.getInstance().keyboardHandler.setClipboard(editableTooltip.getText());
+                    } else if (Screen.isPaste(key)) {
+                        if (editingEditable) {
+                            editableTooltip.addText(Minecraft.getInstance().keyboardHandler.getClipboard());
+                            cursorPos += Minecraft.getInstance().keyboardHandler.getClipboard().length();
+                        } else {
+                            editableTooltip.replaceText(Minecraft.getInstance().keyboardHandler.getClipboard());
+                        }
+                    } else if (Screen.isCut(key)) {
+                        Minecraft.getInstance().keyboardHandler.setClipboard(editableTooltip.getText());
+                        editableTooltip.replaceText("");
+                    } else if (Screen.isSelectAll(key)) {
+                        selected = true;
+                    }
+                }
+            }
+            CompoundTag tag = new CompoundTag();
+            tag.putString("output", editableTooltip.getText());
+            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
+            cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
+        }
+    }
+
+    public static void charTyped(long windowPointer, char key, int modifiers) {
+        if (editingEditable && editableTooltip != null) {
+            if (selected) {
+                editableTooltip.replaceText(String.valueOf(key));
+                selected = false;
+            } else {
+                editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, Math.max(0, editableTooltip.getText().length() - 1)), Math.max(0, editableTooltip.getText().length() - 1)));
+            }
+            cursorPos++;
+            cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
+            flash = 0;
+            CompoundTag tag = new CompoundTag();
+            tag.putString("output", editableTooltip.getText());
+            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
+        }
+    }
+
+    public static void clientTick(Level level) {
+        if (editableTooltip == null) {
+            cursorPos = 400;
+            editingEditable = false;
+            editPos = null;
+            selected = false;
+        }
+    }
 
     public static void renderOverlay(GuiGraphics graphics, DeltaTracker deltaTracker) {
         int width = graphics.guiWidth();
@@ -58,11 +175,19 @@ public class SuperpositionUITooltipRenderer {
                 pos = entityHitResult.getEntity().getPosition(0f).add(0.0, entityHitResult.getEntity().getEyeHeight() / 2f, 0.0);
             }
         }
+        editableTooltip = null;
         if (result instanceof BlockHitResult blockHitResult) {
             pos = Vec3.atCenterOf(blockHitResult.getBlockPos());
             BlockEntity blockEntity = mc.level.getBlockEntity(BlockPos.containing(pos));
             if (blockEntity instanceof SPTooltipable tooltippable1) {
                 tooltippable = tooltippable1;
+            }
+            if (blockEntity instanceof EditableTooltip editableTooltip1) {
+                editableTooltip = editableTooltip1;
+                if (editPos != null)
+                    editPos.set(BlockPos.containing(pos));
+                else
+                    editPos = new BlockPos.MutableBlockPos().set(BlockPos.containing(pos));
             }
         }
         if (tooltippable == null) {
@@ -76,7 +201,11 @@ public class SuperpositionUITooltipRenderer {
 
         hoverTicks++;
         lastHoveredPos = pos;
-        List<Component> tooltip = tooltippable.getTooltip();
+        List<Component> tooltip = new ArrayList<>(tooltippable.getTooltip());
+        if (editableTooltip != null) {
+            tooltip.add(Component.literal(editableTooltip.prefix() + editableTooltip.getText()));
+        }
+
         if (tooltip.isEmpty()) {
             hoverTicks = 0;
             return;
@@ -145,7 +274,22 @@ public class SuperpositionUITooltipRenderer {
             desiredY = (int) desiredScreenSpacePos.y();
         }
         tooltippable.drawExtra();
+        if (editableTooltip != null && editingEditable && flash < 40) {
+            cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
+            int xOffset = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));
+            graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset + 1, tooltipY + (int) textYOffset + 10, -3092272);
+            if (selected) {
+                xOffset = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
+                int xOffset2 = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
+                graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset2, tooltipY + (int) textYOffset + 10, -3092272);
+            }
+        }
+        flash++;
+        if (flash > 80 || selected) {
+            flash = 0;
+        }
         SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.getHex(), borderTop.getHex(), borderBottom.getHex(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
+        graphics.blit(SAVE, 64, 64, 0, 0, 16, 16);
         stack.popPose();
     }
 
@@ -191,8 +335,7 @@ public class SuperpositionUITooltipRenderer {
         position.y = -position.y;
 
         // Account for view bobbing
-        if (mc.options.bobView().get() && mc.getCameraEntity() instanceof Player) {
-            Player player = (Player) mc.getCameraEntity();
+        if (mc.options.bobView().get() && mc.getCameraEntity() instanceof Player player) {
             float playerStep = player.walkDist - player.walkDistO;
             float stepSize = -(player.walkDist + playerStep * partialTicks);
             float viewBob = Mth.lerp(partialTicks, player.oBob, player.bob);

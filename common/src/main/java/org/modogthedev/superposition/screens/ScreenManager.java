@@ -3,7 +3,6 @@ package org.modogthedev.superposition.screens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.modogthedev.superposition.SuperpositionClient;
-import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.system.filter.Filter;
 
 public class ScreenManager {

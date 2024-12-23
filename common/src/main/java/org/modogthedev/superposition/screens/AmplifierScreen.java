@@ -69,9 +69,9 @@ public class AmplifierScreen extends WidgetScreen {
         float resolution = 0.5f;
         for (float i = 0; i < 61; i += resolution) {
             float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
-            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
-            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition,-35,42);
-            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition,-35,42);
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
+            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition, -35, 42);
+            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition, -35, 42);
             fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + resolution, (j + 45 + nextCalculatedPosition), 0xFF56d156);
         }
     }
@@ -81,10 +81,10 @@ public class AmplifierScreen extends WidgetScreen {
         int j = (this.height - imageHeight) / 2;
         float resolution = 0.5f;
         for (float i = 0; i < 45; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude-amplitude) / 5) + signalAmplitude));
-            float nextCalculatedPosition = (float) (Math.sin(((i+resolution) + ticks) / frequency) * (5 + ((readAmplitude-amplitude) / 5) + signalAmplitude));
-            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition,-35,42);
-            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition,-35,42);
+            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude));
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) / frequency) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude));
+            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition, -35, 42);
+            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition, -35, 42);
             fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + resolution, (j + 45 + nextCalculatedPosition), 0xFF56d156);
         }
     }
@@ -104,11 +104,11 @@ public class AmplifierScreen extends WidgetScreen {
         if (pMinY > pMaxY) {
             float minY = pMinY;
             pMinY = pMaxY;
-            pMaxY = minY+3;
+            pMaxY = minY + 3;
         } else {
             pMaxY += 3;
         }
-            // In ryan we trust
+        // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -121,6 +121,7 @@ public class AmplifierScreen extends WidgetScreen {
         this.lineConsumer.addVertex(matrix4f, pMaxX, pMaxY, 0.0f).setColor(f, f1, f2, f3);
         this.lineConsumer.addVertex(matrix4f, pMaxX, pMinY, 0.0f).setColor(f, f1, f2, f3);
     }
+
     public void fillExact(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
         // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
@@ -140,11 +141,11 @@ public class AmplifierScreen extends WidgetScreen {
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
-            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),mute);
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(), mute);
             mute = !mute;
         }
         if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 + 12 > pMouseY - 24 && (double) height / 2 + 12 < pMouseY) {
-            this.playSwitchSound(Minecraft.getInstance().getSoundManager(),swap);
+            this.playSwitchSound(Minecraft.getInstance().getSoundManager(), swap);
             swap = !swap;
             updateBlock();
         }

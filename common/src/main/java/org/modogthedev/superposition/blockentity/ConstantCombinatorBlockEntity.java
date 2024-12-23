@@ -8,10 +8,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity {
+import java.util.List;
+
+public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implements EditableTooltip {
     public ConstantCombinatorBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.CONSTANT_COMBINATOR.get(), pos, state);
     }
@@ -28,7 +31,6 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity {
             outputSignal.encode(outputString);
         resetTooltip();
         addTooltip("Constant Combinator Status:");
-        addTooltip("Output - " + outputString);
         super.tick();
     }
 
@@ -60,6 +62,16 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity {
     }
 
     @Override
+    public List<Signal> getSignals() {
+        return List.of(outputSignal);
+    }
+
+    @Override
+    public List<Signal> getSideSignals(Direction face) {
+        return getSignals();
+    }
+
+    @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         if (signal.getEncodedData() != null) {
             outputString = signal.getEncodedData().stringValue();
@@ -70,6 +82,16 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity {
 
     public Direction getFacing() {
         return getBlockState().getValue(SignalActorTickingBlock.FACING);
+    }
+
+    @Override
+    public String getText() {
+        return outputString;
+    }
+
+    @Override
+    public void replaceText(String string) {
+        outputString = string;
     }
 }
 

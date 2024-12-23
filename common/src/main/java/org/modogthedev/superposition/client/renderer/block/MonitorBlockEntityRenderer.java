@@ -66,7 +66,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
         int j = 0;
         for (String text : be.text) { //TODO: Finish text system
-            float x = 45-this.font.width(text)/2f;
+            float x = 1;
             this.font.drawInBatch(text.substring(0, (int) (text.length()*transformUp)), x, j * 9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
             j++;
         }

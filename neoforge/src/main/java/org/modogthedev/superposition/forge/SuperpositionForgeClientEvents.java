@@ -7,6 +7,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
@@ -20,6 +21,7 @@ public class SuperpositionForgeClientEvents {
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
         CarabinerManager.tick(level);
+        SuperpositionUITooltipRenderer.clientTick(level);
     }
 
     @SubscribeEvent
