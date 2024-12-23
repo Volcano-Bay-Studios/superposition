@@ -135,7 +135,7 @@ public class SuperpositionUITooltipRenderer {
                 editableTooltip.replaceText(String.valueOf(key));
                 selected = false;
             } else {
-                editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, Math.max(0, editableTooltip.getText().length() - 1)), Math.max(0, editableTooltip.getText().length() - 1)));
+                editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, editableTooltip.getText().length())));
             }
             cursorPos++;
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
