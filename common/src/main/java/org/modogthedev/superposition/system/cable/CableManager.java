@@ -190,7 +190,7 @@ public class CableManager {
                 for (int i = 0; i < amount; i++) {
                     cable.addPointAtIndex(index, new Cable.Point(pos));
                 }
-                cable.addPlayerHoldingPoint(id, index + amount);
+                cable.addPlayerHoldingPoint(id, Math.min(cable.getPoints().size()-1,index + amount));
             }
         }
     }

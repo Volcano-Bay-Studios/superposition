@@ -212,7 +212,7 @@ public class Cable {
                 } else if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
                     List<Signal> signalList = startSignalActor.getSideSignals(points.getFirst().attachedFace);
                     if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
-                        endSignalActor.addSignals(signalList,points.getLast().attachedFace);
+                        endSignalActor.addSignals(new Object(),signalList,points.getLast().attachedFace);
                     }
                 }
             }
@@ -387,6 +387,7 @@ public class Cable {
         for (int i = 0; i < points.size(); i++) {
             points.get(i).setPosition(cable.points.get(i).getPosition());
             points.get(i).setPrevPosition(cable.points.get(i).getPrevPosition());
+            points.get(i).setAnchor(cable.points.get(i).attachedPoint,cable.points.get(i).attachedFace);
         }
         this.playerHoldingPointMap = cable.playerHoldingPointMap;
     }

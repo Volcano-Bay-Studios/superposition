@@ -51,6 +51,13 @@ repositories {
         }
     }
     maven {
+        url "https://squiddev.cc/maven/"
+        content {
+            includeGroup("cc.tweaked")
+            includeModule("org.squiddev", "Cobalt")
+        }
+    }
+    maven {
         name = "Architectury"
         url = "https://maven.shedaniel.me/"
     }

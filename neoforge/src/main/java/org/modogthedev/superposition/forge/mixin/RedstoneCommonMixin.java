@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.mixin;
+package org.modogthedev.superposition.forge.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

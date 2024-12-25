@@ -56,6 +56,7 @@ public class Signal {
         this.frequency = frequency;
         this.amplitude = amplitude;
         this.sourceFrequency = sourceFrequency;
+        setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()),0);
     }
 
     public Signal(UUID id, FriendlyByteBuf buf) {
@@ -108,6 +109,7 @@ public class Signal {
     }
 
     public void copy(Signal signal) {
+        this.id = signal.id;
         this.modulation = signal.modulation;
         this.emitting = signal.emitting;
         this.lifetime = signal.lifetime;

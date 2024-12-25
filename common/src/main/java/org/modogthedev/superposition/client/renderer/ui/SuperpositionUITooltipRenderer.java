@@ -49,7 +49,7 @@ public class SuperpositionUITooltipRenderer {
     public static Vec3 currentPos = null;
     public static Vec3 desiredPos = null;
     public static EditableTooltip editableTooltip;
-    public static boolean editingEditable = true;
+    public static boolean editingEditable = false;
     public static int cursorPos = 0;
     public static int flash;
     public static BlockPos.MutableBlockPos editPos = new BlockPos.MutableBlockPos();
@@ -283,6 +283,12 @@ public class SuperpositionUITooltipRenderer {
                 int xOffset2 = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
                 graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset2, tooltipY + (int) textYOffset + 10, -3092272);
             }
+        }
+        if (editableTooltip != null && editingEditable) {
+            String focusText = "[PRESS ESC TO UNFOCUS]";
+            RenderSystem.setShaderColor(.5f, 1, .5f, 1f);
+            graphics.drawString(Minecraft.getInstance().font, focusText, tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2+8, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
+            RenderSystem.setShaderColor(1, 1, 1, 1);
         }
         flash++;
         if (flash > 80 || selected) {

@@ -4,6 +4,7 @@
   "package": "org.modogthedev.superposition.forge.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "RedstoneCommonMixin",
     "self.CommonRedstoneMixin"
   ],
   "client": [

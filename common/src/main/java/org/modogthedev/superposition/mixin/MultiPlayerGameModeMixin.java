@@ -5,6 +5,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.phys.BlockHitResult;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,6 +14,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MultiPlayerGameMode.class)
 public class MultiPlayerGameModeMixin {
+    @Inject(method = "performUseItemOn", at = @At("HEAD"), cancellable = true)
+    public void performUseItemOnHead(LocalPlayer player, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
+        if (player.level().getBlockEntity(result.getBlockPos()) instanceof SignalActorBlockEntity) {
+            InteractionResult value = CableManager.playerUseEvent(player, result.getBlockPos(), result.getDirection());
+            if (value.consumesAction()) {
+                cir.setReturnValue(value);
+            }
+        }
+    }
+
 
     @Inject(method = "performUseItemOn", at = @At("RETURN"), cancellable = true)
     public void performUseItemOn(LocalPlayer player, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {

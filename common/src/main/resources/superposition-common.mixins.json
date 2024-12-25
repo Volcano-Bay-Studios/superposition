@@ -3,8 +3,8 @@
   "minVersion": "0.8",
   "package": "org.modogthedev.superposition.mixin",
   "compatibilityLevel": "JAVA_21",
+  "refmap": "superposition.refmap.json",
   "mixins": [
-    "RedstoneCommonMixin",
     "ServerGameModeMixin"
   ],
   "client": [

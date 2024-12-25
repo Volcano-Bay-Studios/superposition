@@ -353,7 +353,7 @@ public class CableRenderer {
         for (Cable cable : CableManager.getLevelCables(level)) {
             for (Int2IntMap.Entry entry : cable.getPlayerHoldingPointMap().int2IntEntrySet()) {
                 if (level.getEntity(entry.getIntKey()) instanceof Player player) {
-                    int i = entry.getIntValue();
+                    int i = Math.min(cable.getPoints().size()-1,entry.getIntValue());
 
                     Vec3 pointPos = cable.getPoints().get(i).getPosition();
                     Vec3 prevPos = cable.getPoints().get(i).getPrevRenderPosition();

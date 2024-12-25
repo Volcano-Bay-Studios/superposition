@@ -1,6 +1,5 @@
 {
   "values": [
-    "superposition:casing",
     "superposition:signal_generator",
     "superposition:signal_readout",
     "superposition:amplifier",

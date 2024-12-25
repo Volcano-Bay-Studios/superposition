@@ -68,6 +68,7 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
                 }
             }
             List<Signal> signals = getSignals();
+            updatePutSignals(signals);
             int currentSize = signals.size();
             tooltip.add(Component.literal("Signal - "+(signals.isEmpty() ? "NONE":"OK")));
             if (currentSize != lastSize || (antennaBrokenLastTick != (antenna == null))) {

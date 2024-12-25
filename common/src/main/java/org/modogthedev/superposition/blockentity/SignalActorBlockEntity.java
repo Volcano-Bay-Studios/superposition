@@ -62,7 +62,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
     int signalsReceived = 0;
 
-    private Object lastCall;
+    Object lastCall;
     private Object lastCallList;
     protected final List<Signal> putSignals = new ArrayList<>();
     private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
@@ -281,8 +281,16 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return putSignals;
     }
 
-    public void addSignals(List<Signal> signals, Direction face) {
+    public void addSignals(Object lastCall,List<Signal> signals, Direction face) {
+        if (lastCall == this.lastCall) {
+            return;
+        }
+        this.lastCall = lastCall;
         this.modulateSignals(signals, true);
+        BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
+            signalActorBlockEntity.addSignals(lastCall,new ArrayList<>(signals),face);
+        }
         if (signalsReceived == 0) {
             this.updatePutSignals(signals);
         } else {

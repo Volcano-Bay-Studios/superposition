@@ -60,8 +60,16 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
     }
 
     @Override
-    public void addSignals(List<Signal> signals, Direction face) {
+    public void addSignals(Object lastCall,List<Signal> signals, Direction face) {
+        if (lastCall == this.lastCall) {
+            return;
+        }
+        this.lastCall = lastCall;
         this.modulateSignals(signals, true);
+        BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
+            signalActorBlockEntity.addSignals(lastCall,new ArrayList<>(signals),face);
+        }
         if (face == getInvertedSwappedSide()) {
             if (signalsReceived == 0) {
                 this.updatePutSignals(signals);
@@ -186,7 +194,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
     }
 
     public void updateMode(int index) {
-        if (Modes.values()[index].type != type) {
+        if (index >= Modes.values().length || Modes.values()[index].type != type) {
             for (int i = 0; i < Modes.values().length; i++) {
                 if (Modes.values()[i].type == type) {
                     mode = Modes.values()[i];
@@ -216,7 +224,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
     @Override
     public void setupConfigTooltips() {
         super.setupConfigTooltips();
-        this.addConfigTooltip("Mode - " + mode.name(), () -> {
+        this.addConfigTooltip("Mode - " + mode.displayText, () -> {
             CompoundTag tag = new CompoundTag();
             tag.putInt("mode", mode.ordinal() + 1);
             VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, this.getBlockPos()));
@@ -268,49 +276,49 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
         SIN((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += (float) Math.sin(f);
+                value += (float) Math.toDegrees(Math.sin(Math.toRadians(f)));
             }
             return value;
         }, Types.TRIGONOMETRIC, "SIN"),
         COS((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += (float) Math.cos(f);
+                value += (float) Math.toDegrees(Math.cos(Math.toRadians(f)));
             }
             return value;
         }, Types.TRIGONOMETRIC, "COS"),
         TAN((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += (float) Math.tan(f);
+                value += (float) Math.toDegrees(Math.tan(Math.toRadians(f)));
             }
             return value;
         }, Types.TRIGONOMETRIC,"TAN"),
         ASIN((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += (float) Math.asin(f);
+                value += (float) Math.toDegrees(Math.asin(Math.toRadians(f)));
             }
             return value;
         }, Types.TRIGONOMETRIC,"ASIN"),
         ACOS((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += (float) Math.acos(f);
+                value += (float) Math.toDegrees(Math.acos(Math.toRadians(f)));
             }
             return value;
         }, Types.TRIGONOMETRIC,"ACOS"),
         ATAN((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += (float) Math.atan(f);
+                value += (float) Math.toDegrees(Math.atan(Math.toRadians(f)));
             }
             return value;
         }, Types.TRIGONOMETRIC,"ATAN"),
         SQR((floats) -> {
             float value = 0;
             for (float f : floats) {
-                value += f * f;
+                value += (float) Math.toDegrees(Math.atan(Math.toRadians(f)));
             }
             return value;
         }, Types.SCIENTIFIC,"^2"),
@@ -321,13 +329,6 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
             }
             return value;
         }, Types.SCIENTIFIC, "ROOT"),
-        FACTORIAL((floats) -> {
-            float value = 0;
-            for (float f : floats) {
-                value += 0;
-            }
-            return value;
-        }, Types.SCIENTIFIC, "!"),
         EQUAL((floats) -> {
             float value = floats[0];
             for (int i = 1; i < floats.length; i++) {
@@ -335,7 +336,47 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
                     return 0f;
             }
             return 1f;
-        }, Types.COMPARISON, "==");
+        }, Types.COMPARISON, "=="),
+        NOT_EQUAL((floats) -> {
+            float value = floats[0];
+            for (int i = 1; i < floats.length; i++) {
+                if (value == floats[i])
+                    return 0f;
+            }
+            return 1f;
+        }, Types.COMPARISON, "!="),
+        LESS_THAN((floats) -> {
+            float value = floats[0];
+            for (int i = 1; i < floats.length; i++) {
+                if (value >= floats[i])
+                    return 0f;
+            }
+            return 1f;
+        }, Types.COMPARISON, "<"),
+        GREATER_THAN((floats) -> {
+            float value = floats[0];
+            for (int i = 1; i < floats.length; i++) {
+                if (value <= floats[i])
+                    return 0f;
+            }
+            return 1f;
+        }, Types.COMPARISON, ">"),
+        LESS_THAN_OR_EQUALS((floats) -> {
+            float value = floats[0];
+            for (int i = 1; i < floats.length; i++) {
+                if (value > floats[i])
+                    return 0f;
+            }
+            return 1f;
+        }, Types.COMPARISON, "<="),
+        GREATER_THAN_OR_EQUALS((floats) -> {
+            float value = floats[0];
+            for (int i = 1; i < floats.length; i++) {
+                if (value < floats[i])
+                    return 0f;
+            }
+            return 1f;
+        }, Types.COMPARISON, ">=");
         private MathFunction function;
         public Types type;
         private String displayText;
