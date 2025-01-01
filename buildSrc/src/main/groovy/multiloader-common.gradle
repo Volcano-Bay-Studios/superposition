@@ -50,11 +50,12 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
-    maven {
-        url "https://squiddev.cc/maven/"
-        content {
-            includeGroup("cc.tweaked")
-            includeModule("org.squiddev", "Cobalt")
+    repositories {
+        maven {
+            url "https://maven.squiddev.cc"
+            content {
+                includeGroup("cc.tweaked")
+            }
         }
     }
     maven {

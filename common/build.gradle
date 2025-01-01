@@ -22,8 +22,7 @@ dependencies {
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
 
-    compileOnly("cc.tweaked:cc-tweaked-1.21-common-api:1.111.0")
-    implementation("cc.tweaked:cc-tweaked-1.21-common:1.111.0")
+    compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-common-api:${project.cc_version}")
 
     implementation "foundry.veil:veil-common-${project.minecraft_version}:${project.veil_version}"
     implementation "mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}"

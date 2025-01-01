@@ -8,8 +8,9 @@ dependencies {
         exclude group: "maven.modrinth"
     }
 
-    compileOnly("cc.tweaked:cc-tweaked-1.21-forge-api:1.111.0")
-    implementation("cc.tweaked:cc-tweaked-1.21-forge:1.111.0")
+    compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-core-api:${project.cc_version}")
+    compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge-api:${project.cc_version}")
+    runtimeOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge:${project.cc_version}")
 
     compileOnly "mezz.jei:jei-${project.minecraft_version}-neoforge-api:${project.jei_version}"
     runtimeOnly("mezz.jei:jei-${project.minecraft_version}-neoforge:${project.jei_version}")

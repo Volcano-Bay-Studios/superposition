@@ -8,6 +8,7 @@ import org.modogthedev.superposition.Superposition;
 public class SuperpositionForge {
 
     public SuperpositionForge(IEventBus modEventBus) {
+        SuperpositionForgeCompatability.setup();
         Superposition.init();
     }
 
