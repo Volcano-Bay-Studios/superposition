@@ -204,7 +204,7 @@ public class Cable {
                         periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
                         signalActorBlockEntity.putSignalFace(periphrealSignal,points.getLast().attachedFace);
                     }
-                } else if (points.getLast().attachedFace == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as periphreal
+                } else if (points.getLast().attachedFace == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as peripheral
                     Card card = cbe.getCard();
                     if (card != null && start instanceof SignalActorBlockEntity signalActorBlockEntity) {
                         cbe.acceptPeriphrealSignal(signalActorBlockEntity.getSignal());
@@ -213,6 +213,17 @@ public class Cable {
                     List<Signal> signalList = startSignalActor.getSideSignals(points.getFirst().attachedFace);
                     if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
                         endSignalActor.addSignals(new Object(),signalList,points.getLast().attachedFace);
+                    }
+                } else if (start instanceof SignalActorBlockEntity startSignalActor) {
+                    CablePassthroughManager.addSignalsToBlock(level,endPos,startSignalActor.getSideSignals(points.getFirst().getAttachedFace()));
+                } else  {
+                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level,startPos);
+                    if (signalList != null) {
+                        if (end instanceof SignalActorBlockEntity endSignalActor) {
+                            endSignalActor.putSignalsFace(new Object(), signalList, points.getLast().getAttachedFace());
+                        } else {
+                            CablePassthroughManager.addSignalsToBlock(level,endPos,signalList);
+                        }
                     }
                 }
             }

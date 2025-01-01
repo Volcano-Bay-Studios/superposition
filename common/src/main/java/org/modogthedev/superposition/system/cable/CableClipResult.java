@@ -6,9 +6,7 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.util.SuperpositionMth;
 import oshi.util.tuples.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 // TODO add spacial mapping + make this static
 public class CableClipResult {
@@ -41,6 +39,47 @@ public class CableClipResult {
     public Pair<Cable, Cable.Point> rayCastForClosest(Vec3 toPos, float range) {
         List<Pair<Cable, Cable.Point>> rayCast = this.rayCast(toPos, range);
         List<Pair<Float, Cable.Point>> distancePointPairMap = new ArrayList<>();
+
+        for (Pair<Cable, Cable.Point> cablePointPair : rayCast) {
+            distancePointPairMap.add(new Pair<>(999f, cablePointPair.getB()));
+        }
+        for (float delta = 0; delta < sourcePos.distanceTo(toPos); delta += range) {
+            Vec3 stepPos = SuperpositionMth.lerpVec3(sourcePos, toPos, SuperpositionMth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
+            int i = 0;
+            for (Pair<Cable, Cable.Point> cablePointPair : rayCast) {
+                boolean isAnEndPoint = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
+                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
+                float storedDistance = distancePointPairMap.get(i).getA();
+                if (distance < storedDistance) {
+                    distancePointPairMap.set(i, new Pair<>(distance, cablePointPair.getB()));
+                }
+                i++;
+            }
+        }
+        float closetPointDistance = 999f;
+        int closestPointIndex = 0;
+        for (int i = 0; i < rayCast.size(); i++) {
+            float distance = distancePointPairMap.get(i).getA();
+            if (distance < closetPointDistance) {
+                closetPointDistance = distance;
+                closestPointIndex = i;
+            }
+        }
+        if (!rayCast.isEmpty()) {
+            return rayCast.get(closestPointIndex);
+        }
+        return null;
+    }
+
+    public Pair<Cable, Cable.Point> filteredRayCastForClosest(Vec3 toPos, float range, UUID uuid) {
+        List<Pair<Cable, Cable.Point>> rayCast = this.rayCast(toPos, range);
+        List<Pair<Float, Cable.Point>> distancePointPairMap = new ArrayList<>();
+        ListIterator<Pair<Cable, Cable.Point>> iterator = rayCast.listIterator();
+        while (iterator.hasNext()) {
+            if (!iterator.next().getA().getId().equals(uuid)) {
+                iterator.remove();
+            }
+        }
         for (Pair<Cable, Cable.Point> cablePointPair : rayCast) {
             distancePointPairMap.add(new Pair<>(999f, cablePointPair.getB()));
         }

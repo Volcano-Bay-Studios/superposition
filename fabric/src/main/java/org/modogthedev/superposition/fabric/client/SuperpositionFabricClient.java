@@ -10,6 +10,7 @@ import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
@@ -23,6 +24,7 @@ public class SuperpositionFabricClient implements ClientModInitializer {
         ClientTickEvents.END_WORLD_TICK.register(level -> {
             ClientSignalManager.tick(level);
             CableManager.clientTick(level);
+            CablePassthroughManager.tick(level);
             CarabinerManager.tick(level);
             SuperpositionUITooltipRenderer.clientTick(level);
         });

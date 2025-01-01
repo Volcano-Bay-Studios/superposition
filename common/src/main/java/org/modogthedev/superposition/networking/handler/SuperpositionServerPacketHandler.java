@@ -75,7 +75,7 @@ public class SuperpositionServerPacketHandler {
         ServerLevel level = player.serverLevel();
 
         CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, player.level());
-        Pair<Cable, Cable.Point> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
+        Pair<Cable, Cable.Point> rayCast = cableClipResult.filteredRayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f,packet.id());
         if (rayCast == null || !rayCast.getA().getId().equals(packet.id())) {
             Cable cable = CableManager.getCable(level, packet.id());
             ctx.sendPacket(cable != null ? new CableSyncS2CPacket(cable) : new CableSyncS2CPacket(packet.id()));

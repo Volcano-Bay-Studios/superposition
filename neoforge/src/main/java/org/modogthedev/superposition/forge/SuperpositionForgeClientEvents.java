@@ -9,6 +9,7 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
@@ -20,6 +21,7 @@ public class SuperpositionForgeClientEvents {
         Level level = event.getLevel();
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
+        CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
         SuperpositionUITooltipRenderer.clientTick(level);
     }
@@ -29,6 +31,7 @@ public class SuperpositionForgeClientEvents {
         Level level = event.getLevel();
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
+        CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
     }
 }
