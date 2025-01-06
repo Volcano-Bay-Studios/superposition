@@ -2,7 +2,7 @@ package org.modogthedev.superposition.client.renderer.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -45,7 +45,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         float offset = (stage / stages);
         float uvOffsetx = 0f;
 
-        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING)));
+        light = LightTexture.FULL_BRIGHT;
 
         buffer
                 .addVertex(m, min, 0.5001f, min)

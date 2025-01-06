@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.system.cable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -47,7 +48,7 @@ public class CablePassthroughManager {
         getNewHeldSignals(level).clear();
     }
 
-    public static void addSignalsToBlock(Level level, BlockPos pos, List<Signal> signals) {
+    public static void addSignalsToBlock(Level level, BlockPos pos, List<Signal> signals, Direction direction) {
         accessedLevel(level);
         if (getNewHeldSignals(level).get(level.dimension()).containsKey(pos)) {
             getNewHeldSignals(level).get(level.dimension()).get(pos).addAll(signals);

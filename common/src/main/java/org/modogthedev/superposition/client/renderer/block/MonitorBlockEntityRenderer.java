@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -54,7 +55,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
         float stages = 25;
 
         float transformDown = Math.max(0,(-be.transformState/10f)+1);
-        float transformUp = SuperpositionMth.clamp(((be.transformState-10)/10f),0,1);
+        float transformUp = Mth.clamp(((be.transformState-10)/10f),0,1);
         float uvOffsetx = 0f;
         int offset = 2;
         float part = 1f / (size + 4);
@@ -81,7 +82,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             Signal[] signals = SuperpositionMth.spaceArray(be.signals, size);
             if (signals != null && signals[i] != null) {
                 y = Math.max(-.061f, (float) ((((signals[i].getAmplitude()) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)))*transformDown;
-                y = SuperpositionMth.lerp(-(transformDown-1),y,.21f);
+                y = Mth.lerp(-(transformDown-1),y,.21f);
             }
             y += (float) (Math.random() / 64)*transformDown;
             yinverse = -y + .42f +(.05f*transformDown);

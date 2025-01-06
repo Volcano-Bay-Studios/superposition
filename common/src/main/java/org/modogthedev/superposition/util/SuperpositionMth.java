@@ -2,6 +2,7 @@ package org.modogthedev.superposition.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -9,7 +10,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class SuperpositionMth extends net.minecraft.util.Mth {
+public class SuperpositionMth  {
     public static float getFromRange(float OldMax, float OldMin, float NewMax, float NewMin, float OldValue) {
         float OldRange = (OldMax - OldMin);
         float NewRange = (NewMax - NewMin);
@@ -22,7 +23,7 @@ public class SuperpositionMth extends net.minecraft.util.Mth {
         return new BlockPos((int) vec3.x(), (int) vec3.y(), (int) vec3.z());
     }
     public static Vec3 lerpVec3(Vec3 start, Vec3 end, float delta) {
-        return new Vec3(lerp(delta,start.x,end.x),lerp(delta,start.y,end.y),lerp(delta,start.z,end.z));
+        return new Vec3(Mth.lerp(delta,start.x,end.x),Mth.lerp(delta,start.y,end.y),Mth.lerp(delta,start.z,end.z));
     }
 
     public static Vector3dc convertVec(BlockPos pos) {

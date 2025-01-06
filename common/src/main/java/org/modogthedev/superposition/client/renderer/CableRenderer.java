@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -88,12 +89,12 @@ public class CableRenderer {
                 Vec3 prevNextPoint = prevPoints.get(i + 1);
                 Vec3 nextPoint = points.get(i + 1);
 
-                double x = SuperpositionMth.lerp(partialTicks, prevPoint.x, point.x);
-                double y = SuperpositionMth.lerp(partialTicks, prevPoint.y, point.y);
-                double z = SuperpositionMth.lerp(partialTicks, prevPoint.z, point.z);
-                double nextX = SuperpositionMth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
-                double nextY = SuperpositionMth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
-                double nextZ = SuperpositionMth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
+                double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+                double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+                double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
+                double nextX = Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
+                double nextY = Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
+                double nextZ = Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
 
                 if (i < points.size() - 2) {
                     calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevPoints.get(i + 2), points.get(i + 2), partialTicks);
@@ -245,9 +246,9 @@ public class CableRenderer {
     private static void renderCableStart(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         PoseStack.Pose pose = matrixStack.pose();
         float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
-        double x = SuperpositionMth.lerp(partialTicks, prevPoint.x, point.x);
-        double y = SuperpositionMth.lerp(partialTicks, prevPoint.y, point.y);
-        double z = SuperpositionMth.lerp(partialTicks, prevPoint.z, point.z);
+        double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+        double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+        double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
 
         // TODO attach to block face
         calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
@@ -288,9 +289,9 @@ public class CableRenderer {
     private static void renderCableEnd(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         PoseStack.Pose pose = matrixStack.pose();
         float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
-        double x = SuperpositionMth.lerp(partialTicks, prevPoint.x, point.x);
-        double y = SuperpositionMth.lerp(partialTicks, prevPoint.y, point.y);
-        double z = SuperpositionMth.lerp(partialTicks, prevPoint.z, point.z);
+        double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+        double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+        double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
 
         // TODO attach to block face
         calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
@@ -329,9 +330,9 @@ public class CableRenderer {
     }
 
     private static Quaternionf calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
-        double dx = (SuperpositionMth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
-        double dy = (SuperpositionMth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
-        double dz = (SuperpositionMth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
+        double dx = (Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
+        double dy = (Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
+        double dz = (Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
         float factor = 0;//(float) Mth.smoothstep(1.0-Mth.clamp(8*Math.sqrt(dx * dx + dz * dz), 0.0, 1.0));
         return store.identity()
                 .rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0)
@@ -353,7 +354,7 @@ public class CableRenderer {
         for (Cable cable : CableManager.getLevelCables(level)) {
             for (Int2IntMap.Entry entry : cable.getPlayerHoldingPointMap().int2IntEntrySet()) {
                 if (level.getEntity(entry.getIntKey()) instanceof Player player) {
-                    int i = Math.min(cable.getPoints().size()-1,entry.getIntValue());
+                    int i = Math.min(cable.getPoints().size() - 1, entry.getIntValue());
 
                     Vec3 pointPos = cable.getPoints().get(i).getPosition();
                     Vec3 prevPos = cable.getPoints().get(i).getPrevRenderPosition();
@@ -369,9 +370,9 @@ public class CableRenderer {
             }
         }
         if (detachDelta > 0) {
-            float delta = SuperpositionMth.lerp(partialTicks, detachDelta, detachDelta - 0.2f);
+            float delta = Mth.lerp(partialTicks, detachDelta, detachDelta - 0.2f);
             stretch = 1;
-            width = 0.12f - SuperpositionMth.map(1, 0, 0, 1, delta) * 0.15125f;
+            width = 0.12f - Mth.map(1, 0, 0, 1, delta) * 0.15125f;
             if (width > 0) {
                 DebugRenderer.renderFilledBox(poseStack, bufferSource, detachPos.x - cameraPos.x - width, detachPos.y - cameraPos.y - width, detachPos.z - cameraPos.z - width, detachPos.x - cameraPos.x + width, detachPos.y - cameraPos.y + width, detachPos.z - cameraPos.z + width, 1f, 0.4f, 0.3f, 0.8f);
                 width += 0.03125f;

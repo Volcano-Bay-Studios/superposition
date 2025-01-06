@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -215,14 +216,14 @@ public class Cable {
                         endSignalActor.addSignals(new Object(),signalList,points.getLast().attachedFace);
                     }
                 } else if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    CablePassthroughManager.addSignalsToBlock(level,endPos,startSignalActor.getSideSignals(points.getFirst().getAttachedFace()));
+                    CablePassthroughManager.addSignalsToBlock(level,endPos,startSignalActor.getSideSignals(points.getFirst().getAttachedFace()),points.getLast().getAttachedFace());
                 } else  {
                     List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level,startPos);
                     if (signalList != null) {
                         if (end instanceof SignalActorBlockEntity endSignalActor) {
                             endSignalActor.putSignalsFace(new Object(), signalList, points.getLast().getAttachedFace());
                         } else {
-                            CablePassthroughManager.addSignalsToBlock(level,endPos,signalList);
+                            CablePassthroughManager.addSignalsToBlock(level,endPos,signalList,points.getLast().getAttachedFace());
                         }
                     }
                 }
@@ -319,7 +320,7 @@ public class Cable {
                 if (point.inContact) {
                     point.position = point.position.add(offset.scale(0.7f));
                 } else {
-                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : SuperpositionMth.map(sleepTimer,60,0,0.999f,0.9f)));
+                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : Mth.map(sleepTimer,60,0,0.999f,0.9f)));
                 }
             } else {
                 point.prevPosition = point.position;

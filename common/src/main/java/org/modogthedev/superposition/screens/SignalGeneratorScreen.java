@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,6 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class SignalGeneratorScreen extends WidgetScreen {
     private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/signal_generator_background.png");
@@ -165,7 +165,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
     public void tick() {
         super.tick();
         if (!mute && frequency > .72f) {
-            float pitch = 1.0F / SuperpositionMth.map(0, 30, 2, .72f, frequency);
+            float pitch = 1.0F / Mth.map(0, 30, 2, .72f, frequency);
             // TODO make it work pls
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
         }
