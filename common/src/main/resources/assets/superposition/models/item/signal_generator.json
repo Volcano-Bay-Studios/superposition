@@ -1,3 +1,23 @@
 {
-  "parent": "superposition:block/signal_generator/signal_generator"
+  "credit": "Made with Blockbench",
+  "parent": "minecraft:block/block",
+  "texture_size": [64, 48],
+  "textures": {
+    "4": "superposition:block/signal_generator/signal_generator_item",
+    "particle": "superposition:block/computer"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": {"uv": [4, 5.33333, 8, 10.66667], "texture": "#4", "cullface": "north"},
+        "east": {"uv": [0, 5.33333, 4, 10.66667], "texture": "#4", "cullface": "east"},
+        "south": {"uv": [12, 5.33333, 16, 10.66667], "texture": "#4", "cullface": "south"},
+        "west": {"uv": [8, 5.33333, 12, 10.66667], "texture": "#4", "cullface": "west"},
+        "up": {"uv": [4, 5.33333, 8, 0], "texture": "#4", "cullface": "up"},
+        "down": {"uv": [8, 16, 4, 10.66667], "texture": "#4", "cullface": "down"}
+      }
+    }
+  ]
 }

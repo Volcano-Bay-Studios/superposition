@@ -1,7 +1,6 @@
 package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -34,10 +33,10 @@ public class Signal {
     private float minDist = 0;
 
     public boolean tick() {
-        for (float i = 0; i < 361; i += .1f) {
-            this.level.addParticle(ParticleTypes.WAX_ON, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, Math.random()-0.5, 0);
-            this.level.addParticle(ParticleTypes.WAX_OFF, pos.x + (Math.sin(i)*minDist), pos.y, pos.z+ (Math.cos(i)*minDist), 0, Math.random()-0.5, 0);
-        }
+//        for (float i = 0; i < 361; i += .1f) {
+//            this.level.addParticle(ParticleTypes.WAX_ON, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, Math.random()-0.5, 0);
+//            this.level.addParticle(ParticleTypes.WAX_OFF, pos.x + (Math.sin(i)*minDist), pos.y, pos.z+ (Math.cos(i)*minDist), 0, Math.random()-0.5, 0);
+//        }
         lifetime++;
         float maxRange = amplitude * 100;
         minDist = 0;
