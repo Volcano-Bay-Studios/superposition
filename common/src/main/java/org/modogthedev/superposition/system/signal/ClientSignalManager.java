@@ -44,18 +44,14 @@ public class ClientSignalManager {
     }
 
     public static void postSignalsToAntenna(Antenna antenna) {
-        antenna.signals.clear();
-
         for (Signal signal : clientSignals.get(antenna.level).values()) {
             AntennaManager.postSignalToAntenna(signal, antenna);
         }
     }
 
     public static void stopSignal(Signal signal) {
-        if (clientSignals.get(signal.level).containsValue(signal)) {
-            Signal ourSignal = clientSignals.get(signal.level).get(signal.getId());
-            ourSignal.stop();
-            clientSignals.get(signal.level).put(signal.getId(), ourSignal);
+        if (clientSignals.get(signal.level).containsValue(signal) && signal.isEmitting()) {
+            signal.stop();
         }
     }
 

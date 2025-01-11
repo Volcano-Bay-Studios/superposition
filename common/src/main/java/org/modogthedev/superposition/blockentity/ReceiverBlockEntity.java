@@ -28,11 +28,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        if (antenna != null)
-            if (level.isClientSide)
-                ClientSignalManager.postSignalsToAntenna(antenna);
-            else
-                SignalManager.postSignalsToAntenna(antenna);
     }
 
     @Override
@@ -40,6 +35,7 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         if (antenna == null) {
             return null;
         }
+        antenna.signals.clear();
         if (level.isClientSide)
             ClientSignalManager.postSignalsToAntenna(antenna);
         else

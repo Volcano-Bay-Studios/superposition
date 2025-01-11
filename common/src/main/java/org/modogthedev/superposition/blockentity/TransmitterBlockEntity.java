@@ -44,7 +44,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     signalForBroadcast.setSourceAntenna(this.getBlockPos(), antenna.antennaParts.size());
                     frequency += signalForBroadcast.getFrequency();
                     signalForBroadcast.setFrequency(frequency);
-                    SignalManager.addSignal(signalForBroadcast);
+                    SignalManager.updateSignal(signalForBroadcast);
                     signal = signalForBroadcast;
                     if (level.isClientSide) {
                         tooltip.add(Component.literal("Broadcast Frequency - " + SuperpositionMth.frequencyToHzReadable(signalForBroadcast.getFrequency())));

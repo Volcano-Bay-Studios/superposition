@@ -4,8 +4,16 @@ import com.mojang.logging.LogUtils;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.networking.SuperpositionMessages;
+import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.CablePassthroughManager;
+import org.modogthedev.superposition.system.cable.CarabinerManager;
+import org.modogthedev.superposition.system.signal.ClientSignalManager;
+import org.modogthedev.superposition.system.signal.SignalManager;
 import org.slf4j.Logger;
 
 public class Superposition {
@@ -28,6 +36,20 @@ public class Superposition {
         SuperpositionSounds.bootstrap();
         SuperpositionMessages.register();
         LOGGER.info("Superposition has been initialized.");
+    }
+
+    public static void tick(ServerLevel level) {
+        SignalManager.tick(level);
+        CableManager.tick(level);
+        CablePassthroughManager.tick(level);
+        CarabinerManager.tick(level);
+    }
+    public static void clientTick(Level level){
+        ClientSignalManager.tick(level);
+        CableManager.clientTick(level);
+        CablePassthroughManager.tick(level);
+        CarabinerManager.tick(level);
+        SuperpositionUITooltipRenderer.clientTick(level);
     }
 
     public static void initTheme() {

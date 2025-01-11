@@ -39,14 +39,6 @@ public class AntennaManager {
         }
     }
 
-    public static void postSignal(Signal signal) {
-        Level level = signal.level;
-        BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
-        for (Antenna antenna : antennas.get(level)) {
-            postSignalToAntenna(signal, antenna);
-        }
-    }
-
     public static void postSignalToAntenna(Signal signal, Antenna antenna) {
         BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
 
@@ -65,7 +57,6 @@ public class AntennaManager {
         if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
             Signal signal1 = new Signal(signal);
 
-            Antenna sourceAntenna = AntennaManager.getAntennaActorAntenna(signal.level, signal.getSourceAntennaPos());
             signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
             signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
 

@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +15,7 @@ public class Signal {
 
     public static final int SPEED = 64;
 
-    private UUID id;
+    private UUID uuid;
     private final Vector3d pos;
     private float amplitude;
     private float frequency;
@@ -33,11 +34,13 @@ public class Signal {
     private float minDist = 0;
 
     public boolean tick() {
-//        for (float i = 0; i < 361; i += .1f) {
-//            this.level.addParticle(ParticleTypes.ELECTRIC_SPARK, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, 0, 0);
-//        }
+        for (float i = 0; i < 361; i += .1f) {
+            this.level.addParticle(ParticleTypes.WAX_ON, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, Math.random()-0.5, 0);
+            this.level.addParticle(ParticleTypes.WAX_OFF, pos.x + (Math.sin(i)*minDist), pos.y, pos.z+ (Math.cos(i)*minDist), 0, Math.random()-0.5, 0);
+        }
         lifetime++;
         float maxRange = amplitude * 100;
+        minDist = 0;
         if (!emitting) {
             int endTicks = lifetime - endTime - 2;
             minDist = endTicks * SPEED;
@@ -50,7 +53,7 @@ public class Signal {
     }
 
     public Signal(Vector3dc pos, Level level, float frequency, float amplitude, float sourceFrequency) {
-        this.id = UUID.randomUUID();
+        this.uuid = UUID.randomUUID();
         this.pos = new Vector3d(pos);
         this.level = level;
         this.frequency = frequency;
@@ -59,9 +62,9 @@ public class Signal {
         setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()),0);
     }
 
-    public Signal(UUID id, FriendlyByteBuf buf) {
+    public Signal(UUID uuid, FriendlyByteBuf buf) {
         this.pos = new Vector3d();
-        this.load(id, buf);
+        this.load(uuid, buf);
     }
 
     public Signal(Signal signal) {
@@ -70,7 +73,7 @@ public class Signal {
     }
 
     public void load(UUID id, FriendlyByteBuf buf) {
-        this.id = id;
+        this.uuid = id;
         this.pos.set(buf.readFloat(), buf.readFloat(), buf.readFloat());
         this.amplitude = buf.readFloat();
         this.frequency = buf.readFloat();
@@ -87,7 +90,7 @@ public class Signal {
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeUUID(this.id);
+        buf.writeUUID(this.uuid);
         buf.writeFloat((float) this.pos.x);
         buf.writeFloat((float) this.pos.y);
         buf.writeFloat((float) this.pos.z);
@@ -109,7 +112,8 @@ public class Signal {
     }
 
     public void copy(Signal signal) {
-        this.id = signal.id;
+        this.level = signal.level;
+        this.uuid = signal.uuid;
         this.modulation = signal.modulation;
         this.emitting = signal.emitting;
         this.lifetime = signal.lifetime;
@@ -158,8 +162,15 @@ public class Signal {
         this.amplitude *= amplitude;
     }
 
-    public UUID getId() {
-        return this.id;
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    /**
+     * Resets the UUID of a signal if it already exists and is closing
+     */
+    public void changeUUID() {
+        uuid = UUID.randomUUID();
     }
 
     public Vector3d getPos() {

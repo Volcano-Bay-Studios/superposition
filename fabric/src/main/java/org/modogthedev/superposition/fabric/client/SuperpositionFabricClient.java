@@ -6,13 +6,10 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
-import org.modogthedev.superposition.system.cable.CableManager;
-import org.modogthedev.superposition.system.cable.CablePassthroughManager;
-import org.modogthedev.superposition.system.cable.CarabinerManager;
-import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
 public class SuperpositionFabricClient implements ClientModInitializer {
 
@@ -21,13 +18,7 @@ public class SuperpositionFabricClient implements ClientModInitializer {
         SuperpositionClient.init();
         SuperpositionClient.registerBlockEntityRenderers(BlockEntityRenderers::register);
 
-        ClientTickEvents.END_WORLD_TICK.register(level -> {
-            ClientSignalManager.tick(level);
-            CableManager.clientTick(level);
-            CablePassthroughManager.tick(level);
-            CarabinerManager.tick(level);
-            SuperpositionUITooltipRenderer.clientTick(level);
-        });
+        ClientTickEvents.END_WORLD_TICK.register(Superposition::clientTick);
 
         HudRenderCallback.EVENT.register(SuperpositionUITooltipRenderer::renderOverlay);
 
