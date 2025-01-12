@@ -88,10 +88,12 @@ public class SignalManager {
     }
 
     public static void stopSignal(Signal signal) {
-        if (signal.level.isClientSide) {
-            ClientSignalManager.stopSignal(signal);
-        } else if (transmittedSignals.get(signal.level).containsKey(signal.getUuid()) && transmittedSignals.get(signal.level).get(signal.getUuid()).isEmitting()) {
-            transmittedSignals.get(signal.level).get(signal.getUuid()).stop();
+        if (signal != null) {
+            if (signal.level.isClientSide) {
+                ClientSignalManager.stopSignal(signal);
+            } else if (transmittedSignals.get(signal.level).containsKey(signal.getUuid()) && transmittedSignals.get(signal.level).get(signal.getUuid()).isEmitting()) {
+                transmittedSignals.get(signal.level).get(signal.getUuid()).stop();
+            }
         }
     }
 

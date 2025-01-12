@@ -3,9 +3,7 @@ package org.modogthedev.superposition.client.renderer.ui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import foundry.veil.Veil;
-import foundry.veil.api.client.tooltip.Tooltippable;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
-import foundry.veil.api.client.util.UIUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -15,11 +13,9 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
-import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.util.SPTooltipable;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static foundry.veil.api.client.util.UIUtils.*;
@@ -32,8 +28,7 @@ public class SPUIUtils {
         if (textLines.isEmpty())
             return;
 
-        List<ClientTooltipComponent> list = gatherTooltipComponents(stack, textLines,
-                stack.getTooltipImage(), mouseX, screenWidth, screenHeight, font, font);
+        List<ClientTooltipComponent> list = gatherTooltipComponents(stack, textLines, stack.getTooltipImage().orElse(null), mouseX, screenWidth, screenHeight, font, font);
         // RenderSystem.disableRescaleNormal();
         RenderSystem.disableDepthTest();
         int tooltipTextWidth = 0;

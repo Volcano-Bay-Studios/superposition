@@ -402,17 +402,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
     }
 
-    public void endSignal(Object nextCall) {
-        if (level == null) {
-            return;
-        }
-        BlockPos sidedPos = this.getSwappedPos();
-        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
-            lastCall = nextCall;
-            signalActorBlockEntity.endSignal(nextCall);
-        }
-    }
+
 
     @Override
     public void loadSyncedData(CompoundTag tag) {

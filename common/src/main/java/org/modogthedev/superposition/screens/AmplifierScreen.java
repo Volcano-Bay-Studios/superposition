@@ -68,11 +68,11 @@ public class AmplifierScreen extends WidgetScreen {
         int j = (this.height - imageHeight) / 2;
         float resolution = 0.5f;
         for (float i = 0; i < 61; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
-            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) / frequency) * (5 + ((readAmplitude) / 5) + signalAmplitude));
+            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80))) * (5 + ((readAmplitude) / 5) + signalAmplitude);
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80))) * (5 + ((readAmplitude) / 5) + signalAmplitude);
             calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition, -35, 42);
             nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition, -35, 42);
-            fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + resolution, (j + 45 + nextCalculatedPosition), 0xFF56d156);
+            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
         }
     }
 
@@ -81,11 +81,11 @@ public class AmplifierScreen extends WidgetScreen {
         int j = (this.height - imageHeight) / 2;
         float resolution = 0.5f;
         for (float i = 0; i < 45; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) / frequency) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude));
-            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) / frequency) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude));
+            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80))) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude);
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80))) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude);
             calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition, -35, 42);
             nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition, -35, 42);
-            fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + resolution, (j + 45 + nextCalculatedPosition), 0xFF56d156);
+            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
         }
     }
 

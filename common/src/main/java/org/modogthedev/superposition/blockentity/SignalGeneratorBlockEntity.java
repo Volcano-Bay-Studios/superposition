@@ -75,13 +75,6 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         super.tick();
     }
 
-    public void endSignal(Object object) {
-        if (connectedSignal != null) {
-            SignalManager.stopSignal(connectedSignal);
-            connectedSignal = null;
-        }
-    }
-
     @Override
     public Signal getSignal() {
         this.updateSignal();
