@@ -1,14 +1,17 @@
 package org.modogthedev.superposition.system.antenna;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.BlockHelper;
+import org.modogthedev.superposition.util.LongRaycast;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
@@ -59,6 +62,10 @@ public class AntennaManager {
 
             signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
             signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
+            Vec3 to = antenna.antennaActor.getCenter().add(antenna.relativeCenter.x,antenna.relativeCenter.y,antenna.relativeCenter.z);
+            float penetration = LongRaycast.getPenetration(signal.level,signal.getPos(),new Vector3d(to.x,to.y,to.z));
+            // TODO: Synchronize the state of the signal when its received.
+            signal1.mulAmplitude(Mth.map(penetration,0,signal.getFrequency()/200000,1,0));
 
             if (signal1.getAmplitude() > 1) {
                 antenna.signals.add(signal1);

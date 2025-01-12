@@ -26,6 +26,10 @@ public class SuperpositionMth  {
         return new Vec3(Mth.lerp(delta,start.x,end.x),Mth.lerp(delta,start.y,end.y),Mth.lerp(delta,start.z,end.z));
     }
 
+    public static Vec3 lerpVector3d(Vector3d start, Vector3d end, float delta) {
+        return new Vec3(Mth.lerp(delta,start.x,end.x),Mth.lerp(delta,start.y,end.y),Mth.lerp(delta,start.z,end.z));
+    }
+
     public static Vector3dc convertVec(BlockPos pos) {
         return new Vector3d(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
     }
