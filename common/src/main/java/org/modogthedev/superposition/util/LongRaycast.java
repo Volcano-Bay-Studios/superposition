@@ -3,8 +3,10 @@ package org.modogthedev.superposition.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
+import org.modogthedev.superposition.core.SuperpositionTags;
 
 public class LongRaycast {
     public static float getPenetration(Level level, Vector3d from, Vector3d to) {
@@ -22,8 +24,14 @@ public class LongRaycast {
                 continue;
             }
             if (level.isLoaded(blockPos)) {
-                if (!level.getBlockState(blockPos).is(Blocks.AIR)) {
+                BlockState blockState = level.getBlockState(blockPos);
+                if (!blockState.is(Blocks.AIR)) {
                     penetration += 0.1f;
+                    if (blockState.is(SuperpositionTags.HARD_PENETRATE)) {
+                        penetration += 100;
+                    } else if (blockState.is(SuperpositionTags.MEDIUM_PENETRATE)) {
+                        penetration += 10;
+                    }
                 }
             } else {
                 f += 16;
