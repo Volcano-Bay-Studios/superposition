@@ -18,11 +18,12 @@ public class LongRaycast {
             float delta = f/length;
             Vec3 pos = SuperpositionMth.lerpVector3d(from,to,delta);
 
-            blockPos.set(pos.x,pos.y,pos.z);
+            blockPos.set(Math.round(pos.x),Math.round(pos.y),Math.round(pos.z));
             if (level.getChunk(blockPos).getSection(blockPos.getY()/16).hasOnlyAir()) {
                 f += 16f;
                 continue;
             }
+
             if (level.isLoaded(blockPos)) {
                 BlockState blockState = level.getBlockState(blockPos);
                 if (!blockState.is(Blocks.AIR)) {
@@ -40,4 +41,5 @@ public class LongRaycast {
 
         return penetration;
     }
+
 }

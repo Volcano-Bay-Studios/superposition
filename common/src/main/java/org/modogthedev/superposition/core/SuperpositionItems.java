@@ -6,10 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.item.CableItem;
-import org.modogthedev.superposition.item.CarabinerItem;
-import org.modogthedev.superposition.item.FilterItem;
-import org.modogthedev.superposition.item.ScrewdriverItem;
+import org.modogthedev.superposition.item.*;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,6 +20,7 @@ public class SuperpositionItems {
     
     // TOOL / UTILITY
     public static final RegistryObject<ScrewdriverItem> SCREWDRIVER = registerItem("screwdriver", () -> new ScrewdriverItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<HandheldReceiverItem> HANDHELD_RECEIVER = registerItem("handheld_receiver", () -> new HandheldReceiverItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<CarabinerItem> CABLE_CARABINER = registerItem("cable_carabiner", () -> new CarabinerItem(new Item.Properties()));
     public static final RegistryObject<CableItem> WHITE_CABLE = registerItem("white_cable", () -> new CableItem(new Item.Properties(), new Color(249, 255, 254)));
     public static final RegistryObject<CableItem> LIGHT_GRAY_CABLE = registerItem("light_gray_cable", () -> new CableItem(new Item.Properties(), new Color(157, 157, 151)));

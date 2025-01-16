@@ -195,7 +195,7 @@ public class AmplifierScreen extends WidgetScreen {
     public void tick() {
         super.tick();
         if (!mute && frequency > .72f) {
-            float pitch = SuperpositionMth.getFromRange(0, 30, 2, .72f, frequency);
+            float pitch = SuperpositionMth.getFromRange(30, 0, 2, .72f, frequency);
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
         }
         ticks++;
