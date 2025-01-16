@@ -18,7 +18,7 @@ public class LongRaycast {
             float delta = f/length;
             Vec3 pos = SuperpositionMth.lerpVector3d(from,to,delta);
 
-            blockPos.set(Math.round(pos.x),Math.round(pos.y),Math.round(pos.z));
+            blockPos.set(Math.floor(pos.x),Math.floor(pos.y),Math.floor(pos.z));
             if (level.getChunk(blockPos).getSection(blockPos.getY()/16).hasOnlyAir()) {
                 f += 16f;
                 continue;
