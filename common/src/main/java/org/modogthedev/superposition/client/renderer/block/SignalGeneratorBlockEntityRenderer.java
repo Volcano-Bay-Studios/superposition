@@ -23,7 +23,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
     public void render(SignalGeneratorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
@@ -74,7 +74,6 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
                 .setUv(1+uvOffsetx, (uvMin/stages)+offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
-
     }
     private float getMaxPlaneExtent(SignalGeneratorBlockEntity be) {
         return -(0.5f);

@@ -27,7 +27,7 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
             return;
         if (be.getFilterType() == null)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);

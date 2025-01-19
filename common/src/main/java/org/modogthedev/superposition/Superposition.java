@@ -3,6 +3,7 @@ package org.modogthedev.superposition;
 import com.mojang.logging.LogUtils;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
+import foundry.veil.impl.client.render.pipeline.VeilBloomRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -45,6 +46,7 @@ public class Superposition {
         CarabinerManager.tick(level);
     }
     public static void clientTick(Level level){
+        VeilBloomRenderer.enable();
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
         CablePassthroughManager.tick(level);

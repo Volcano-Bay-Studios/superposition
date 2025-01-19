@@ -74,7 +74,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
         ms.popPose();
         light = LightTexture.FULL_BRIGHT;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
         for (int i = 0; i < size; i++) {
             float x = (i * totalPart) + (offset / (size + 4f)) - min;
             float y = .21f;

@@ -286,15 +286,19 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             return;
         }
         this.lastCall = lastCall;
-        this.modulateSignals(signals, true);
+        List<Signal> signals1 = new ArrayList<>();
+        for (Signal signal : signals) {
+            signals1.add(new Signal(signal));
+        }
+        this.modulateSignals(signals1, true);
         BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.addSignals(lastCall,new ArrayList<>(signals),face);
+            signalActorBlockEntity.addSignals(lastCall,new ArrayList<>(signals1),face);
         }
         if (signalsReceived == 0) {
-            this.updatePutSignals(signals);
+            this.updatePutSignals(signals1);
         } else {
-            for (Signal signal : signals) {
+            for (Signal signal : signals1) {
                 putSignals.add(new Signal(signal));
             }
             signalsReceived++;

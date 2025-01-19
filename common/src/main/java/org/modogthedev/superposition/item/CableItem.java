@@ -19,17 +19,19 @@ public class CableItem extends Item {
     private Vec3 start;
     private Vec3 end;
     private Color color;
+    private boolean emitsLight;
 
-    public CableItem(Properties properties, Color color) {
+    public CableItem(Properties properties, Color color, boolean emitsLight) {
         super(properties);
         this.color = color;
+        this.emitsLight = emitsLight;
     }
 
     private static final int SIZE = 3;
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        CableManager.playerUsesCable(context.getPlayer(), context.getClickedPos(),color, context.getClickedFace());
+        CableManager.playerUsesCable(context.getPlayer(), context.getClickedPos(),color, emitsLight, context.getClickedFace());
         return InteractionResult.SUCCESS;
     }
 

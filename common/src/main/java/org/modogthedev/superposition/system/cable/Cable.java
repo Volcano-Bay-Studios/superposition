@@ -1,5 +1,8 @@
 package org.modogthedev.superposition.system.cable;
 
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.light.PointLight;
+import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.client.Minecraft;
@@ -32,6 +35,7 @@ import oshi.util.tuples.Pair;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.UUID;
 
 public class Cable {
@@ -49,8 +53,13 @@ public class Cable {
     public int sleepTimer = 20;
     private float lastMovement;
     private float averageMovement = 0;
+    private boolean emitsLight = false;
+    private List<PointLight> pointLights;
+    private  float brightness;
 
-    public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color) {
+    private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+
+    public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
         this.addPoint(new Point(starAnchor));
         for (int i = 0; i < points; i++) {
@@ -60,13 +69,15 @@ public class Cable {
         this.addPoint(new Point(endAnchor));
         this.level = level;
         this.color = color;
+        this.emitsLight = emitsLight;
     }
 
-    private Cable(UUID id, List<Point> points, Level level, Color color) {
+    private Cable(UUID id, List<Point> points, Level level, Color color, boolean emitsLight) {
         this.id = id;
         this.points = points;
         this.level = level;
         this.color = color;
+        this.emitsLight = emitsLight;
     }
 
     public void addPoint(Point point) {
@@ -135,7 +146,7 @@ public class Cable {
             this.updatePointsInBlocks();
             lastMovement = 0;
             this.integrate();
-            averageMovement = (lastMovement + (averageMovement*19)) / 20f;
+            averageMovement = (lastMovement + (averageMovement * 19)) / 20f;
             if (averageMovement > 0.8f) {
                 sleepTimer = 60;
             } else {
@@ -159,6 +170,9 @@ public class Cable {
             }
         }
         this.sendSignal();
+        if (level.isClientSide && emitsLight) {
+            updateLights();
+        }
     }
 
 
@@ -168,7 +182,7 @@ public class Cable {
             Point point = points.get(i);
             Point lastPoint = points.get(i - 1);
             Point nextPoint = points.get(i + 1);
-            pos.set(point.position.x,point.position.y,point.position.z);
+            pos.set(point.position.x, point.position.y, point.position.z);
             float distanceBack = (float) point.getPosition().distanceTo(lastPoint.getPosition());
             float distanceForward = (float) point.getPosition().distanceTo(lastPoint.getPosition());
             if (distanceBack > SuperpositionConstants.cableRadius * 3) {
@@ -200,10 +214,10 @@ public class Cable {
                         if (!cbe.getSignals().isEmpty())
                             frequency = cbe.getSignal().getFrequency();
                         BlockPos blockPos = cbe.getBlockPos();
-                        Vector3d pos = new Vector3d(blockPos.getX(),blockPos.getY(),blockPos.getZ());
+                        Vector3d pos = new Vector3d(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                         Signal periphrealSignal = new Signal(pos, level, frequency, 1, frequency / 100000);
                         periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
-                        signalActorBlockEntity.putSignalFace(periphrealSignal,points.getLast().attachedFace);
+                        signalActorBlockEntity.putSignalFace(periphrealSignal, points.getLast().attachedFace);
                     }
                 } else if (points.getLast().attachedFace == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as peripheral
                     Card card = cbe.getCard();
@@ -213,22 +227,98 @@ public class Cable {
                 } else if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
                     List<Signal> signalList = startSignalActor.getSideSignals(points.getFirst().attachedFace);
                     if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
-                        endSignalActor.addSignals(new Object(),signalList,points.getLast().attachedFace);
+                        endSignalActor.addSignals(new Object(), signalList, points.getLast().attachedFace);
                     }
                 } else if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    CablePassthroughManager.addSignalsToBlock(level,endPos,startSignalActor.getSideSignals(points.getFirst().getAttachedFace()),points.getLast().getAttachedFace());
-                } else  {
-                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level,startPos);
+                    CablePassthroughManager.addSignalsToBlock(level, endPos, startSignalActor.getSideSignals(points.getFirst().getAttachedFace()), points.getLast().getAttachedFace());
+                } else {
+                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
                     if (signalList != null) {
                         if (end instanceof SignalActorBlockEntity endSignalActor) {
                             endSignalActor.putSignalsFace(new Object(), signalList, points.getLast().getAttachedFace());
                         } else {
-                            CablePassthroughManager.addSignalsToBlock(level,endPos,signalList,points.getLast().getAttachedFace());
+                            CablePassthroughManager.addSignalsToBlock(level, endPos, signalList, points.getLast().getAttachedFace());
                         }
+                        if (emitsLight) {
+                            updateColor(signalList);
+                        }
+                    }
+                }
+                if (emitsLight) {
+                    if (start instanceof SignalActorBlockEntity startSignalActor) {
+                        updateColor(startSignalActor.getSideSignals(points.getFirst().attachedFace));
                     }
                 }
             }
         }
+    }
+
+    private void updateColor(List<Signal> signalList) {
+        if (signalList == null || signalList.isEmpty()) {
+            return;
+        }
+        Signal signal = signalList.getFirst();
+        brightness = signal.getAmplitude();
+        if (signal.getEncodedData() != null) {
+            int colorInt = signal.getEncodedData().intValue();
+            int[] ints = new int[6];
+            int i = 1;
+            while (colorInt > 0 && i < 7) {
+                ints[i-1] = colorInt % 10;
+                colorInt = colorInt / 10;
+                i++;
+            }
+            for (int j = i; j < 7; j++) {
+                ints[j-1] = 0;
+            }
+            int red = Math.max(20,ints[5] * 10 + ints[4]);
+            int green = Math.max(20,ints[3] * 10 + ints[2]);
+            int blue = Math.max(20, ints[1] * 10 + ints[0]);
+            Color color = new Color(red / 99f, green / 99f, blue / 99f, 1f);
+            if (color != null) {
+                this.color = color;
+            }
+        }
+    }
+
+    private void updateLights() {
+        if (pointLights == null) {
+            pointLights = new ArrayList<>();
+        }
+        if (points.size() == pointLights.size()) {
+            for (int i = 0; i < points.size(); i++) {
+                updateLight(pointLights.get(i),points.get(i));
+            }
+        } else if (pointLights.size() > points.size()) {
+            ListIterator<PointLight> iterator = pointLights.listIterator();
+            while (iterator.hasNext()) {
+                int i = iterator.nextIndex();
+                PointLight point = iterator.next();
+                if (i >= points.size()) {
+                    lightRenderer.removeLight(point);
+                    iterator.remove();
+                    continue;
+                }
+                updateLight(point,points.get(i));
+            }
+        } else {
+            for (int i = 0; i < points.size(); i++) {
+                Point point = points.get(i);
+                if (i >= pointLights.size()) {
+                    pointLights.add(new PointLight());
+                    lightRenderer.addLight(pointLights.get(i));
+                    continue;
+                }
+                updateLight(pointLights.get(i),point);
+            }
+        }
+    }
+
+    private void updateLight(PointLight light, Point point) {
+        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+        light.setBrightness((float) Mth.map(brightness,1,200,0.15,0.4));
+        light.setRadius(Mth.map(brightness,1,200,3,8));
+        light.setColor(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f);
     }
 
     private void lerpPos() {
@@ -247,7 +337,7 @@ public class Cable {
         if (isForwards) {
             for (int i = 1; i < points.size(); i++) {
                 Point point = points.get(i);
-                blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
+                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
                 if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
                     continue;
                 }
@@ -263,7 +353,7 @@ public class Cable {
         } else {
             for (int i = (points.size() - 2); i >= 0; i--) {
                 Point point = points.get(i);
-                blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
+                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
                 if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
                     point.tempPos = point.position;
                     continue;
@@ -297,7 +387,7 @@ public class Cable {
                 Vec3 velocity = point.position.subtract(point.prevPosition);
                 point.setInContact(false);
                 if (collision.subtract(velocity).length() != 0) {
-                    velocity = velocity.scale(1+restitution);
+                    velocity = velocity.scale(1 + restitution);
                     point.setInContact(true);
                     assert !level.isClientSide || Minecraft.getInstance().level != null;
                 }
@@ -311,7 +401,7 @@ public class Cable {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         for (Point point : points) {
             point.oRenderPosition = point.position;
-            blockPos.set(point.getPosition().x,point.getPosition().y,point.getPosition().z);
+            blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
             if (!point.inBlock && !point.grabbed && level.isLoaded(blockPos)) {
                 Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -13.8, 0).scale(.05 * 0.05));
                 Vec3 offset = (nextPosition.subtract(point.position));
@@ -320,7 +410,7 @@ public class Cable {
                 if (point.inContact) {
                     point.position = point.position.add(offset.scale(0.7f));
                 } else {
-                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : Mth.map(sleepTimer,60,0,0.999f,0.9f)));
+                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : Mth.map(sleepTimer, 60, 0, 0.999f, 0.9f)));
                 }
             } else {
                 point.prevPosition = point.position;
@@ -343,6 +433,7 @@ public class Cable {
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(color.getRGB());
+        buf.writeBoolean(emitsLight);
         buf.writeVarInt(points.size());
         for (Point point : points) {
             buf.writeVec3(point.position);
@@ -363,6 +454,7 @@ public class Cable {
 
     public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level) {
         Color color1 = new Color(buf.readInt());
+        boolean emitsLight = buf.readBoolean();
         int size = buf.readVarInt();
         List<Point> pointList = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -373,7 +465,7 @@ public class Cable {
             }
             pointList.add(newPoint);
         }
-        Cable cable = new Cable(id, pointList, level, color1);
+        Cable cable = new Cable(id, pointList, level, color1, emitsLight);
         int playerHoldingMapSize = buf.readVarInt();
         for (int i = 0; i < playerHoldingMapSize; i++) {
             cable.addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
@@ -399,7 +491,7 @@ public class Cable {
         for (int i = 0; i < points.size(); i++) {
             points.get(i).setPosition(cable.points.get(i).getPosition());
             points.get(i).setPrevPosition(cable.points.get(i).getPrevPosition());
-            points.get(i).setAnchor(cable.points.get(i).attachedPoint,cable.points.get(i).attachedFace);
+            points.get(i).setAnchor(cable.points.get(i).attachedPoint, cable.points.get(i).attachedFace);
         }
         this.playerHoldingPointMap = cable.playerHoldingPointMap;
     }

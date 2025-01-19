@@ -25,7 +25,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
             return;
         if (be.ticks == -1)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
+        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
@@ -79,35 +79,6 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
                 .setUv(1, (uvMin/stages)+lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
-        alpha = delta;
-        buffer
-                .addVertex(m, -0.1887f, 0.5001f, -0.15625f)
-                .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
-                .setLight(light)
-                .setNormal(ms.last(), 0, 1, 0);
-
-        buffer
-                .addVertex(m, -0.1887f, 0.5001f, 0.15825f)
-                .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMax/stages)+offset)
-                .setLight(light)
-                .setNormal(ms.last(), 0, 1, 0);
-
-        buffer
-                .addVertex(m, 0.1887f, 0.5001f, 0.15825f)
-                .setColor(1f, 1f, 1f, alpha)
-                .setUv(1, (uvMax/stages)+offset)
-                .setLight(light)
-                .setNormal(ms.last(), 0, 1, 0);
-
-        buffer
-                .addVertex(m, 0.1887f, 0.5001f, -0.15625f)
-                .setColor(1f, 1f, 1f, alpha)
-                .setUv(1, (uvMin/stages)+offset)
-                .setLight(light)
-                .setNormal(ms.last(), 0, 1, 0);
-
     }
     private float getMaxPlaneExtent(AmplifierBlockEntity be) {
         return -(0.1875f);

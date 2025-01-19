@@ -98,14 +98,14 @@ public class CableManager {
         }
     }
 
-    public static void playerUsesCable(Player player, BlockPos pos, Color color, Direction face) {
+    public static void playerUsesCable(Player player, BlockPos pos, Color color, boolean emitsLight, Direction face) {
         for (Cable cable : getLevelCables(player.level())) {
             if (cable.hasPlayerHolding(player.getId())) {
                 playerFinishDraggingCable(player, pos, face);
                 return;
             }
         }
-        playerStartCable(pos, face, player.level(), player, color);
+        playerStartCable(pos, face, player.level(), player, color,emitsLight);
     }
 
     public static InteractionResult playerUseEvent(Player player, BlockPos pos, Direction face) {
@@ -148,13 +148,13 @@ public class CableManager {
         return InteractionResult.PASS;
     }
 
-    private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color) {
+    private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color,boolean emitsLight) {
         if (player.level().isClientSide) {
             return;
         }
 
         Vec3 anchorPosition = Cable.getAnchoredPoint(pos, face);
-        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color);
+        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color,emitsLight);
         newCable.getPoints().getFirst().setAnchor(pos, face);
         newCable.setPlayerHolding(player);
         addCable(newCable, level);
