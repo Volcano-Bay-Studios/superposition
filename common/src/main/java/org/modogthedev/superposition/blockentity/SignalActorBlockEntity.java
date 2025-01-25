@@ -66,7 +66,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private Object lastCallList;
     protected final List<Signal> putSignals = new ArrayList<>();
     private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
-    private Light light;
+    Light light;
 
     public List<Component> getTooltip() {
         return this.veil$tooltip;
@@ -518,6 +518,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public void configurePointLight(PointLight light) {
+
     }
     //TODO: Weak power checking method PLEASE
 

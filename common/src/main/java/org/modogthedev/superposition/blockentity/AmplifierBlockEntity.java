@@ -1,11 +1,15 @@
 package org.modogthedev.superposition.blockentity;
 
+import foundry.veil.api.client.render.light.AreaLight;
+import foundry.veil.api.client.render.light.PointLight;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -113,11 +117,34 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
 
         lastAmplitude = amplitude;
         amplitude = 0;
+        if (light != null) {
+            light.setBrightness((lastAmplitude/50f)*(lastStep+((float) (ticks) /AmplifierBlockEntity.ticksToChange)));
+        }
         super.tick();
     }
 
     @Override
     public BlockPos getDataPos() {
         return this.getBlockPos().relative(this.level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getOpposite(), 1);
+    }
+
+    public boolean lightEnabled() {
+        return true;
+    }
+
+    @Override
+    public void createLight() {
+        light = new PointLight();
+    }
+
+    @Override
+    public void configurePointLight(PointLight light) {
+        Vec3 center = this.getBlockPos().getCenter();
+        Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
+        center = center.add(new Vec3(facing.getNormal().getX(),facing.getNormal().getY(),facing.getNormal().getZ()).scale(0.4f));
+        light.setPosition(center.x, center.y, center.z);
+        light.setColor(3979870);
+        light.setBrightness(1.5f);
+        light.setRadius(3f);
     }
 }
