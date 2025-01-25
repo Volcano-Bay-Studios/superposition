@@ -1,10 +1,12 @@
 package org.modogthedev.superposition.blockentity;
 
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,15 +15,18 @@ import org.joml.Vector3d;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionCards;
+import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.codecs.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
+import java.util.List;
+
 public class ComputerBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     private Card card;
-    private Signal periphrealSignal;
+    public Signal periphrealSignal;
     public boolean updatedLastTick = false;
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
@@ -87,7 +92,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 addTooltip(Component.literal("Card - ").append(Component.translatable("item.superposition." + getCard().getSelfReference().getPath())));
             }
         }
-        if (card != null && !level.getBlockState(getBlockPos().above()).is(Blocks.AIR) && level.getBlockEntity(getBlockPos().above()) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
+        if (!level.isClientSide && card != null && !level.getBlockState(getBlockPos().above()).is(Blocks.AIR) && level.getBlockEntity(getBlockPos().above()) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
             float frequency = 0; // Put data signal
             if (!getSignals().isEmpty())
                 frequency = getSignal().getFrequency();
@@ -108,8 +113,11 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 tickingCard.tick(getBlockPos(), level, this);
             }
         }
-        if (!updatedLastTick && periphrealSignal != null) {
+        if (!level.isClientSide && !updatedLastTick && periphrealSignal != null) {
             periphrealSignal.clearEncodedData();
+        }
+        if (!level.isClientSide && periphrealSignal != null) {
+            VeilPacketManager.around(null,(ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(),getBlockPos().getZ(),200d).sendPacket(new BlockSignalSyncS2CPacket(List.of(periphrealSignal),getBlockPos()));
         }
         updatedLastTick = false;
         super.tick();

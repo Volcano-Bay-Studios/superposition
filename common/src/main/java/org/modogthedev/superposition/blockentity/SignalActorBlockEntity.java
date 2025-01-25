@@ -514,7 +514,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
         light.setPosition(center.x, center.y, center.z);
         light.setOrientation(facing.getRotation().rotateX((float) (Math.PI / 2f)).rotateY((float) Math.PI));
-
     }
 
     public void configurePointLight(PointLight light) {

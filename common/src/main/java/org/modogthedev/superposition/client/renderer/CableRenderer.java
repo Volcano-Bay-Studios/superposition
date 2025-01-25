@@ -63,6 +63,7 @@ public class CableRenderer {
         PoseStack.Pose pose = matrixStack.pose();
 
         for (Cable cable : CableManager.getLevelCables(level)) {
+            cable.updateLights(partialTicks);
             CABLE_POINTS.clear();
             PREV_CABLE_POINTS.clear();
             for (Cable.Point point : cable.getPoints()) {

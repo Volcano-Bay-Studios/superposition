@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.system.signal;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -126,8 +127,16 @@ public class Signal {
         this.encodedData = signal.encodedData;
     }
 
+    public void encode(boolean bool) {
+        this.encodedData = EncodedData.of(bool);
+    }
+
     public void encode(String string) {
         this.encodedData = EncodedData.of(string);
+    }
+
+    public void encode(CompoundTag compoundTag) {
+        this.encodedData = EncodedData.of(compoundTag);
     }
 
     public void setEncodedData(EncodedData<?> encodedData) {

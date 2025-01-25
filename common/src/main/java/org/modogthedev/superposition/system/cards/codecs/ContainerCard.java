@@ -1,12 +1,11 @@
 package org.modogthedev.superposition.system.cards.codecs;
 
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
-import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
@@ -28,34 +27,25 @@ public class ContainerCard extends Card {
     public void modulateSignal(Signal signal) {
         if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) { //TODO: fix
             BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
-            if (blockEntity1 instanceof WorldlyContainer worldlyContainer) {
-                List<ItemStack> stacks = getItems(worldlyContainer, analyserBlockEntity.getFacing().getOpposite());
+            if (blockEntity1 instanceof BaseContainerBlockEntity container) {
+                List<ItemStack> stacks = new ArrayList<>();
                 CompoundTag tag = new CompoundTag();
-                for (ItemStack stack : stacks) {
-                    tag.putInt(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString(),stack.getCount());
+                for (int i = 0; i < container.getContainerSize(); i++) {
+                    ItemStack stack = container.getItem(i);
+                    if (!stack.is(Items.AIR)) {
+                        String key = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+                        if (!tag.contains(key)) {
+                            tag.putInt(key, stack.getCount());
+                        } else {
+                            tag.putInt(key, stack.getCount()+tag.getInt(key));
+                        }
+                    }
                 }
-                signal.encode(tag.getAsString());
+                signal.encode(tag);
             }
         }
     }
 
-    private static int[] getSlots(Container container, Direction direction) {
-        if (container instanceof WorldlyContainer worldlyContainer) {
-            return worldlyContainer.getSlotsForFace(direction);
-        }
-        return null;
-    }
-
-    private static List<ItemStack> getItems(Container container, Direction direction) {
-        List<ItemStack> stacks = new ArrayList<>();
-        int[] slots = getSlots(container, direction);
-        if (slots != null) {
-            for (int slot : slots) {
-                stacks.add(container.getItem(slot));
-            }
-        }
-        return stacks;
-    }
     @Override
     public boolean requiresPeriphreal() {
         return true;

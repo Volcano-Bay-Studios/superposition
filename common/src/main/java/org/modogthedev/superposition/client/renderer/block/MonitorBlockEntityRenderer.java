@@ -86,17 +86,11 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             }
             y += (float) (Math.random() / 64)*transformDown;
             yinverse = -y + .42f +(.05f*transformDown);
-            buffer
-                    .addVertex(m, x, 0.5001f, yinverse)
-                    .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMin + uvOffsetx, (uvMin / stages))
-                    .setLight(light)
-                    .setNormal(ms.last(), 0, 1, 0);
 
             buffer
-                    .addVertex(m, x, 0.5001f, y)
+                    .addVertex(m, x + part, 0.5001f, yinverse)
                     .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMin + uvOffsetx, (uvMax / stages))
+                    .setUv(uvMax + uvOffsetx, (uvMin / stages))
                     .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
 
@@ -108,11 +102,24 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
                     .setNormal(ms.last(), 0, 1, 0);
 
             buffer
-                    .addVertex(m, x + part, 0.5001f, yinverse)
+                    .addVertex(m, x, 0.5001f, y)
                     .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMax + uvOffsetx, (uvMin / stages))
+                    .setUv(uvMin + uvOffsetx, (uvMax / stages))
                     .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
+
+            buffer
+                    .addVertex(m, x, 0.5001f, yinverse)
+                    .setColor(1f, 1f, 1f, alpha)
+                    .setUv(uvMin + uvOffsetx, (uvMin / stages))
+                    .setLight(light)
+                    .setNormal(ms.last(), 0, 1, 0);
+
+
+
+
+
+
         }
 //        ms.translate(0,-.00025,.22);
 //        alpha = .4f;

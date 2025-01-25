@@ -17,15 +17,14 @@ public class SuperpositionRenderTypes extends RenderType {
     private static final Function<ResourceLocation, RenderType> BLOOM_BLOCK_POLYGON_OFFSET = texture -> {
         RenderType.CompositeState blockPolygonOffsetBloom = RenderType.CompositeState.builder()
                 .setOutputState(VeilRenderSystem.BLOOM_SHARD)
-                .setShaderState(RenderStateShard.RENDERTYPE_TRANSLUCENT_SHADER)
+                .setShaderState(RenderStateShard.RENDERTYPE_CUTOUT_SHADER)
                 .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
                 .setWriteMaskState(RenderType.COLOR_WRITE)
                 .setLightmapState(LIGHTMAP)
                 .createCompositeState(true);
         RenderType.CompositeState blockPolygonOffset = RenderType.CompositeState.builder()
-                .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
+                .setShaderState(RENDERTYPE_CUTOUT_SHADER)
                 .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
-                .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                 .setLayeringState(POLYGON_OFFSET_LAYERING)
                 .setCullState(NO_CULL)
                 .setLightmapState(LIGHTMAP)

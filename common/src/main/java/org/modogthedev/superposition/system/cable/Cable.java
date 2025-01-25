@@ -55,7 +55,7 @@ public class Cable {
     private float averageMovement = 0;
     private boolean emitsLight = false;
     private List<PointLight> pointLights;
-    private  float brightness;
+    private float brightness;
 
     private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
 
@@ -170,9 +170,6 @@ public class Cable {
             }
         }
         this.sendSignal();
-        if (level.isClientSide && emitsLight) {
-            updateLights();
-        }
     }
 
 
@@ -264,15 +261,15 @@ public class Cable {
             int[] ints = new int[6];
             int i = 1;
             while (colorInt > 0 && i < 7) {
-                ints[i-1] = colorInt % 10;
+                ints[i - 1] = colorInt % 10;
                 colorInt = colorInt / 10;
                 i++;
             }
             for (int j = i; j < 7; j++) {
-                ints[j-1] = 0;
+                ints[j - 1] = 0;
             }
-            int red = Math.max(20,ints[5] * 10 + ints[4]);
-            int green = Math.max(20,ints[3] * 10 + ints[2]);
+            int red = Math.max(20, ints[5] * 10 + ints[4]);
+            int green = Math.max(20, ints[3] * 10 + ints[2]);
             int blue = Math.max(20, ints[1] * 10 + ints[0]);
             Color color = new Color(red / 99f, green / 99f, blue / 99f, 1f);
             if (color != null) {
@@ -281,44 +278,46 @@ public class Cable {
         }
     }
 
-    private void updateLights() {
-        if (pointLights == null) {
-            pointLights = new ArrayList<>();
-        }
-        if (points.size() == pointLights.size()) {
-            for (int i = 0; i < points.size(); i++) {
-                updateLight(pointLights.get(i),points.get(i));
+    public void updateLights(float partialTicks) {
+        if (emitsLight) {
+            if (pointLights == null) {
+                pointLights = new ArrayList<>();
             }
-        } else if (pointLights.size() > points.size()) {
-            ListIterator<PointLight> iterator = pointLights.listIterator();
-            while (iterator.hasNext()) {
-                int i = iterator.nextIndex();
-                PointLight point = iterator.next();
-                if (i >= points.size()) {
-                    lightRenderer.removeLight(point);
-                    iterator.remove();
-                    continue;
+            if (points.size() == pointLights.size()) {
+                for (int i = 0; i < points.size(); i++) {
+                    updateLight(pointLights.get(i), points.get(i));
                 }
-                updateLight(point,points.get(i));
-            }
-        } else {
-            for (int i = 0; i < points.size(); i++) {
-                Point point = points.get(i);
-                if (i >= pointLights.size()) {
-                    pointLights.add(new PointLight());
-                    lightRenderer.addLight(pointLights.get(i));
-                    continue;
+            } else if (pointLights.size() > points.size()) {
+                ListIterator<PointLight> iterator = pointLights.listIterator();
+                while (iterator.hasNext()) {
+                    int i = iterator.nextIndex();
+                    PointLight point = iterator.next();
+                    if (i >= points.size()) {
+                        lightRenderer.removeLight(point);
+                        iterator.remove();
+                        continue;
+                    }
+                    updateLight(point, points.get(i));
                 }
-                updateLight(pointLights.get(i),point);
+            } else {
+                for (int i = 0; i < points.size(); i++) {
+                    Point point = points.get(i);
+                    if (i >= pointLights.size()) {
+                        pointLights.add(new PointLight());
+                        lightRenderer.addLight(pointLights.get(i));
+                        continue;
+                    }
+                    updateLight(pointLights.get(i), point);
+                }
             }
         }
     }
 
     private void updateLight(PointLight light, Point point) {
         light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-        light.setBrightness((float) Mth.map(brightness,1,200,0.15,0.4));
-        light.setRadius(Mth.map(brightness,1,200,3,8));
-        light.setColor(color.getRed()/255f,color.getGreen()/255f,color.getBlue()/255f);
+        light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.4));
+        light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
+        light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
     }
 
     private void lerpPos() {
