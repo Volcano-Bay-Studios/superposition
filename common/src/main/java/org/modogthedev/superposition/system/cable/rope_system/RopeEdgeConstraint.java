@@ -16,7 +16,7 @@ public class RopeEdgeConstraint implements RopeConstraint, BendConstraint {
     }
     
     @Override
-    public void iterateConstraint() {
+    public void applyConstraint() {
         if (middle.anchor != null) {
             to.addNextPosition(BendConstraint.resolveAnchorBend(
                 middle.anchor.getAnchorBlock().getCenter()
@@ -24,8 +24,13 @@ public class RopeEdgeConstraint implements RopeConstraint, BendConstraint {
                 middle.position, to.position, width
             ));
         } else {
-            to.addNextPosition(BendConstraint.resolveSinglePair(middle.position, to.position, width));
+            Vec3 newPos = BendConstraint.resolveSinglePair(middle.position, to.position, width);
+            to.addNextPosition(newPos);
         }
     }
     
+    @Override
+    public double getStress() {
+        return to.position.distanceTo(middle.position);
+    }
 }

@@ -67,6 +67,7 @@ public class Cable {
         if (!playerHoldingPointMap.isEmpty()) {
             ropeSimulation.invalidateSleepTime();
         }
+        freeStuckPoints();
         if (!isSleeping()) {
             ropeSimulation.simulate(level);
         }
@@ -202,6 +203,18 @@ public class Cable {
             
             for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
                 updateLight(pointLights.get(i), ropeSimulation.getNode(i));
+            }
+        }
+    }
+    
+    private void freeStuckPoints() {
+        for (int i = 0; i < ropeSimulation.getNodesCount() - 1; i++) {
+            RopeNode point = ropeSimulation.getNode(i);
+            RopeNode lastPoint = ropeSimulation.getNode(i + 1);
+            float distance = (float) point.getPosition().distanceTo(lastPoint.getPosition());
+            if (distance > SuperpositionConstants.cableRadius * 3) {
+                point.addNextPosition(lastPoint.getPosition());
+                lastPoint.addNextPosition(point.getPosition());
             }
         }
     }

@@ -24,7 +24,6 @@ public class RopeNode {
     List<Vec3> nextPositions = new ArrayList<>();
     
     boolean fixed = false;
-    boolean fixedByPlayer = false;
     
     public RopeNode(Vec3 position) {
         this.position = position;
@@ -32,28 +31,11 @@ public class RopeNode {
     }
     
     public boolean isFixed() {
-        return fixed || fixedByPlayer || anchor != null;
+        return fixed || anchor != null;
     }
     
     public void setFixed(boolean fixed) {
         this.fixed = fixed;
-    }
-    
-    public void setFixedByPlayer(boolean fixedByPlayer) {
-        this.fixedByPlayer = fixedByPlayer;
-    }
-    
-    public void simulatePhysics() {
-        Vec3 velocity = Vec3.ZERO;
-        if (!fixed) {
-            velocity = position.subtract(prevPosition);
-            
-            velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
-            velocity = velocity.scale(0.99);
-        }
-        
-        prevPosition = position;
-        position = position.add(velocity);
     }
     
     public void resolveWorldCollisions(Level level) {
@@ -61,8 +43,8 @@ public class RopeNode {
         Vec3 velocity = position.subtract(prevPosition);
         double initialYVelocity = velocity.y;
         
-        Vec3 minBox = prevPosition.subtract(0.01, 0.01, 0.01);
-        Vec3 maxBox = prevPosition.add(0.01, 0.01, 0.01);
+        Vec3 minBox = prevPosition.subtract(2/16f, 2/16f, 2/16f);
+        Vec3 maxBox = prevPosition.add(2/16f, 2/16f, 2/16f);
         
         AABB collisionBox = new AABB(minBox, maxBox);
         
@@ -110,7 +92,8 @@ public class RopeNode {
     }
     
     public void addNextPosition(Vec3 nextPosition) {
-        this.nextPositions.add(nextPosition);
+        if (!isFixed()) this.position = position.lerp(nextPosition, 0.25);
+//        this.nextPositions.add(nextPosition);
     }
     
     public void applyNextPositions() {
