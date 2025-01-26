@@ -5,25 +5,17 @@ import foundry.veil.api.client.render.light.PointLight;
 import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
@@ -31,8 +23,6 @@ import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SuperpositionMth;
-import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
@@ -48,15 +38,9 @@ public class Cable {
     private Level level;
     public float radius = SuperpositionConstants.cableRadius;
     private final RopeSimulation ropeSimulation;
-    public float elasticity = 0.9f;
     private Player playerHolding;
     private Color color;
-    public Vec3 playerDraggedLastDelta = Vec3.ZERO;
-    public int ticksSinceUpdate = 0;
-    public int sleepTimer = 20;
-    private float lastMovement;
-    private float averageMovement = 0;
-    private boolean emitsLight = false;
+    private final boolean emitsLight;
     private List<PointLight> pointLights;
     private float brightness;
     
@@ -79,19 +63,12 @@ public class Cable {
         this.emitsLight = emitsLight;
     }
     
-    public float getMaxLength() {
-        return radius * ropeSimulation.getNodesCount() * elasticity + radius * 2;
-    }
-    
     public void updatePhysics() {
-        ticksSinceUpdate++;
         if (!playerHoldingPointMap.isEmpty()) {
-            sleepTimer = 60;
+            ropeSimulation.invalidateSleepTime();
         }
-        if (sleepTimer > 0) {
+        if (!isSleeping()) {
             ropeSimulation.simulate(level);
-        } else {
-            ropeSimulation.sleep();
         }
         this.sendSignal();
     }
@@ -300,7 +277,6 @@ public class Cable {
     }
     
     public void updateFromCable(Cable cable) {
-        ticksSinceUpdate = 0;
         color = cable.color;
         ropeSimulation.removeAllConstraints();
         ropeSimulation.resizeRope(cable.getPointsCount());
@@ -365,6 +341,10 @@ public class Cable {
     
     public static Vec3 getAnchoredPoint(BlockPos pos, Direction face) {
         return pos.getCenter().add(pos.getCenter().subtract(pos.relative(face).getCenter()).scale(-0.45));
+    }
+    
+    public boolean isSleeping() {
+        return ropeSimulation.isSleeping();
     }
     
 }

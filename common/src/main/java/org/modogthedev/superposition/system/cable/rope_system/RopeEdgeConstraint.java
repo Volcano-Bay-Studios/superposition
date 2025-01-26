@@ -18,10 +18,10 @@ public class RopeEdgeConstraint implements RopeConstraint, BendConstraint {
     @Override
     public void iterateConstraint() {
         if (middle.anchor != null) {
-            to.addNextPosition(BendConstraint.resolve(
+            to.addNextPosition(BendConstraint.resolveAnchorBend(
                 middle.anchor.getAnchorBlock().getCenter()
                     .add(Vec3.atLowerCornerOf(middle.anchor.direction.getNormal()).scale(6/16f)),
-                middle.position, to.position, width, 50.0f
+                middle.position, to.position, width
             ));
         } else {
             to.addNextPosition(BendConstraint.resolveSinglePair(middle.position, to.position, width));

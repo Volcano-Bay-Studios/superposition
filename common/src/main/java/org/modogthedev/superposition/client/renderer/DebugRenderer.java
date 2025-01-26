@@ -46,7 +46,7 @@ public class DebugRenderer {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getRelativeCenter(POS), 0.5f, 0.5f, 0.9f, 0.5f);
         }
         for (Cable cable : CableManager.getLevelCables(level)) {
-            boolean isSleeping = cable.sleepTimer <= 0;
+            boolean isSleeping = cable.isSleeping();
             for (RopeNode point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 float width = SuperpositionConstants.cableRadius / 2;

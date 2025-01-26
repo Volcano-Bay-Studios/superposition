@@ -14,6 +14,8 @@ public class RopeSimulation {
     List<RopeConstraint> baseConstraints = new ArrayList<>();
     List<RopeConstraint> constraints = new ArrayList<>();
     
+    int sleepTime = 0;
+    
     public RopeSimulation(float connectionWidth) {
         this.connectionWidth = connectionWidth;
     }
@@ -24,10 +26,6 @@ public class RopeSimulation {
             addNode(new RopeNode(from.lerp(to, (double) i / count)));
         }
         recalculateBaseRopeConstraints();
-        
-//        constraints.add(new RopeEndConstraint(
-//            fromPivot, nodes.get(0), nodes.get(1), connectionWidth
-//        ));
     }
     
     public void addNode(RopeNode ropeNode) {
@@ -100,6 +98,20 @@ public class RopeSimulation {
         for (RopeNode node : nodes) {
             node.resolveWorldCollisions(level);
         }
+        
+        boolean shouldSleep = true;
+        for (RopeNode node : nodes) {
+            Vec3 movedLastTick = node.getPrevPosition().subtract(node.getPosition());
+            if (movedLastTick.lengthSqr() > 1e-9) {
+                shouldSleep = false;
+                break;
+            }
+        }
+        if (shouldSleep) {
+            sleepTime++;
+        } else {
+            sleepTime = 0;
+        }
     }
     
     private List<RopeConstraint> allConstraints() {
@@ -133,14 +145,20 @@ public class RopeSimulation {
         return nodes;
     }
     
-    public void sleep() {
-        for (RopeNode node : nodes) {
-            node.prevPosition = node.position;
-        }
-    }
-    
     public void removeAllConstraints() {
         constraints = new ArrayList<>();
+    }
+    
+    public int getSleepTime() {
+        return sleepTime;
+    }
+    
+    public void invalidateSleepTime() {
+        sleepTime = 0;
+    }
+    
+    public boolean isSleeping() {
+        return sleepTime > 20;
     }
     
 }

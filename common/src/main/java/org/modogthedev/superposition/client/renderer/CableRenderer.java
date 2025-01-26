@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
@@ -64,6 +65,7 @@ public class CableRenderer {
         PoseStack.Pose pose = matrixStack.pose();
 
         for (Cable cable : CableManager.getLevelCables(level)) {
+            float effectiveGeometryPartialTicks = cable.isSleeping() ? 1.0f : partialTicks;
             cable.updateLights(partialTicks);
             CABLE_POINTS.clear();
             PREV_CABLE_POINTS.clear();
@@ -86,22 +88,23 @@ public class CableRenderer {
             float v = 0;
             float nextV;
 
-            renderCableStart(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), partialTicks);
+            renderCableStart(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), effectiveGeometryPartialTicks);
+            
             for (int i = 0; i < splinePoints.size() - 1; i++) {
                 Vec3 prevPoint = prevSplinePoints.get(i);
                 Vec3 point = splinePoints.get(i);
                 Vec3 prevNextPoint = prevSplinePoints.get(i + 1);
                 Vec3 nextPoint = splinePoints.get(i + 1);
 
-                double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
-                double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
-                double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
-                double nextX = Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
-                double nextY = Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
-                double nextZ = Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
+                double x = Mth.lerp(effectiveGeometryPartialTicks, prevPoint.x, point.x);
+                double y = Mth.lerp(effectiveGeometryPartialTicks, prevPoint.y, point.y);
+                double z = Mth.lerp(effectiveGeometryPartialTicks, prevPoint.z, point.z);
+                double nextX = Mth.lerp(effectiveGeometryPartialTicks, prevNextPoint.x, nextPoint.x);
+                double nextY = Mth.lerp(effectiveGeometryPartialTicks, prevNextPoint.y, nextPoint.y);
+                double nextZ = Mth.lerp(effectiveGeometryPartialTicks, prevNextPoint.z, nextPoint.z);
 
                 if (i < splinePoints.size() - 2) {
-                    calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevSplinePoints.get(i + 2), splinePoints.get(i + 2), partialTicks);
+                    calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevSplinePoints.get(i + 2), splinePoints.get(i + 2), effectiveGeometryPartialTicks);
                 } else {
                     NEXT_ORIENTATION.set(ORIENTATION);
                 }
@@ -242,7 +245,7 @@ public class CableRenderer {
                 ORIENTATION.set(NEXT_ORIENTATION);
                 v = nextV;
             }
-            renderCableEnd(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
+            renderCableEnd(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), effectiveGeometryPartialTicks);
         }
         bufferSource.endBatch();
     }
@@ -386,24 +389,56 @@ public class CableRenderer {
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
         oshi.util.tuples.Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
         if (cablePointPair != null) {
-            Vec3 pointPos = cablePointPair.getB().getPosition();
-            Vec3 prevPos = cablePointPair.getB().getPrevPosition();
-            Vec3 pos = SuperpositionMth.lerpVec3(prevPos, pointPos, partialTicks);
+            Vec3 pos = cablePointPair.getB().getPosition(partialTicks);
             if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getId())) {
                 boolean isLast = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB());
                 boolean isFirst = cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
+                boolean hasAnchor = cablePointPair.getB().getAnchor() != null;
+                
+                Vector4f color = getColorForNodeHighlight(isLast, isFirst, hasAnchor);
                 if (isLast || isFirst) {
                     width -= 0.03f;
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, isFirst ? 0.9f : 0.5f, 0.5f, isLast ? 0.9f : 0.5f, 0.2f);
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
                     width += 0.03f;
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, isFirst ? 0.9f : 0.5f, 0.5f, isLast ? 0.9f : 0.5f, 0.4f);
+                    color.w = 0.4f;
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
                 } else {
-                    DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f, 0.9f, 0.5f, 0.4f);
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
+                }
+                
+                for (RopeNode node : cablePointPair.getA().getPoints()) {
+                    if (node == cablePointPair.getB() || node.getAnchor() == null) continue;
+                    Vec3 anchorPos = node.getPosition(partialTicks);
+                    DebugRenderer.renderFilledBox(poseStack, bufferSource, anchorPos.x - cameraPos.x - width, anchorPos.y - cameraPos.y - width, anchorPos.z - cameraPos.z - width, anchorPos.x - cameraPos.x + width, anchorPos.y - cameraPos.y + width, anchorPos.z - cameraPos.z + width, 0.4f, 0.4f, 0.9f, 0.2f);
                 }
             }
         }
     }
-
+    
+    private static Vector4f getColorForNodeHighlight(boolean isLast, boolean isFirst, boolean hasAnchor) {
+        if (isLast) {
+            return new Vector4f(
+                0.9f, 0.5f, 0.5f,
+                0.6f
+            );
+        } else if (isFirst) {
+            return new Vector4f(
+                0.9f, 0.5f, 0.5f,
+                0.6f
+            );
+        } else if (hasAnchor) {
+            return new Vector4f(
+                0.4f, 0.4f, 0.9f,
+                0.4f
+            );
+        } else {
+            return new Vector4f(
+                0.4f, 0.9f, 0.4f,
+                0.4f
+            );
+        }
+    }
+    
     public static void renderOverlays(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
         if (Minecraft.getInstance().options.hideGui) {
             return;
@@ -433,7 +468,6 @@ public class CableRenderer {
                     DebugRenderer.renderFilledBox(matrixStack.toPoseStack(), bufferSource, analyserBlockEntity.getDistancePosition(1), analyserBlockEntity.getDistancePosition(analyserBlockEntity.startDistance - 1), 0.9f, 0.3f, 0.3f, 0.5f);
                 }
                 BlockPos selectedPos = analyserBlockEntity.getDistancePosition(analyserBlockEntity.distance);
-//            DebugRenderer.renderFilledBox(matrixStack.toPoseStack(),bufferSource,selectedPos,selectedPos,0.3f,0.3f,0.9f,0.5f);
                 DebugRenderer.renderFilledBox(matrixStack.toPoseStack(), bufferSource, Math.min(selectedPos.getX(), selectedPos.getX()) - cameraPos.x - width, (double) Math.min(selectedPos.getY(), selectedPos.getY()) - cameraPos.y - width, (double) Math.min(selectedPos.getZ(), selectedPos.getZ()) - cameraPos.z - width, (double) (Math.max(selectedPos.getX(), selectedPos.getX()) + 1) - cameraPos.x + width, (double) (Math.max(selectedPos.getY(), selectedPos.getY()) + 1) - cameraPos.y + width, (double) (Math.max(selectedPos.getZ(), selectedPos.getZ()) + 1) - cameraPos.z + width, 0.3f, 0.3f, 0.9f, 0.5f);
                 matrixStack.matrixPop();
             }

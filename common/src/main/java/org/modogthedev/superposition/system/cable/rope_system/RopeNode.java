@@ -48,8 +48,8 @@ public class RopeNode {
         if (!fixed) {
             velocity = position.subtract(prevPosition);
             
-            velocity = velocity.add(0, -0.1, 0);
-            velocity = velocity.scale(0.9);
+            velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
+            velocity = velocity.scale(0.99);
         }
         
         prevPosition = position;
@@ -57,26 +57,39 @@ public class RopeNode {
     }
     
     public void resolveWorldCollisions(Level level) {
-        if (fixed) return;
+        if (fixed || !level.isLoaded(BlockPos.containing(getPosition()))) return;
         Vec3 velocity = position.subtract(prevPosition);
         double initialYVelocity = velocity.y;
         
-        Vec3 minBox = prevPosition.subtract(0.1, 0.1, 0.1);
-        Vec3 maxBox = prevPosition.add(0.1, 0.1, 0.1);
+        Vec3 minBox = prevPosition.subtract(0.01, 0.01, 0.01);
+        Vec3 maxBox = prevPosition.add(0.01, 0.01, 0.01);
         
         AABB collisionBox = new AABB(minBox, maxBox);
         
-        if ((velocity.x != 0 || velocity.y != 0 || velocity.z != 0))
-            velocity = Entity.collideBoundingBox(null, velocity, collisionBox, level, List.of());
+        if ((velocity.x != 0 || velocity.y != 0 || velocity.z != 0)) {
+            Vec3 velocityVertical = new Vec3(0, velocity.y, 0);
+            velocityVertical = Entity.collideBoundingBox(null, velocityVertical, collisionBox, level, List.of());
+            
+            collisionBox = collisionBox.move(velocityVertical);
+            Vec3 velocityHorizontal = new Vec3(velocity.x, 0, velocity.z);
+            velocityHorizontal = Entity.collideBoundingBox(null, velocityHorizontal, collisionBox, level, List.of());
+            
+            velocity = new Vec3(velocityHorizontal.x, velocityVertical.y, velocityHorizontal.z);
+        }
         
         if (initialYVelocity < velocity.y && velocity.y <= 0) {
-            velocity = new Vec3(velocity.x * 0.1, velocity.y, velocity.z * 0.1);
+            velocity = new Vec3(velocity.x * 0.75, velocity.y, velocity.z * 0.75);
+        }
+        
+        if (velocity.lengthSqr() < 0.00005) {
+            velocity = velocity.scale(0.9f);
         }
         
         position = prevPosition.add(velocity);
     }
     
     public Vec3 getPosition(float partialTicks) {
+        if (simulation.isSleeping()) return position;
         return prevPosition.lerp(position, partialTicks);
     }
     
