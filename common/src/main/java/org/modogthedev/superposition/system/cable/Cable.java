@@ -39,7 +39,7 @@ import java.util.ListIterator;
 import java.util.UUID;
 
 public class Cable {
-
+    
     private final UUID id;
     private List<Point> points = new ArrayList<>();
     private Int2IntMap playerHoldingPointMap = new Int2IntArrayMap();
@@ -56,9 +56,9 @@ public class Cable {
     private boolean emitsLight = false;
     private List<PointLight> pointLights;
     private float brightness;
-
+    
     private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
-
+    
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
         this.addPoint(new Point(starAnchor));
@@ -71,7 +71,7 @@ public class Cable {
         this.color = color;
         this.emitsLight = emitsLight;
     }
-
+    
     private Cable(UUID id, List<Point> points, Level level, Color color, boolean emitsLight) {
         this.id = id;
         this.points = points;
@@ -79,18 +79,18 @@ public class Cable {
         this.color = color;
         this.emitsLight = emitsLight;
     }
-
+    
     public void addPoint(Point point) {
         points.add(point);
     }
-
+    
     public void debugDraw() {
         for (Point point : points) {
             assert Minecraft.getInstance().level != null;
             Minecraft.getInstance().level.addParticle(ParticleTypes.ELECTRIC_SPARK, point.position.x, point.position.y, point.position.z, 0, 0, 0);
         }
     }
-
+    
     public void followPlayer() {
         for (Point point : points) {
             point.grabbed = false;
@@ -101,9 +101,9 @@ public class Cable {
                 int index = playerHoldingPointMap.get(id);
                 Point heldPoint = points.get(index);
                 Vec3 playerOffset = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-
+                
                 HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-
+                
                 float maxLength = this.getMaxLength();
                 float actualLength = 0;
                 for (int i = 1; i < (points.size()); i++) {
@@ -127,16 +127,17 @@ public class Cable {
                     return;
                 }
                 heldPoint.position = result;
+                heldPoint.isFixedByPlayer = true;
 
 //                addPoint(new Point(playerOffset));
             }
         }
     }
-
+    
     public float getMaxLength() {
         return radius * points.size() * elasticity + radius * 2;
     }
-
+    
     public void updatePhysics() {
         ticksSinceUpdate++;
         if (!playerHoldingPointMap.isEmpty()) {
@@ -153,15 +154,18 @@ public class Cable {
                 sleepTimer--;
             }
             this.followPlayer();
-            points.getLast().tempPos = points.getLast().position;
             this.update(false);
-            this.update(true);
-            for (Point point : points) {
-                if (point.tempPos != null) {
-                    point.position = SuperpositionMth.lerpVec3(point.position, point.tempPos, 0.5f);
-                }
+            for (int i = 0; i < points.size() - 1; i++) {
+                Point backward = points.get(i);
+                Point forward = points.get(i + 1);
+                double length = backward.position.distanceToSqr(forward.position);
+                backward.forwardLength = (float) length;
+                forward.backwordsLength = (float) length;
             }
-            this.freeStuckPoints();
+            for (Point point : points) {
+                point.isFixedByPlayer = false;
+            }
+//            this.freeStuckPoints();
             this.updateCollisions();
             this.lerpPos();
         } else {
@@ -171,8 +175,8 @@ public class Cable {
         }
         this.sendSignal();
     }
-
-
+    
+    
     private void freeStuckPoints() {
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for (int i = 1; i < points.size() - 1; i++) {
@@ -196,7 +200,7 @@ public class Cable {
             }
         }
     }
-
+    
     private void sendSignal() {
         if (level != null && playerHolding == null) {
             BlockPos startPos = BlockPos.containing(points.getFirst().getPosition());
@@ -249,7 +253,7 @@ public class Cable {
             }
         }
     }
-
+    
     private void updateColor(List<Signal> signalList) {
         if (signalList == null || signalList.isEmpty()) {
             return;
@@ -277,7 +281,7 @@ public class Cable {
             }
         }
     }
-
+    
     public void updateLights(float partialTicks) {
         if (emitsLight) {
             if (pointLights == null) {
@@ -312,14 +316,14 @@ public class Cable {
             }
         }
     }
-
+    
     private void updateLight(PointLight light, Point point) {
         light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.4));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
     }
-
+    
     private void lerpPos() {
         for (Point point : points) {
             if (point.lerpedPos != null) {
@@ -330,52 +334,120 @@ public class Cable {
             }
         }
     }
-
+    
     private void update(boolean isForwards) {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-        if (isForwards) {
-            for (int i = 1; i < points.size(); i++) {
-                Point point = points.get(i);
-                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
-                    continue;
-                }
-
-                Point prevPoint = points.get(i - 1);
-
-                point.forwardLength = (float) point.tempPos.subtract(prevPoint.tempPos).length();
-
-                float distanceToMove = (float) (point.tempPos.distanceTo(prevPoint.tempPos) - radius) * (elasticity);
-                Vec3 normal = (point.tempPos.subtract(prevPoint.tempPos)).normalize();
-                point.tempPos = (point.tempPos.subtract(normal.scale(distanceToMove)));
+        
+        for (Point point : points) {
+            point.resultPos = new ArrayList<>();
+        }
+        
+        for (int g = 0; g < 5; g++) {
+            
+            for (int i = 0; i < points.size() - 2; i++) {
+                Point fromPoint = points.get(i);
+                Point midPoint = points.get(i + 1);
+                Point toPoint = points.get(i + 2);
+                
+                Vec3 fromDiff = fromPoint.position.subtract(midPoint.position);
+                Vec3 toDiff = toPoint.position.subtract(midPoint.position);
+                
+                double alignment = Math.max(-fromDiff.normalize().dot(toDiff.normalize()), 0);
+                double misalignment = Math.max((1f - alignment) - 0.5f, 0) * 2f;
+                
+                double originalFromDist = fromPoint.position.distanceToSqr(midPoint.position);
+                double originalToDist = toPoint.position.distanceToSqr(midPoint.position);
+                
+                Vec3 fromOffset = fromDiff.normalize().lerp(toDiff.normalize().scale(-1), misalignment);
+                fromPoint.resultPos.add(fromOffset.normalize().scale(originalFromDist).add(midPoint.position));
+                
+                Vec3 toOffset = toDiff.normalize().lerp(fromDiff.normalize().scale(-1), misalignment);
+                toPoint.resultPos.add(toOffset.normalize().scale(originalToDist).add(midPoint.position));
             }
-        } else {
-            for (int i = (points.size() - 2); i >= 0; i--) {
-                Point point = points.get(i);
-                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
-                    point.tempPos = point.position;
+            
+            this.applyPointResultPositions();
+            
+            for (int i = 0; i < points.size() - 1; i++) {
+                Point fromPoint = points.get(i);
+                Point toPoint = points.get(i + 1);
+                
+                double distance = fromPoint.position.distanceToSqr(toPoint.position);
+                
+                double push = (radius - distance) / 2f;
+                Vec3 resolve = fromPoint.position.subtract(toPoint.position).normalize().scale(push * elasticity + distance * (1f - elasticity));
+                
+                fromPoint.resultPos.add(fromPoint.position.add(resolve));
+                toPoint.resultPos.add(toPoint.position.subtract(resolve));
+            }
+            
+            this.applyPointResultPositions();
+        
+        }
+
+//        if (isForwards) {
+//            for (int i = 1; i < points.size(); i++) {
+//                Point point = points.get(i);
+//                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+//                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
+//                    continue;
+//                }
+//
+//                Point prevPoint = points.get(i - 1);
+//
+//                point.forwardLength = (float) point.tempPos.subtract(prevPoint.tempPos).length();
+//
+//                float distanceToMove = (float) (point.tempPos.distanceTo(prevPoint.tempPos) - radius) * (elasticity);
+//                Vec3 normal = (point.tempPos.subtract(prevPoint.tempPos)).normalize();
+//                point.tempPos = (point.tempPos.subtract(normal.scale(distanceToMove)));
+//            }
+//        } else {
+//            for (int i = (points.size() - 2); i >= 0; i--) {
+//                Point point = points.get(i);
+//                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+//                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
+//                    point.tempPos = point.position;
+//                    continue;
+//                }
+//
+//                Point prevPoint = points.get(i + 1);
+//
+//                point.backwordsLength = (float) point.position.subtract(prevPoint.position).length();
+//
+//                float distanceToMove = (float) (point.position.distanceTo(prevPoint.position) - radius) * (elasticity);
+//                Vec3 normal = (point.position.subtract(prevPoint.position)).normalize();
+//                point.tempPos = point.position;
+//                point.position = point.position.subtract(normal.scale(distanceToMove));
+//            }
+//        }
+    }
+    
+    private void applyPointResultPositions() {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (Point point : points) {
+            if (!point.resultPos.isEmpty()) {
+                int count = point.isFixedByPlayer ? 10 : 1;
+                Vec3 total = point.position.scale(point.isFixedByPlayer ? 10 : 1);
+                for (Vec3 resultPoint : point.resultPos) {
+                    total = total.add(resultPoint);
+                    count += 1;
+                }
+//                    point.position = SuperpositionMth.lerpVec3(point.position, total.scale(1f/count), 0.5f);
+                pos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+                if (point.getAttachedFace() != null || !level.isLoaded(pos)) {
                     continue;
                 }
-
-                Point prevPoint = points.get(i + 1);
-
-                point.backwordsLength = (float) point.position.subtract(prevPoint.position).length();
-
-                float distanceToMove = (float) (point.position.distanceTo(prevPoint.position) - radius) * (elasticity);
-                Vec3 normal = (point.position.subtract(prevPoint.position)).normalize();
-                point.tempPos = point.position;
-                point.position = point.position.subtract(normal.scale(distanceToMove));
+                point.position = total.scale(1f / count);
             }
         }
+        
     }
-
+    
     public void shrink() {
         if (points.size() > 4) {
             points.remove(points.getLast());
         }
     }
-
+    
     private void updateCollisions() {
         for (Point point : points) {
             if (point.lerpedPos == null && !point.inBlock && !point.grabbed) {
@@ -395,7 +467,7 @@ public class Cable {
             }
         }
     }
-
+    
     private void integrate() {
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         for (Point point : points) {
@@ -416,20 +488,20 @@ public class Cable {
             }
         }
     }
-
+    
     public void setPlayerHolding(Player player) {
         this.addPoint(new Point(player.position()));
         this.addPlayerHoldingPoint(player.getId(), points.size() - 1);
     }
-
+    
     public void setLevel(Level level) {
         this.level = level;
     }
-
+    
     public List<Point> getPoints() {
         return points;
     }
-
+    
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(color.getRGB());
         buf.writeBoolean(emitsLight);
@@ -450,7 +522,7 @@ public class Cable {
             buf.writeVarInt(entry.getIntValue());
         }
     }
-
+    
     public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level) {
         Color color1 = new Color(buf.readInt());
         boolean emitsLight = buf.readBoolean();
@@ -471,11 +543,11 @@ public class Cable {
         }
         return cable;
     }
-
+    
     public Int2IntMap getPlayerHoldingPointMap() {
         return playerHoldingPointMap;
     }
-
+    
     public void updateFromCable(Cable cable) {
         ticksSinceUpdate = 0;
         color = cable.color;
@@ -494,14 +566,14 @@ public class Cable {
         }
         this.playerHoldingPointMap = cable.playerHoldingPointMap;
     }
-
+    
     public void updatePointsInBlocks() {
         for (Point point : points) {
             point.ownedCable = this;
             this.updatePointInBlock(point);
         }
     }
-
+    
     public void updatePointInBlock(Point point) {
         Vec3 vec3 = point.getPosition();
         BlockPos pos = BlockPos.containing(vec3);
@@ -511,19 +583,19 @@ public class Cable {
                 point.attachedFace = null;
         }
     }
-
+    
     public UUID getId() {
         return id;
     }
-
+    
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
         playerHoldingPointMap.put(playerId, pointIndex);
     }
-
+    
     public boolean hasPlayerHolding(int playerUUID) {
         return playerHoldingPointMap.containsKey(playerUUID);
     }
-
+    
     public Pair<Point, Integer> getPlayerHeldPoint(int playerUUID) {
         if (playerHoldingPointMap.containsKey(playerUUID)) {
             int index = playerHoldingPointMap.get(playerUUID);
@@ -533,36 +605,38 @@ public class Cable {
         }
         return null;
     }
-
+    
     public void addPointAtIndex(int index, Point point) {
         points.add(index, point);
     }
-
+    
     public void replacePointAtIndex(int index, Point point) {
         points.set(index, point);
     }
-
+    
     public int getPointIndex(Point point) {
         return points.indexOf(point);
     }
-
+    
     public void stopPlayerDrag(int playerUUID) {
         playerHoldingPointMap.remove(playerUUID);
     }
-
+    
     public Color getColor() {
         return color;
     }
-
+    
     public static Vec3 getAnchoredPoint(BlockPos pos, Direction face) {
         return pos.getCenter().add(pos.getCenter().subtract(pos.relative(face).getCenter()).scale(-0.45));
     }
-
+    
     public static class Point {
+        
+        private boolean isFixedByPlayer = false;
         private Vec3 oRenderPosition;
         private Vec3 prevPosition;
         private Vec3 position;
-        private Vec3 tempPos;
+        private List<Vec3> resultPos = new ArrayList<>();
         private boolean inContact = false;
         private boolean inBlock;
         private boolean grabbed;
@@ -572,68 +646,70 @@ public class Cable {
         private Cable ownedCable;
         private Direction attachedFace;
         private BlockPos attachedPoint;
-
+        
         public Point(Vec3 position) {
             this.oRenderPosition = position;
             this.prevPosition = position;
             this.position = position;
         }
-
+        
         public void setAnchor(BlockPos pos, Direction attachedFace) {
             this.attachedPoint = pos;
             this.attachedFace = attachedFace;
         }
-
+        
         public void setAttachedFace(Direction attachedFace) {
             this.attachedFace = attachedFace;
         }
-
+        
         public void setAttachedPoint(BlockPos attachedPoint) {
             this.attachedPoint = attachedPoint;
         }
-
+        
         public BlockPos getAttachedPoint() {
             return attachedPoint;
         }
-
+        
         public Direction getAttachedFace() {
             return attachedFace;
         }
-
+        
         public Vec3 getPrevPosition() {
             return prevPosition;
         }
-
+        
         public Vec3 getPrevRenderPosition() {
             return oRenderPosition;
         }
-
+        
         public Vec3 getPosition() {
             return position;
         }
-
+        
         public boolean getInContact() {
             return inContact;
         }
-
+        
         public void setPosition(Vec3 vec3) {
             this.position = vec3;
         }
-
+        
         public float getLength() {
             return Math.max(forwardLength, backwordsLength);
         }
-
+        
         public void setPrevPosition(Vec3 vec3) {
             this.prevPosition = vec3;
         }
-
+        
         public void setInContact(boolean inContact) {
             this.inContact = inContact;
         }
-
+        
         public Cable getOwnedCable() {
             return ownedCable;
         }
+        
     }
+    
 }
