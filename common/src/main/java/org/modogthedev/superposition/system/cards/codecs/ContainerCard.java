@@ -24,7 +24,7 @@ public class ContainerCard extends Card {
     }
 
     @Override
-    public void modulateSignal(Signal signal) {
+    public void modulateSignal(Signal signal, Signal periphrealSignal) {
         if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) { //TODO: fix
             BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof BaseContainerBlockEntity container) {
@@ -37,7 +37,7 @@ public class ContainerCard extends Card {
                         if (!tag.contains(key)) {
                             tag.putInt(key, stack.getCount());
                         } else {
-                            tag.putInt(key, stack.getCount()+tag.getInt(key));
+                            tag.putInt(key, stack.getCount() + tag.getInt(key));
                         }
                     }
                 }
@@ -50,6 +50,7 @@ public class ContainerCard extends Card {
     public boolean requiresPeriphreal() {
         return true;
     }
+
     @Override
     public Card copy() {
         return new ContainerCard(this);

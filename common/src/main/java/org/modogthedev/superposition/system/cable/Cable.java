@@ -285,7 +285,7 @@ public class Cable {
             }
             if (points.size() == pointLights.size()) {
                 for (int i = 0; i < points.size(); i++) {
-                    updateLight(pointLights.get(i), points.get(i));
+                    updateLight(pointLights.get(i), points.get(i), partialTicks);
                 }
             } else if (pointLights.size() > points.size()) {
                 ListIterator<PointLight> iterator = pointLights.listIterator();
@@ -297,7 +297,7 @@ public class Cable {
                         iterator.remove();
                         continue;
                     }
-                    updateLight(point, points.get(i));
+                    updateLight(point, points.get(i), partialTicks);
                 }
             } else {
                 for (int i = 0; i < points.size(); i++) {
@@ -307,14 +307,14 @@ public class Cable {
                         lightRenderer.addLight(pointLights.get(i));
                         continue;
                     }
-                    updateLight(pointLights.get(i), point);
+                    updateLight(pointLights.get(i), point, partialTicks);
                 }
             }
         }
     }
 
-    private void updateLight(PointLight light, Point point) {
-        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+    private void updateLight(PointLight light, Point point, float partialTicks) {
+        light.setPosition(Mth.lerp(partialTicks,point.prevPosition.x,point.getPosition().x), Mth.lerp(partialTicks,point.prevPosition.y,point.getPosition().y), Mth.lerp(partialTicks,point.prevPosition.z,point.getPosition().z));
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.4));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);

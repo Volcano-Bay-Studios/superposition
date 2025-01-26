@@ -15,7 +15,7 @@ public class DistanceCard extends Card {
     }
 
     @Override
-    public void modulateSignal(Signal signal) {
+    public void modulateSignal(Signal signal, Signal periphrealSignal) {
         if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.distance);
     }

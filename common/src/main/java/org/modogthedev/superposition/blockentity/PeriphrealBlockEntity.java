@@ -39,7 +39,7 @@ public class PeriphrealBlockEntity extends SignalActorBlockEntity {
                 card.periphrealBlockEntity = this;
         }
         if (card != null)
-            card.modulateSignal(processSignal);
+            card.modulateSignal(processSignal,null);
         super.tick();
     }
 

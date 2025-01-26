@@ -125,13 +125,20 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
+        if (card != null && !card.requiresPeriphreal()) {
+            card.modulateSignal(signal,periphrealSignal);
+        } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
             signal.setEncodedData(periphrealSignal.getEncodedData());
         }
-        if (card != null && !card.requiresPeriphreal()) {
-            card.modulateSignal(signal);
-        }
         return super.modulateSignal(signal, updateTooltip);
+    }
+
+    @Override
+    public void putSignalFace(Signal signal, Direction face) {
+        if (face == Direction.UP) {
+            acceptPeriphrealSignal(signal);
+        }
+        super.putSignalFace(signal, face);
     }
 
     @Override
