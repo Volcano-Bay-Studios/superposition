@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
@@ -15,6 +16,7 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
 import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
+import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
@@ -84,15 +86,17 @@ public class CableManager {
         for (Cable cable : getLevelCables(level)) {
             for (int id : cable.getPlayerHoldingPointMap().keySet()) {
                 if (level.getEntity(id) instanceof Player player) {
-                    float longestSegment = 0f;
-                    for (int i = 1; i < (cable.getPoints().size()); i++) {
-                        if (longestSegment < cable.getPoints().get(i).getLength()) {
-                            longestSegment = cable.getPoints().get(i).getLength();
-                        }
-                    }
-                    Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
-                    Cable.Point playerPoint = pointIndexPair.getA();
+//                    float longestSegment = 0f;
+//                    for (int i = 1; i < (cable.getPoints().size()); i++) {
+//                        if (longestSegment < cable.getPoints().get(i).getLength()) {
+//                            longestSegment = cable.getPoints().get(i).getLength();
+//                        }
+//                    }
+                    Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
+                    RopeNode playerPoint = pointIndexPair.getA();
                     Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+                    playerPoint.setPosition(holdGoalPos);
+                    playerPoint.removeAnchor();
                 }
             }
         }
@@ -137,7 +141,7 @@ public class CableManager {
         }
 
         CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, level);
-        Pair<Cable, Cable.Point> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
+        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
         if (rayCast != null) {
             Cable cable = rayCast.getA();
             cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
@@ -148,14 +152,14 @@ public class CableManager {
         return InteractionResult.PASS;
     }
 
-    private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color,boolean emitsLight) {
+    private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color, boolean emitsLight) {
         if (player.level().isClientSide) {
             return;
         }
 
         Vec3 anchorPosition = Cable.getAnchoredPoint(pos, face);
-        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color,emitsLight);
-        newCable.getPoints().getFirst().setAnchor(pos, face);
+        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color, emitsLight);
+        newCable.getPoints().getFirst().setAnchor(face, pos);
         newCable.setPlayerHolding(player);
         addCable(newCable, level);
     }
@@ -164,15 +168,13 @@ public class CableManager {
         for (Cable cable : getLevelCables(player.level())) {
             int id = player.getId();
             if (cable.hasPlayerHolding(id)) {
-                Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
-                Cable.Point anchorPoint = new Cable.Point(pointIndexPair.getA().getPosition());
-                Vec3 anchorPosition = pos.getCenter();
+                Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
+                RopeNode anchorPoint = pointIndexPair.getA();
                 if (face != null) {
-                    anchorPosition = Cable.getAnchoredPoint(pos, face);
-                    anchorPoint.setAnchor(pos, face);
+                    anchorPoint.setAnchor(face, pos);
+                } else {
+                    anchorPoint.removeAnchor();
                 }
-                anchorPoint.lerpedPos = new Vec3LerpComponent(anchorPosition, anchorPoint.getPosition(), 5);
-                cable.replacePointAtIndex(pointIndexPair.getB(), anchorPoint);
                 cable.stopPlayerDrag(id);
                 if (player.level() instanceof ServerLevel serverLevel) {
                     syncCable(serverLevel, cable);
@@ -188,7 +190,7 @@ public class CableManager {
                 int index = cable.getPlayerHeldPoint(id).getB();
                 Vec3 pos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(3));
                 for (int i = 0; i < amount; i++) {
-                    cable.addPointAtIndex(index, new Cable.Point(pos));
+                    cable.addPointAtIndex(index, new RopeNode(pos));
                 }
                 cable.addPlayerHoldingPoint(id, Math.min(cable.getPoints().size()-1,index + amount));
             }
