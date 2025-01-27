@@ -3,6 +3,7 @@ package org.modogthedev.superposition.networking.handler;
 import foundry.veil.api.network.handler.ClientPacketContext;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cable.Cable;
@@ -23,6 +24,16 @@ public class SuperpositionClientPacketHandler {
         }
 
         ClientSignalManager.processTag(level, packet.getBuf());
+    }
+
+    public static void handleBlockSignalSync(BlockSignalSyncS2CPacket packet, ClientPacketContext ctx) {
+        Level level = ctx.level();
+        if (level == null) {
+            Superposition.LOGGER.warn("Server sent signal sync for unknown level");
+            return;
+        }
+
+        ClientSignalManager.processBlockBoundTag(level, packet.getBuf());
     }
 
     public static void handleCableSync(CableSyncS2CPacket packet, ClientPacketContext ctx) {

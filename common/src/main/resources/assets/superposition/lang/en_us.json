@@ -39,6 +39,7 @@
   "item.superposition.sign_card" : "Sign Card",
   "item.superposition.distance_card" : "Distance Card",
   "item.superposition.identity_card" : "Identity Card",
+  "item.superposition.container_card" : "Container Card",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

@@ -1,6 +1,9 @@
 package org.modogthedev.superposition.system.signal.data;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -259,6 +262,74 @@ public sealed interface EncodedData<T> {
         }
     }
 
+    final class CompoundTagData implements EncodedData<CompoundTag> {
+
+        private final CompoundTag value;
+        private Number asNumber;
+
+        public CompoundTagData(CompoundTag value) {
+            this.value = value;
+        }
+
+        @Override
+        public CompoundTag value() {
+            return this.value;
+        }
+
+        @Override
+        public boolean booleanValue() {
+            return !this.value.getAsString().isBlank();
+        }
+
+        @Override
+        public Number numberValue() {
+            if (this.asNumber == null) {
+                try {
+                    this.asNumber = NumberUtils.createNumber(this.value.getAsString());
+                } catch (NumberFormatException e) {
+                    this.asNumber = 0;
+                }
+            }
+            return this.asNumber;
+        }
+
+        @Override
+        public String stringValue() {
+            return this.value.getAsString();
+        }
+
+        @Override
+        public Type type() {
+            return Type.COMPOUND_TAG;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+            var that = (CompoundTagData) obj;
+            return this.value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.value.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "CompoundTagData[value=" + this.value + ']';
+        }
+    }
+
+    static EncodedData<Boolean> of(boolean value) {
+        return new BoolData(value);
+    }
+
     static EncodedData<Integer> of(int value) {
         return new IntData(value);
     }
@@ -271,11 +342,48 @@ public sealed interface EncodedData<T> {
         return new StringData(value);
     }
 
+    static EncodedData<CompoundTag> of(CompoundTag value) {
+        return new CompoundTagData(value);
+    }
+
     T value();
 
     boolean booleanValue();
 
     Number numberValue();
+
+    default CompoundTag compoundTagData() {
+        String string = this.stringValue();
+        CompoundTag tag;
+        try {
+            tag = TagParser.parseTag(string);
+        } catch (CommandSyntaxException e) {
+            tag = null;
+        }
+        return tag;
+    }
+
+    default EncodedData<?> getTagKey(String key) {
+        CompoundTag tag = compoundTagData();
+        if (tag != null && tag.contains(key)) {
+            if (tag.contains(key, 8)) {
+                return EncodedData.of(tag.getString(key));
+            }
+            if (tag.contains(key, 99)) {
+                return EncodedData.of(tag.getInt(key));
+            }
+            if (tag.contains(key, 99)) {
+                return EncodedData.of(tag.getFloat(key));
+            }
+            if (tag.contains(key, 10)) {
+                return EncodedData.of(tag.getCompound(key));
+            }
+            if (tag.contains(key)) {
+                return EncodedData.of(tag.getBoolean(key));
+            }
+        }
+        return EncodedData.of("null");
+    }
 
     default int intValue() {
         return this.numberValue().intValue();
@@ -301,7 +409,8 @@ public sealed interface EncodedData<T> {
         BOOL(ByteBufCodecs.BOOL.map(BoolData::new, data -> ((BoolData) data).value)),
         INT(ByteBufCodecs.INT.map(IntData::new, data -> ((IntData) data).value)),
         FLOAT(ByteBufCodecs.FLOAT.map(FloatData::new, data -> ((FloatData) data).value)),
-        STRING(ByteBufCodecs.STRING_UTF8.map(StringData::new, data -> ((StringData) data).value));
+        STRING(ByteBufCodecs.STRING_UTF8.map(StringData::new, data -> ((StringData) data).value)),
+        COMPOUND_TAG(ByteBufCodecs.COMPOUND_TAG.map(CompoundTagData::new, data -> ((CompoundTagData) data).value));
 
         private final StreamCodec<ByteBuf, EncodedData<?>> codec;
 

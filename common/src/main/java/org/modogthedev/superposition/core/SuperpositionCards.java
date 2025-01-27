@@ -20,6 +20,9 @@ public class SuperpositionCards {
     public static final RegistryObject<Card> IDENTITY_CARD = registerCard("identity_card", () -> new IdentityCard(Superposition.id("identity_card")));
     public static final RegistryObject<Card> DISTANCE_CARD = registerCard("distance_card", () -> new DistanceCard(Superposition.id("distance_card")));
     public static final RegistryObject<Card> AMPLITUDE_CARD = registerCard("amplitude_card", () -> new AmplitudeCard(Superposition.id("amplitude_card")));
+    public static final RegistryObject<Card> ENCAPSULATE_CARD = registerCard("encapsulate_card", () -> new EncapsulateCard(Superposition.id("encapsulate_card")));
+    public static final RegistryObject<Card> MERGE_CARD = registerCard("merge_card", () -> new MergeCard(Superposition.id("merge_card")));
+    public static final RegistryObject<Card> RETRIEVE_CARD = registerCard("retrieve_card", () -> new RetriveCard(Superposition.id("retrieve_card")));
 
     private static <T extends Card> RegistryObject<T> registerCard(String name, Supplier<T> card) {
         SuperpositionItems.registerItem(name, () -> new CardItem(new CardItem.Properties().type(card.get()), new Item.Properties().stacksTo(1))); // Does the supplier work?

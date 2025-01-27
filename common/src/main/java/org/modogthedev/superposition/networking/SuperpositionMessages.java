@@ -11,6 +11,7 @@ public class SuperpositionMessages {
     private static final VeilPacketManager INSTANCE = VeilPacketManager.create(Superposition.MODID, "1");
 
     public static void register() {
+        INSTANCE.registerClientbound(BlockSignalSyncS2CPacket.TYPE,BlockSignalSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleBlockSignalSync);
         INSTANCE.registerClientbound(SignalSyncS2CPacket.TYPE,SignalSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleSignalSync);
         INSTANCE.registerClientbound(CableSyncS2CPacket.TYPE, CableSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleCableSync);
 

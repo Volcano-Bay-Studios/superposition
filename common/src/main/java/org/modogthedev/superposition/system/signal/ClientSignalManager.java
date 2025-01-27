@@ -1,7 +1,9 @@
 package org.modogthedev.superposition.system.signal;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
+import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
@@ -41,6 +43,24 @@ public class ClientSignalManager {
             }
         }
         signalMap.keySet().removeAll(removed);
+    }
+
+    public static void processBlockBoundTag(Level level, FriendlyByteBuf buf) {
+        ifAbsent(level);
+        BlockPos pos = buf.readBlockPos();
+        if (level.getBlockEntity(pos) instanceof ComputerBlockEntity computerBlockEntity) {
+            int count = buf.readVarInt();
+            for (int i = 0; i < count; i++) {
+                UUID id = buf.readUUID();
+                if (computerBlockEntity.periphrealSignal != null) {
+                    computerBlockEntity.periphrealSignal.load(id,buf);
+                } else {
+                    Signal signal = new Signal(id, buf);
+                    signal.level = level;
+                    computerBlockEntity.periphrealSignal = signal;
+                }
+            }
+        }
     }
 
     public static void postSignalsToAntenna(Antenna antenna) {
