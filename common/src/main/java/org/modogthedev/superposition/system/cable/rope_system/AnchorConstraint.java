@@ -18,7 +18,7 @@ public class AnchorConstraint implements RopeConstraint {
     }
     
     @Override
-    public void iterateConstraint() {
+    public void applyConstraint() {
         node.position = anchorBlock.getCenter().add(Vec3.atLowerCornerOf(direction.getNormal()).scale(0.5f + 1/16f));
     }
     
@@ -28,6 +28,11 @@ public class AnchorConstraint implements RopeConstraint {
     
     public BlockPos getAnchorBlock() {
         return anchorBlock;
+    }
+    
+    @Override
+    public double getStress() {
+        return 0.0f;
     }
     
 }

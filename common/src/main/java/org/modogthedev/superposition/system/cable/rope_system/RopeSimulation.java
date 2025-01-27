@@ -4,6 +4,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class RopeSimulation {
@@ -78,8 +79,17 @@ public class RopeSimulation {
     
     
     public void simulate(Level level) {
+        
         for (RopeNode node : nodes) {
-            node.simulatePhysics();
+            Vec3 velocity = Vec3.ZERO;
+            if (!node.isFixed()) {
+                velocity = node.getPosition().subtract(node.prevPosition);
+
+                velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
+                velocity = velocity.scale(0.9f * (velocity.length() < 1e-2 ? 0.1 : 1.0));
+            }
+            node.prevPosition = node.position;
+            node.position = node.position.add(velocity);
         }
         
         for (RopeNode node : nodes) {
@@ -87,8 +97,11 @@ public class RopeSimulation {
         }
         
         for (int i = 0; i < 5; i++) {
-            for (RopeConstraint connection : allConstraints()) {
-                connection.iterateConstraint();
+            List<RopeConstraint> allConstraints = collectAllConstraints();
+            allConstraints.sort((a, b) -> -Double.compare(a.getStress(), b.getStress()));
+            
+            for (RopeConstraint connection : allConstraints) {
+                connection.applyConstraint();
             }
             for (RopeNode node : nodes) {
                 node.applyNextPositions();
@@ -99,6 +112,12 @@ public class RopeSimulation {
             node.resolveWorldCollisions(level);
         }
         
+        for (RopeNode node : nodes) {
+            if (node.prevPosition.distanceTo(node.position) < 0.025f) {
+                node.position = node.prevPosition;
+            }
+        }
+        
         boolean shouldSleep = true;
         for (RopeNode node : nodes) {
             Vec3 movedLastTick = node.getPrevPosition().subtract(node.getPosition());
@@ -107,6 +126,7 @@ public class RopeSimulation {
                 break;
             }
         }
+        
         if (shouldSleep) {
             sleepTime++;
         } else {
@@ -114,7 +134,7 @@ public class RopeSimulation {
         }
     }
     
-    private List<RopeConstraint> allConstraints() {
+    private List<RopeConstraint> collectAllConstraints() {
         ArrayList<RopeConstraint> all = new ArrayList<>();
         all.addAll(baseConstraints);
         all.addAll(constraints);

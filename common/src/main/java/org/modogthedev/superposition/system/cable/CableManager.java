@@ -57,10 +57,11 @@ public class CableManager {
     public static void tick(ServerLevel level) {
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
+            dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
             }
-            dragPlayers(level);
+            applyPlayerStretch(level);
 
             for (Cable cable : cables.values()) {
                 syncCable(level, cable);
@@ -75,10 +76,11 @@ public class CableManager {
         CableRenderer.stretch = 0;
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
+            dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
             }
-            dragPlayers(level);
+            applyPlayerStretch(level);
         }
     }
 
@@ -86,17 +88,30 @@ public class CableManager {
         for (Cable cable : getLevelCables(level)) {
             for (int id : cable.getPlayerHoldingPointMap().keySet()) {
                 if (level.getEntity(id) instanceof Player player) {
-//                    float longestSegment = 0f;
-//                    for (int i = 1; i < (cable.getPoints().size()); i++) {
-//                        if (longestSegment < cable.getPoints().get(i).getLength()) {
-//                            longestSegment = cable.getPoints().get(i).getLength();
-//                        }
-//                    }
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
                     Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
                     playerPoint.setPosition(holdGoalPos);
                     playerPoint.removeAnchor();
+                }
+            }
+        }
+    }
+    
+    public static void applyPlayerStretch(Level level) {
+        for (Cable cable : getLevelCables(level)) {
+            for (int id : cable.getPlayerHoldingPointMap().keySet()) {
+                if (level.getEntity(id) instanceof Player player) {
+                    Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
+                    RopeNode playerPoint = pointIndexPair.getA();
+                    playerPoint.setPrevPosition(playerPoint.getPosition());
+                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+                    
+                    double stretch = holdGoalPos.distanceTo(playerPoint.getPosition());
+                    CableRenderer.stretch = (float) Math.clamp(stretch/2f, 0, 1);
+                    if (stretch > 1.5f) {
+                        playerFinishDraggingCable(player, null, null);
+                    }
                 }
             }
         }
