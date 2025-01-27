@@ -20,6 +20,7 @@ import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
@@ -45,24 +46,24 @@ public class DebugRenderer {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getRelativeCenter(POS), 0.5f, 0.5f, 0.9f, 0.5f);
         }
         for (Cable cable : CableManager.getLevelCables(level)) {
-            boolean isSleeping = cable.sleepTimer <= 0;
-            for (Cable.Point point : cable.getPoints()) {
+            boolean isSleeping = cable.isSleeping();
+            for (RopeNode point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 float width = SuperpositionConstants.cableRadius / 2;
                 drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, isSleeping ? 0.5f : 0.9f, 0.5f, isSleeping ? 0.9f : 0.5f);
-                Pair<Cable.Point, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getId());
+                Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getId());
                 if (pointIndexPair != null && pointIndexPair.getA().equals(point)) {
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.5f, 0.9f, 0.5f);
                     drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .2f, 0.5f, 0.9f, 0.5f);
                 }
             }
-            Cable.Point point = cable.getPoints().getLast();
+            RopeNode point = cable.getPoints().getLast();
             Vec3 pos = point.getPosition();
             float width = SuperpositionConstants.cableRadius / 2;
             drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.9f, 0.9f, 0.5f);
         }
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
-        Pair<Cable, Cable.Point> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
+        Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
         if (cablePointPair != null) {
             Vec3 pos = cablePointPair.getB().getPosition();
             float width = SuperpositionConstants.cableRadius / 2 + .1f;

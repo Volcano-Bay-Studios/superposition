@@ -5,31 +5,24 @@ import foundry.veil.api.client.render.light.PointLight;
 import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
+import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
+import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
+import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SuperpositionMth;
-import org.modogthedev.superposition.util.Vec3LerpComponent;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
@@ -39,172 +32,67 @@ import java.util.ListIterator;
 import java.util.UUID;
 
 public class Cable {
-
+    
     private final UUID id;
-    private List<Point> points = new ArrayList<>();
     private Int2IntMap playerHoldingPointMap = new Int2IntArrayMap();
     private Level level;
     public float radius = SuperpositionConstants.cableRadius;
-    public float elasticity = 0.9f;
+    private final RopeSimulation ropeSimulation;
     private Player playerHolding;
     private Color color;
-    public Vec3 playerDraggedLastDelta = Vec3.ZERO;
-    public int ticksSinceUpdate = 0;
-    public int sleepTimer = 20;
-    private float lastMovement;
-    private float averageMovement = 0;
-    private boolean emitsLight = false;
+    private final boolean emitsLight;
     private List<PointLight> pointLights;
     private float brightness;
-
+    
     private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
-
+    
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
-        this.addPoint(new Point(starAnchor));
-        for (int i = 0; i < points; i++) {
-            float delta = (float) i / points;
-            this.addPoint(new Point(SuperpositionMth.lerpVec3(starAnchor, endAnchor, delta)));
-        }
-        this.addPoint(new Point(endAnchor));
+        this.ropeSimulation = new RopeSimulation(radius);
+        ropeSimulation.createRope(points, starAnchor, endAnchor);
         this.level = level;
         this.color = color;
         this.emitsLight = emitsLight;
     }
-
-    private Cable(UUID id, List<Point> points, Level level, Color color, boolean emitsLight) {
+    
+    private Cable(UUID id, RopeSimulation ropeSimulation, Level level, Color color, boolean emitsLight) {
         this.id = id;
-        this.points = points;
+        this.ropeSimulation = ropeSimulation;
         this.level = level;
         this.color = color;
         this.emitsLight = emitsLight;
     }
-
-    public void addPoint(Point point) {
-        points.add(point);
-    }
-
-    public void debugDraw() {
-        for (Point point : points) {
-            assert Minecraft.getInstance().level != null;
-            Minecraft.getInstance().level.addParticle(ParticleTypes.ELECTRIC_SPARK, point.position.x, point.position.y, point.position.z, 0, 0, 0);
-        }
-    }
-
-    public void followPlayer() {
-        for (Point point : points) {
-            point.grabbed = false;
-        }
-        for (int id : playerHoldingPointMap.keySet()) {
-            Entity entity = level.getEntity(id);
-            if (entity instanceof Player player) {
-                int index = playerHoldingPointMap.get(id);
-                Point heldPoint = points.get(index);
-                Vec3 playerOffset = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-
-                HitResult hitResult = level.clip(new ClipContext(player.getEyePosition(), playerOffset, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-
-                float maxLength = this.getMaxLength();
-                float actualLength = 0;
-                for (int i = 1; i < (points.size()); i++) {
-                    Vec3 start = index == i - 1 ? hitResult.getLocation() : points.get(i - 1).position;
-                    Vec3 end = index == i ? hitResult.getLocation() : points.get(i).position;
-                    actualLength += (float) start.distanceTo(end);
-                }
-                boolean isEndPoint = heldPoint.equals(points.getFirst()) || heldPoint.equals(points.getLast());
-                Vec3 result = (SuperpositionMth.lerpVec3(heldPoint.prevPosition, hitResult.getLocation(), net.minecraft.util.Mth.clamp((maxLength + (isEndPoint ? 0 : 1)) / (actualLength), 0, 1)));
-                heldPoint.grabbed = true;
-                float stretch = (float) result.distanceTo(hitResult.getLocation());
-                if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
-                    CableRenderer.stretch = net.minecraft.util.Mth.clamp((float) (Math.log(stretch) / 4f + 1f), 0, 1);
-                }
-                if (stretch > 1.5f) {
-                    if (level.isClientSide && player.equals(Minecraft.getInstance().player)) {
-                        CableRenderer.detachPos = heldPoint.position;
-                        CableRenderer.detachDelta = net.minecraft.util.Mth.clamp((float) (Math.log(stretch) / 4f + 1f), 0, 1);
-                    }
-                    CableManager.playerFinishDraggingCable(player, BlockPos.containing(heldPoint.position), null);
-                    return;
-                }
-                heldPoint.position = result;
-
-//                addPoint(new Point(playerOffset));
-            }
-        }
-    }
-
-    public float getMaxLength() {
-        return radius * points.size() * elasticity + radius * 2;
-    }
-
+    
     public void updatePhysics() {
-        ticksSinceUpdate++;
         if (!playerHoldingPointMap.isEmpty()) {
-            sleepTimer = 60;
+            ropeSimulation.invalidateSleepTime();
         }
-        if (sleepTimer > 0) {
-            this.updatePointsInBlocks();
-            lastMovement = 0;
-            this.integrate();
-            averageMovement = (lastMovement + (averageMovement * 19)) / 20f;
-            if (averageMovement > 0.8f) {
-                sleepTimer = 60;
-            } else {
-                sleepTimer--;
-            }
-            this.followPlayer();
-            points.getLast().tempPos = points.getLast().position;
-            this.update(false);
-            this.update(true);
-            for (Point point : points) {
-                if (point.tempPos != null) {
-                    point.position = SuperpositionMth.lerpVec3(point.position, point.tempPos, 0.5f);
-                }
-            }
-            this.freeStuckPoints();
-            this.updateCollisions();
-            this.lerpPos();
-        } else {
-            for (Point point : points) {
-                point.setPrevPosition(point.position);
-            }
+        freeStuckPoints();
+        if (!isSleeping()) {
+            ropeSimulation.simulate(level);
         }
         this.sendSignal();
     }
-
-
-    private void freeStuckPoints() {
-        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-        for (int i = 1; i < points.size() - 1; i++) {
-            Point point = points.get(i);
-            Point lastPoint = points.get(i - 1);
-            Point nextPoint = points.get(i + 1);
-            pos.set(point.position.x, point.position.y, point.position.z);
-            float distanceBack = (float) point.getPosition().distanceTo(lastPoint.getPosition());
-            float distanceForward = (float) point.getPosition().distanceTo(lastPoint.getPosition());
-            if (distanceBack > SuperpositionConstants.cableRadius * 3) {
-                if (distanceBack > distanceForward) {
-                    point.setPosition(lastPoint.position);
-                } else {
-                    point.setPosition(nextPoint.position);
-                }
-                point.inBlock = true;
-            }
-            if (distanceForward > SuperpositionConstants.cableRadius * 3) {
-                point.setPosition(nextPoint.position);
-                point.inBlock = true;
-            }
-        }
-    }
-
+    
     private void sendSignal() {
         if (level != null && playerHolding == null) {
-            BlockPos startPos = BlockPos.containing(points.getFirst().getPosition());
-            BlockPos endPos = BlockPos.containing(points.getLast().getPosition());
+            RopeNode firstNode = ropeSimulation.getNodes().getFirst();
+            RopeNode lastNode = ropeSimulation.getNodes().getLast();
+            
+            if (firstNode.getAnchor() == null || lastNode.getAnchor() == null) {
+                return;
+            }
+            
+            BlockPos startPos = firstNode.getAnchor().getAnchorBlock();
+            BlockPos endPos = lastNode.getAnchor().getAnchorBlock();
+            
             if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
+                
                 BlockEntity start = level.getBlockEntity(startPos);
                 BlockEntity end = level.getBlockEntity(endPos);
-                if (points.getFirst().attachedFace == Direction.UP && start instanceof ComputerBlockEntity cbe) {
+                
+                if (firstNode.getAnchor().getDirection() == Direction.UP && start instanceof ComputerBlockEntity cbe) {
+                    
                     Card card = cbe.getCard();
                     if (card != null && end instanceof SignalActorBlockEntity signalActorBlockEntity) { // Tells a periphreal what card is being used
                         float frequency = SuperpositionConstants.periphrealFrequency;
@@ -214,42 +102,55 @@ public class Cable {
                         Vector3d pos = new Vector3d(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                         Signal periphrealSignal = new Signal(pos, level, frequency, 1, frequency / 100000);
                         periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
-                        signalActorBlockEntity.putSignalFace(periphrealSignal, points.getLast().attachedFace);
+                        signalActorBlockEntity.putSignalFace(periphrealSignal, lastNode.getAnchor().getDirection());
                     }
-                } else if (points.getLast().attachedFace == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as peripheral
+                    
+                } else if (lastNode.getAnchor().getDirection() == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as peripheral
+                    
                     Card card = cbe.getCard();
                     if (card != null && start instanceof SignalActorBlockEntity signalActorBlockEntity) {
                         cbe.acceptPeriphrealSignal(signalActorBlockEntity.getSignal());
                     }
+                    
                 } else if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
-                    List<Signal> signalList = startSignalActor.getSideSignals(points.getFirst().attachedFace);
+                    
+                    List<Signal> signalList = startSignalActor.getSideSignals(firstNode.getAnchor().getDirection());
                     if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
-                        endSignalActor.addSignals(new Object(), signalList, points.getLast().attachedFace);
+                        endSignalActor.addSignals(new Object(), signalList, lastNode.getAnchor().getDirection());
                     }
+                    
                 } else if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    CablePassthroughManager.addSignalsToBlock(level, endPos, startSignalActor.getSideSignals(points.getFirst().getAttachedFace()), points.getLast().getAttachedFace());
+                    
+                    CablePassthroughManager.addSignalsToBlock(
+                        level, endPos,
+                        startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()),
+                        lastNode.getAnchor().getDirection()
+                    );
+                
                 } else {
+                    
                     List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
                     if (signalList != null) {
                         if (end instanceof SignalActorBlockEntity endSignalActor) {
-                            endSignalActor.putSignalsFace(new Object(), signalList, points.getLast().getAttachedFace());
+                            endSignalActor.putSignalsFace(new Object(), signalList, lastNode.getAnchor().getDirection());
                         } else {
-                            CablePassthroughManager.addSignalsToBlock(level, endPos, signalList, points.getLast().getAttachedFace());
+                            CablePassthroughManager.addSignalsToBlock(level, endPos, signalList, lastNode.getAnchor().getDirection());
                         }
                         if (emitsLight) {
                             updateColor(signalList);
                         }
                     }
+                    
                 }
                 if (emitsLight) {
                     if (start instanceof SignalActorBlockEntity startSignalActor) {
-                        updateColor(startSignalActor.getSideSignals(points.getFirst().attachedFace));
+                        updateColor(startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()));
                     }
                 }
             }
         }
     }
-
+    
     private void updateColor(List<Signal> signalList) {
         if (signalList == null || signalList.isEmpty()) {
             return;
@@ -277,171 +178,83 @@ public class Cable {
             }
         }
     }
-
+    
     public void updateLights(float partialTicks) {
         if (emitsLight) {
             if (pointLights == null) {
                 pointLights = new ArrayList<>();
             }
-            if (points.size() == pointLights.size()) {
-                for (int i = 0; i < points.size(); i++) {
-                    updateLight(pointLights.get(i), points.get(i), partialTicks);
-                }
-            } else if (pointLights.size() > points.size()) {
+            if (pointLights.size() > ropeSimulation.getNodesCount()) {
                 ListIterator<PointLight> iterator = pointLights.listIterator();
                 while (iterator.hasNext()) {
                     int i = iterator.nextIndex();
                     PointLight point = iterator.next();
-                    if (i >= points.size()) {
+                    if (i >= ropeSimulation.getNodesCount()) {
                         lightRenderer.removeLight(point);
                         iterator.remove();
-                        continue;
                     }
-                    updateLight(point, points.get(i), partialTicks);
                 }
-            } else {
-                for (int i = 0; i < points.size(); i++) {
-                    Point point = points.get(i);
-                    if (i >= pointLights.size()) {
-                        pointLights.add(new PointLight());
-                        lightRenderer.addLight(pointLights.get(i));
-                        continue;
-                    }
-                    updateLight(pointLights.get(i), point, partialTicks);
+            } else if (pointLights.size() < ropeSimulation.getNodesCount()) {
+                for (int i = pointLights.size(); i < ropeSimulation.getNodes().size(); i++) {
+                    pointLights.add(new PointLight());
+                    lightRenderer.addLight(pointLights.get(i));
                 }
+            }
+            
+            for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
+                updateLight(pointLights.get(i), ropeSimulation.getNode(i));
             }
         }
     }
-
-    private void updateLight(PointLight light, Point point, float partialTicks) {
-        light.setPosition(Mth.lerp(partialTicks,point.prevPosition.x,point.getPosition().x), Mth.lerp(partialTicks,point.prevPosition.y,point.getPosition().y), Mth.lerp(partialTicks,point.prevPosition.z,point.getPosition().z));
+    
+    private void freeStuckPoints() {
+        for (int i = 0; i < ropeSimulation.getNodesCount() - 1; i++) {
+            RopeNode point = ropeSimulation.getNode(i);
+            RopeNode lastPoint = ropeSimulation.getNode(i + 1);
+            float distance = (float) point.getPosition().distanceTo(lastPoint.getPosition());
+            if (distance > SuperpositionConstants.cableRadius * 3) {
+                point.addNextPosition(lastPoint.getPosition());
+                lastPoint.addNextPosition(point.getPosition());
+            }
+        }
+    }
+    
+    private void updateLight(PointLight light, RopeNode point) {
+        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.4));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
     }
-
-    private void lerpPos() {
-        for (Point point : points) {
-            if (point.lerpedPos != null) {
-                point.position = point.lerpedPos.stepAndGather();
-                if (point.lerpedPos.isComplete()) {
-                    point.lerpedPos = null;
-                }
-            }
-        }
-    }
-
-    private void update(boolean isForwards) {
-        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-        if (isForwards) {
-            for (int i = 1; i < points.size(); i++) {
-                Point point = points.get(i);
-                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
-                    continue;
-                }
-
-                Point prevPoint = points.get(i - 1);
-
-                point.forwardLength = (float) point.tempPos.subtract(prevPoint.tempPos).length();
-
-                float distanceToMove = (float) (point.tempPos.distanceTo(prevPoint.tempPos) - radius) * (elasticity);
-                Vec3 normal = (point.tempPos.subtract(prevPoint.tempPos)).normalize();
-                point.tempPos = (point.tempPos.subtract(normal.scale(distanceToMove)));
-            }
-        } else {
-            for (int i = (points.size() - 2); i >= 0; i--) {
-                Point point = points.get(i);
-                blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-                if (point.getAttachedFace() != null || !level.isLoaded(blockPos)) {
-                    point.tempPos = point.position;
-                    continue;
-                }
-
-                Point prevPoint = points.get(i + 1);
-
-                point.backwordsLength = (float) point.position.subtract(prevPoint.position).length();
-
-                float distanceToMove = (float) (point.position.distanceTo(prevPoint.position) - radius) * (elasticity);
-                Vec3 normal = (point.position.subtract(prevPoint.position)).normalize();
-                point.tempPos = point.position;
-                point.position = point.position.subtract(normal.scale(distanceToMove));
-            }
-        }
-    }
-
+    
     public void shrink() {
-        if (points.size() > 4) {
-            points.remove(points.getLast());
-        }
+        if (ropeSimulation.getNodesCount() > 4)
+            ropeSimulation.resizeRope(ropeSimulation.getNodesCount() -1);
     }
-
-    private void updateCollisions() {
-        for (Point point : points) {
-            if (point.lerpedPos == null && !point.inBlock && !point.grabbed) {
-                float restitution = 0.3f;
-                if (level.getBlockState(BlockPos.containing(point.position)).is(Blocks.SLIME_BLOCK))
-                    restitution = 0.9f;
-                Vec3 collision = Entity.collideBoundingBox(null, point.position.subtract(point.prevPosition), AABB.ofSize(point.prevPosition, radius, radius, radius), level, List.of());
-                Vec3 velocity = point.position.subtract(point.prevPosition);
-                point.setInContact(false);
-                if (collision.subtract(velocity).length() != 0) {
-                    velocity = velocity.scale(1 + restitution);
-                    point.setInContact(true);
-                    assert !level.isClientSide || Minecraft.getInstance().level != null;
-                }
-                point.position = point.position.add(collision.subtract(velocity));
-//            }
-            }
-        }
-    }
-
-    private void integrate() {
-        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
-        for (Point point : points) {
-            point.oRenderPosition = point.position;
-            blockPos.set(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-            if (!point.inBlock && !point.grabbed && level.isLoaded(blockPos)) {
-                Vec3 nextPosition = ((point.position.scale(2)).subtract(point.prevPosition)).add(new Vec3(0, -13.8, 0).scale(.05 * 0.05));
-                Vec3 offset = (nextPosition.subtract(point.position));
-                lastMovement += (float) offset.length();
-                point.prevPosition = point.position;
-                if (point.inContact) {
-                    point.position = point.position.add(offset.scale(0.7f));
-                } else {
-                    point.position = point.position.add(offset.scale(sleepTimer == 60 ? 0.999f : Mth.map(sleepTimer, 60, 0, 0.999f, 0.9f)));
-                }
-            } else {
-                point.prevPosition = point.position;
-            }
-        }
-    }
-
+    
     public void setPlayerHolding(Player player) {
-        this.addPoint(new Point(player.position()));
-        this.addPlayerHoldingPoint(player.getId(), points.size() - 1);
+        this.addPlayerHoldingPoint(player.getId(), getPoints().size() - 1);
     }
-
+    
     public void setLevel(Level level) {
         this.level = level;
     }
-
-    public List<Point> getPoints() {
-        return points;
+    
+    public List<RopeNode> getPoints() {
+        return ropeSimulation.getNodes();
     }
-
+    
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(color.getRGB());
         buf.writeBoolean(emitsLight);
-        buf.writeVarInt(points.size());
-        for (Point point : points) {
-            buf.writeVec3(point.position);
-            buf.writeVec3(point.prevPosition);
-            boolean hasFace = point.attachedPoint != null && point.attachedFace != null;
-            buf.writeBoolean(hasFace);
-            if (hasFace) {
-                buf.writeBlockPos(point.attachedPoint);
-                buf.writeEnum(point.attachedFace);
+        buf.writeVarInt(ropeSimulation.getNodesCount());
+        for (RopeNode point : ropeSimulation.getNodes()) {
+            buf.writeVec3(point.getPosition());
+            buf.writeVec3(point.getPrevPosition());
+            AnchorConstraint constraint = point.getAnchor();
+            buf.writeBoolean(constraint != null);
+            if (constraint != null) {
+                buf.writeEnum(constraint.getDirection());
+                buf.writeBlockPos(constraint.getAnchorBlock());
             }
         }
         buf.writeVarInt(playerHoldingPointMap.size());
@@ -450,190 +263,101 @@ public class Cable {
             buf.writeVarInt(entry.getIntValue());
         }
     }
-
+    
     public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level) {
         Color color1 = new Color(buf.readInt());
         boolean emitsLight = buf.readBoolean();
         int size = buf.readVarInt();
-        List<Point> pointList = new ArrayList<>(size);
+        RopeSimulation ropeSimulation = new RopeSimulation(SuperpositionConstants.cableRadius);
         for (int i = 0; i < size; i++) {
-            Point newPoint = new Point(buf.readVec3());
+            RopeNode newPoint = new RopeNode(buf.readVec3());
+            ropeSimulation.addNode(newPoint);
             newPoint.setPrevPosition(buf.readVec3());
             if (buf.readBoolean()) {
-                newPoint.setAnchor(buf.readBlockPos(), buf.readEnum(Direction.class));
+                newPoint.setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
             }
-            pointList.add(newPoint);
         }
-        Cable cable = new Cable(id, pointList, level, color1, emitsLight);
+        Cable cable = new Cable(id, ropeSimulation, level, color1, emitsLight);
         int playerHoldingMapSize = buf.readVarInt();
         for (int i = 0; i < playerHoldingMapSize; i++) {
             cable.addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
         }
         return cable;
     }
-
+    
     public Int2IntMap getPlayerHoldingPointMap() {
         return playerHoldingPointMap;
     }
-
+    
     public void updateFromCable(Cable cable) {
-        ticksSinceUpdate = 0;
         color = cable.color;
-        if (points.size() > cable.points.size()) {
-            for (int i = cable.points.size() - 1; i < cable.points.size(); i++) {
-                points.removeLast();
+        ropeSimulation.removeAllConstraints();
+        ropeSimulation.resizeRope(cable.getPointsCount());
+        List<RopeNode> targetPoints = cable.getPoints();
+        for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
+            ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
+            ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
+            AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
+            if (newAnchor != null) {
+                ropeSimulation.getNode(i).setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
+            } else {
+                targetPoints.get(i).removeAnchor();
             }
         }
-        if (cable.points.size() > points.size()) {
-            points.addAll(cable.points.subList(points.size(), cable.points.size())); //TODO: Test this
-        }
-        for (int i = 0; i < points.size(); i++) {
-            points.get(i).setPosition(cable.points.get(i).getPosition());
-            points.get(i).setPrevPosition(cable.points.get(i).getPrevPosition());
-            points.get(i).setAnchor(cable.points.get(i).attachedPoint, cable.points.get(i).attachedFace);
-        }
+        ropeSimulation.recalculateBaseRopeConstraints();
         this.playerHoldingPointMap = cable.playerHoldingPointMap;
     }
-
-    public void updatePointsInBlocks() {
-        for (Point point : points) {
-            point.ownedCable = this;
-            this.updatePointInBlock(point);
-        }
+    
+    private int getPointsCount() {
+        return ropeSimulation.getNodesCount();
     }
-
-    public void updatePointInBlock(Point point) {
-        Vec3 vec3 = point.getPosition();
-        BlockPos pos = BlockPos.containing(vec3);
-        point.inBlock = !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
-        if (point.lerpedPos == null && point.attachedFace != null) {
-            if (!point.inBlock)
-                point.attachedFace = null;
-        }
-    }
-
+    
     public UUID getId() {
         return id;
     }
-
+    
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
+        getPoints().get(pointIndex).removeAnchor();
         playerHoldingPointMap.put(playerId, pointIndex);
     }
-
+    
     public boolean hasPlayerHolding(int playerUUID) {
         return playerHoldingPointMap.containsKey(playerUUID);
     }
-
-    public Pair<Point, Integer> getPlayerHeldPoint(int playerUUID) {
+    
+    public Pair<RopeNode, Integer> getPlayerHeldPoint(int playerUUID) {
         if (playerHoldingPointMap.containsKey(playerUUID)) {
             int index = playerHoldingPointMap.get(playerUUID);
-            if (points.size() > index) {
-                return new Pair<>(points.get(index), index);
+            if (ropeSimulation.getNodesCount() > index) {
+                return new Pair<>(ropeSimulation.getNode(index), index);
             }
         }
         return null;
     }
-
-    public void addPointAtIndex(int index, Point point) {
-        points.add(index, point);
+    
+    public void addPointAtIndex(int index, RopeNode point) {
+        ropeSimulation.addNode(index, point);
+        ropeSimulation.recalculateBaseRopeConstraints();
     }
-
-    public void replacePointAtIndex(int index, Point point) {
-        points.set(index, point);
+    
+    public int getPointIndex(RopeNode point) {
+        return ropeSimulation.getNodes().indexOf(point);
     }
-
-    public int getPointIndex(Point point) {
-        return points.indexOf(point);
-    }
-
+    
     public void stopPlayerDrag(int playerUUID) {
         playerHoldingPointMap.remove(playerUUID);
     }
-
+    
     public Color getColor() {
         return color;
     }
-
+    
     public static Vec3 getAnchoredPoint(BlockPos pos, Direction face) {
         return pos.getCenter().add(pos.getCenter().subtract(pos.relative(face).getCenter()).scale(-0.45));
     }
-
-    public static class Point {
-        private Vec3 oRenderPosition;
-        private Vec3 prevPosition;
-        private Vec3 position;
-        private Vec3 tempPos;
-        private boolean inContact = false;
-        private boolean inBlock;
-        private boolean grabbed;
-        private float forwardLength;
-        private float backwordsLength;
-        public Vec3LerpComponent lerpedPos = null;
-        private Cable ownedCable;
-        private Direction attachedFace;
-        private BlockPos attachedPoint;
-
-        public Point(Vec3 position) {
-            this.oRenderPosition = position;
-            this.prevPosition = position;
-            this.position = position;
-        }
-
-        public void setAnchor(BlockPos pos, Direction attachedFace) {
-            this.attachedPoint = pos;
-            this.attachedFace = attachedFace;
-        }
-
-        public void setAttachedFace(Direction attachedFace) {
-            this.attachedFace = attachedFace;
-        }
-
-        public void setAttachedPoint(BlockPos attachedPoint) {
-            this.attachedPoint = attachedPoint;
-        }
-
-        public BlockPos getAttachedPoint() {
-            return attachedPoint;
-        }
-
-        public Direction getAttachedFace() {
-            return attachedFace;
-        }
-
-        public Vec3 getPrevPosition() {
-            return prevPosition;
-        }
-
-        public Vec3 getPrevRenderPosition() {
-            return oRenderPosition;
-        }
-
-        public Vec3 getPosition() {
-            return position;
-        }
-
-        public boolean getInContact() {
-            return inContact;
-        }
-
-        public void setPosition(Vec3 vec3) {
-            this.position = vec3;
-        }
-
-        public float getLength() {
-            return Math.max(forwardLength, backwordsLength);
-        }
-
-        public void setPrevPosition(Vec3 vec3) {
-            this.prevPosition = vec3;
-        }
-
-        public void setInContact(boolean inContact) {
-            this.inContact = inContact;
-        }
-
-        public Cable getOwnedCable() {
-            return ownedCable;
-        }
+    
+    public boolean isSleeping() {
+        return ropeSimulation.isSleeping();
     }
+    
 }

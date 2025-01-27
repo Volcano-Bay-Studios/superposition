@@ -15,6 +15,7 @@ import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
 import oshi.util.tuples.Pair;
 
@@ -62,7 +63,7 @@ public class SuperpositionServerPacketHandler {
                 cable.stopPlayerDrag(player.getId());
                 CableSyncS2CPacket response = new CableSyncS2CPacket(cable);
 
-                List<Cable.Point> points = cable.getPoints();
+                List<RopeNode> points = cable.getPoints();
                 Vec3 pos = points.getFirst().getPosition();
                 VeilPacketManager.around(player, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(response);
                 break;
@@ -75,7 +76,7 @@ public class SuperpositionServerPacketHandler {
         ServerLevel level = player.serverLevel();
 
         CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, player.level());
-        Pair<Cable, Cable.Point> rayCast = cableClipResult.filteredRayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f,packet.id());
+        Pair<Cable, RopeNode> rayCast = cableClipResult.filteredRayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f,packet.id());
         if (rayCast == null || !rayCast.getA().getId().equals(packet.id())) {
             Cable cable = CableManager.getCable(level, packet.id());
             ctx.sendPacket(cable != null ? new CableSyncS2CPacket(cable) : new CableSyncS2CPacket(packet.id()));
@@ -85,7 +86,7 @@ public class SuperpositionServerPacketHandler {
         Cable cable = rayCast.getA();
         cable.addPlayerHoldingPoint(player.getId(), cable.getPointIndex(rayCast.getB()));
 
-        List<Cable.Point> points = cable.getPoints();
+        List<RopeNode> points = cable.getPoints();
         Vec3 pos = points.getFirst().getPosition();
         VeilPacketManager.around(player, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(new CableSyncS2CPacket(cable));
     }
