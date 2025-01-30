@@ -18,6 +18,7 @@ public class SuperpositionCards {
     public static final RegistryObject<Card> REDSTONE_CARD = registerCard("redstone_card", () -> new RedstoneCard(Superposition.id("redstone_card")));
     public static final RegistryObject<Card> CONTAINER_CARD = registerCard("container_card", () -> new ContainerCard(Superposition.id("container_card")));
     public static final RegistryObject<Card> IDENTITY_CARD = registerCard("identity_card", () -> new IdentityCard(Superposition.id("identity_card")));
+    public static final RegistryObject<Card> COLOR_CARD = registerCard("color_card", () -> new ColorCard(Superposition.id("color_card")));
     public static final RegistryObject<Card> DISTANCE_CARD = registerCard("distance_card", () -> new DistanceCard(Superposition.id("distance_card")));
     public static final RegistryObject<Card> AMPLITUDE_CARD = registerCard("amplitude_card", () -> new AmplitudeCard(Superposition.id("amplitude_card")));
     public static final RegistryObject<Card> FREQUENCY_CARD = registerCard("frequency_card", () -> new FrequencyCard(Superposition.id("frequency_card")));
