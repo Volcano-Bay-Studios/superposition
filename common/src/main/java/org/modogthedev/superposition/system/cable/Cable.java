@@ -70,7 +70,11 @@ public class Cable {
         }
         freeStuckPoints();
         if (!isSleeping()) {
-            ropeSimulation.simulate(level);
+            Integer tensionNodeIndex = null;
+            if (!playerHoldingPointMap.isEmpty()) {
+                tensionNodeIndex = playerHoldingPointMap.values().iterator().nextInt();
+            }
+            ropeSimulation.simulate(level, tensionNodeIndex);
         }
         this.sendSignal();
     }
@@ -335,5 +339,11 @@ public class Cable {
     public boolean isSleeping() {
         return ropeSimulation.isSleeping();
     }
-
+    
+    public void setRenderPrevPos() {
+        for (RopeNode node : getPoints()) {
+            node.setRenderPrevPosition(node.getPosition());
+        }
+    }
+    
 }
