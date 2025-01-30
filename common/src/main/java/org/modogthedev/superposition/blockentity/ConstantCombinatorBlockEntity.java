@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
@@ -29,6 +30,11 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         }
         if (outputString != null)
             outputSignal.encode(outputString);
+        BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
+            signalActorBlockEntity.putSignalsFace(new Object(),List.of(outputSignal),getInvertedSwappedSide());
+        }
+
         resetTooltip();
         addTooltip("Constant Combinator Status:");
         super.tick();
