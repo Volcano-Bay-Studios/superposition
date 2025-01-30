@@ -32,7 +32,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
             outputSignal.encode(outputString);
         BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.putSignalsFace(new Object(),List.of(outputSignal),getInvertedSwappedSide());
+            signalActorBlockEntity.putSignalsFace(new Object(),List.of(new Signal(outputSignal)),getInvertedSwappedSide());
         }
 
         resetTooltip();
