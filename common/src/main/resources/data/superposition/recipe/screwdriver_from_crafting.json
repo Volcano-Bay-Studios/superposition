@@ -2,22 +2,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "PQP",
-    "PIP"
+    "N  ",
+    " I ",
+    "  C"
   ],
   "key": {
-    "P": {
-      "item": "superposition:pliant_sheet"
-    },
-    "Q": {
-      "item": "minecraft:quartz"
-    },
     "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    },
+    "C": {
       "item": "superposition:integrated_circuit"
     }
   },
   "result": {
     "count": 1,
-    "id": "superposition:signal_generator"
+    "id": "superposition:screwdriver"
   }
 }

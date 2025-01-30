@@ -26,7 +26,7 @@ public class SuperpositionFabricClient implements ClientModInitializer {
     }
 
     private void registerBlockRenderLayers() {
-        BlockRenderLayerMap.INSTANCE.putBlock(SuperpositionBlocks.SIGNAL_READOUT.get(), RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(SuperpositionBlocks.MONITOR.get(), RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(SuperpositionBlocks.ANTENNA.get(), RenderType.cutout());
     }
 }

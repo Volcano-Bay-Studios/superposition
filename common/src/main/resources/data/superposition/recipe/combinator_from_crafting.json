@@ -2,6 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
+    " I ",
     "PQP",
     "PIP"
   ],
@@ -18,6 +19,6 @@
   },
   "result": {
     "count": 1,
-    "id": "superposition:signal_generator"
+    "id": "superposition:combinator"
   }
 }

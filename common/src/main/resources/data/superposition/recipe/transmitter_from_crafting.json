@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " A ",
+    "PIP",
+    "PRP"
+  ],
+  "key": {
+    "I": {
+      "item": "superposition:integrated_circuit"
+    },
+    "A": {
+      "item": "superposition:antenna"
+    },
+    "P": {
+      "item": "superposition:pliant_sheet"
+    },
+    "R": {
+      "item": "minecraft:redstone_torch"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:transmitter"
+  }
+}

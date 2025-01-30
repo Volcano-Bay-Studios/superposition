@@ -25,7 +25,7 @@ public class SuperpositionClient {
 
     public static void registerBlockEntityRenderers(BlockEntityRegistry registry) {
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.SIGNAL_GENERATOR.get(), SignalGeneratorBlockEntityRenderer::new);
-        registry.registerBlockEntityRenderer(SuperpositionBlockEntities.SIGNAL_READOUT.get(), MonitorBlockEntityRenderer::new);
+        registry.registerBlockEntityRenderer(SuperpositionBlockEntities.MONITOR.get(), MonitorBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.AMPLIFIER.get(), AmplifierBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.FILTER.get(), FilterBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.COMBINATOR.get(), CombinatorBlockEntityRenderer::new);

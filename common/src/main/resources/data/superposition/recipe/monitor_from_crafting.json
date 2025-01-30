@@ -2,22 +2,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "pattern": [
-    "PQP",
-    "PIP"
+    "GIG",
+    "AAA",
+    "GIG"
   ],
   "key": {
-    "P": {
-      "item": "superposition:pliant_sheet"
-    },
-    "Q": {
-      "item": "minecraft:quartz"
+    "G": {
+      "item": "minecraft:iron_ingot"
     },
     "I": {
       "item": "superposition:integrated_circuit"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
     }
   },
   "result": {
     "count": 1,
-    "id": "superposition:signal_generator"
+    "id": "superposition:monitor"
   }
 }

@@ -46,6 +46,7 @@ public class SuperpositionItems {
     // Cards
     // CRAFTING
     public static final RegistryObject<Item> PLIANT_SHEET = registerItem("pliant_sheet", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> INTEGRATED_CIRCUIT = registerItem("integrated_circuit", () -> new Item(new Item.Properties()));
     // BLOCK ITEM
 
     public static void fillTab(CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {

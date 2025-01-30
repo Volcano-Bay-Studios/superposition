@@ -24,7 +24,7 @@ public class SuperpositionBlocks {
             () -> new SignalGeneratorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-    public static final RegistryObject<MonitorBlock> SIGNAL_READOUT = registerBlock("signal_readout",
+    public static final RegistryObject<MonitorBlock> MONITOR = registerBlock("monitor",
             () -> new MonitorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR)
                     .strength(2.0f, 8f).noOcclusion()
             ));
