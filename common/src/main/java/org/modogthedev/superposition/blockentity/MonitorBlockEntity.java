@@ -18,7 +18,7 @@ import java.util.List;
 
 public class MonitorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     public MonitorBlockEntity(BlockPos pos, BlockState state) {
-        super(SuperpositionBlockEntities.SIGNAL_READOUT.get(), pos, state);
+        super(SuperpositionBlockEntities.MONITOR.get(), pos, state);
     }
 
     private BlockPos linkedPos = null;

@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "superposition:item/insulated_sheet"
+    "layer0": "superposition:item/pliant_sheet"
   }
 }

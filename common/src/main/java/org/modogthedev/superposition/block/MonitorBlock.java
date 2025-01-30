@@ -65,7 +65,7 @@ public class MonitorBlock extends SignalActorTickingBlock implements EntityBlock
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.SIGNAL_READOUT.get().create(pos, state);
+        return SuperpositionBlockEntities.MONITOR.get().create(pos, state);
     }
 
     @Override

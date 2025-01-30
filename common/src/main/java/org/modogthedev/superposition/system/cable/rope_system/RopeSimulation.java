@@ -2,9 +2,9 @@ package org.modogthedev.superposition.system.cable.rope_system;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class RopeSimulation {
@@ -139,6 +139,17 @@ public class RopeSimulation {
         all.addAll(baseConstraints);
         all.addAll(constraints);
         return all;
+    }
+
+    public float calculateOverstretch() {
+        float length = 0f;
+        for (int i = 0; i < nodes.size()-1; i++) {
+            RopeNode node = nodes.get(i);
+            RopeNode nextNode = nodes.get(i+1);
+            float newLength = (float) node.getPosition().distanceTo(nextNode.getPosition());
+            length = Math.max(newLength,length);
+        }
+        return length- SuperpositionConstants.cableRadius;
     }
     
     public List<RopeConstraint> getConstraints() {

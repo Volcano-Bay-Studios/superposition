@@ -37,9 +37,9 @@ public class SuperpositionBlockEntities {
             registerBlockEntity("computer",
                     () -> BlockEntityType.Builder.of(ComputerBlockEntity::new, SuperpositionBlocks.COMPUTER.get()));
 
-    public static final RegistryObject<BlockEntityType<MonitorBlockEntity>> SIGNAL_READOUT =
-            registerBlockEntity("signal_readout",
-                    () -> BlockEntityType.Builder.of(MonitorBlockEntity::new, SuperpositionBlocks.SIGNAL_READOUT.get()));
+    public static final RegistryObject<BlockEntityType<MonitorBlockEntity>> MONITOR =
+            registerBlockEntity("monitor",
+                    () -> BlockEntityType.Builder.of(MonitorBlockEntity::new, SuperpositionBlocks.MONITOR.get()));
 
     public static final RegistryObject<BlockEntityType<AnalyserBlockEntity>> ANALYSER =
             registerBlockEntity("analyser",

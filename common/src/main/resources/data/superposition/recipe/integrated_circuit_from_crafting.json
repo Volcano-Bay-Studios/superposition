@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " D ",
+    "RPR"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone_torch"
+    },
+    "D": {
+      "item": "minecraft:redstone"
+    },
+    "P": {
+      "item": "superposition:pliant_sheet"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:integrated_circuit"
+  }
+}

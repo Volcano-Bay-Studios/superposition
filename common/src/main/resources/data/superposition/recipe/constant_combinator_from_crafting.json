@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PSP",
+    "PIP"
+  ],
+  "key": {
+    "P": {
+      "item": "superposition:pliant_sheet"
+    },
+    "S": {
+      "tag": "minecraft:signs"
+    },
+    "I": {
+      "item": "superposition:integrated_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:constant_combinator"
+  }
+}

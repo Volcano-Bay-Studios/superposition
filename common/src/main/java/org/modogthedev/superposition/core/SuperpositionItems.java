@@ -45,7 +45,8 @@ public class SuperpositionItems {
     public static final RegistryObject<FilterItem> BAND_PASS_FILTER = registerItem("band_pass_filter", () -> new FilterItem(SuperpositionFilters.BAND_PASS, new Item.Properties().stacksTo(1)));
     // Cards
     // CRAFTING
-    public static final RegistryObject<Item> INSULATED_SHEET = registerItem("insulated_sheet", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> PLIANT_SHEET = registerItem("pliant_sheet", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> INTEGRATED_CIRCUIT = registerItem("integrated_circuit", () -> new Item(new Item.Properties()));
     // BLOCK ITEM
 
     public static void fillTab(CreativeModeTab.ItemDisplayParameters parameters, CreativeModeTab.Output output) {

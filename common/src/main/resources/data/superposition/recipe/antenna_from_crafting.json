@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "DRD"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:dried_kelp"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:antenna"
+  }
+}

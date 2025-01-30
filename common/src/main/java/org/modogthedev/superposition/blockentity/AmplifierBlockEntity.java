@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.render.light.AreaLight;
 import foundry.veil.api.client.render.light.PointLight;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -118,7 +117,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         lastAmplitude = amplitude;
         amplitude = 0;
         if (light != null) {
-            light.setBrightness((lastAmplitude/50f)*(lastStep+((float) (ticks) /AmplifierBlockEntity.ticksToChange)));
+            light.setBrightness((lastAmplitude/50f));
         }
         super.tick();
     }

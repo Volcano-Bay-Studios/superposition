@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " I ",
+    "PQP",
+    "PIP"
+  ],
+  "key": {
+    "P": {
+      "item": "superposition:pliant_sheet"
+    },
+    "Q": {
+      "item": "minecraft:quartz"
+    },
+    "I": {
+      "item": "superposition:integrated_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:combinator"
+  }
+}

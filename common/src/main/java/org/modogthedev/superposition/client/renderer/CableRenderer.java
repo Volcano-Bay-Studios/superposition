@@ -76,10 +76,10 @@ public class CableRenderer {
             }
             List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
             List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
-            
+
             splinePoints.addFirst(cable.getPoints().getFirst().getPosition());
             prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevPosition());
-            
+
             splinePoints.add(cable.getPoints().getLast().getPosition());
             prevSplinePoints.add(cable.getPoints().getLast().getPrevPosition());
 
@@ -89,7 +89,7 @@ public class CableRenderer {
             float nextV;
 
             renderCableStart(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), effectiveGeometryPartialTicks);
-            
+
             for (int i = 0; i < splinePoints.size() - 1; i++) {
                 Vec3 prevPoint = prevSplinePoints.get(i);
                 Vec3 point = splinePoints.get(i);
@@ -394,7 +394,7 @@ public class CableRenderer {
                 boolean isLast = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB());
                 boolean isFirst = cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
                 boolean hasAnchor = cablePointPair.getB().getAnchor() != null;
-                
+
                 Vector4f color = getColorForNodeHighlight(isLast, isFirst, hasAnchor);
                 if (isLast || isFirst) {
                     width -= 0.03f;
@@ -405,7 +405,7 @@ public class CableRenderer {
                 } else {
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
                 }
-                
+
                 for (RopeNode node : cablePointPair.getA().getPoints()) {
                     if (node == cablePointPair.getB() || node.getAnchor() == null) continue;
                     Vec3 anchorPos = node.getPosition(partialTicks);
@@ -414,31 +414,31 @@ public class CableRenderer {
             }
         }
     }
-    
+
     private static Vector4f getColorForNodeHighlight(boolean isLast, boolean isFirst, boolean hasAnchor) {
         if (isLast) {
             return new Vector4f(
-                0.9f, 0.5f, 0.5f,
-                0.6f
+                    0.5f, 0.5f, 0.9f,
+                    0.6f
             );
         } else if (isFirst) {
             return new Vector4f(
-                0.9f, 0.5f, 0.5f,
-                0.6f
+                    0.9f, 0.5f, 0.5f,
+                    0.6f
             );
         } else if (hasAnchor) {
             return new Vector4f(
-                0.4f, 0.4f, 0.9f,
-                0.4f
+                    0.4f, 0.4f, 0.9f,
+                    0.4f
             );
         } else {
             return new Vector4f(
-                0.4f, 0.9f, 0.4f,
-                0.4f
+                    0.4f, 0.9f, 0.4f,
+                    0.4f
             );
         }
     }
-    
+
     public static void renderOverlays(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
         if (Minecraft.getInstance().options.hideGui) {
             return;

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PP ",
+    "IQQ",
+    "PP "
+  ],
+  "key": {
+    "P": {
+      "item": "superposition:pliant_sheet"
+    },
+    "Q": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "I": {
+      "item": "superposition:integrated_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:analyser"
+  }
+}

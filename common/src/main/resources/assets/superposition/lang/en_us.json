@@ -4,17 +4,17 @@
   "block.superposition.transmitter" : "Transmitter",
   "block.superposition.antenna" : "Antenna Part",
   "block.superposition.receiver" : "Receiver",
-  "block.superposition.signal_readout" : "Monitor",
+  "block.superposition.monitor" : "Monitor",
   "block.superposition.filter" : "Filter",
-  "block.superposition.casing" : "Insulated Casing",
   "block.superposition.analyser" : "Analyser",
   "block.superposition.computer" : "Computer",
   "block.superposition.combinator" : "Combinator",
   "block.superposition.constant_combinator" : "Constant Combinator",
 
+  "item.superposition.pliant_sheet" : "Pliant Sheet",
+  "item.superposition.integrated_circuit" : "Integrated Circuit",
   "item.superposition.screwdriver" : "Screwdriver",
   "item.superposition.handheld_receiver" : "Handheld Receiver",
-  "item.superposition.insulated_sheet" : "Insulated Sheet",
   "item.superposition.low_pass_filter" : "Low Pass Filter",
   "item.superposition.high_pass_filter" : "High Pass Filter",
   "item.superposition.band_pass_filter" : "Band Pass Filter",
@@ -43,7 +43,6 @@
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",
-
 
   "creativemodetab.superposition" : "Superposition"
 }

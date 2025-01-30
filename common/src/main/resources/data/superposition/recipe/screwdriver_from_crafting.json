@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "N  ",
+    " I ",
+    "  C"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    },
+    "C": {
+      "item": "superposition:integrated_circuit"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "superposition:screwdriver"
+  }
+}
