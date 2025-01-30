@@ -25,7 +25,7 @@ public class RopeMiddleConstraint implements RopeConstraint, BendConstraint {
     
     @Override
     public double getStress() {
-        return (from.getPosition().distanceTo(middle.getPosition()) + to.getPosition().distanceTo(middle.getPosition())) * 0.5f;
+        return (from.getPosition().distanceTo(middle.getPosition()) + to.getPosition().distanceTo(middle.getPosition()));
     }
     
 }
