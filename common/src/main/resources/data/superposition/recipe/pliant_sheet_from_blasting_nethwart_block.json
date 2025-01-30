@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "cookingtime": 100,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "minecraft:nether_wart"
+  },
+  "result": {
+    "id": "superposition:pliant_sheet"
+  }
+}

@@ -25,7 +25,7 @@ public class ContainerCard extends Card {
 
     @Override
     public void modulateSignal(Signal signal, Signal periphrealSignal) {
-        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) { //TODO: fix
+        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
             BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof BaseContainerBlockEntity container) {
                 List<ItemStack> stacks = new ArrayList<>();

@@ -6,7 +6,6 @@
   "block.superposition.receiver" : "Receiver",
   "block.superposition.signal_readout" : "Monitor",
   "block.superposition.filter" : "Filter",
-  "block.superposition.casing" : "Insulated Casing",
   "block.superposition.analyser" : "Analyser",
   "block.superposition.computer" : "Computer",
   "block.superposition.combinator" : "Combinator",
@@ -14,7 +13,7 @@
 
   "item.superposition.screwdriver" : "Screwdriver",
   "item.superposition.handheld_receiver" : "Handheld Receiver",
-  "item.superposition.insulated_sheet" : "Insulated Sheet",
+  "item.superposition.pliant_sheet" : "Pliant Sheet",
   "item.superposition.low_pass_filter" : "Low Pass Filter",
   "item.superposition.high_pass_filter" : "High Pass Filter",
   "item.superposition.band_pass_filter" : "Band Pass Filter",

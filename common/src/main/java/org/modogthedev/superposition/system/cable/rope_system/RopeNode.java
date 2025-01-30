@@ -14,10 +14,11 @@ import java.util.List;
 public class RopeNode {
     
     RopeSimulation simulation;
-    
+
     Vec3 prevPosition;
     Vec3 position;
-    
+    Vec3 tempPosition;
+
     @Nullable
     AnchorConstraint anchor = null;
     
@@ -78,7 +79,10 @@ public class RopeNode {
     public Vec3 getPosition() {
         return position;
     }
-    
+    public Vec3 getTempPosition() {
+        return tempPosition;
+    }
+
     public void setPosition(Vec3 position) {
         this.position = position;
     }
@@ -128,9 +132,17 @@ public class RopeNode {
     public void setPrevPosition(Vec3 prevPosition) {
         this.prevPosition = prevPosition;
     }
+
+    public void setTempPosition(Vec3 tempPosition) {
+        this.tempPosition = tempPosition;
+    }
     
     public Vec3 getPrevPosition() {
         return prevPosition;
+    }
+
+    public float calculateOverstretch() {
+        return simulation.calculateOverstretch();
     }
     
 }

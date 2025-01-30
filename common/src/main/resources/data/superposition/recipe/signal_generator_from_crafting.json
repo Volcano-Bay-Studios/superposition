@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "Q": {
+      "tag": "minecraft:quartz"
+    },
+    "P": {
+      "item": "superposition:pliant_sheet"
+    },
+    "R": {
+      "tag": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "PQP",
+    "PRP",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "superposition:signal_generator"
+  }
+}
