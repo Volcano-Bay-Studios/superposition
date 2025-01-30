@@ -14,13 +14,15 @@ import java.util.List;
 public class RopeNode {
     
     RopeSimulation simulation;
-
+    
+    Vec3 renderPrevPosition;
     Vec3 prevPosition;
     Vec3 position;
-    Vec3 tempPosition;
+    Vec3 playerDragPosition;
 
     @Nullable
     AnchorConstraint anchor = null;
+    int anchorStress = 0;
     
     List<Vec3> nextPositions = new ArrayList<>();
     
@@ -29,6 +31,7 @@ public class RopeNode {
     public RopeNode(Vec3 position) {
         this.position = position;
         this.prevPosition = position;
+        this.renderPrevPosition = position;
     }
     
     public boolean isFixed() {
@@ -39,7 +42,7 @@ public class RopeNode {
         this.fixed = fixed;
     }
     
-    public void resolveWorldCollisions(Level level) {
+    public void resolveWorldCollisions(Level level, boolean friction) {
         if (fixed || !level.isLoaded(BlockPos.containing(getPosition()))) return;
         Vec3 velocity = position.subtract(prevPosition);
         double initialYVelocity = velocity.y;
@@ -61,7 +64,8 @@ public class RopeNode {
         }
         
         if (initialYVelocity < velocity.y && velocity.y <= 0) {
-            velocity = new Vec3(velocity.x * 0.75, velocity.y, velocity.z * 0.75);
+            if (friction)
+                velocity = new Vec3(velocity.x * 0.5, velocity.y, velocity.z * 0.5);
         }
         
         if (velocity.lengthSqr() < 0.00005) {
@@ -73,14 +77,14 @@ public class RopeNode {
     
     public Vec3 getPosition(float partialTicks) {
         if (simulation.isSleeping()) return position;
-        return prevPosition.lerp(position, partialTicks);
+        return renderPrevPosition.lerp(position, partialTicks);
     }
     
     public Vec3 getPosition() {
         return position;
     }
-    public Vec3 getTempPosition() {
-        return tempPosition;
+    public Vec3 getPlayerDragPosition() {
+        return playerDragPosition;
     }
 
     public void setPosition(Vec3 position) {
@@ -95,9 +99,13 @@ public class RopeNode {
         this.nextPositions = nextPositions;
     }
     
+    public void setRenderPrevPosition(Vec3 renderPrevPosition) {
+        this.renderPrevPosition = renderPrevPosition;
+    }
+    
     public void addNextPosition(Vec3 nextPosition) {
-        if (!isFixed()) this.position = position.lerp(nextPosition, 0.25);
-//        this.nextPositions.add(nextPosition);
+//        if (!isFixed()) this.position = position.lerp(nextPosition, 0.25);
+        this.nextPositions.add(nextPosition);
     }
     
     public void applyNextPositions() {
@@ -133,8 +141,8 @@ public class RopeNode {
         this.prevPosition = prevPosition;
     }
 
-    public void setTempPosition(Vec3 tempPosition) {
-        this.tempPosition = tempPosition;
+    public void setPlayerDragPosition(Vec3 playerDragPosition) {
+        this.playerDragPosition = playerDragPosition;
     }
     
     public Vec3 getPrevPosition() {
@@ -143,6 +151,10 @@ public class RopeNode {
 
     public float calculateOverstretch() {
         return simulation.calculateOverstretch();
+    }
+    
+    public Vec3 getRenderPrevPosition() {
+        return renderPrevPosition;
     }
     
 }
