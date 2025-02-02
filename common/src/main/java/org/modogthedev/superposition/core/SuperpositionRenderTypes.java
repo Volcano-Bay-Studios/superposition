@@ -47,7 +47,7 @@ public class SuperpositionRenderTypes extends RenderType {
             false,
             RenderType.CompositeState.builder()
                     .setShaderState(VeilRenderBridge.shaderState(Superposition.id("cable")))
-                    .setTextureState(new RenderStateShard.TextureStateShard(Superposition.id("textures/screen/cable.png"), false, false))
+                    .setTextureState(new RenderStateShard.TextureStateShard(Superposition.id("textures/misc/cable.png"), false, false))
                     .setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 
