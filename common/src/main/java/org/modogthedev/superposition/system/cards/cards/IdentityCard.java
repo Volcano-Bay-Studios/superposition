@@ -1,23 +1,23 @@
-package org.modogthedev.superposition.system.cards.codecs;
+package org.modogthedev.superposition.system.cards.cards;
 
 import net.minecraft.resources.ResourceLocation;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class ColorCard extends Card {
-    public ColorCard(ResourceLocation card) {
+public class IdentityCard extends Card {
+    public IdentityCard(ResourceLocation card) {
         super(card);
     }
 
-    public ColorCard(Card card) {
+    public IdentityCard(Card card) {
         super(card);
     }
 
     @Override
     public void modulateSignal(Signal signal, Signal periphrealSignal) {
         if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
-            signal.encode(analyserBlockEntity.getLevel().getBlockState(analyserBlockEntity.getAnalysisPosition()).getBlock().defaultMapColor().col);
+            signal.encode(analyserBlockEntity.getLevel().getBlockState(analyserBlockEntity.getAnalysisPosition()).getBlock().getName().getString());
     }
 
     @Override
@@ -27,6 +27,6 @@ public class ColorCard extends Card {
 
     @Override
     public Card copy() {
-        return new ColorCard(this);
+        return new IdentityCard(this);
     }
 }

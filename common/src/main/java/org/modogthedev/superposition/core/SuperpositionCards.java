@@ -7,7 +7,7 @@ import net.minecraft.world.item.Item;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.item.CardItem;
 import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.codecs.*;
+import org.modogthedev.superposition.system.cards.cards.*;
 
 import java.util.function.Supplier;
 
