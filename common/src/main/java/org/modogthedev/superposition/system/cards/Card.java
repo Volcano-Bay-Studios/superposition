@@ -12,7 +12,6 @@ import org.modogthedev.superposition.system.signal.Signal;
 public abstract class Card {
 
     private final ResourceLocation selfReference;
-    public PeriphrealBlockEntity periphrealBlockEntity;
 
     public Card(ResourceLocation card) {
         this.selfReference = card;
@@ -38,7 +37,7 @@ public abstract class Card {
     public void load(CompoundTag pTag) {
 
     }
-    public boolean requiresPeriphreal() {
+    public boolean encodeReturnValue() {
         return false;
     }
 
