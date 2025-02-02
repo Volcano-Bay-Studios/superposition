@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.system.cards.codecs;
+package org.modogthedev.superposition.system.cards.cards;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
