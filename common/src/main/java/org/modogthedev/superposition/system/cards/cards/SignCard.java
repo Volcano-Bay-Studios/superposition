@@ -11,7 +11,7 @@ import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class SignCard extends Card {
+public class SignCard extends Card implements PeriphrealCard {
     public SignCard(ResourceLocation card) {
         super(card);
     }
@@ -21,10 +21,10 @@ public class SignCard extends Card {
     }
 
     @Override
-    public void modulateSignal(Signal signal, Signal periphrealSignal) {
+    public void returnSignal(Signal signal, BlockEntity blockEntity) {
         String text = "";
-        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
-            BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
+        if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
+            BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof SignBlockEntity signBlockEntity) {
                 for (Component component : signBlockEntity.getFrontText().getMessages(true)) {
                     if (!component.getString().isEmpty())
@@ -43,7 +43,7 @@ public class SignCard extends Card {
     @Override
     public void affectBlock(Signal signal, Level level, BlockPos pos) {
         if (signal != null && signal.getEncodedData() != null) {
-            BlockEntity blockEntity = periphrealBlockEntity.getLevel().getBlockEntity(pos);
+            BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof SignBlockEntity signBlockEntity) {
                 signBlockEntity.setText(new SignText().setMessage(0,Component.literal(signal.getEncodedData().stringValue())),true);
             }

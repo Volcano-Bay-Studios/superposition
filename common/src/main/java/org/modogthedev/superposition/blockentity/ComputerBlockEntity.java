@@ -125,7 +125,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (card != null && !card.requiresPeriphreal()) {
+        if (card != null && !card.encodeReturnValue()) {
             card.modulateSignal(signal,periphrealSignal);
         } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
             signal.setEncodedData(periphrealSignal.getEncodedData());
