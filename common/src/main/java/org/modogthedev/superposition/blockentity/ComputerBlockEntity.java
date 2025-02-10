@@ -17,7 +17,7 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.codecs.TickingCard;
+import org.modogthedev.superposition.system.cards.cards.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
@@ -125,7 +125,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (card != null && !card.requiresPeriphreal()) {
+        if (card != null && !card.encodeReturnValue()) {
             card.modulateSignal(signal,periphrealSignal);
         } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
             signal.setEncodedData(periphrealSignal.getEncodedData());

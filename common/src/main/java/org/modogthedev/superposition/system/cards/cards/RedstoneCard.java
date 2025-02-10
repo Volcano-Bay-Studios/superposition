@@ -1,13 +1,14 @@
-package org.modogthedev.superposition.system.cards.codecs;
+package org.modogthedev.superposition.system.cards.cards;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class RedstoneCard extends Card {
+public class RedstoneCard extends Card implements PeriphrealCard {
 
     public RedstoneCard(ResourceLocation card) {
         super(card);
@@ -18,10 +19,10 @@ public class RedstoneCard extends Card {
     }
 
     @Override
-    public void modulateSignal(Signal signal, Signal periphrealSignal) {
+    public void returnSignal(Signal signal, BlockEntity blockEntity) {
         int value = 0;
-        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
-            value = periphrealBlockEntity.getLevel().getBestNeighborSignal(analyserBlockEntity.getAnalysisPosition());
+        if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
+            value = blockEntity.getLevel().getBestNeighborSignal(analyserBlockEntity.getAnalysisPosition());
         }
         signal.encode(value);
     }
@@ -33,7 +34,7 @@ public class RedstoneCard extends Card {
     }
 
     @Override
-    public boolean requiresPeriphreal() {
+    public boolean encodeReturnValue() {
         return true;
     }
 

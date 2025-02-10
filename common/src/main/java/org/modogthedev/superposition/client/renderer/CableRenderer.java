@@ -121,28 +121,28 @@ public class CableRenderer {
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0.5F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0.5F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
@@ -153,28 +153,28 @@ public class CableRenderer {
                 ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0.5F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0.5F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
@@ -185,28 +185,28 @@ public class CableRenderer {
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0.5F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0.5F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
@@ -217,28 +217,28 @@ public class CableRenderer {
                 ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0.5F, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, v)
+                        .setUv(0, v)
                         .setLight(lightStart)
                         .setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 
                 NEXT_ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
                 vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z))
                         .setColor(color)
-                        .setUv(0.25F, nextV)
+                        .setUv(0.5F, nextV)
                         .setLight(lightEnd)
                         .setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
 

@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.system.cards.codecs;
+package org.modogthedev.superposition.system.cards.cards;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,7 +14,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerCard extends Card {
+public class ContainerCard extends Card implements PeriphrealCard {
     public ContainerCard(ResourceLocation card) {
         super(card);
     }
@@ -24,9 +24,9 @@ public class ContainerCard extends Card {
     }
 
     @Override
-    public void modulateSignal(Signal signal, Signal periphrealSignal) {
-        if (periphrealBlockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
-            BlockEntity blockEntity1 = periphrealBlockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
+    public void returnSignal(Signal signal, BlockEntity blockEntity) {
+        if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
+            BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof BaseContainerBlockEntity container) {
                 List<ItemStack> stacks = new ArrayList<>();
                 CompoundTag tag = new CompoundTag();
@@ -47,7 +47,7 @@ public class ContainerCard extends Card {
     }
 
     @Override
-    public boolean requiresPeriphreal() {
+    public boolean encodeReturnValue() {
         return true;
     }
 

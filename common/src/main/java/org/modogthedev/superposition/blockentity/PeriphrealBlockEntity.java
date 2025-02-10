@@ -8,6 +8,7 @@ import org.joml.Vector3d;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.cards.PeriphrealCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 
@@ -35,11 +36,9 @@ public class PeriphrealBlockEntity extends SignalActorBlockEntity {
             Card card1 = SuperpositionCards.CARDS.asVanillaRegistry().byId(signal.getEncodedData().intValue());
             if (card1 != null)
                 card = card1.copy();
-            if (card != null)
-                card.periphrealBlockEntity = this;
         }
-        if (card != null)
-            card.modulateSignal(processSignal,null);
+        if (card != null && card instanceof PeriphrealCard periphrealCard)
+            periphrealCard.returnSignal(processSignal,this);
         super.tick();
     }
 
