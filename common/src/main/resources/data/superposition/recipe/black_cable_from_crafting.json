@@ -3,7 +3,7 @@
   "category": "redstone",
   "ingredients": [
     {
-      "item": "minecraft:copper_ingot"
+      "item": "minecraft:redstone"
     },
     {
       "item": "minecraft:dried_kelp"

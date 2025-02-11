@@ -8,6 +8,9 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Objects;
 
 public sealed interface EncodedData<T> {
@@ -42,6 +45,13 @@ public sealed interface EncodedData<T> {
                 this.asString = Boolean.toString(this.value);
             }
             return this.asString;
+        }
+
+        @Override
+        public byte[] byteArrayValue() {
+            byte[] bytes = new byte[1];
+            bytes[0] = (byte) (this.value? 1: 0);
+            return bytes;
         }
 
         @Override
@@ -105,6 +115,11 @@ public sealed interface EncodedData<T> {
                 this.asString = Integer.toString(this.value);
             }
             return this.asString;
+        }
+
+        @Override
+        public byte[] byteArrayValue() {
+            return ByteBuffer.allocate(4).putInt(this.value).array();
         }
 
         @Override
@@ -173,6 +188,11 @@ public sealed interface EncodedData<T> {
         }
 
         @Override
+        public byte[] byteArrayValue() {
+            return ByteBuffer.allocate(4).putFloat(this.value).array();
+        }
+
+        @Override
         public Type type() {
             return Type.FLOAT;
         }
@@ -232,6 +252,11 @@ public sealed interface EncodedData<T> {
         @Override
         public String stringValue() {
             return this.value;
+        }
+
+        @Override
+        public byte[] byteArrayValue() {
+            return this.value.getBytes(StandardCharsets.UTF_8);
         }
 
         @Override
@@ -299,6 +324,11 @@ public sealed interface EncodedData<T> {
         }
 
         @Override
+        public byte[] byteArrayValue() {
+            return stringValue().getBytes(StandardCharsets.UTF_8);
+        }
+
+        @Override
         public Type type() {
             return Type.COMPOUND_TAG;
         }
@@ -326,6 +356,72 @@ public sealed interface EncodedData<T> {
         }
     }
 
+    final class ByteArrayData implements EncodedData<byte[]> {
+
+        private final byte[] value;
+
+        public ByteArrayData(byte[] value) {
+            this.value = value;
+        }
+
+        @Override
+        public byte[] value() {
+            return this.value;
+        }
+
+        @Override
+        public boolean booleanValue() {
+            return false;
+        }
+
+        @Override
+        public int intValue() {
+            return 0;
+        }
+
+        @Override
+        public Number numberValue() {
+            return 0;
+        }
+
+        @Override
+        public String stringValue() {
+            return new String(this.value, StandardCharsets.UTF_8);
+        }
+
+        @Override
+        public byte[] byteArrayValue() {
+            return new byte[0];
+        }
+
+        @Override
+        public Type type() {
+            return Type.INT;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+            var that = (ByteArrayData) obj;
+            return Arrays.equals(this.value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(this.value);
+        }
+
+        @Override
+        public String toString() {
+            return "IntData[value=" + Arrays.toString(this.value) + ']';
+        }
+    }
+
     static EncodedData<Boolean> of(boolean value) {
         return new BoolData(value);
     }
@@ -346,11 +442,17 @@ public sealed interface EncodedData<T> {
         return new CompoundTagData(value);
     }
 
+    static EncodedData<byte[]> of(byte[] value) {
+        return new ByteArrayData(value);
+    }
+
     T value();
 
     boolean booleanValue();
 
     Number numberValue();
+
+    byte[] byteArrayValue();
 
     default CompoundTag compoundTagData() {
         String string = this.stringValue();
@@ -410,7 +512,8 @@ public sealed interface EncodedData<T> {
         INT(ByteBufCodecs.INT.map(IntData::new, data -> ((IntData) data).value)),
         FLOAT(ByteBufCodecs.FLOAT.map(FloatData::new, data -> ((FloatData) data).value)),
         STRING(ByteBufCodecs.STRING_UTF8.map(StringData::new, data -> ((StringData) data).value)),
-        COMPOUND_TAG(ByteBufCodecs.COMPOUND_TAG.map(CompoundTagData::new, data -> ((CompoundTagData) data).value));
+        COMPOUND_TAG(ByteBufCodecs.COMPOUND_TAG.map(CompoundTagData::new, data -> ((CompoundTagData) data).value)),
+        BYTE_ARRAY(ByteBufCodecs.BYTE_ARRAY.map(ByteArrayData::new, data -> ((ByteArrayData) data).value));
 
         private final StreamCodec<ByteBuf, EncodedData<?>> codec;
 
