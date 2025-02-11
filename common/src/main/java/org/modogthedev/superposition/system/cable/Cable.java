@@ -217,7 +217,7 @@ public class Cable {
 
     private void updateLight(PointLight light, RopeNode point) {
         light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-        light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.4));
+        light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
     }

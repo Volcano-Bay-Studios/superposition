@@ -51,6 +51,7 @@ public class Superposition {
         CableManager.clientTick(level);
         CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
+        CarabinerManager.clientTick(level);
         SuperpositionUITooltipRenderer.clientTick(level);
     }
 

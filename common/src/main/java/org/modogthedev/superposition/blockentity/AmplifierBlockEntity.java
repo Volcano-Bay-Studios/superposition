@@ -117,7 +117,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         lastAmplitude = amplitude;
         amplitude = 0;
         if (light != null) {
-            light.setBrightness((lastAmplitude/50f));
+            light.setBrightness((lastAmplitude/100f+0.2f));
         }
         super.tick();
     }
