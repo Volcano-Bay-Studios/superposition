@@ -58,9 +58,6 @@ public class CableManager {
     public static void tick(ServerLevel level) {
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
-            for (Cable cable : cables.values()) {
-                cable.setRenderPrevPos();
-            }
             dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
@@ -80,9 +77,6 @@ public class CableManager {
         CableRenderer.stretch = 0;
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
-            for (Cable cable : cables.values()) {
-                cable.setRenderPrevPos();
-            }
             dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
@@ -97,13 +91,7 @@ public class CableManager {
                 if (level.getEntity(id) instanceof Player player) {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-                    BlockHitResult result = level.clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
-                    if (result.getType() == HitResult.Type.BLOCK) {
-                        holdGoalPos = result.getLocation();
-                    }
-                    playerPoint.setPosition(holdGoalPos);
-                    playerPoint.setPlayerDragPosition(holdGoalPos);
+                    playerPoint.setTempPosition(playerPoint.getPosition());
                 }
             }
         }
@@ -115,7 +103,15 @@ public class CableManager {
                 if (level.getEntity(id) instanceof Player player) {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-                    
+//                    playerPoint.setPrevPosition(playerPoint.getPosition());
+                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+                    BlockHitResult result = level.clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+                    if (result.getType() == HitResult.Type.BLOCK) {
+                        holdGoalPos = result.getLocation();
+                    }
+
+                    playerPoint.setPrevPosition(playerPoint.getTempPosition());
+                    playerPoint.setPosition(holdGoalPos);
                     playerPoint.removeAnchor();
                     
                     double stretch = playerPoint.calculateOverstretch();

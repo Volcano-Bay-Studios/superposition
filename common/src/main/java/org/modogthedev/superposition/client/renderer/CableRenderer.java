@@ -31,7 +31,6 @@ import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.util.CatmulRomSpline;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -363,9 +362,7 @@ public class CableRenderer {
                 if (level.getEntity(entry.getIntKey()) instanceof Player player) {
                     int i = Math.min(cable.getPoints().size() - 1, entry.getIntValue());
 
-                    Vec3 pointPos = cable.getPoints().get(i).getPosition();
-                    Vec3 prevPos = cable.getPoints().get(i).getPrevPosition();
-                    Vec3 pos = SuperpositionMth.lerpVec3(prevPos, pointPos, partialTicks);
+                    Vec3 pos = cable.getPoints().get(i).getPosition(partialTicks);
                     if (Minecraft.getInstance().player.equals(player)) {
                         DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
                         width += stretch / 32;
