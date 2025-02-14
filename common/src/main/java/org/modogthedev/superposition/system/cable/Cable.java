@@ -64,6 +64,7 @@ public class Cable {
     }
 
     public void updatePhysics() {
+        ropeSimulation.updatePrevRenderPos();
         if (!playerHoldingPointMap.isEmpty()) {
             ropeSimulation.invalidateSleepTime();
         }
