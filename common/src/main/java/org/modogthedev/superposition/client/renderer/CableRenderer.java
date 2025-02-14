@@ -72,16 +72,16 @@ public class CableRenderer {
             for (RopeNode point : cable.getPoints()) {
                 Vec3 pos = point.getPosition();
                 CABLE_POINTS.add(pos);
-                PREV_CABLE_POINTS.add(point.getRenderPrevPosition());
+                PREV_CABLE_POINTS.add(point.getPrevRenderPosition());
             }
             List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
             List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
 
             splinePoints.addFirst(cable.getPoints().getFirst().getPosition());
-            prevSplinePoints.addFirst(cable.getPoints().getFirst().getRenderPrevPosition());
-            
+            prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
+
             splinePoints.add(cable.getPoints().getLast().getPosition());
-            prevSplinePoints.add(cable.getPoints().getLast().getRenderPrevPosition());
+            prevSplinePoints.add(cable.getPoints().getLast().getPrevRenderPosition());
 
             int color = 0xFF000000 | cable.getColor().getRGB();
             float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
@@ -363,7 +363,9 @@ public class CableRenderer {
                 if (level.getEntity(entry.getIntKey()) instanceof Player player) {
                     int i = Math.min(cable.getPoints().size() - 1, entry.getIntValue());
 
-                    Vec3 pos = cable.getPoints().get(i).getPosition(partialTicks);
+                    Vec3 pointPos = cable.getPoints().get(i).getPosition();
+                    Vec3 prevPos = cable.getPoints().get(i).getPrevPosition();
+                    Vec3 pos = SuperpositionMth.lerpVec3(prevPos, pointPos, partialTicks);
                     if (Minecraft.getInstance().player.equals(player)) {
                         DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
                         width += stretch / 32;
