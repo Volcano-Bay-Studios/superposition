@@ -152,6 +152,12 @@ public class RopeSimulation {
             sleepTime = 0;
         }
     }
+
+    public void updatePrevRenderPos() {
+        for (RopeNode node : nodes) {
+            node.prevRenderPosition = node.position;
+        }
+    }
     
     protected void applyConnectionTensions(int tensionNodeIndex) {
         for (int i = tensionNodeIndex; i >= 1; i--) {

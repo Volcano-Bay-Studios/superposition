@@ -225,18 +225,18 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     public BlockPos getSwappedPos() {
         BlockPos sidedPos2;
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            sidedPos2 = this.getBlockPos().relative(level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise(), 1);
+            sidedPos2 = this.getBlockPos().relative(getBlockState().getValue(SignalActorTickingBlock.FACING).getClockWise(), 1);
         } else {
-            sidedPos2 = this.getBlockPos().relative(level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise(), 1);
+            sidedPos2 = this.getBlockPos().relative(getBlockState().getValue(SignalActorTickingBlock.FACING).getCounterClockWise(), 1);
         }
         return sidedPos2;
     }
 
     public Direction getSwappedSide() {
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            return level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise();
+            return getBlockState().getValue(SignalActorTickingBlock.FACING).getClockWise();
         } else {
-            return level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+            return getBlockState().getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
         }
     }
 

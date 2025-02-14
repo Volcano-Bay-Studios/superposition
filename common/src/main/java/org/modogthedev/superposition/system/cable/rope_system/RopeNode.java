@@ -16,6 +16,7 @@ public class RopeNode {
     RopeSimulation simulation;
 
     Vec3 prevPosition;
+    Vec3 prevRenderPosition;
     Vec3 position;
     Vec3 tempPosition;
 
@@ -29,6 +30,7 @@ public class RopeNode {
     public RopeNode(Vec3 position) {
         this.position = position;
         this.prevPosition = position;
+        this.prevRenderPosition = position;
     }
 
     public boolean isFixed() {
@@ -98,6 +100,10 @@ public class RopeNode {
 
     public Vec3 getTempPosition() {
         return tempPosition;
+    }
+
+    public Vec3 getPrevRenderPosition() {
+        return prevRenderPosition;
     }
 
     public void setPosition(Vec3 position) {
