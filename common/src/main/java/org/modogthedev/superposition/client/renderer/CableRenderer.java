@@ -99,7 +99,7 @@ public class CableRenderer {
                 prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
             }
 
-            if (cable.getPoints().getFirst().getAnchor() != null) {
+            if (cable.getPoints().getLast().getAnchor() != null) {
                 RopeNode point = cable.getPoints().getLast();
                 Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
                 splinePoints.add(pos);
