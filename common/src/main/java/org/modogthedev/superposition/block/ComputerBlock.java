@@ -73,6 +73,7 @@ public class ComputerBlock extends SignalActorTickingBlock implements EntityBloc
                     cardItem.card = computerBlockEntity.getCard();
                     player.getInventory().add(cardItem.getDefaultInstance().copy());
                     computerBlockEntity.setCard(null);
+                    return InteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
         }

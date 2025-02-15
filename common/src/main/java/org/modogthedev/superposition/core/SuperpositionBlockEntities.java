@@ -44,6 +44,9 @@ public class SuperpositionBlockEntities {
     public static final RegistryObject<BlockEntityType<AnalyserBlockEntity>> ANALYSER =
             registerBlockEntity("analyser",
                     () -> BlockEntityType.Builder.of(AnalyserBlockEntity::new, SuperpositionBlocks.ANALYSER.get()));
+    public static final RegistryObject<BlockEntityType<ManipulatorBlockEntity>> MANIPULATOR =
+            registerBlockEntity("manipulator",
+                    () -> BlockEntityType.Builder.of(ManipulatorBlockEntity::new, SuperpositionBlocks.MANIPULATOR.get()));
 
     public static final RegistryObject<BlockEntityType<CombinatorBlockEntity>> COMBINATOR =
             registerBlockEntity("combinator",

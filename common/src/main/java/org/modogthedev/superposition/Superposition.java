@@ -38,7 +38,8 @@ public class Superposition {
         SuperpositionMessages.register();
         LOGGER.info("Superposition has been initialized.");
     }
-
+    public static void preTick(ServerLevel level) {
+    }
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
         CableManager.tick(level);
