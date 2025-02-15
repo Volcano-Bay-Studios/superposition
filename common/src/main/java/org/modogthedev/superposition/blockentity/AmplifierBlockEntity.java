@@ -7,11 +7,13 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
@@ -78,6 +80,23 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         return signal;
     }
 
+    public float getColdness(BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (state.is(Blocks.AIR)) {
+            return 0.0F;
+        }
+        if (state.is(SuperpositionTags.COOL)) {
+            return 0.5F;
+        }
+        if (state.is(SuperpositionTags.COLD)) {
+            return 1F;
+        }
+        if (state.is(SuperpositionTags.VERY_COLD)) {
+            return 3F;
+        }
+        return 0.0F;
+    }
+
     @Override
     public void tick() {
         if (level.isClientSide) {
@@ -100,12 +119,15 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
                 this.addTooltip(Component.literal("Temperature - " + Math.floor(temp * 10) / 10 + "°C"));
             }
         }
-        float tempGoal = (amplitude / 10f) + 26;
-        if (temp > (tempGoal + .1f)) {
-            temp -= .01f;
-        } else if (temp < (tempGoal - .1f)) {
-            temp += .05f;
+        float coldness = 0f;
+        for (Direction direction : Direction.values()) {
+            coldness += getColdness(getBlockPos().relative(direction));
         }
+
+        float tempGoal = (amplitude / 10f) + 26;
+        tempGoal -= coldness;
+        temp += (tempGoal-temp)/100f;
+
         if (lastAmplitude != amplitude) {
             updateNext = true;
         }
@@ -117,7 +139,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         lastAmplitude = amplitude;
         amplitude = 0;
         if (light != null) {
-            light.setBrightness((lastAmplitude/100f+0.2f));
+            light.setBrightness((lastAmplitude/200f+0.2f));
         }
         super.tick();
     }

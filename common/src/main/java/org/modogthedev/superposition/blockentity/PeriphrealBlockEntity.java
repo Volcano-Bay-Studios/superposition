@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -33,9 +34,13 @@ public class PeriphrealBlockEntity extends SignalActorBlockEntity {
     public void tick() {
         Signal signal = SignalManager.randomSignal(putSignals);
         if (signal != null && signal.getEncodedData() != null) {
-            Card card1 = SuperpositionCards.CARDS.asVanillaRegistry().byId(signal.getEncodedData().intValue());
-            if (card1 != null)
-                card = card1.copy();
+            CompoundTag tag = signal.getEncodedData().compoundTagData();
+            if (tag.contains("id",99)) {
+                int id = tag.getInt("id");
+                Card card1 = SuperpositionCards.CARDS.asVanillaRegistry().byId(id);
+                if (card1 != null)
+                    card = card1.copy();
+            }
         }
         if (card != null && card instanceof PeriphrealCard periphrealCard)
             periphrealCard.returnSignal(processSignal,this);

@@ -28,6 +28,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     private Card card;
     public Signal periphrealSignal;
     public boolean updatedLastTick = false;
+    private CompoundTag outboundTag = new CompoundTag();
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.COMPUTER.get(), pos, state);
@@ -98,7 +99,8 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 frequency = getSignal().getFrequency();
             Vec3 center = getBlockPos().getCenter();
             Signal periphrealSignal = new Signal(new Vector3d(center.x,center.y,center.z), level, frequency, 1, frequency / 100000);
-            periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
+            outboundTag.putInt("id", SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference())));
+            periphrealSignal.encode(outboundTag); // Encode the id of the card for the analyser
             periphrealBlockEntity.putSignalFace(periphrealSignal, Direction.UP);
 
             Signal fromSignal = periphrealBlockEntity.getSignal();
