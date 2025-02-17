@@ -53,8 +53,8 @@ public class AmplifierScreen extends WidgetScreen {
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof AmplifierBlockEntity generatorBlockEntity) {
-            dials.get(0).scrolledAmount = generatorBlockEntity.redstoneMod;
-            dials.get(1).scrolledAmount = generatorBlockEntity.modRate;
+            dials.get(0).scrolledAmount = generatorBlockEntity.redstoneAmplification;
+            dials.get(1).scrolledAmount = generatorBlockEntity.amplification;
         }
         swap = state.getValue(SignalGeneratorBlock.SWAP_SIDES);
     }
@@ -232,8 +232,8 @@ public class AmplifierScreen extends WidgetScreen {
 
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("modRate", Math.min(76, Math.abs((int) dials.get(1).scrolledAmount)));
-        tag.putFloat("redstoneMod", Math.min(76, Math.abs((int) dials.get(0).scrolledAmount)));
+        tag.putFloat("amplification", Math.min(76, Math.abs((int) dials.get(1).scrolledAmount)));
+        tag.putFloat("redstoneAmplification", Math.min(76, Math.abs((int) dials.get(0).scrolledAmount)));
         tag.putBoolean("swap", swap);
         VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, pos));
     }
