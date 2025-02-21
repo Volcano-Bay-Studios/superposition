@@ -6,7 +6,7 @@ import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class DistanceCard extends Card implements PeriphrealCard {
+public class DistanceCard extends Card implements PeripheralCard {
     public DistanceCard(ResourceLocation card) {
         super(card);
     }
@@ -21,17 +21,12 @@ public class DistanceCard extends Card implements PeriphrealCard {
     }
 
     @Override
-    public boolean encodeReturnValue() {
-        return true;
-    }
-
-    @Override
     public Card copy() {
         return new DistanceCard(this);
     }
 
     @Override
-    public void returnSignal(Signal signal, BlockEntity blockEntity) {
+    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.distance);
     }

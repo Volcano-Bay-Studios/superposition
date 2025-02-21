@@ -6,7 +6,7 @@ import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class ColorCard extends Card implements PeriphrealCard {
+public class ColorCard extends Card implements PeripheralCard {
     public ColorCard(ResourceLocation card) {
         super(card);
     }
@@ -16,14 +16,9 @@ public class ColorCard extends Card implements PeriphrealCard {
     }
 
     @Override
-    public void returnSignal(Signal signal, BlockEntity blockEntity) {
+    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.getLevel().getBlockState(analyserBlockEntity.getAnalysisPosition()).getBlock().defaultMapColor().col);
-    }
-
-    @Override
-    public boolean encodeReturnValue() {
-        return true;
     }
 
     @Override
