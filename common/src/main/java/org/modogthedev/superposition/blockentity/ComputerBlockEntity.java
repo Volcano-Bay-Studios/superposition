@@ -17,6 +17,7 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.cards.PeripheralCard;
 import org.modogthedev.superposition.system.cards.cards.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -94,14 +95,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             }
         }
         if (!level.isClientSide && card != null && !level.getBlockState(getBlockPos().above()).is(Blocks.AIR) && level.getBlockEntity(getBlockPos().above()) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
-            float frequency = 0; // Put data signal
-            if (!getSignals().isEmpty())
-                frequency = getSignal().getFrequency();
-            Vec3 center = getBlockPos().getCenter();
-            Signal periphrealSignal = new Signal(new Vector3d(center.x,center.y,center.z), level, frequency, 1, frequency / 100000);
-            outboundTag.putInt("id", SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference())));
-            periphrealSignal.encode(outboundTag); // Encode the id of the card for the analyser
-            periphrealBlockEntity.putSignalFace(periphrealSignal, Direction.UP);
+            periphrealBlockEntity.putSignalFace(getOutboundSignal(), Direction.UP);
 
             Signal fromSignal = periphrealBlockEntity.getSignal();
             if (fromSignal != null && fromSignal.getEncodedData() != null)
@@ -119,20 +113,53 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             periphrealSignal.clearEncodedData();
         }
         if (!level.isClientSide && periphrealSignal != null) {
-            VeilPacketManager.around(null,(ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(),getBlockPos().getZ(),200d).sendPacket(new BlockSignalSyncS2CPacket(List.of(periphrealSignal),getBlockPos()));
+            VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 200d).sendPacket(new BlockSignalSyncS2CPacket(List.of(periphrealSignal), getBlockPos()));
         }
         updatedLastTick = false;
         super.tick();
     }
 
+    public Signal getOutboundSignal() {
+        float frequency = 1; // Put data signal
+        if (!getSignals().isEmpty())
+            frequency = getSignal().getFrequency();
+        Vec3 center = getBlockPos().getCenter();
+        Signal periphrealSignal = new Signal(new Vector3d(center.x, center.y, center.z), level, frequency, 1, frequency / 100000);
+        outboundTag.putInt("id", SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference())));
+        periphrealSignal.encode(outboundTag); // Encode the id of the card for the analyser
+        return periphrealSignal;
+    }
+
+    @Override
+    public List<Signal> getSideSignals(Direction face) {
+        return List.of(getSideSignal(face));
+    }
+
+    @Override
+    public Signal getSideSignal(Direction face) {
+        if (face == Direction.UP) {
+            return getOutboundSignal();
+        }
+        return super.getSideSignal(face);
+    }
+
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (card != null && !card.encodeReturnValue()) {
-            card.modulateSignal(signal,periphrealSignal);
+        if (card != null && !(card instanceof PeripheralCard)) {
+            card.modulateSignal(signal, periphrealSignal);
         } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
             signal.setEncodedData(periphrealSignal.getEncodedData());
         }
         return super.modulateSignal(signal, updateTooltip);
+    }
+
+    @Override
+    public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
+        if (face == Direction.UP) {
+            for (Signal signal : signals) {
+                acceptPeriphrealSignal(signal);
+            }
+        }
     }
 
     @Override

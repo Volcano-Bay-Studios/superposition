@@ -14,7 +14,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerCard extends Card implements PeriphrealCard {
+public class ContainerCard extends Card implements PeripheralCard {
     public ContainerCard(ResourceLocation card) {
         super(card);
     }
@@ -24,7 +24,7 @@ public class ContainerCard extends Card implements PeriphrealCard {
     }
 
     @Override
-    public void returnSignal(Signal signal, BlockEntity blockEntity) {
+    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
             BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof BaseContainerBlockEntity container) {
@@ -44,11 +44,6 @@ public class ContainerCard extends Card implements PeriphrealCard {
                 signal.encode(tag);
             }
         }
-    }
-
-    @Override
-    public boolean encodeReturnValue() {
-        return true;
     }
 
     @Override

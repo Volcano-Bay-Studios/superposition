@@ -278,7 +278,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public List<Signal> getSideSignals(Direction face) {
-        return putSignals;
+        return getSignals();
     }
 
     public void addSignals(Object lastCall,List<Signal> signals, Direction face) {

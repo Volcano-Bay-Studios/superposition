@@ -11,7 +11,7 @@ import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class SignCard extends Card implements PeriphrealCard {
+public class SignCard extends Card implements PeripheralCard {
     public SignCard(ResourceLocation card) {
         super(card);
     }
@@ -21,7 +21,7 @@ public class SignCard extends Card implements PeriphrealCard {
     }
 
     @Override
-    public void returnSignal(Signal signal, BlockEntity blockEntity) {
+    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
         String text = "";
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
             BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());

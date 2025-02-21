@@ -37,9 +37,6 @@ public abstract class Card {
     public void load(CompoundTag pTag) {
 
     }
-    public boolean encodeReturnValue() {
-        return false;
-    }
 
     public ResourceLocation getSelfReference() {
         return this.selfReference;
