@@ -50,7 +50,7 @@ public class SignalScopeItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        if (isSelected && level.isClientSide) {
+        if (isSelected && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
             for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
                 float dist = (float) Vec3.atLowerCornerOf(entity.blockPosition()).distanceTo(Vec3.atLowerCornerOf(SuperpositionMth.blockPosFromVec3(signal.getPos())));
                 if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {

@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "superposition.refmap.json",
   "mixins": [
+    "PlayerMixin",
     "ServerGameModeMixin"
   ],
   "client": [

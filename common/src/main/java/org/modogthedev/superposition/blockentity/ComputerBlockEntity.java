@@ -159,6 +159,8 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             for (Signal signal : signals) {
                 acceptPeriphrealSignal(signal);
             }
+        } else {
+            putSignalList(nextCall,signals);
         }
     }
 
