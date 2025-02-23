@@ -67,7 +67,7 @@ public class AntennaManager {
             // TODO: Synchronize the state of the signal when its received.
             signal1.mulAmplitude(Mth.map(penetration,0,signal.getFrequency()/200000,1,0));
 
-            if (signal1.getAmplitude() > 1) {
+            if (signal1.getAmplitude() > 0.5f) {
                 antenna.signals.add(signal1);
             }
         }
