@@ -71,7 +71,8 @@ public class SuperpositionUITooltipRenderer {
                             editableTooltip.replaceText("");
                             selected = false;
                         } else {
-                            editableTooltip.replaceText(editableTooltip.getText().substring(0, Math.max(0, editableTooltip.getText().length() - 1)));
+                            editableTooltip.replaceText(editableTooltip.getText().substring(0, Math.max(0, cursorPos-1))+ editableTooltip.getText().substring(cursorPos));
+                            cursorPos--;
                         }
                     }
                 }

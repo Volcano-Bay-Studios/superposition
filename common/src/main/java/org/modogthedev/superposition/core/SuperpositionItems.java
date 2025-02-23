@@ -20,7 +20,7 @@ public class SuperpositionItems {
     
     // TOOL / UTILITY
     public static final RegistryObject<ScrewdriverItem> SCREWDRIVER = registerItem("screwdriver", () -> new ScrewdriverItem(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<HandheldReceiverItem> HANDHELD_RECEIVER = registerItem("handheld_receiver", () -> new HandheldReceiverItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<SignalScopeItem> SIGNAL_SCOPE = registerItem("signal_scope", () -> new SignalScopeItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<CarabinerItem> CABLE_CARABINER = registerItem("cable_carabiner", () -> new CarabinerItem(new Item.Properties()));
     public static final RegistryObject<CableItem> GLOWING_CABLE = registerItem("glowing_cable", () -> new CableItem(new Item.Properties(), new Color(249, 255, 254),true));
     public static final RegistryObject<CableItem> WHITE_CABLE = registerItem("white_cable", () -> new CableItem(new Item.Properties(), new Color(249, 255, 254),false));
