@@ -9,6 +9,7 @@
     "ServerGameModeMixin"
   ],
   "client": [
+    "GuiMixin",
     "KeyboardHandlerMixin",
     "MultiPlayerGameModeMixin"
   ],

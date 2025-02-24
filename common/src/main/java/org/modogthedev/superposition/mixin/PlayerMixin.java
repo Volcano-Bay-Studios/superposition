@@ -17,6 +17,7 @@ public abstract class PlayerMixin {
     private void isScoping(CallbackInfoReturnable<Boolean> cir) {
         Player player = (Player) ((Object)this);
         if (player.isUsingItem() && player.getUseItem().is(SuperpositionItems.SIGNAL_SCOPE.get())) {
+            cir.setReturnValue(true);
         }
     }
 }
