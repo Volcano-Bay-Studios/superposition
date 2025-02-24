@@ -22,6 +22,7 @@ import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.LongRaycast;
+import org.modogthedev.superposition.util.SoundUtils;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class SignalScopeItem extends Item {
@@ -61,7 +62,7 @@ public class SignalScopeItem extends Item {
                     float penetration = LongRaycast.getPenetration(signal.level,signal.getPos(),new Vector3d(entity.getX(),entity.getY(),entity.getZ()));
                     volume *= Mth.map(penetration,0,signal.getFrequency()/200000,1,0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch, volume));
+                    SoundUtils.playUISound(SuperpositionSounds.SINE.get(),pitch,volume);
                 }
             }
         }

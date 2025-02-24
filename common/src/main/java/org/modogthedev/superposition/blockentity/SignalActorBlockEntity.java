@@ -65,7 +65,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     Object lastCall;
     private Object lastCallList;
     protected final List<Signal> putSignals = new ArrayList<>();
-    private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+    private LightRenderer lightRenderer = null;
     Light light;
 
     public List<Component> getTooltip() {
@@ -204,13 +204,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.put("tooltipData", this.saveTooltipData());
         super.saveAdditional(tag, registries);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        this.loadTooltipData(tag.getCompound("tooltipData"));
         super.loadAdditional(tag, registries);
     }
 
@@ -478,7 +476,10 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     @Override
     public void tick() {
-        if (this.level.isClientSide) {
+        if (this.level != null && this.level.isClientSide) {
+            if (lightRenderer == null) {
+                lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+            }
             if (this.lightEnabled() && light == null) {
                 this.createLight();
                 lightRenderer.addLight(light);

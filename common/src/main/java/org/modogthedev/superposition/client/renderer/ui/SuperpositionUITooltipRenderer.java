@@ -38,6 +38,7 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SPTooltipable;
+import org.modogthedev.superposition.util.SyncedBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,9 +126,17 @@ public class SuperpositionUITooltipRenderer {
             }
             CompoundTag tag = new CompoundTag();
             tag.putString("output", editableTooltip.getText());
-            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
+            updateEditableBlockEntity(editPos,tag);
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
         }
+    }
+
+    private static void updateEditableBlockEntity(BlockPos pos, CompoundTag tag) {
+        Level level = Minecraft.getInstance().level;
+        if (level.getBlockEntity(editPos) instanceof SyncedBlockEntity syncedBlockEntity) {
+            syncedBlockEntity.loadSyncedData(tag);
+        }
+        VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
     }
 
     public static void charTyped(long windowPointer, char key, int modifiers) {
@@ -143,7 +152,7 @@ public class SuperpositionUITooltipRenderer {
             flash = 0;
             CompoundTag tag = new CompoundTag();
             tag.putString("output", editableTooltip.getText());
-            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
+            updateEditableBlockEntity(editPos,tag);
         }
     }
 
