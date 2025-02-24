@@ -16,7 +16,6 @@ public class RopeSimulation {
     List<RopeConstraint> constraints = new ArrayList<>();
     
     int sleepTime = 0;
-    int tick = 0;
     
     public RopeSimulation(float connectionWidth) {
         this.connectionWidth = connectionWidth;
@@ -79,8 +78,8 @@ public class RopeSimulation {
     }
     
     
-    public void simulate(Level level, Integer tensionNodeIndex) {
-        tick++;
+    public void simulate(Level level) {
+        
         for (RopeNode node : nodes) {
             Vec3 velocity = Vec3.ZERO;
             if (!node.isFixed()) {
@@ -89,50 +88,32 @@ public class RopeSimulation {
                 velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
                 velocity = velocity.scale(0.9f * (velocity.length() < 1e-2 ? 0.1 : 1.0));
             }
-            node.resolveWorldCollisions(level, true);
             node.prevPosition = node.position;
             node.position = node.position.add(velocity);
-            node.anchorStress = Math.max(node.anchorStress-1, 0);
+        }
+        
+        for (RopeNode node : nodes) {
+            node.resolveWorldCollisions(level);
         }
         
         for (int i = 0; i < 5; i++) {
             List<RopeConstraint> allConstraints = collectAllConstraints();
             allConstraints.sort((a, b) -> -Double.compare(a.getStress(), b.getStress()));
             
-            for (RopeConstraint process : allConstraints) {
-                process.applyConstraint();
+            for (RopeConstraint connection : allConstraints) {
+                connection.applyConstraint();
             }
-            
             for (RopeNode node : nodes) {
                 node.applyNextPositions();
-                node.resolveWorldCollisions(level, true);
             }
-        }
-        
-        if (tensionNodeIndex == null) {
-            int anchorCount = 0;
-            RopeNode tensionNode = null;
-            for (RopeNode node : nodes) {
-                if (node.anchor != null) {
-                    anchorCount++;
-                    tensionNode = node;
-                }
-            }
-            if (anchorCount == 1) {
-                applyConnectionTensions((nodes.size()-1) - nodes.indexOf(tensionNode));
-            } else {
-                applyConnectionTensions(0);
-            }
-        } else {
-            applyConnectionTensions(tensionNodeIndex);
         }
         
         for (RopeNode node : nodes) {
-            node.resolveWorldCollisions(level, false);
+            node.resolveWorldCollisions(level);
         }
         
         for (RopeNode node : nodes) {
-            if (node.prevPosition.distanceTo(node.position) < 0.0025f) {
+            if (node.prevPosition.distanceTo(node.position) < 0.025f) {
                 node.position = node.prevPosition;
             }
         }
@@ -157,51 +138,6 @@ public class RopeSimulation {
         for (RopeNode node : nodes) {
             node.prevRenderPosition = node.position;
         }
-    }
-    
-    protected void applyConnectionTensions(int tensionNodeIndex) {
-        for (int i = tensionNodeIndex; i >= 1; i--) {
-            RopeNode current = getNode(i);
-            RopeNode next = getNode(i-1);
-            Vec3 offset = next.position.subtract(current.position).normalize().scale(connectionWidth);
-            
-            Vec3 target = current.position.add(offset);
-            if (next.isFixed() && next.anchor == null) {
-                continue;
-            }
-            
-            if (next.anchor == null) {
-                next.position = target;
-            } else {
-                if (next.position.distanceTo(target) > 1.01*connectionWidth) {
-                    next.anchorStress = Math.min(next.anchorStress + 2, 10);
-                    if (next.anchorStress > 8)
-                        next.removeAnchor();
-                }
-            }
-        }
-        
-        for (int i = tensionNodeIndex; i <= getNodesCount() -2; i++) {
-            RopeNode current = getNode(i);
-            RopeNode next = getNode(i+1);
-            Vec3 offset = next.position.subtract(current.position).normalize().scale(connectionWidth);
-            
-            Vec3 target = current.position.add(offset);
-            if (next.isFixed() && next.anchor == null) {
-                continue;
-            }
-            
-            if (next.anchor == null) {
-                next.position = target;
-            } else {
-                if (next.position.distanceTo(target) > 1.01*connectionWidth) {
-                    next.anchorStress = Math.min(next.anchorStress + 2, 10);
-                    if (next.anchorStress > 8)
-                        next.removeAnchor();
-                }
-            }
-        }
-        
     }
     
     private List<RopeConstraint> collectAllConstraints() {
