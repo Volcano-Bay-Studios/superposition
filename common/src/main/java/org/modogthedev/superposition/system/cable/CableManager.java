@@ -115,7 +115,9 @@ public class CableManager {
                     playerPoint.removeAnchor();
                     
                     double stretch = playerPoint.calculateOverstretch();
-                    CableRenderer.stretch = (float) Math.clamp(stretch/2.5f, 0, 1);
+                    if (level.isClientSide) {
+                        CableRenderer.stretch = (float) Math.clamp(stretch / 2.5f, 0, 1);
+                    }
                     if (stretch > 2.5f) {
                         playerFinishDraggingCable(player, null, null);
                     }

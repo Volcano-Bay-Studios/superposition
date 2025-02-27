@@ -44,7 +44,7 @@ public class Cable {
     private List<PointLight> pointLights;
     private float brightness;
 
-    private final LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+    private LightRenderer lightRenderer = null;
 
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
@@ -156,6 +156,9 @@ public class Cable {
     }
 
     public void updateLights(float partialTicks) {
+        if (lightRenderer == null) {
+            lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+        }
         if (emitsLight) {
             if (pointLights == null) {
                 pointLights = new ArrayList<>();

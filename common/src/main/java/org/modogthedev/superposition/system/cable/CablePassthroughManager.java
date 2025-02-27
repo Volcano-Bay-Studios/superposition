@@ -38,7 +38,7 @@ public class CablePassthroughManager {
             if (map.containsKey(pos)) {
                 updateList(map.get(pos), oldMap.get(pos));
             } else {
-                map.put(pos,oldMap.get(pos));
+                map.put(pos, oldMap.get(pos));
             }
         }
         for (BlockPos pos : removedPos) {
@@ -75,29 +75,31 @@ public class CablePassthroughManager {
     }
 
     public static void updateList(List<Signal> oldSignals, List<Signal> newSignals) {
-        if (oldSignals.size() == newSignals.size()) {
-            for (int i = 0; i < newSignals.size(); i++) {
-                oldSignals.get(i).copy(newSignals.get(i));
-            }
-        } else if (oldSignals.size() > newSignals.size()) {
-            ListIterator<Signal> iterator = oldSignals.listIterator();
-            while (iterator.hasNext()) {
-                int i = iterator.nextIndex();
-                Signal signal = iterator.next();
-                if (i >= newSignals.size()) {
-                    iterator.remove();
-                    continue;
+        if (oldSignals != null) {
+            if (oldSignals.size() == newSignals.size()) {
+                for (int i = 0; i < newSignals.size(); i++) {
+                    oldSignals.get(i).copy(newSignals.get(i));
                 }
-                signal.copy(newSignals.get(i));
-            }
-        } else {
-            for (int i = 0; i < newSignals.size(); i++) {
-                Signal signal = newSignals.get(i);
-                if (i >= oldSignals.size()) {
-                    oldSignals.add(new Signal(signal));
-                    continue;
+            } else if (oldSignals.size() > newSignals.size()) {
+                ListIterator<Signal> iterator = oldSignals.listIterator();
+                while (iterator.hasNext()) {
+                    int i = iterator.nextIndex();
+                    Signal signal = iterator.next();
+                    if (i >= newSignals.size()) {
+                        iterator.remove();
+                        continue;
+                    }
+                    signal.copy(newSignals.get(i));
                 }
-                oldSignals.get(i).copy(signal);
+            } else {
+                for (int i = 0; i < newSignals.size(); i++) {
+                    Signal signal = newSignals.get(i);
+                    if (i >= oldSignals.size()) {
+                        oldSignals.add(new Signal(signal));
+                        continue;
+                    }
+                    oldSignals.get(i).copy(signal);
+                }
             }
         }
     }

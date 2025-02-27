@@ -2,8 +2,6 @@ package org.modogthedev.superposition.util;
 
 import foundry.veil.api.client.color.ColorTheme;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
-import foundry.veil.api.client.tooltip.anim.TooltipTimeline;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -15,9 +13,6 @@ public interface SPTooltipable {
     boolean isTooltipEnabled();
     boolean isSuperpositionTooltipEnabled();
 
-    CompoundTag saveTooltipData();
-
-    void loadTooltipData(CompoundTag var1);
 
     void setTooltip(List<Component> var1);
 
@@ -39,8 +34,6 @@ public interface SPTooltipable {
     void drawExtra();
 
     boolean getWorldspace();
-
-    TooltipTimeline getTimeline();
 
     ItemStack getStack();
 

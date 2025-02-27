@@ -270,9 +270,6 @@ public class SuperpositionUITooltipRenderer {
             if (hoverTicks == 1) {
                 currentPos = desiredPos.add(0, -0.15f, 0);
             }
-            background = background.multiply(1, 1, 1, fade);
-            borderTop = borderTop.multiply(1, 1, 1, fade);
-            borderBottom = borderBottom.multiply(1, 1, 1, fade);
             currentPos = currentPos.lerp(desiredPos, 0.05f);
             Vector3f screenSpacePos = worldToScreenSpace(currentPos, partialTicks);
             Vector3f desiredScreenSpacePos = worldToScreenSpace(desiredPos, partialTicks);
@@ -304,19 +301,16 @@ public class SuperpositionUITooltipRenderer {
         if (flash > 80 || selected) {
             flash = 0;
         }
-        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.getHex(), borderTop.getHex(), borderBottom.getHex(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
+        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.rgb(), borderTop.rgb(), borderBottom.rgb(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
         graphics.blit(SAVE, 64, 64, 0, 0, 16, 16);
         stack.popPose();
     }
 
-    public static Color resetAlpha(Color color) {
-        return (color.lightenCopy(.1f).multiply(1, 1, 1, 10f).lightenCopy(-.1f));
-    }
 
     public static void drawConnectionLine(PoseStack stack, SPTooltipable tooltippable, int tooltipX, int tooltipY, int desiredX, int desiredY) {
         if (tooltippable.getTheme().getColor("connectingLine") != null) {
             stack.pushPose();
-            Color color = tooltippable.getTheme().getColor("connectingLine");
+            Color color = (Color) tooltippable.getTheme().getColor("connectingLine");
             float thickness = ((NumberThemeProperty) tooltippable.getTheme().getProperty("connectingLineThickness")).getValue(Float.class);
 //            stack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
 //            stack.mulPose(Vector3f.YP.rotationDegrees(180));
@@ -328,10 +322,10 @@ public class SuperpositionUITooltipRenderer {
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             // draw a quad of thickness thickness from desiredX, desiredY to tooltipX, tooltipY with a z value of 399, starting from the top right corner and going anti-clockwise
-            buffer.addVertex(mat, desiredX + thickness, desiredY, 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-            buffer.addVertex(mat, desiredX - thickness, desiredY, 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-            buffer.addVertex(mat, tooltipX - thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-            buffer.addVertex(mat, tooltipX + thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+            buffer.addVertex(mat, desiredX + thickness, desiredY, 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
+            buffer.addVertex(mat, desiredX - thickness, desiredY, 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
+            buffer.addVertex(mat, tooltipX - thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
+            buffer.addVertex(mat, tooltipX + thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
             BufferUploader.drawWithShader(buffer.buildOrThrow());
             RenderSystem.disableBlend();
             stack.popPose();

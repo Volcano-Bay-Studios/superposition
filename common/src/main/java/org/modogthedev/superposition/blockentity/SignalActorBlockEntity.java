@@ -8,7 +8,6 @@ import foundry.veil.api.client.render.light.Light;
 import foundry.veil.api.client.render.light.PointLight;
 import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
-import foundry.veil.api.client.tooltip.anim.TooltipTimeline;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -48,8 +47,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Unique
     private final List<VeilUIItemTooltipDataHolder> veil$tooltipDataHolder = new ArrayList<>();
     @Unique
-    private final TooltipTimeline veil$timeline = null;
-    @Unique
     private boolean veil$worldspace = true;
     @Unique
     private boolean veil$tooltipEnabled = false;
@@ -85,46 +82,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         this.veil$tooltip.clear();
     }
 
-    public CompoundTag saveTooltipData() {
-        CompoundTag tag = new CompoundTag();
-        tag.putBoolean("tooltipEnabled", this.veil$tooltipEnabled);
-        tag.putInt("tooltipY", this.veil$tooltipY);
-        tag.putBoolean("worldspace", this.veil$worldspace);
-        if (this.veil$theme != null) {
-            CompoundTag themeTag = new CompoundTag();
-
-            for (Map.Entry<String, Color> entry : this.veil$theme.getColorsMap().entrySet()) {
-                String key = entry.getKey() != null ? entry.getKey() : "";
-                themeTag.putInt(key, entry.getValue().getRGB());
-            }
-
-            tag.put("theme", themeTag);
-        }
-
-        return tag;
-    }
-
-    public void loadTooltipData(CompoundTag tag) {
-        this.veil$tooltipEnabled = tag.getBoolean("tooltipEnabled");
-        this.veil$tooltipY = tag.getInt("tooltipY");
-        this.veil$worldspace = tag.getBoolean("worldspace");
-        if (this.veil$theme != null) {
-            this.veil$theme.clear();
-        }
-
-        if (tag.contains("theme", 10)) {
-            if (this.veil$theme == null) {
-                this.veil$theme = new ColorTheme();
-            }
-
-            CompoundTag themeTag = tag.getCompound("theme");
-            for (String key : themeTag.getAllKeys()) {
-                this.veil$theme.addColor(key, Color.of(themeTag.getInt(key)));
-            }
-        }
-
-    }
-
     public void setTooltip(List<Component> tooltip) {
         this.veil$tooltip = tooltip;
     }
@@ -154,15 +111,12 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     public void setBackgroundColor(int color) {
-        this.veil$theme.addColor("background", Color.of(color));
     }
 
     public void setTopBorderColor(int color) {
-        this.veil$theme.addColor("topBorder", Color.of(color));
     }
 
     public void setBottomBorderColor(int color) {
-        this.veil$theme.addColor("bottomBorder", Color.of(color));
     }
 
     @Override
@@ -172,10 +126,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     public boolean getWorldspace() {
         return this.veil$worldspace;
-    }
-
-    public TooltipTimeline getTimeline() {
-        return this.veil$timeline;
     }
 
     public ItemStack getStack() {

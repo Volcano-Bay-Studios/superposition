@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.checkerframework.checker.units.qual.N;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -125,7 +126,9 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             frequency = getSignal().getFrequency();
         Vec3 center = getBlockPos().getCenter();
         Signal periphrealSignal = new Signal(new Vector3d(center.x, center.y, center.z), level, frequency, 1, frequency / 100000);
-        outboundTag.putInt("id", SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference())));
+        if (card != null) {
+            outboundTag.putInt("id", SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference())));
+        }
         periphrealSignal.encode(outboundTag); // Encode the id of the card for the analyser
         return periphrealSignal;
     }
@@ -160,7 +163,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 acceptPeriphrealSignal(signal);
             }
         } else {
-            putSignalList(nextCall,signals);
+            putSignalList(nextCall, signals);
         }
     }
 
