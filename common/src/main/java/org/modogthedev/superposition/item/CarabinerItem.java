@@ -20,7 +20,7 @@ public class CarabinerItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, player.level());
-        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f);
+        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f,!player.isCrouching());
         if (rayCast != null) {
             CarabinerManager.attachPlayer(player, rayCast.getB());
             return InteractionResultHolder.success(player.getItemInHand(usedHand));

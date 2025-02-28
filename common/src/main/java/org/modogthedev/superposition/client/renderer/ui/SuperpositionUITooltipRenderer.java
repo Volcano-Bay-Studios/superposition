@@ -243,9 +243,9 @@ public class SuperpositionUITooltipRenderer {
         tooltipY = Math.min(tooltipY, height - tooltipHeight - 20);
 
         float fade = Mth.clamp((hoverTicks + partialTicks) / 24f, 0, 1);
-        Color background = new Color(50, 168, 82, 150);
-        Color borderTop = new Color(60, 186, 94, 255);
-        Color borderBottom = new Color(44, 150, 72, 255);
+        Color background = (Color) Superposition.SUPERPOSITION_THEME.getColor("background");
+        Color borderTop = (Color) Superposition.SUPERPOSITION_THEME.getColor("topBorder");
+        Color borderBottom = (Color) Superposition.SUPERPOSITION_THEME.getColor("bottomBorder");
 //        background = resetAlpha(background).multiply(1,1,1,.7f);
 //        borderBottom = resetAlpha(borderBottom);
 //        borderTop = resetAlpha(borderTop);
@@ -301,7 +301,7 @@ public class SuperpositionUITooltipRenderer {
         if (flash > 80 || selected) {
             flash = 0;
         }
-        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.rgb(), borderTop.rgb(), borderBottom.rgb(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
+        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.argb(), borderTop.argb(), borderBottom.argb(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
         graphics.blit(SAVE, 64, 64, 0, 0, 16, 16);
         stack.popPose();
     }

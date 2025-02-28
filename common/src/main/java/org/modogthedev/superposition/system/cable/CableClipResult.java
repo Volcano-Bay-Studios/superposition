@@ -37,7 +37,7 @@ public class CableClipResult {
         }
     }
 
-    public Pair<Cable, RopeNode> rayCastForClosest(Vec3 toPos, float range) {
+    public Pair<Cable, RopeNode> rayCastForClosest(Vec3 toPos, float range, boolean perferEnd) {
         List<Pair<Cable, RopeNode>> rayCast = this.rayCast(toPos, range);
         List<Pair<Float, RopeNode>> distancePointPairMap = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class CableClipResult {
             int i = 0;
             for (Pair<Cable, RopeNode> cablePointPair : rayCast) {
                 boolean isAnEndPoint = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
-                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
+                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos) - ((isAnEndPoint & perferEnd) ? SuperpositionConstants.endPreference : 0f);
                 float storedDistance = distancePointPairMap.get(i).getA();
                 if (distance < storedDistance) {
                     distancePointPairMap.set(i, new Pair<>(distance, cablePointPair.getB()));
