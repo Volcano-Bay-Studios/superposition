@@ -1,0 +1,19 @@
+{
+  "values": [
+    "superposition:signal_generator",
+    "superposition:amplifier",
+    "superposition:antenna",
+    "superposition:transmitter",
+    "superposition:receiver",
+    "superposition:filter",
+    "superposition:computer",
+    "superposition:combinator",
+    "computercraft:computer_normal",
+    "computercraft:computer_advanced",
+    "computercraft:computer_command",
+    "computercraft:turtle_normal",
+    "computercraft:turtle_advanced",
+    "computercraft:turtle_advanced",
+    "computercraft:wired_modem_full"
+  ]
+}

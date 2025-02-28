@@ -15,7 +15,7 @@ public class CablePassthroughManager {
     private static Map<ResourceKey<Level>, Map<BlockPos, List<Signal>>> newHeldSignals = new HashMap<>();
     private static Map<ResourceKey<Level>, Map<BlockPos, List<Signal>>> clientNewHeldSignals = new HashMap<>();
 
-    private static Map<ResourceKey<Level>, Map<BlockPos, List<Signal>>> getCurrentHeldSignals(Level level) {
+    public static Map<ResourceKey<Level>, Map<BlockPos, List<Signal>>> getCurrentHeldSignals(Level level) {
         return level.isClientSide ? clientCurrentHeldSignals : currentHeldSignals;
     }
 

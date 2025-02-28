@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ServerGameModeMixin {
     @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true)
     public void performUseItemOnHead(ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
-        if (player.level().getBlockEntity(result.getBlockPos()) instanceof SignalActorBlockEntity) {
+        if (level.getBlockEntity(result.getBlockPos()) instanceof SignalActorBlockEntity || level.getBlockState(result.getBlockPos()).is(SuperpositionTags.PLACEABLE)) {
             InteractionResult value = CableManager.playerUseEvent(player, result.getBlockPos(), result.getDirection());
             if (value.consumesAction()) {
                 cir.setReturnValue(value);
