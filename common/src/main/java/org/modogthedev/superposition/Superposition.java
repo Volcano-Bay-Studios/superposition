@@ -15,6 +15,7 @@ import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
+import org.modogthedev.superposition.system.sound.ClientMusicManager;
 import org.slf4j.Logger;
 
 public class Superposition {
@@ -54,15 +55,19 @@ public class Superposition {
         CarabinerManager.tick(level);
         CarabinerManager.clientTick(level);
         SuperpositionUITooltipRenderer.clientTick(level);
+        ClientMusicManager.tick(level);
     }
 
     public static void initTheme() {
-        SUPERPOSITION_THEME.addColor(new Color(50, 168, 82,200));
-        SUPERPOSITION_THEME.addColor(new Color(60, 186, 94,255));
-        SUPERPOSITION_THEME.addColor(new Color(44, 150, 72,255));
-        SUPERPOSITION_THEME.addColor("background",new Color(50, 168, 82,200));
-        SUPERPOSITION_THEME.addColor("topBorder",new Color(60, 186, 94,255));
-        SUPERPOSITION_THEME.addColor("bottomBorder",new Color(44, 150, 72,255));
+        Color background = new Color().setInt(50, 168, 82, 150);
+        Color borderTop = new Color().setInt(60, 186, 94, 255);
+        Color borderBottom = new Color().setInt(44, 150, 72, 255);
+        SUPERPOSITION_THEME.addColor(background);
+        SUPERPOSITION_THEME.addColor(borderTop);
+        SUPERPOSITION_THEME.addColor(borderBottom);
+        SUPERPOSITION_THEME.addColor("background",background);
+        SUPERPOSITION_THEME.addColor("topBorder",borderTop);
+        SUPERPOSITION_THEME.addColor("bottomBorder",borderBottom);
     }
 
     public static ResourceLocation id(String loc) {

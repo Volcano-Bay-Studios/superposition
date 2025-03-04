@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.compat.cc;
 
-import dan200.computercraft.api.ComputerCraftAPI;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class ComputeCraftCompat {
     public static void register() {

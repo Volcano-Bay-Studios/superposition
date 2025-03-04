@@ -15,6 +15,7 @@ public class SuperpositionSounds {
     public static final RegistryObject<SoundEvent> SWITCH_ON = registerSoundEvent("switch_on");
     public static final RegistryObject<SoundEvent> SWITCH_OFF = registerSoundEvent("switch_off");
     public static final RegistryObject<SoundEvent> SCROLL = registerSoundEvent("scroll");
+    public static final RegistryObject<SoundEvent> TRAVELERS = registerSoundEvent("travelers");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUNDS.register(Superposition.id(name), () -> SoundEvent.createVariableRangeEvent(Superposition.id(name)));

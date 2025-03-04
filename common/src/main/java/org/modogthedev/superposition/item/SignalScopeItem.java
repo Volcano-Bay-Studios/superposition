@@ -1,7 +1,5 @@
 package org.modogthedev.superposition.item;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
@@ -18,11 +16,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
-import org.modogthedev.superposition.core.SuperpositionSounds;
+import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.sound.ClientMusicManager;
 import org.modogthedev.superposition.util.LongRaycast;
-import org.modogthedev.superposition.util.SoundUtils;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class SignalScopeItem extends Item {
@@ -51,7 +49,7 @@ public class SignalScopeItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        if (isSelected && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
+        if ((isSelected || (entity instanceof  Player player && player.getOffhandItem().is(SuperpositionItems.SIGNAL_SCOPE.get()))) && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
             for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
                 float dist = (float) Vec3.atLowerCornerOf(entity.blockPosition()).distanceTo(Vec3.atLowerCornerOf(SuperpositionMth.blockPosFromVec3(signal.getPos())));
                 if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
@@ -62,7 +60,8 @@ public class SignalScopeItem extends Item {
                     float penetration = LongRaycast.getPenetration(signal.level,signal.getPos(),new Vector3d(entity.getX(),entity.getY(),entity.getZ()));
                     volume *= Mth.map(penetration,0,signal.getFrequency()/200000,1,0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
-                    SoundUtils.playUISound(SuperpositionSounds.SINE.get(),pitch,volume);
+                    ClientMusicManager.addVolume(volume);
+//                    SoundUtils.playUISound(SuperpositionSounds.SINE.get(),pitch,volume);
                 }
             }
         }

@@ -37,5 +37,11 @@
     "sounds": [
       "superposition:scroll"
     ]
+  },
+  "travelers": {
+    "subtitles": "sounds.superposition.travelers",
+    "sounds": [
+      "superposition:travelers"
+    ]
   }
 }

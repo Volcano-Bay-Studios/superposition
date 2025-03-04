@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
@@ -20,10 +21,14 @@ import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
+
+import java.util.List;
+import java.util.Map;
 
 public class DebugRenderer {
 
@@ -63,12 +68,18 @@ public class DebugRenderer {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.9f, 0.9f, 0.5f);
         }
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
-        Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
+        Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f, !Minecraft.getInstance().player.isCrouching());
         if (cablePointPair != null) {
             Vec3 pos = cablePointPair.getB().getPosition();
             float width = SuperpositionConstants.cableRadius / 2 + .1f;
             drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, 0.5f, 0.9f, 0.5f);
         }
+        for (Map<BlockPos, List<Signal>> map : (CablePassthroughManager.getCurrentHeldSignals(level).values())) {
+            for (BlockPos pos : map.keySet()) {
+                drawPosBox((PoseStack) matrixStack, vertexConsumer, pos.getCenter(), 0.6f, 0.5f, 0.9f, 0.5f);
+            }
+        }
+
         matrixStack.matrixPop();
     }
 
