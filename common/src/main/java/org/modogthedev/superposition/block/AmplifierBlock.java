@@ -2,13 +2,11 @@ package org.modogthedev.superposition.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -26,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
-import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.screens.AmplifierScreen;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
@@ -98,8 +95,9 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        switch ((Direction)pState.getValue(FACING)) {
+        switch ((Direction) pState.getValue(FACING)) {
             case NORTH:
                 return SHAPE_NORTH;
             case SOUTH:
@@ -115,7 +113,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
 
     @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return getShape(pState,pLevel,pPos,pContext);
+        return getShape(pState, pLevel, pPos, pContext);
     }
 
     @Override
@@ -168,7 +166,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
         AmplifierBlockEntity blockEntity = (AmplifierBlockEntity) pLevel.getBlockEntity(pPos);
         if (blockEntity != null && blockEntity.lastAmplitude > 0) {
-            return (int) Math.floor(Math.min(15, blockEntity.lastAmplitude/10f));
+            return (int) Math.floor(Math.min(15, blockEntity.lastAmplitude / 10f));
         }
         return 0;
     }

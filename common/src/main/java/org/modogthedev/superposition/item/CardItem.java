@@ -47,7 +47,7 @@ public class CardItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getItemInHand().getItem() instanceof CardItem)
-            runIfHasData(context.getItemInHand(),(a) -> {
+            runIfHasData(context.getItemInHand(), (a) -> {
                 card.load(a);
             });
         if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof ComputerBlockEntity computerBlockEntity) {

@@ -15,7 +15,7 @@ public class ManipulatorBlockEntity extends PeriphrealBlockEntity {
     public void tick() {
         resetTooltip();
         addTooltip("Manipulator Status:");
-        addTooltip("Manipulating " + level.getBlockState(getFrontPos()).getBlock().getName().getString()+"...");
+        addTooltip("Manipulating " + level.getBlockState(getFrontPos()).getBlock().getName().getString() + "...");
         super.tick();
     }
 

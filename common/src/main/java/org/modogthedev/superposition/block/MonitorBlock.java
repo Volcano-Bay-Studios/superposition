@@ -79,7 +79,7 @@ public class MonitorBlock extends SignalActorTickingBlock implements EntityBlock
     }
 
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        switch ((Direction)pState.getValue(FACING)) {
+        switch ((Direction) pState.getValue(FACING)) {
             case NORTH:
                 return SHAPE_NORTH;
             case SOUTH:
@@ -95,7 +95,7 @@ public class MonitorBlock extends SignalActorTickingBlock implements EntityBlock
 
     @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return getShape(pState,pLevel,pPos,pContext);
+        return getShape(pState, pLevel, pPos, pContext);
     }
 
     @Override

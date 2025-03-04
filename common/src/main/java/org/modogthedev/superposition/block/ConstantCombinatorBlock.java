@@ -26,8 +26,9 @@ public class ConstantCombinatorBlock extends SignalActorTickingBlock implements 
 
     public ConstantCombinatorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
         return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
@@ -38,6 +39,7 @@ public class ConstantCombinatorBlock extends SignalActorTickingBlock implements 
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SuperpositionBlockEntities.CONSTANT_COMBINATOR.get().create(pos, state);
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -52,6 +54,7 @@ public class ConstantCombinatorBlock extends SignalActorTickingBlock implements 
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     @Override
     public boolean commonConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return direction == state.getValue(FACING).getOpposite();

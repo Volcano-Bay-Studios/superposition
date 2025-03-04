@@ -13,6 +13,5 @@ public class SuperpositionFabric implements ModInitializer {
         Superposition.init();
 
         ServerTickEvents.END_WORLD_TICK.register(Superposition::tick);
-        ServerTickEvents.START_WORLD_TICK.register(Superposition::preTick);
     }
 }

@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import org.modogthedev.superposition.blockentity.PeriphrealBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.system.cards.config.CardConfig;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -58,5 +57,6 @@ public abstract class Card {
     public void modulateSignal(Signal signal, Signal periphrealSignal) {
     }
 
-    public void affectBlock(Signal signal, Level level, BlockPos pos) {}
+    public void affectBlock(Signal signal, Level level, BlockPos pos) {
+    }
 }

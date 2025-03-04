@@ -15,11 +15,11 @@ public class LongRaycast {
         float length = (float) from.distance(to);
         BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         for (float f = 0; f < length; f++) {
-            float delta = f/length;
-            Vec3 pos = SuperpositionMth.lerpVector3d(from,to,delta);
+            float delta = f / length;
+            Vec3 pos = SuperpositionMth.lerpVector3d(from, to, delta);
 
-            blockPos.set(Math.floor(pos.x),Math.floor(pos.y),Math.floor(pos.z));
-            if (level.getChunk(blockPos).getSection(blockPos.getY()/16).hasOnlyAir()) {
+            blockPos.set(Math.floor(pos.x), Math.floor(pos.y), Math.floor(pos.z));
+            if (level.getChunk(blockPos).getSection(blockPos.getY() / 16).hasOnlyAir()) {
                 f += 16f;
                 continue;
             }

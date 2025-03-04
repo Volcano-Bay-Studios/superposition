@@ -63,18 +63,18 @@ public class CarabinerManager {
                     PLAYER_POINT_MAP.put(entry.getKey(), point.getLast());
                     slide = 0;
                 }
-                float moveAmount = (float) player.getViewVector(0).dot(cableVector)/5f;
+                float moveAmount = (float) player.getViewVector(0).dot(cableVector) / 5f;
                 if (Minecraft.getInstance().options.keyUp.isDown()) {
                     slide += moveAmount;
                 }
                 if (Minecraft.getInstance().options.keyLeft.isDown()) {
-                    slide -= 0.1f-moveAmount;
+                    slide -= 0.1f - moveAmount;
                 }
                 if (Minecraft.getInstance().options.keyDown.isDown()) {
                     slide -= moveAmount;
                 }
                 if (Minecraft.getInstance().options.keyRight.isDown()) {
-                    slide += 0.1f-moveAmount;
+                    slide += 0.1f - moveAmount;
                 }
 
                 player.setDeltaMovement(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(1)).subtract(0f, 0.2f, 0f).subtract(pos).scale(-0.5f));

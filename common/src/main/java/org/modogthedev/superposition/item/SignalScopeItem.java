@@ -27,6 +27,7 @@ public class SignalScopeItem extends Item {
     public SignalScopeItem(Properties properties) {
         super(properties);
     }
+
     @Override
     public @NotNull UseAnim getUseAnimation(ItemStack stack) {
         return UseAnim.SPYGLASS;
@@ -46,10 +47,9 @@ public class SignalScopeItem extends Item {
     }
 
 
-
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        if ((isSelected || (entity instanceof  Player player && player.getOffhandItem().is(SuperpositionItems.SIGNAL_SCOPE.get()))) && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
+        if ((isSelected || (entity instanceof Player player && player.getOffhandItem().is(SuperpositionItems.SIGNAL_SCOPE.get()))) && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
             for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
                 float dist = (float) Vec3.atLowerCornerOf(entity.blockPosition()).distanceTo(Vec3.atLowerCornerOf(SuperpositionMth.blockPosFromVec3(signal.getPos())));
                 if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
@@ -57,8 +57,8 @@ public class SignalScopeItem extends Item {
                     Vec3 vec31 = new Vec3(signal.getPos().x - entity.getX(), signal.getPos().y - entity.getEyeY(), signal.getPos().z - entity.getZ());
                     float volume = signal.getAmplitude();
                     volume *= (float) Math.pow(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize())), 4) - 0.8f;
-                    float penetration = LongRaycast.getPenetration(signal.level,signal.getPos(),new Vector3d(entity.getX(),entity.getY(),entity.getZ()));
-                    volume *= Mth.map(penetration,0,signal.getFrequency()/200000,1,0);
+                    float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(entity.getX(), entity.getY(), entity.getZ()));
+                    volume *= Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
                     ClientMusicManager.addVolume(volume);
 //                    SoundUtils.playUISound(SuperpositionSounds.SINE.get(),pitch,volume);
@@ -66,6 +66,7 @@ public class SignalScopeItem extends Item {
             }
         }
     }
+
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged) {
         this.stopUsing(livingEntity);

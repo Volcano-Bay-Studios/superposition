@@ -59,7 +59,7 @@ public class Signal {
         this.frequency = frequency;
         this.amplitude = amplitude;
         this.sourceFrequency = sourceFrequency;
-        setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()),0);
+        setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()), 0);
     }
 
     public Signal(UUID uuid, FriendlyByteBuf buf) {
@@ -216,6 +216,7 @@ public class Signal {
     public int getSourceAntennaSize() {
         return this.sourceAntennaSize;
     }
+
     @Nullable
     public EncodedData<?> getEncodedData() {
         return this.encodedData;

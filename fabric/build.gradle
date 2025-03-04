@@ -28,6 +28,8 @@ dependencies {
 //    modImplementation "maven.modrinth:iris:1.8.1+1.21.1-fabric"
 //    modRuntimeOnly "maven.modrinth:worldedit:7.3.8"
     modRuntimeOnly "mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}"
+
+//    implementation("net.createmod.ponder:Ponder-Fabric-${minecraft_version}:${ponder_version}")
 }
 
 loom {

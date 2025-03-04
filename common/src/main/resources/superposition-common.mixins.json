@@ -11,7 +11,8 @@
   "client": [
     "GuiMixin",
     "KeyboardHandlerMixin",
-    "MultiPlayerGameModeMixin"
+    "MultiPlayerGameModeMixin",
+    "client.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

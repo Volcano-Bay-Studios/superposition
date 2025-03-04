@@ -17,10 +17,11 @@ import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 
 import java.awt.*;
 
-public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlockEntity> {
+public class FilterBlockEntityRenderer implements BlockEntityRenderer<FilterBlockEntity> {
 
     public FilterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
+
     @Override
     public void render(FilterBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
@@ -34,7 +35,7 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
 
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
-        ms.translate(0,-.125,0.03f);
+        ms.translate(0, -.125, 0.03f);
 
 
         Matrix4f m = ms.last().pose();
@@ -55,39 +56,40 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
 //        }
         float stages = 1;
         Color color = be.getFilterType().getColor();
-        float offset = (stage / stages)+.5f;
+        float offset = (stage / stages) + .5f;
 
-        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING),1));
+        light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING), 1));
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, -0.15525f)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
+                .setUv(0, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, 0.21825f)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .setUv(0, (uvMin/stages)+offset)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
+                .setUv(0, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, 0.21825f)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .setUv(1, (uvMin/stages)+offset)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
+                .setUv(1, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, -0.15525f)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
-                .setUv(1, (uvMin/stages)+offset)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
+                .setUv(1, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
     }
+
     private float getMaxPlaneExtent(FilterBlockEntity be) {
         return -(0.1875f);
     }
@@ -95,6 +97,7 @@ public class FilterBlockEntityRenderer  implements BlockEntityRenderer<FilterBlo
     private float getMinPlaneExtent(FilterBlockEntity be) {
         return 0.1875f;
     }
+
     public boolean isInvalid(FilterBlockEntity be) {
         return !be.hasLevel() || be.getBlockState()
                 .getBlock() == Blocks.AIR;

@@ -47,7 +47,7 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
             for (String string : text) {
                 whole.append(" ").append(string);
             }
-            String[] strings = (WordUtils.wrap(whole.toString(), 14,"\n",true)).split("\n"+"");
+            String[] strings = (WordUtils.wrap(whole.toString(), 14, "\n", true)).split("\n" + "");
             text = List.of(strings);
         }
 
@@ -114,7 +114,7 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
     @Override
     public void configureAreaLight(AreaLight light) {
         super.configureAreaLight(light);
-        light.setSize(0.317,0.244);
+        light.setSize(0.317, 0.244);
         light.setColor(3979870);
         light.setDistance(10);
         light.setBrightness(1.5f);

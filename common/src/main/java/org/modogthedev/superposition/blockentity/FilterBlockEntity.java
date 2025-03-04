@@ -81,7 +81,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag,registries);
+        super.saveAdditional(tag, registries);
         if (type != null) {
             tag.putString("namespace", type.getSelfReference().getNamespace());
             tag.putString("path", type.getSelfReference().getPath());

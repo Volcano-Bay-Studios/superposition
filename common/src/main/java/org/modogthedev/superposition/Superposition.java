@@ -39,15 +39,15 @@ public class Superposition {
         SuperpositionMessages.register();
         LOGGER.info("Superposition has been initialized.");
     }
-    public static void preTick(ServerLevel level) {
-    }
+
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
         CableManager.tick(level);
         CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
     }
-    public static void clientTick(Level level){
+
+    public static void clientTick(Level level) {
         VeilBloomRenderer.enable();
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
@@ -65,9 +65,9 @@ public class Superposition {
         SUPERPOSITION_THEME.addColor(background);
         SUPERPOSITION_THEME.addColor(borderTop);
         SUPERPOSITION_THEME.addColor(borderBottom);
-        SUPERPOSITION_THEME.addColor("background",background);
-        SUPERPOSITION_THEME.addColor("topBorder",borderTop);
-        SUPERPOSITION_THEME.addColor("bottomBorder",borderBottom);
+        SUPERPOSITION_THEME.addColor("background", background);
+        SUPERPOSITION_THEME.addColor("topBorder", borderTop);
+        SUPERPOSITION_THEME.addColor("bottomBorder", borderBottom);
     }
 
     public static ResourceLocation id(String loc) {

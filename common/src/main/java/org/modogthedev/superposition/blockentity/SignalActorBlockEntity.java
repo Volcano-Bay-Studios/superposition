@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
 import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.light.AreaLight;
@@ -36,7 +35,6 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 public class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
 
@@ -229,7 +227,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return getSignals();
     }
 
-    public void addSignals(Object lastCall,List<Signal> signals, Direction face) {
+    public void addSignals(Object lastCall, List<Signal> signals, Direction face) {
         if (lastCall == this.lastCall) {
             return;
         }
@@ -241,7 +239,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         this.modulateSignals(signals1, true);
         BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.addSignals(lastCall,new ArrayList<>(signals1),face);
+            signalActorBlockEntity.addSignals(lastCall, new ArrayList<>(signals1), face);
         }
         if (signalsReceived == 0) {
             this.updatePutSignals(signals1);
@@ -298,7 +296,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             if (signalActorBlockEntity.getInvertedSwappedPos().equals(this.getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
                 lastCallList = nextCall;
-                signalActorBlockEntity.putSignalsFace(nextCall, list,getInvertedSwappedSide());
+                signalActorBlockEntity.putSignalsFace(nextCall, list, getInvertedSwappedSide());
             }
         }
     }
@@ -353,7 +351,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             return null;
         }
     }
-
 
 
     @Override

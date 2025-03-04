@@ -12,8 +12,8 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.MathFunction;
-import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
     }
 
     @Override
-    public void addSignals(Object lastCall,List<Signal> signals, Direction face) {
+    public void addSignals(Object lastCall, List<Signal> signals, Direction face) {
         if (lastCall == this.lastCall) {
             return;
         }
@@ -68,7 +68,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
         this.modulateSignals(signals, true);
         BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.addSignals(lastCall,new ArrayList<>(signals),face);
+            signalActorBlockEntity.addSignals(lastCall, new ArrayList<>(signals), face);
         }
         if (face == getInvertedSwappedSide()) {
             if (signalsReceived == 0) {
@@ -146,7 +146,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
         rightSignalsReceived = 0;
         BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.putSignalFace(outputSignal,Direction.UP);
+            signalActorBlockEntity.putSignalFace(outputSignal, Direction.UP);
         }
         super.tick();
     }
@@ -293,35 +293,35 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
                 value += (float) Math.toDegrees(Math.tan(Math.toRadians(f)));
             }
             return value;
-        }, Types.TRIGONOMETRIC,"TAN"),
+        }, Types.TRIGONOMETRIC, "TAN"),
         ASIN((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.toDegrees(Math.asin(Math.toRadians(f)));
             }
             return value;
-        }, Types.TRIGONOMETRIC,"ASIN"),
+        }, Types.TRIGONOMETRIC, "ASIN"),
         ACOS((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.toDegrees(Math.acos(Math.toRadians(f)));
             }
             return value;
-        }, Types.TRIGONOMETRIC,"ACOS"),
+        }, Types.TRIGONOMETRIC, "ACOS"),
         ATAN((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.toDegrees(Math.atan(Math.toRadians(f)));
             }
             return value;
-        }, Types.TRIGONOMETRIC,"ATAN"),
+        }, Types.TRIGONOMETRIC, "ATAN"),
         SQR((floats) -> {
             float value = 0;
             for (float f : floats) {
                 value += (float) Math.toDegrees(Math.atan(Math.toRadians(f)));
             }
             return value;
-        }, Types.SCIENTIFIC,"^2"),
+        }, Types.SCIENTIFIC, "^2"),
         ROOT((floats) -> {
             float value = 0;
             for (float f : floats) {

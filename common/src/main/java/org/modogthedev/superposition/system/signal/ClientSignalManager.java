@@ -53,7 +53,7 @@ public class ClientSignalManager {
             for (int i = 0; i < count; i++) {
                 UUID id = buf.readUUID();
                 if (computerBlockEntity.periphrealSignal != null) {
-                    computerBlockEntity.periphrealSignal.load(id,buf);
+                    computerBlockEntity.periphrealSignal.load(id, buf);
                 } else {
                     Signal signal = new Signal(id, buf);
                     signal.level = level;
@@ -64,6 +64,7 @@ public class ClientSignalManager {
     }
 
     public static void postSignalsToAntenna(Antenna antenna) {
+        ifAbsent(antenna.level);
         for (Signal signal : clientSignals.get(antenna.level).values()) {
             AntennaManager.postSignalToAntenna(signal, antenna);
         }

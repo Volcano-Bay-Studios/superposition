@@ -4,9 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import org.modogthedev.superposition.block.TransmitterBlock;
 import org.modogthedev.superposition.block.AntennaBlock;
 import org.modogthedev.superposition.block.ReceiverBlock;
+import org.modogthedev.superposition.block.TransmitterBlock;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,6 +23,7 @@ public class BlockHelper {
             Direction.SOUTH,
             Direction.WEST
     };
+
     public static boolean base(Block b) {
         return (b instanceof TransmitterBlock || b instanceof ReceiverBlock);
     }
@@ -48,6 +49,7 @@ public class BlockHelper {
         }
         return foundBase;
     }
+
     public static AntennaPart getAntennaPart(LevelReader level, BlockPos pos) {
         Set<BlockPos> set = new HashSet<>();
         LinkedList<BlockPos> list = new LinkedList<>();
@@ -62,14 +64,15 @@ public class BlockHelper {
             basePos = pos;
 
         //Execute this method for each block in the 'todo' list
-        while((pos = list.poll()) != null) {
+        while ((pos = list.poll()) != null) {
             BlockPos foundPos = getConnectedblocks(level, pos, set, list, basePos);
             if (foundPos != null) {
                 basePos = foundPos;
             }
         }
-        return new AntennaPart(set,basePos);
+        return new AntennaPart(set, basePos);
     }
+
     public record AntennaPart(Set<BlockPos> parts, BlockPos base) {
     }
 }

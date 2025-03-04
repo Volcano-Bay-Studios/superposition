@@ -19,6 +19,8 @@ dependencies {
     //modRuntimeOnly("maven.modrinth:spark:1.10.53-forge")
     //modRuntimeOnly("curse.maven:worldedit-225608:4586218")
     //modRuntimeOnly("mezz.jei:jei-${rootProject.property("minecraft_version")}-forge:${rootProject.property("jei_version")}")
+
+    implementation("net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:${ponder_version}")
 }
 
 neoForge {

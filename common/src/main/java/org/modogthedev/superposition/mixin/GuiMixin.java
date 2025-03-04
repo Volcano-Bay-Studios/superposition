@@ -12,10 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
 public class GuiMixin {
-    @Inject(method = "renderSpyglassOverlay",at = @At("HEAD"),cancellable = true)
+    @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
     private void renderSpyglassOverlay(GuiGraphics guiGraphics, float scopeScale, CallbackInfo ci) {
         if (Minecraft.getInstance().player.getUseItem().is(SuperpositionItems.SIGNAL_SCOPE.get())) {
-            SignalScopeRenderer.renderSignalScope(guiGraphics,scopeScale);
+            SignalScopeRenderer.renderSignalScope(guiGraphics, scopeScale);
             ci.cancel();
         }
     }

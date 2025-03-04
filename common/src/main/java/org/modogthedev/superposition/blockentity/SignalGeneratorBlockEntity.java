@@ -10,7 +10,6 @@ import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 

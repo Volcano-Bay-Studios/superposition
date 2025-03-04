@@ -10,8 +10,8 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.EditableTooltip;
-import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
             outputSignal.encode(outputString);
         BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.putSignalsFace(new Object(),List.of(new Signal(outputSignal)),getInvertedSwappedSide());
+            signalActorBlockEntity.putSignalsFace(new Object(), List.of(new Signal(outputSignal)), getInvertedSwappedSide());
         }
 
         resetTooltip();

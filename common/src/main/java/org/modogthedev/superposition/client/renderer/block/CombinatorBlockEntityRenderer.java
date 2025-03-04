@@ -17,9 +17,11 @@ import java.util.Objects;
 public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<CombinatorBlockEntity> {
 
     public Font font;
+
     public CombinatorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         font = context.getFont();
     }
+
     @Override
     public void render(CombinatorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
@@ -47,10 +49,11 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
         }
 
 
-        this.font.drawInBatch(text, -this.font.width(text)/2f, 9, 3979870, false, ms.last().pose(), bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+        this.font.drawInBatch(text, -this.font.width(text) / 2f, 9, 3979870, false, ms.last().pose(), bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
 
         ms.popPose();
     }
+
     private float getMaxPlaneExtent(CombinatorBlockEntity be) {
         return -(0.5f);
     }
@@ -58,6 +61,7 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
     private float getMinPlaneExtent(CombinatorBlockEntity be) {
         return 0.5f;
     }
+
     public boolean isInvalid(CombinatorBlockEntity be) {
         return !be.hasLevel() || be.getBlockState()
                 .getBlock() == Blocks.AIR;
@@ -65,6 +69,6 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
 
     @Override
     public boolean shouldRender(CombinatorBlockEntity pBlockEntity, Vec3 pCameraPos) {
-        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos) && (pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING),1)).is(Blocks.AIR) || !pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING),1)).canOcclude()));
+        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos) && (pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING), 1)).is(Blocks.AIR) || !pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING), 1)).canOcclude()));
     }
 }

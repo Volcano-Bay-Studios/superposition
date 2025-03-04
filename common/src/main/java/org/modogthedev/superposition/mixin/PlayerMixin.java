@@ -11,11 +11,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Player.class)
 public abstract class PlayerMixin {
 
-    @Shadow public abstract void tick();
+    @Shadow
+    public abstract void tick();
 
     @Inject(method = "isScoping", at = @At("HEAD"), cancellable = true)
     private void isScoping(CallbackInfoReturnable<Boolean> cir) {
-        Player player = (Player) ((Object)this);
+        Player player = (Player) ((Object) this);
         if (player.isUsingItem() && player.getUseItem().is(SuperpositionItems.SIGNAL_SCOPE.get())) {
             cir.setReturnValue(true);
         }

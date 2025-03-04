@@ -13,8 +13,6 @@ import org.modogthedev.superposition.system.cards.cards.PeripheralCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class PeriphrealBlockEntity extends SignalActorBlockEntity {
@@ -35,7 +33,7 @@ public class PeriphrealBlockEntity extends SignalActorBlockEntity {
         Signal signal = SignalManager.randomSignal(putSignals);
         if (signal != null && signal.getEncodedData() != null) {
             CompoundTag tag = signal.getEncodedData().compoundTagData();
-            if (tag != null && tag.contains("id",99)) {
+            if (tag != null && tag.contains("id", 99)) {
                 int id = tag.getInt("id");
                 Card card1 = SuperpositionCards.CARDS.asVanillaRegistry().byId(id);
                 if (card1 != null)
@@ -43,7 +41,7 @@ public class PeriphrealBlockEntity extends SignalActorBlockEntity {
             }
         }
         if (card != null && card instanceof PeripheralCard peripheralCard)
-            peripheralCard.peripheralEncode(processSignal,this);
+            peripheralCard.peripheralEncode(processSignal, this);
         super.tick();
     }
 

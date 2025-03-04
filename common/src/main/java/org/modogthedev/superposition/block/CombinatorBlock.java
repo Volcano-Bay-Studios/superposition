@@ -21,8 +21,9 @@ public class CombinatorBlock extends SignalActorTickingBlock implements EntityBl
 
     public CombinatorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
         return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
@@ -33,6 +34,7 @@ public class CombinatorBlock extends SignalActorTickingBlock implements EntityBl
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SuperpositionBlockEntities.COMBINATOR.get().create(pos, state);
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -42,6 +44,7 @@ public class CombinatorBlock extends SignalActorTickingBlock implements EntityBl
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     @Override
     public boolean commonConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return direction == state.getValue(FACING).getOpposite();

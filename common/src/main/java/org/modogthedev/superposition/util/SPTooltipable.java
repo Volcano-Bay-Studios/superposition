@@ -11,6 +11,7 @@ public interface SPTooltipable {
     List<Component> getTooltip();
 
     boolean isTooltipEnabled();
+
     boolean isSuperpositionTooltipEnabled();
 
 
@@ -31,6 +32,7 @@ public interface SPTooltipable {
     void setTopBorderColor(int var1);
 
     void setBottomBorderColor(int var1);
+
     void drawExtra();
 
     boolean getWorldspace();

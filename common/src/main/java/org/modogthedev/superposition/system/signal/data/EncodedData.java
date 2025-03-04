@@ -50,7 +50,7 @@ public sealed interface EncodedData<T> {
         @Override
         public byte[] byteArrayValue() {
             byte[] bytes = new byte[1];
-            bytes[0] = (byte) (this.value? 1: 0);
+            bytes[0] = (byte) (this.value ? 1 : 0);
             return bytes;
         }
 

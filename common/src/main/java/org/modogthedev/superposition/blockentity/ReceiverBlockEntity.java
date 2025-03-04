@@ -46,7 +46,7 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
 
     @Override
     public List<Component> getTooltip() {
-        AntennaManager.antennaPartUpdate(level,getBlockPos());
+        AntennaManager.antennaPartUpdate(level, getBlockPos());
         return super.getTooltip();
     }
 
@@ -60,13 +60,13 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
                 tooltip.add(Component.literal("Antenna Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()))));
                 float bonusFrequency = getBounusFrequency();
                 if (bonusFrequency != 0) {
-                    tooltip.add(Component.literal("Actual Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size())+bonusFrequency)));
+                    tooltip.add(Component.literal("Actual Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()) + bonusFrequency)));
                 }
             }
             List<Signal> signals = getSignals();
             updatePutSignals(signals);
             int currentSize = signals.size();
-            tooltip.add(Component.literal("Signal - "+(signals.isEmpty() ? "NONE":"OK")));
+            tooltip.add(Component.literal("Signal - " + (signals.isEmpty() ? "NONE" : "OK")));
             if (currentSize != lastSize || (antennaBrokenLastTick != (antenna == null))) {
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
             }

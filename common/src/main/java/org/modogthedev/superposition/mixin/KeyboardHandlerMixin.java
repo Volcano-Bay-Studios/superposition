@@ -15,7 +15,7 @@ public class KeyboardHandlerMixin {
         if (SuperpositionUITooltipRenderer.editingEditable && action != GLFW.GLFW_RELEASE) {
             ci.cancel();
         }
-        SuperpositionUITooltipRenderer.keyPress(windowPointer,key,scanCode,action,modifiers);
+        SuperpositionUITooltipRenderer.keyPress(windowPointer, key, scanCode, action, modifiers);
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
@@ -24,10 +24,10 @@ public class KeyboardHandlerMixin {
             ci.cancel();
         }
         if (Character.charCount(codePoint) == 1) {
-            SuperpositionUITooltipRenderer.charTyped(windowPointer,(char) codePoint,modifiers);
+            SuperpositionUITooltipRenderer.charTyped(windowPointer, (char) codePoint, modifiers);
         } else {
             for (char c0 : Character.toChars(codePoint)) {
-                SuperpositionUITooltipRenderer.charTyped(windowPointer,c0,modifiers);
+                SuperpositionUITooltipRenderer.charTyped(windowPointer, c0, modifiers);
             }
         }
     }

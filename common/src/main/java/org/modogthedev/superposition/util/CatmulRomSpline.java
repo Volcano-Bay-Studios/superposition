@@ -12,7 +12,7 @@ public class CatmulRomSpline {
         for (int i = 1; i < controlPoints.size() - 2; i++) {
             for (int j = 0; j < numSegments; j++) {
                 double t = j / (double) numSegments;
-                Vec3 point = interpolate(controlPoints.get(i-1), controlPoints.get(i),
+                Vec3 point = interpolate(controlPoints.get(i - 1), controlPoints.get(i),
                         controlPoints.get(i + 1), controlPoints.get(i + 2), t);
                 splinePoints.add(point);
             }

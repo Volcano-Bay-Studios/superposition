@@ -52,7 +52,7 @@ public class CableClipContext extends ClipContext {
     public enum CableCollides implements ShapeGetter {
 
         CABLE_COLLIDES(BlockBehaviour.BlockStateBase::getCollisionShape);
-//      (state, world, pos, context) -> state.is(Blocks.AIR) ? Shapes.empty() : Shapes.block()
+        //      (state, world, pos, context) -> state.is(Blocks.AIR) ? Shapes.empty() : Shapes.block()
         private final ShapeGetter shapeGetter;
 
         CableCollides(ShapeGetter shapeGetter) {

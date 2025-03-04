@@ -1,13 +1,9 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.util.TickableBlockEntity;

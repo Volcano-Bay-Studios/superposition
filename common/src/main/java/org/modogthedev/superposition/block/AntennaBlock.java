@@ -24,25 +24,27 @@ import org.modogthedev.superposition.system.antenna.AntennaManager;
 public class AntennaBlock extends CrossCollisionBlock {
     public static BooleanProperty SHORT = SuperpositionBlockStates.SHORT;
     public static final MapCodec<AntennaBlock> CODEC = simpleCodec(AntennaBlock::new);
+
     @Override
     protected MapCodec<? extends CrossCollisionBlock> codec() {
         return CODEC;
     }
+
     public AntennaBlock(Properties p_54198_) {
         super(2F, 1.0F, 16.0F, 16.0F, 16.0F, p_54198_);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(SHORT,false));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(SHORT, false));
     }
 
     @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pMovedByPiston) {
         super.onPlace(pState, pLevel, pPos, pOldState, pMovedByPiston);
-        AntennaManager.antennaPartUpdate(pLevel,pPos);
+        AntennaManager.antennaPartUpdate(pLevel, pPos);
     }
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
         super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
-        AntennaManager.antennaPartUpdate(pLevel,pPos);
+        AntennaManager.antennaPartUpdate(pLevel, pPos);
     }
 
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
@@ -70,7 +72,7 @@ public class AntennaBlock extends CrossCollisionBlock {
         if (pState.getValue(WATERLOGGED)) {
             pLevel.scheduleTick(pCurrentPos, Fluids.WATER, Fluids.WATER.getTickDelay(pLevel));
         }
-        AntennaManager.antennaPartUpdate(pLevel,pCurrentPos);
+        AntennaManager.antennaPartUpdate(pLevel, pCurrentPos);
 
         return pFacing.getAxis().isHorizontal() ? pState.setValue(PROPERTY_BY_DIRECTION.get(pFacing), Boolean.valueOf(this.attachsTo(pFacingState, pFacingState.isFaceSturdy(pLevel, pFacingPos, pFacing.getOpposite())))) : super.updateShape(pState, pFacing, pFacingState, pLevel, pCurrentPos, pFacingPos);
     }
@@ -79,6 +81,7 @@ public class AntennaBlock extends CrossCollisionBlock {
     public VoxelShape getVisualShape(BlockState pState, BlockGetter pReader, BlockPos pPos, CollisionContext pContext) {
         return Shapes.empty();
     }
+
     public static boolean isCap(BlockState state) {
         boolean north = state.getValue(NORTH);
         boolean south = state.getValue(SOUTH);
@@ -112,7 +115,7 @@ public class AntennaBlock extends CrossCollisionBlock {
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED,SHORT);
+        pBuilder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED, SHORT);
     }
 
 

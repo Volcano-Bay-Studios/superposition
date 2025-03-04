@@ -20,6 +20,6 @@ public class BezierCurve {
         Vector3d lerp0112 = lerp01.lerp(lerp12, t);
         Vector3d lerp1223 = lerp23.lerp(lerp12, 1 - t);
 
-        return  lerp0112.lerp(lerp1223, t);
+        return lerp0112.lerp(lerp1223, t);
     }
 }

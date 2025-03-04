@@ -21,17 +21,18 @@ import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ReceiverBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.util.AntennaActorTickingBlock;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class ReceiverBlock extends AntennaActorTickingBlock {
     public ReceiverBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
         return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -41,10 +42,12 @@ public class ReceiverBlock extends AntennaActorTickingBlock {
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
         stateBuilder.add(new Property[]{FACING, SWAP_SIDES});
     }
+
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return Shapes.join(Block.box(4, 14, 4, 12, 16, 12), Block.box(2, 0, 2, 14, 14, 14), BooleanOp.OR);
@@ -59,6 +62,7 @@ public class ReceiverBlock extends AntennaActorTickingBlock {
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
     }
+
     @Nullable
 
     @Override

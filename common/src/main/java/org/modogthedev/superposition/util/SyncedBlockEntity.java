@@ -16,9 +16,11 @@ public class SyncedBlockEntity extends BlockEntity {
     public SyncedBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
+
     public void loadSyncedData(CompoundTag tag) {
 
     }
+
     public void syncData() {
 
     }
@@ -26,7 +28,7 @@ public class SyncedBlockEntity extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        saveAdditional(tag,registries);
+        saveAdditional(tag, registries);
         return tag;
     }
 

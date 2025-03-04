@@ -1,9 +1,7 @@
 package org.modogthedev.superposition.client.renderer.block;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import foundry.veil.api.client.render.VeilRenderSystem;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -21,6 +19,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
 
     public SignalGeneratorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
+
     @Override
     public void render(SignalGeneratorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
@@ -30,8 +29,8 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
-            ms.translate(0.5, 0.5, 0.5);
-            ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
+        ms.translate(0.5, 0.5, 0.5);
+        ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
 
 
         Matrix4f m = ms.last().pose();
@@ -40,7 +39,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         float uvMin = (.5f + min);
         float uvMax = (.5f + max);
 
-        float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/ ;
+        float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/;
         float stage = Math.round(be.dial);
         float stages = 25;
 
@@ -52,31 +51,32 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         buffer
                 .addVertex(m, min, 0.5001f, min)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0+uvOffsetx, (uvMin/stages)+offset)
+                .setUv(0 + uvOffsetx, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, min, 0.5001f, max)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0+uvOffsetx, (uvMax/stages)+offset)
+                .setUv(0 + uvOffsetx, (uvMax / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, max, 0.5001f, max)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(1+uvOffsetx, (uvMax/stages)+offset)
+                .setUv(1 + uvOffsetx, (uvMax / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, max, 0.5001f, min)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(1+uvOffsetx, (uvMin/stages)+offset)
+                .setUv(1 + uvOffsetx, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
     }
+
     private float getMaxPlaneExtent(SignalGeneratorBlockEntity be) {
         return -(0.5f);
     }
@@ -84,6 +84,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
     private float getMinPlaneExtent(SignalGeneratorBlockEntity be) {
         return 0.5f;
     }
+
     public boolean isInvalid(SignalGeneratorBlockEntity be) {
         return !be.hasLevel() || be.getBlockState()
                 .getBlock() == Blocks.AIR;
@@ -91,6 +92,6 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
 
     @Override
     public boolean shouldRender(SignalGeneratorBlockEntity pBlockEntity, Vec3 pCameraPos) {
-        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos) && (pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING),1)).is(Blocks.AIR) || !pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING),1)).canOcclude()));
+        return (BlockEntityRenderer.super.shouldRender(pBlockEntity, pCameraPos) && (pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING), 1)).is(Blocks.AIR) || !pBlockEntity.getLevel().getBlockState(pBlockEntity.getBlockPos().relative(pBlockEntity.getBlockState().getValue(SignalGeneratorBlock.FACING), 1)).canOcclude()));
     }
 }

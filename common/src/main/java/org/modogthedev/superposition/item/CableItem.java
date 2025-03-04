@@ -31,7 +31,7 @@ public class CableItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        CableManager.playerUsesCable(context.getPlayer(), context.getClickedPos(),color, emitsLight, context.getClickedFace());
+        CableManager.playerUsesCable(context.getPlayer(), context.getClickedPos(), color, emitsLight, context.getClickedFace());
         return InteractionResult.SUCCESS;
     }
 

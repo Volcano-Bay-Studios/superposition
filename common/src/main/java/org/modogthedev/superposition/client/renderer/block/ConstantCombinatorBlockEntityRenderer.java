@@ -33,7 +33,7 @@ public class ConstantCombinatorBlockEntityRenderer implements BlockEntityRendere
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
 
-        String text = be.getOutputString().substring(0,Math.min(3,be.getOutputString().length()));
+        String text = be.getOutputString().substring(0, Math.min(3, be.getOutputString().length()));
         if (be.getOutputString().length() > 3)
             text = text + "-";
 
@@ -51,7 +51,7 @@ public class ConstantCombinatorBlockEntityRenderer implements BlockEntityRendere
             }
 
 
-            this.font.drawInBatch(text, -this.font.width(text)/2f, 9, 3979870, false, ms.last().pose(), bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+            this.font.drawInBatch(text, -this.font.width(text) / 2f, 9, 3979870, false, ms.last().pose(), bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
 
             ms.popPose();
         }

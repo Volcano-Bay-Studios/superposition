@@ -7,6 +7,7 @@ import java.util.List;
 
 public class CardConfig {
     public List<CardConfigPart> parts = new ArrayList<>();
+
     public void addComment(Component component) {
         parts.add(new CardConfigPart(component.getString()));
     }

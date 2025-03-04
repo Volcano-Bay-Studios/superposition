@@ -30,7 +30,7 @@ public class SuperpositionRenderTypes extends RenderType {
                 .setLightmapState(LIGHTMAP)
                 .setOverlayState(OVERLAY)
                 .createCompositeState(true);
-        return VeilRenderType.layered(create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffsetBloom),create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset));
+        return VeilRenderType.layered(create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffsetBloom), create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset));
     };
 
 //    private static final Function<ResourceLocation, RenderType> BLOCK_POLYGON_OFFSET = texture -> {

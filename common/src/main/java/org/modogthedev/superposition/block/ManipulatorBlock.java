@@ -22,8 +22,9 @@ public class ManipulatorBlock extends SignalActorTickingBlock implements EntityB
 
     public ManipulatorBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES,true));
+        this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
+
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
         return this.defaultBlockState().setValue(FACING, blockPlaceContext.getNearestLookingDirection().getOpposite());
@@ -39,6 +40,7 @@ public class ManipulatorBlock extends SignalActorTickingBlock implements EntityB
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SuperpositionBlockEntities.MANIPULATOR.get().create(pos, state);
     }
+
     @Override
     public BlockState rotate(BlockState pState, Rotation pRotation) {
         return pState.setValue(FACING, pRotation.rotate(pState.getValue(FACING)));
@@ -48,6 +50,7 @@ public class ManipulatorBlock extends SignalActorTickingBlock implements EntityB
     public BlockState mirror(BlockState pState, Mirror pMirror) {
         return pState.rotate(pMirror.getRotation(pState.getValue(FACING)));
     }
+
     @Override
     public boolean commonConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return direction == state.getValue(FACING).getOpposite();

@@ -103,7 +103,7 @@ public class WidgetScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double pMouseX, double pMouseY, double scrollX ,double pDelta) {
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double scrollX, double pDelta) {
         getTouching((int) pMouseX, (int) pMouseY);
         for (Dial dial : dials) {
             if (dial.mouseOver) {
@@ -149,7 +149,8 @@ public class WidgetScreen extends Screen {
     }
 
     @Override
-    protected void renderBlurredBackground(float partialTick) {}
+    protected void renderBlurredBackground(float partialTick) {
+    }
 
     public static class Dial {
         public Dial(int x, int y) {

@@ -28,7 +28,6 @@ public class ServerGameModeMixin {
     }
 
 
-
     @Inject(method = "useItemOn", at = @At("RETURN"), cancellable = true)
     public void performUseItemOn(ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult result, CallbackInfoReturnable<InteractionResult> cir) {
         if (cir.getReturnValue().consumesAction()) {

@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -17,7 +16,6 @@ import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.filter.Filter;
 
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -126,7 +124,7 @@ public class FilterItem extends Item {
         Filter type = this.filter.get();
         if (stack.getItem() instanceof FilterItem) {
             this.runIfHasData(stack, type::load);
-            return  (Component.literal(type.toString()));
+            return (Component.literal(type.toString()));
         }
         return super.getName(stack);
     }

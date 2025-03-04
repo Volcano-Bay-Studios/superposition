@@ -72,6 +72,6 @@ public class SuperpositionBlocks {
         return toReturn;
     }
 
-    public static void bootstrap(){
+    public static void bootstrap() {
     }
 }

@@ -107,6 +107,7 @@ public class SPUIUtils {
         SuperpositionUITooltipRenderer.drawConnectionLine(pStack, tooltippable, tooltipX, tooltipY, desiredX, desiredY);
         drawTooltipRects(pticks, pStack, zLevel, backgroundColor, borderColorStart, borderColorEnd, font, list, tooltipTextWidth, titleLinesCount, tooltipX, tooltipY, tooltipHeight, items);
     }
+
     private static void drawTooltipRects(float pticks, PoseStack pStack, int z, int backgroundColor, int borderColorStart, int borderColorEnd, Font font, List<ClientTooltipComponent> list, int tooltipTextWidth, int titleLinesCount, int tooltipX, int tooltipY, int tooltipHeight, List<VeilUIItemTooltipDataHolder> items) {
         pStack.pushPose();
         Matrix4f mat = pStack.last()
@@ -144,7 +145,7 @@ public class SPUIUtils {
 
         for (int lineNumber = 0; lineNumber < list.size(); ++lineNumber) {
             ClientTooltipComponent line = list.get(lineNumber);
-            RenderSystem.setShaderColor(.5f,1,.5f,1f);
+            RenderSystem.setShaderColor(.5f, 1, .5f, 1f);
             if (line != null) {
                 line.renderText(font, tooltipX, tooltipY, mat, renderType);
             }
@@ -161,8 +162,9 @@ public class SPUIUtils {
         pStack.popPose();
 
         RenderSystem.enableDepthTest();
-        RenderSystem.setShaderColor(1,1,1,1);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
     }
+
     public static void drawGradientRect(Matrix4f mat, int zLevel, int left, int top, int right, int bottom, int startColor, int endColor) {
         float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
         float startRed = (float) (startColor >> 16 & 255) / 255.0F;

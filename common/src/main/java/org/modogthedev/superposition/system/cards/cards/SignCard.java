@@ -45,7 +45,7 @@ public class SignCard extends Card implements PeripheralCard {
         if (signal != null && signal.getEncodedData() != null) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof SignBlockEntity signBlockEntity) {
-                signBlockEntity.setText(new SignText().setMessage(0,Component.literal(signal.getEncodedData().stringValue())),true);
+                signBlockEntity.setText(new SignText().setMessage(0, Component.literal(signal.getEncodedData().stringValue())), true);
             }
         }
     }

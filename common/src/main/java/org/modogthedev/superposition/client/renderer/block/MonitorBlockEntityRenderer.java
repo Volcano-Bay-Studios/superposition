@@ -54,8 +54,8 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
         float stage = Math.round(1.5f);
         float stages = 25;
 
-        float transformDown = Math.max(0,(-be.transformState/10f)+1);
-        float transformUp = Mth.clamp(((be.transformState-10)/10f),0,1);
+        float transformDown = Math.max(0, (-be.transformState / 10f) + 1);
+        float transformUp = Mth.clamp(((be.transformState - 10) / 10f), 0, 1);
         float uvOffsetx = 0f;
         int offset = 2;
         float part = 1f / (size + 4);
@@ -68,7 +68,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
         int j = 0;
         for (String text : be.text) { //TODO: Finish text system
             float x = 1;
-            this.font.drawInBatch(text.substring(0, (int) (text.length()*transformUp)), x, j * 9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
+            this.font.drawInBatch(text.substring(0, (int) (text.length() * transformUp)), x, j * 9, 3979870, false, textPose, bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
             j++;
         }
 
@@ -81,11 +81,11 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             float yinverse;
             Signal[] signals = SuperpositionMth.spaceArray(be.signals, size);
             if (signals != null && signals[i] != null) {
-                y = Math.max(-.061f, (float) ((((signals[i].getAmplitude()) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4)))*transformDown;
-                y = Mth.lerp(-(transformDown-1),y,.21f);
+                y = Math.max(-.061f, (float) ((((signals[i].getAmplitude()) / be.highestValue) / -6f) + ((be.lowestValue / be.highestValue) / 4))) * transformDown;
+                y = Mth.lerp(-(transformDown - 1), y, .21f);
             }
-            y += (float) (Math.random() / 64)*transformDown;
-            yinverse = -y + .42f +(.05f*transformDown);
+            y += (float) (Math.random() / 64) * transformDown;
+            yinverse = -y + .42f + (.05f * transformDown);
 
             buffer
                     .addVertex(m, x + part, 0.5001f, yinverse)
@@ -114,10 +114,6 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
                     .setUv(uvMin + uvOffsetx, (uvMin / stages))
                     .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
-
-
-
-
 
 
         }

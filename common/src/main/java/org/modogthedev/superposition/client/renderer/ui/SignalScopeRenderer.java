@@ -63,7 +63,7 @@ public class SignalScopeRenderer {
             int height = (int) (43 - (strength * 250));
             strength = Math.min(0.084f, strength);
             int offset = (int) (67 - (strength * 800)) + 16;
-            int alpha = (int) Mth.clamp(Mth.map(strength, 0.02f, 0.06f, 0, 255),0,255);
+            int alpha = (int) Mth.clamp(Mth.map(strength, 0.02f, 0.06f, 0, 255), 0, 255);
 
             int x = (int) ((guiGraphics.guiWidth() / 2f) - offset);
             int x2 = (int) ((guiGraphics.guiWidth() / 2f) + offset);

@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 
-public class AbstractMusicInstance implements IMusicInstance{
+public class AbstractMusicInstance implements IMusicInstance {
     protected Sound sound;
     protected final SoundSource source;
     protected final ResourceLocation location;
@@ -24,6 +24,7 @@ public class AbstractMusicInstance implements IMusicInstance{
     protected SoundInstance.Attenuation attenuation = SoundInstance.Attenuation.LINEAR;
     protected boolean relative;
     protected RandomSource random;
+
     protected AbstractMusicInstance(SoundEvent p_235072_, SoundSource p_235073_, RandomSource p_235074_) {
         this(p_235072_.getLocation(), p_235073_, p_235074_);
     }
@@ -89,6 +90,7 @@ public class AbstractMusicInstance implements IMusicInstance{
     public double getZ() {
         return this.z;
     }
+
     public void setVolume(float data) {
         volume = data;
     }

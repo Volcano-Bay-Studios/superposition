@@ -19,6 +19,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
 
     public AmplifierBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
+
     @Override
     public void render(AmplifierBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
@@ -32,7 +33,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
 
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
-        ms.translate(0,-.125,0.03f);
+        ms.translate(0, -.125, 0.03f);
 
 
         Matrix4f m = ms.last().pose();
@@ -43,43 +44,44 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
 
         float lastStage = be.lastStep;
         float stage = be.step;
-        float delta = (float) (be.ticks+pPartialTick) /AmplifierBlockEntity.ticksToChange;
+        float delta = (float) (be.ticks + pPartialTick) / AmplifierBlockEntity.ticksToChange;
         float stages = 3;
-        float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/ ;
+        float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/;
 
-        float offset = (stage / stages)+.5f;
-        float lastOffset = (lastStage / stages)+.5f;
+        float offset = (stage / stages) + .5f;
+        float lastOffset = (lastStage / stages) + .5f;
 
         light = LightTexture.FULL_BRIGHT; //TODO: make the light pulse
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, -0.15625f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMin/stages)+lastOffset)
+                .setUv(0, (uvMin / stages) + lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, -0.1887f, 0.5001f, 0.15825f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(0, (uvMax/stages)+lastOffset)
+                .setUv(0, (uvMax / stages) + lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, 0.15825f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(1, (uvMax/stages)+lastOffset)
+                .setUv(1, (uvMax / stages) + lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, 0.1887f, 0.5001f, -0.15625f)
                 .setColor(1f, 1f, 1f, alpha)
-                .setUv(1, (uvMin/stages)+lastOffset)
+                .setUv(1, (uvMin / stages) + lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
     }
+
     private float getMaxPlaneExtent(AmplifierBlockEntity be) {
         return -(0.1875f);
     }
@@ -87,6 +89,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
     private float getMinPlaneExtent(AmplifierBlockEntity be) {
         return 0.1875f;
     }
+
     public boolean isInvalid(AmplifierBlockEntity be) {
         return !be.hasLevel() || be.getBlockState()
                 .getBlock() == Blocks.AIR;

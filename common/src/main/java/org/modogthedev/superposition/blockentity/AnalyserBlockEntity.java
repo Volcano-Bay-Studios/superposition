@@ -23,7 +23,7 @@ public class AnalyserBlockEntity extends PeriphrealBlockEntity {
         resetTooltip();
         updateDistance();
         addTooltip("Analyser Status:");
-        addTooltip("Analyzing " + level.getBlockState(getAnalysisPosition()).getBlock().getName().getString()+"...");
+        addTooltip("Analyzing " + level.getBlockState(getAnalysisPosition()).getBlock().getName().getString() + "...");
         addTooltip("Distance - " + distance + " Blocks");
         super.tick();
     }
@@ -51,9 +51,11 @@ public class AnalyserBlockEntity extends PeriphrealBlockEntity {
     public Direction getFacing() {
         return getBlockState().getValue(SignalActorTickingBlock.FACING);
     }
+
     public BlockPos getDistancePosition(int distance) {
         return getBlockPos().relative(getBlockState().getValue(SignalActorTickingBlock.FACING), distance);
     }
+
     public BlockPos getAnalysisPosition() {
         return getDistancePosition(distance);
     }

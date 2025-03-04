@@ -42,7 +42,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     signalForBroadcast.setEmitting(true);
                     signalForBroadcast.level = level;
                     signalForBroadcast.setSourceAntenna(this.getBlockPos(), antenna.antennaParts.size());
-                    signalForBroadcast.mulAmplitude(1/Math.max(1,Math.abs((signalForBroadcast.getFrequency()-frequency)/100000)));
+                    signalForBroadcast.mulAmplitude(1 / Math.max(1, Math.abs((signalForBroadcast.getFrequency() - frequency) / 100000)));
                     SignalManager.updateSignal(signalForBroadcast);
                     signal = signalForBroadcast;
                     if (level.isClientSide) {

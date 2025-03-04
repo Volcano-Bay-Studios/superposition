@@ -72,7 +72,7 @@ public class SuperpositionUITooltipRenderer {
                             editableTooltip.replaceText("");
                             selected = false;
                         } else {
-                            editableTooltip.replaceText(editableTooltip.getText().substring(0, Math.max(0, cursorPos-1))+ editableTooltip.getText().substring(cursorPos));
+                            editableTooltip.replaceText(editableTooltip.getText().substring(0, Math.max(0, cursorPos - 1)) + editableTooltip.getText().substring(cursorPos));
                             cursorPos--;
                         }
                     }
@@ -126,7 +126,7 @@ public class SuperpositionUITooltipRenderer {
             }
             CompoundTag tag = new CompoundTag();
             tag.putString("output", editableTooltip.getText());
-            updateEditableBlockEntity(editPos,tag);
+            updateEditableBlockEntity(editPos, tag);
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
         }
     }
@@ -152,7 +152,7 @@ public class SuperpositionUITooltipRenderer {
             flash = 0;
             CompoundTag tag = new CompoundTag();
             tag.putString("output", editableTooltip.getText());
-            updateEditableBlockEntity(editPos,tag);
+            updateEditableBlockEntity(editPos, tag);
         }
     }
 
@@ -294,7 +294,7 @@ public class SuperpositionUITooltipRenderer {
         if (editableTooltip != null && editingEditable) {
             String focusText = "[PRESS ESC TO UNFOCUS]";
             RenderSystem.setShaderColor(.5f, 1, .5f, 1f);
-            graphics.drawString(Minecraft.getInstance().font, focusText, tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2+8, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
+            graphics.drawString(Minecraft.getInstance().font, focusText, tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
             RenderSystem.setShaderColor(1, 1, 1, 1);
         }
         flash++;

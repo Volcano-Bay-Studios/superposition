@@ -23,7 +23,7 @@ public class EncapsulateCard extends Card {
             if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
                 key = periphrealSignal.getEncodedData().stringValue();
             }
-            tag.putString(key,signal.getEncodedData().stringValue());
+            tag.putString(key, signal.getEncodedData().stringValue());
             signal.encode(tag);
         } else {
             signal.encode(new CompoundTag());

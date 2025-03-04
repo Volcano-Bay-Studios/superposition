@@ -26,7 +26,10 @@ dependencies {
 
     implementation "foundry.veil:veil-common-${project.minecraft_version}:${project.veil_version}"
     implementation "mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}"
+
+    implementation("net.createmod.ponder:Ponder-Common-${minecraft_version}:${ponder_version}")
 }
+
 
 configurations {
     commonJava {
