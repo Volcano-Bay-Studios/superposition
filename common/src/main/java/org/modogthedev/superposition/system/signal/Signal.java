@@ -39,7 +39,7 @@ public class Signal {
 //            this.level.addParticle(ParticleTypes.WAX_OFF, pos.x + (Math.sin(i)*minDist), pos.y, pos.z+ (Math.cos(i)*minDist), 0, Math.random()-0.5, 0);
 //        }
         lifetime++;
-        float maxRange = amplitude * 100;
+        float maxRange = amplitude * 5000;
         minDist = 0;
         if (!emitting) {
             int endTicks = lifetime - endTime - 2;
@@ -48,7 +48,7 @@ public class Signal {
                 return true;
             }
         }
-        maxDist = Math.min(maxRange, lifetime * SPEED);
+        maxDist = lifetime * SPEED;
         return false;
     }
 

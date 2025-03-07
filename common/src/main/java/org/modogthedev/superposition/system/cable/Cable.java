@@ -89,6 +89,12 @@ public class Cable {
             }
 
             if (lastNode.getAnchor() == null) {
+                if (emitsLight) {
+                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
+                    if (signalList != null && !signalList.isEmpty()) {
+                        updateColor(signalList);
+                    }
+                }
                 return;
             }
 
@@ -124,7 +130,6 @@ public class Cable {
                     }
 
                 } else {
-
                     List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
                     if (signalList != null) {
                         if (end instanceof SignalActorBlockEntity endSignalActor) {

@@ -24,7 +24,7 @@ public class ClientMusicManager {
             minecraft.getSoundManager().play(currentMusic);
         }
 
-        currentMusic.setVolume(volume);
+        currentMusic.setVolume((float) (Math.log10(volume)+1.3f)/3f);
 
         volume = 0;
     }
