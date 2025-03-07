@@ -23,10 +23,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.UUID;
 
 public class Cable {
 
@@ -274,14 +272,19 @@ public class Cable {
         return playerHoldingPointMap;
     }
 
-    public void updateFromCable(Cable cable) {
+    public void updateFromCable(Cable cable, boolean isHard) {
         color = cable.color;
         ropeSimulation.removeAllConstraints();
         ropeSimulation.resizeRope(cable.getPointsCount());
         List<RopeNode> targetPoints = cable.getPoints();
         for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
-            ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
-            ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
+            if (this.playerHoldingPointMap.size() != cable.playerHoldingPointMap.size()) {
+                ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
+//                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
+            } else {
+//                ropeSimulation.getNode(i).setPrevPosition(ropeSimulation.getNode(i).getPosition());
+                ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition().lerp(ropeSimulation.getNode(i).getPosition(),0.8f));
+            }
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
             if (newAnchor != null) {
                 ropeSimulation.getNode(i).setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
@@ -290,7 +293,7 @@ public class Cable {
             }
         }
         ropeSimulation.recalculateBaseRopeConstraints();
-        this.playerHoldingPointMap = cable.playerHoldingPointMap;
+        this.playerHoldingPointMap = new Int2IntArrayMap(cable.playerHoldingPointMap) {};
     }
 
     private int getPointsCount() {

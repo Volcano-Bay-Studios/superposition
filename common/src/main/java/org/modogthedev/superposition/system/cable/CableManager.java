@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.system.cable;
 
 import foundry.veil.api.network.VeilPacketManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
@@ -74,7 +75,7 @@ public class CableManager {
         if (CableRenderer.detachDelta > 0) {
             CableRenderer.detachDelta = CableRenderer.detachDelta - 0.2f;
         }
-        CableRenderer.stretch = 0;
+//        CableRenderer.stretch = 0;
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
             dragPlayers(level);
@@ -115,7 +116,7 @@ public class CableManager {
                     playerPoint.removeAnchor();
 
                     double stretch = playerPoint.calculateOverstretch();
-                    if (level.isClientSide) {
+                    if (level.isClientSide && player == Minecraft.getInstance().player) {
                         CableRenderer.stretch = (float) Math.clamp(stretch / 2.5f, 0, 1);
                     }
                     if (stretch > 2.5f) {

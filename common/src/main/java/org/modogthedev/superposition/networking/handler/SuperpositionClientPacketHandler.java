@@ -55,7 +55,7 @@ public class SuperpositionClientPacketHandler {
         if (cables != null) {
             Cable old = cables.get(id);
             if (old != null) {
-                old.updateFromCable(cable);
+                old.updateFromCable(cable,false);
                 return;
             }
         }

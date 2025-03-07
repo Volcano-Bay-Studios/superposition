@@ -10,7 +10,7 @@ import org.modogthedev.superposition.Superposition;
 public class SuperpositionForgeEvents {
 
     @SubscribeEvent
-    public static void onClientTick(LevelTickEvent.Post event) {
+    public static void onServerTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             Superposition.tick(level);
         }
