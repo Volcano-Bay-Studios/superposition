@@ -2,7 +2,6 @@ package org.modogthedev.superposition.system.cable.rope_system;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,13 +167,16 @@ public class RopeSimulation {
 
         int walkedNodes = 0;
         double walkedNodesLength = 0;
+        double maxWalkedNodeOverstretch = 0;
 
         for (int i = originIndex; i < nodes.size()-1; i++) {
             RopeNode current = nodes.get(i);
             RopeNode next = nodes.get(i+1);
 
             walkedNodes++;
-            walkedNodesLength += current.position.distanceTo(next.position);
+            double dist = current.position.distanceTo(next.position);
+            walkedNodesLength += dist;
+            maxWalkedNodeOverstretch = Math.max(dist, maxWalkedNodeOverstretch);
 
             if (next.anchor != null) break;
         }
@@ -183,12 +185,14 @@ public class RopeSimulation {
             RopeNode next = nodes.get(i-1);
 
             walkedNodes++;
-            walkedNodesLength += current.position.distanceTo(next.position);
+            double dist = current.position.distanceTo(next.position);
+            walkedNodesLength += dist;
+            maxWalkedNodeOverstretch = Math.max(dist, maxWalkedNodeOverstretch);
 
             if (next.anchor != null) break;
         }
 
-        return walkedNodes == 0 ? 0 : (float) ((walkedNodesLength / walkedNodes) - connectionWidth);
+        return walkedNodes == 0 ? 0 : (float) Math.max(maxWalkedNodeOverstretch / 10f, (walkedNodesLength / walkedNodes) - connectionWidth);
     }
 
     public List<RopeConstraint> getConstraints() {

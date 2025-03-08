@@ -1,7 +1,6 @@
 package org.modogthedev.superposition.system.cable;
 
 import foundry.veil.api.network.VeilPacketManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
@@ -26,7 +25,6 @@ import oshi.util.tuples.Pair;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.List;
 
 public class CableManager {
     private static int grabTimer = 0;
@@ -106,6 +104,7 @@ public class CableManager {
                     }
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
+                    playerPoint.setLastDragGoalPos(holdGoalPos);
                 }
             }
         }
@@ -136,8 +135,8 @@ public class CableManager {
                     //                    playerPoint.setPrevPosition(playerPoint.getPosition());
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-
-                    double stretch = playerPoint.calculateOverstretch();
+                    
+                    double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
                     CableRenderer.stretch = (float) Math.clamp(stretch * 10f, 0, 1);
                     if (stretch > 0.1f) {
                         playerFinishDraggingCable(player, null, null);

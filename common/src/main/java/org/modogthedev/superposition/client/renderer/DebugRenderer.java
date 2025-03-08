@@ -53,7 +53,7 @@ public class DebugRenderer {
         for (Cable cable : CableManager.getLevelCables(level)) {
             boolean isSleeping = cable.isSleeping();
             for (RopeNode point : cable.getPoints()) {
-                Vec3 pos = point.getRenderPosition();
+                Vec3 pos = point.getPosition();
                 float width = SuperpositionConstants.cableRadius / 2;
                 drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, isSleeping ? 0.5f : 0.9f, 0.5f, isSleeping ? 0.9f : 0.5f);
                 Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(Minecraft.getInstance().player.getId());
@@ -63,14 +63,14 @@ public class DebugRenderer {
                 }
             }
             RopeNode point = cable.getPoints().getLast();
-            Vec3 pos = point.getRenderPosition();
+            Vec3 pos = point.getPosition();
             float width = SuperpositionConstants.cableRadius / 2;
             drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width + .1f, 0.9f, 0.9f, 0.5f);
         }
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
         Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f, !Minecraft.getInstance().player.isCrouching());
         if (cablePointPair != null) {
-            Vec3 pos = cablePointPair.getB().getRenderPosition();
+            Vec3 pos = cablePointPair.getB().getPosition();
             float width = SuperpositionConstants.cableRadius / 2 + .1f;
             drawPosBox((PoseStack) matrixStack, vertexConsumer, pos, width, 0.5f, 0.9f, 0.5f);
         }

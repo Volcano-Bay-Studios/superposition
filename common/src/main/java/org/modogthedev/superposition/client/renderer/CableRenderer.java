@@ -290,7 +290,7 @@ public class CableRenderer {
                 if (level.getEntity(entry.getIntKey()) instanceof Player player) {
                     int i = Math.min(cable.getPoints().size() - 1, entry.getIntValue());
 
-                    Vec3 pos = cable.getPoints().get(i).getPosition(partialTicks);
+                    Vec3 pos = cable.getPoints().get(i).getRenderPosition(partialTicks);
                     if (Minecraft.getInstance().player.equals(player)) {
                         DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
                         width += stretch / 32;
