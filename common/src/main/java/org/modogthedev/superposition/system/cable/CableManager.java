@@ -24,6 +24,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
+import java.util.List;
 import java.util.*;
 import java.util.List;
 
@@ -59,6 +60,9 @@ public class CableManager {
     public static void tick(ServerLevel level) {
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
+            for (Cable cable : cables.values()) {
+                cable.preSimulate();
+            }
             dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
@@ -78,6 +82,9 @@ public class CableManager {
 //        CableRenderer.stretch = 0;
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
+            for (Cable cable : cables.values()) {
+                cable.preSimulate();
+            }
             dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
@@ -92,34 +99,47 @@ public class CableManager {
                 if (level.getEntity(id) instanceof Player player) {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-                    playerPoint.setTempPosition(playerPoint.getPosition());
+                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+                    BlockHitResult result = level.clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+                    if (result.getType() == HitResult.Type.BLOCK) {
+                        holdGoalPos = result.getLocation();
+                    }
+                    playerPoint.setPrevPosition(holdGoalPos);
+                    playerPoint.setPosition(holdGoalPos);
                 }
             }
         }
     }
-
+    
     public static void applyPlayerStretch(Level level) {
         for (Cable cable : getLevelCables(level)) {
             for (int id : cable.getPlayerHoldingPointMap().keySet()) {
                 if (level.getEntity(id) instanceof Player player) {
+////                    playerPoint.setPrevPosition(playerPoint.getPosition());
+//                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+//                    BlockHitResult result = level.clip(new ClipContext(player.getEyePosition(), holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+//                    if (result.getType() == HitResult.Type.BLOCK) {
+//                        holdGoalPos = result.getLocation();
+//                    }
+//
+//                    playerPoint.setPrevPosition(playerPoint.getTempPosition());
+//                    playerPoint.setPosition(holdGoalPos);
+//                    playerPoint.removeAnchor();
+//
+//                    double stretch = playerPoint.calculateOverstretch();
+//                    if (level.isClientSide && player == Minecraft.getInstance().player) {
+//                        CableRenderer.stretch = (float) Math.clamp(stretch / 2.5f, 0, 1);
+//                    }
+//                    if (stretch > 2.5f) {
+//                        playerFinishDraggingCable(player, null, null);
+//                    }
+                    //                    playerPoint.setPrevPosition(playerPoint.getPosition());
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-//                    playerPoint.setPrevPosition(playerPoint.getPosition());
-                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-                    BlockHitResult result = level.clip(new ClipContext(player.getEyePosition(), holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-                    if (result.getType() == HitResult.Type.BLOCK) {
-                        holdGoalPos = result.getLocation();
-                    }
-
-                    playerPoint.setPrevPosition(playerPoint.getTempPosition());
-                    playerPoint.setPosition(holdGoalPos);
-                    playerPoint.removeAnchor();
 
                     double stretch = playerPoint.calculateOverstretch();
-                    if (level.isClientSide && player == Minecraft.getInstance().player) {
-                        CableRenderer.stretch = (float) Math.clamp(stretch / 2.5f, 0, 1);
-                    }
-                    if (stretch > 2.5f) {
+                    CableRenderer.stretch = (float) Math.clamp(stretch * 10f, 0, 1);
+                    if (stretch > 0.1f) {
                         playerFinishDraggingCable(player, null, null);
                     }
                 }
@@ -193,6 +213,9 @@ public class CableManager {
         for (Cable cable : getLevelCables(player.level())) {
             int id = player.getId();
             if (cable.hasPlayerHolding(id)) {
+                for (RopeNode node : cable.getPoints()) {
+                    node.setPrevPosition(node.getPosition());
+                }
                 Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                 RopeNode anchorPoint = pointIndexPair.getA();
                 if (face != null) {

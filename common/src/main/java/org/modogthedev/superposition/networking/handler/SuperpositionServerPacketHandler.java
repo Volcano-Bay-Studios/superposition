@@ -64,7 +64,7 @@ public class SuperpositionServerPacketHandler {
                 CableSyncS2CPacket response = new CableSyncS2CPacket(cable);
 
                 List<RopeNode> points = cable.getPoints();
-                Vec3 pos = points.getFirst().getPosition();
+                Vec3 pos = points.getFirst().getRenderPosition();
                 VeilPacketManager.around(player, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(response);
                 break;
             }
@@ -87,7 +87,7 @@ public class SuperpositionServerPacketHandler {
         cable.addPlayerHoldingPoint(player.getId(), cable.getPointIndex(rayCast.getB()));
 
         List<RopeNode> points = cable.getPoints();
-        Vec3 pos = points.getFirst().getPosition();
+        Vec3 pos = points.getFirst().getRenderPosition();
         VeilPacketManager.around(player, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(new CableSyncS2CPacket(cable));
     }
 }

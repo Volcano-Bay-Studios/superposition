@@ -13,18 +13,24 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
+import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
+import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.UUID;
 
 public class Cable {
 
@@ -59,7 +65,6 @@ public class Cable {
     }
 
     public void updatePhysics() {
-        ropeSimulation.updatePrevRenderPos();
         if (!playerHoldingPointMap.isEmpty()) {
             ropeSimulation.invalidateSleepTime();
         }
@@ -130,6 +135,7 @@ public class Cable {
                     }
 
                 } else {
+
                     List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
                     if (signalList != null) {
                         if (end instanceof SignalActorBlockEntity endSignalActor) {
@@ -208,7 +214,7 @@ public class Cable {
     }
 
     private void updateLight(PointLight light, RopeNode point) {
-        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+        light.setPosition(point.getPosition().x, point.getRenderPosition().y, point.getRenderPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
@@ -354,4 +360,9 @@ public class Cable {
         return ropeSimulation.isSleeping();
     }
 
+    public void preSimulate() {
+        for (RopeNode node : getPoints()) {
+            node.preSimulate();
+        }
+    }
 }
