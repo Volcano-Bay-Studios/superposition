@@ -20,7 +20,7 @@ public class CarabinerManager {
             Player player = level.getPlayerByUUID(entry.getKey());
             if (player != null) {
                 RopeNode point = entry.getValue();
-                player.setDeltaMovement(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(1)).subtract(0f, 0.2f, 0f).subtract(point.getRenderPosition()).scale(-0.5f));
+                player.setDeltaMovement(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(1)).subtract(0f, 0.2f, 0f).subtract(point.getPosition()).scale(-0.5f));
                 if (player.isShiftKeyDown()) {
                     removePlayer(player.getUUID());
                 }
@@ -34,23 +34,23 @@ public class CarabinerManager {
             if (player != null) {
                 RopeNode point = entry.getValue();
                 RopeNode nextPoint = entry.getValue().getNext();
-                Vec3 pos = point.getRenderPosition();
+                Vec3 pos = point.getPosition();
                 Vec3 cableVector;
                 if (nextPoint != null) {
-                    cableVector = nextPoint.getRenderPosition().subtract(point.getRenderPosition()).normalize();
+                    cableVector = nextPoint.getPosition().subtract(point.getPosition()).normalize();
                 } else {
-                    cableVector = point.getLast().getRenderPosition().subtract(point.getRenderPosition()).normalize();
+                    cableVector = point.getLast().getPosition().subtract(point.getPosition()).normalize();
                 }
                 if (slide > 0) {
                     if (nextPoint != null) {
-                        pos = pos.lerp(nextPoint.getRenderPosition(), slide);
+                        pos = pos.lerp(nextPoint.getPosition(), slide);
                     } else {
                         slide = 0;
                     }
                 }
                 if (slide < 0 && point.getLast() != null) {
                     if (point.getLast() != null) {
-                        pos = pos.lerp(point.getLast().getRenderPosition(), -slide);
+                        pos = pos.lerp(point.getLast().getPosition(), -slide);
                     } else {
                         slide = 0;
                     }

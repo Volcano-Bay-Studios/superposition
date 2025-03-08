@@ -20,6 +20,8 @@ public class RopeNode {
     Vec3 position;
     Vec3 tempPosition;
 
+    Vec3 lastHoldGoalPos;
+
     @Nullable
     AnchorConstraint anchor = null;
 
@@ -62,7 +64,7 @@ public class RopeNode {
             position = prevPosition.add(position.subtract(prevPosition).normalize().scale(10f));
         }
 
-        if (fixed || !level.isLoaded(BlockPos.containing(getRenderPosition()))) return;
+        if (fixed || !level.isLoaded(BlockPos.containing(getPosition()))) return;
         Vec3 velocity = position.subtract(prevPosition);
         double initialYVelocity = velocity.y;
 
@@ -96,10 +98,6 @@ public class RopeNode {
     public Vec3 getRenderPosition(float partialTicks) {
         if (simulation.isSleeping()) return position;
         return prevRenderPosition.lerp(position, partialTicks);
-    }
-
-    public Vec3 getRenderPosition() {
-        return position;
     }
 
     public Vec3 getTempPosition() {
@@ -184,6 +182,14 @@ public class RopeNode {
 
     public Vec3 getPosition() {
         return position;
+    }
+
+    public void setLastDragGoalPos(Vec3 holdGoalPos) {
+        this.lastHoldGoalPos = holdGoalPos;
+    }
+
+    public Vec3 getLastHoldGoalPos() {
+        return lastHoldGoalPos;
     }
 
 }

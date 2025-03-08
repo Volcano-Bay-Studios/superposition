@@ -2,7 +2,6 @@ package org.modogthedev.superposition.system.cable.rope_system;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +78,7 @@ public class RopeSimulation {
         for (RopeNode node : nodes) {
             Vec3 velocity = Vec3.ZERO;
             if (!node.isFixed()) {
-                velocity = node.getRenderPosition().subtract(node.prevPosition);
+                velocity = node.getPosition().subtract(node.prevPosition);
 
                 velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
                 velocity = velocity.scale(0.9f * (velocity.length() < 1e-2 ? 0.1 : 1.0));
@@ -135,7 +134,7 @@ public class RopeSimulation {
         
         boolean shouldSleep = true;
         for (RopeNode node : nodes) {
-            Vec3 movedLastTick = node.getPrevPosition().subtract(node.getRenderPosition());
+            Vec3 movedLastTick = node.getPrevPosition().subtract(node.getPosition());
             if (movedLastTick.lengthSqr() > 1e-9) {
                 shouldSleep = false;
                 break;
@@ -167,13 +166,16 @@ public class RopeSimulation {
 
         int walkedNodes = 0;
         double walkedNodesLength = 0;
+        double maxWalkedNodeOverstretch = 0;
 
         for (int i = originIndex; i < nodes.size()-1; i++) {
             RopeNode current = nodes.get(i);
             RopeNode next = nodes.get(i+1);
 
             walkedNodes++;
-            walkedNodesLength += current.position.distanceTo(next.position);
+            double dist = current.position.distanceTo(next.position);
+            walkedNodesLength += dist;
+            maxWalkedNodeOverstretch = Math.max(dist, maxWalkedNodeOverstretch);
 
             if (next.anchor != null) break;
         }
@@ -182,12 +184,14 @@ public class RopeSimulation {
             RopeNode next = nodes.get(i-1);
 
             walkedNodes++;
-            walkedNodesLength += current.position.distanceTo(next.position);
+            double dist = current.position.distanceTo(next.position);
+            walkedNodesLength += dist;
+            maxWalkedNodeOverstretch = Math.max(dist, maxWalkedNodeOverstretch);
 
             if (next.anchor != null) break;
         }
 
-        return walkedNodes == 0 ? 0 : (float) ((walkedNodesLength / walkedNodes) - connectionWidth);
+        return walkedNodes == 0 ? 0 : (float) Math.max(maxWalkedNodeOverstretch / 10f, (walkedNodesLength / walkedNodes) - connectionWidth);
     }
     
     public List<RopeConstraint> getConstraints() {

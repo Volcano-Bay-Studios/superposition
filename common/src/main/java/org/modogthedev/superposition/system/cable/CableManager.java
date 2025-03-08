@@ -51,7 +51,7 @@ public class CableManager {
 
     private static void syncCable(ServerLevel level, Cable cable) {
         CableSyncS2CPacket packet = new CableSyncS2CPacket(cable);
-        Vec3 pos = cable.getPoints().getFirst().getRenderPosition();
+        Vec3 pos = cable.getPoints().getFirst().getPosition();
         VeilPacketManager.around(null, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(packet);
     }
 
@@ -104,6 +104,7 @@ public class CableManager {
                     }
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
+                    playerPoint.setLastDragGoalPos(holdGoalPos);
                 }
             }
         }
@@ -116,7 +117,7 @@ public class CableManager {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
                     
-                    double stretch = playerPoint.calculateOverstretch();
+                    double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
                     CableRenderer.stretch = (float) Math.clamp(stretch * 10f, 0, 1);
                     if (stretch > 0.1f) {
                         playerFinishDraggingCable(player, null, null);

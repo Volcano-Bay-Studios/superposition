@@ -13,15 +13,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
-import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
-import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
 
@@ -64,7 +60,6 @@ public class Cable {
     }
 
     public void updatePhysics() {
-        ropeSimulation.updatePrevRenderPos();
         if (!playerHoldingPointMap.isEmpty()) {
             ropeSimulation.invalidateSleepTime();
         }
@@ -196,7 +191,7 @@ public class Cable {
     }
 
     private void updateLight(PointLight light, RopeNode point) {
-        light.setPosition(point.getRenderPosition().x, point.getRenderPosition().y, point.getRenderPosition().z);
+        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
@@ -224,7 +219,7 @@ public class Cable {
         buf.writeBoolean(emitsLight);
         buf.writeVarInt(ropeSimulation.getNodesCount());
         for (RopeNode point : ropeSimulation.getNodes()) {
-            buf.writeVec3(point.getRenderPosition());
+            buf.writeVec3(point.getPosition());
             buf.writeVec3(point.getPrevPosition());
             AnchorConstraint constraint = point.getAnchor();
             buf.writeBoolean(constraint != null);
@@ -271,7 +266,7 @@ public class Cable {
         ropeSimulation.resizeRope(cable.getPointsCount());
         List<RopeNode> targetPoints = cable.getPoints();
         for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
-            ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getRenderPosition());
+            ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
             ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
             if (newAnchor != null) {
