@@ -3,21 +3,17 @@ package org.modogthedev.superposition.system.cable.rope_system;
 import net.minecraft.world.phys.Vec3;
 
 public interface BendConstraint {
-    
-    static Vec3 resolve(Vec3 from, Vec3 middle, Vec3 to, float width) {
-        return resolve(from, middle, to, width, 1.5f);
-    }
 
-    static Vec3 resolve(Vec3 from, Vec3 middle, Vec3 to, float width, float widthFactor) {
+    static Vec3 resolve(Vec3 from, Vec3 middle, Vec3 to, float width) {
         Vec3 targetDirection = from.subtract(middle).scale(-1).normalize();
 
         Vec3 targetTo = middle.add(targetDirection.scale(width));
 
-        if (to.distanceToSqr(targetTo) < 0.5) {
-            return to;
-        }
+//        if (to.distanceToSqr(targetTo) < 0.5) {
+//            return to;
+//        }
 
-        return to.lerp(targetTo, 0.1);
+        return to.lerp(targetTo, Math.clamp(to.distanceToSqr(targetTo), 0, 1) / 10f);
     }
     
     static Vec3 resolveAnchorBend(Vec3 from, Vec3 middle, Vec3 to, float width) {

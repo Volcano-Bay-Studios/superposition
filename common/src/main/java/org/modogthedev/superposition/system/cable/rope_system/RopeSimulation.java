@@ -88,39 +88,29 @@ public class RopeSimulation {
             node.position = node.position.add(velocity);
         }
 
-        for (RopeConstraint constraint : collectAllConstraints()) {
-            constraint.applyConstraint();
+        List<RopeConstraint> constraints = collectAllConstraints();
+        for (int i = 0; i < constraints.size(); i++) {
+            constraints.get(i).applyConstraint();
+        }
+        for (int i = constraints.size()-1; i >= 0; i--) {
+            constraints.get(i).applyConstraint();
         }
 
         for (RopeNode node : nodes) {
             node.resolveWorldCollisions(level);
         }
         
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < nodes.size() -1; j++) {
-                RopeNode node = nodes.get(j);
-                RopeNode nextNode = nodes.get(j + 1);
-
-                double dist = node.position.distanceTo(nextNode.position);
-                if (dist > 20) {
-                    Vec3 midpoint = node.position.lerp(nextNode.position, 0.5);
-                    node.position = midpoint;
-                    nextNode.position = midpoint;
-                } else {
-                    double change = (dist - connectionWidth) / 4;
-
-                    node.position = node.position.add(nextNode.position.subtract(node.position).normalize().scale(change));
-                    nextNode.position = nextNode.position.add(node.position.subtract(nextNode.position).normalize().scale(change));
-                }
-            }
-
+        for (int i = 0; i < 5; i++) {
+            processLength(true);
             for (RopeNode node : nodes) {
                 node.resolveWorldCollisions(level);
             }
 
+            processLength(false);
             for (RopeNode node : nodes) {
-                node.applyNextPositions();
+                node.resolveWorldCollisions(level);
             }
+
         }
 
         for (RopeNode node : nodes) {
@@ -146,6 +136,25 @@ public class RopeSimulation {
             sleepTime++;
         } else {
             sleepTime = 0;
+        }
+    }
+
+    private void processLength(boolean forwards) {
+        for (int j = forwards ? 0 : nodes.size() -1; forwards ? (j < nodes.size() -1) : (j > 1); j += forwards ? 1 : -1) {
+            RopeNode node = nodes.get(j);
+            RopeNode nextNode = nodes.get(j + (forwards ? 1 : -1));
+
+            double dist = node.position.distanceTo(nextNode.position);
+            if (dist > 20) {
+                Vec3 midpoint = node.position.lerp(nextNode.position, 0.5);
+                node.position = midpoint;
+                nextNode.position = midpoint;
+            } else {
+                double change = (dist - connectionWidth) / 4;
+
+                node.position = node.position.add(nextNode.position.subtract(node.position).normalize().scale(change));
+                nextNode.position = nextNode.position.add(node.position.subtract(nextNode.position).normalize().scale(change));
+            }
         }
     }
 

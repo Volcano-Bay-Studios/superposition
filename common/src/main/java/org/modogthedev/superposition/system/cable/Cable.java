@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
+import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
@@ -209,7 +210,7 @@ public class Cable {
     }
 
     private void updateLight(PointLight light, RopeNode point) {
-        light.setPosition(point.getPosition().x, point.getRenderPosition().y, point.getRenderPosition().z);
+        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
