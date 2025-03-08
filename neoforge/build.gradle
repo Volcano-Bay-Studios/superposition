@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
-    implementation("foundry.veil:veil-neoforge-${project.minecraft_version}:${project.veil_version}") {
+    jarJar(implementation("foundry.veil:veil-neoforge-${project.minecraft_version}:${project.veil_version}") {
         exclude group: "maven.modrinth"
-    }
+    })
 
     compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-core-api:${project.cc_version}")
     compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge-api:${project.cc_version}")

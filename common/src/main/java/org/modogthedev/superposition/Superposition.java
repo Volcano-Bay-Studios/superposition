@@ -58,6 +58,10 @@ public class Superposition {
         ClientMusicManager.tick(level);
     }
 
+    public static void playerLeaveEvent() {
+        CableManager.wipeClientData();
+    }
+
     public static void initTheme() {
         Color background = new Color().setInt(50, 168, 82, 150);
         Color borderTop = new Color().setInt(60, 186, 94, 255);
@@ -73,4 +77,6 @@ public class Superposition {
     public static ResourceLocation id(String loc) {
         return ResourceLocation.fromNamespaceAndPath(MODID, loc);
     }
+
+
 }

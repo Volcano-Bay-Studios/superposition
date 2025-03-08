@@ -3,7 +3,10 @@ package org.modogthedev.superposition.fabric.client;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import org.modogthedev.superposition.Superposition;
@@ -22,7 +25,13 @@ public class SuperpositionFabricClient implements ClientModInitializer {
 
         HudRenderCallback.EVENT.register(SuperpositionUITooltipRenderer::renderOverlay);
 
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(SuperpositionFabricClient::playerLeaveEvent);
+
         this.registerBlockRenderLayers();
+    }
+
+    public static void playerLeaveEvent(Minecraft minecraft, ClientLevel clientLevel) {
+        Superposition.playerLeaveEvent();
     }
 
     private void registerBlockRenderLayers() {

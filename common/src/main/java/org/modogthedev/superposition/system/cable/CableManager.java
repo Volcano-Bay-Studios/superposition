@@ -279,4 +279,9 @@ public class CableManager {
     public static void removeCable(UUID cableId) {
 
     }
+
+    public static void wipeClientData() {
+        clientCables.clear(); // TODO: no worky
+        cables.clear();
+    }
 }
