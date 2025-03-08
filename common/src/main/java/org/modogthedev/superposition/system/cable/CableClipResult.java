@@ -26,10 +26,10 @@ public class CableClipResult {
 
     private void collectPoints() {
         for (Cable cable : CableManager.getLevelCables(level)) {
-            if (cable.getPoints().getFirst().getPosition().distanceTo(sourcePos) < cable.getPoints().size() + collectRange) {
+            if (cable.getPoints().getFirst().getRenderPosition().distanceTo(sourcePos) < cable.getPoints().size() + collectRange) {
                 cablePointMap.put(cable, new ArrayList<>());
                 for (RopeNode point : cable.getPoints()) {
-                    if (point.getPosition().distanceTo(sourcePos) < collectRange) {
+                    if (point.getRenderPosition().distanceTo(sourcePos) < collectRange) {
                         cablePointMap.get(cable).add(point);
                     }
                 }
@@ -49,7 +49,7 @@ public class CableClipResult {
             int i = 0;
             for (Pair<Cable, RopeNode> cablePointPair : rayCast) {
                 boolean isAnEndPoint = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
-                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
+                float distance = (float) cablePointPair.getB().getRenderPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
                 float storedDistance = distancePointPairMap.get(i).getA();
                 if (distance < storedDistance) {
                     distancePointPairMap.set(i, new Pair<>(distance, cablePointPair.getB()));
@@ -89,7 +89,7 @@ public class CableClipResult {
             int i = 0;
             for (Pair<Cable, RopeNode> cablePointPair : rayCast) {
                 boolean isAnEndPoint = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB()) || cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
-                float distance = (float) cablePointPair.getB().getPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
+                float distance = (float) cablePointPair.getB().getRenderPosition().distanceTo(stepPos) - (isAnEndPoint ? SuperpositionConstants.endPreference : 0f);
                 float storedDistance = distancePointPairMap.get(i).getA();
                 if (distance < storedDistance) {
                     distancePointPairMap.set(i, new Pair<>(distance, cablePointPair.getB()));
@@ -118,7 +118,7 @@ public class CableClipResult {
             Vec3 stepPos = SuperpositionMth.lerpVec3(sourcePos, toPos, SuperpositionMth.getFromRange((float) sourcePos.distanceTo(toPos), 0, 1, 0, delta));
             for (Cable cable : cablePointMap.keySet()) {
                 for (RopeNode point : cablePointMap.get(cable)) {
-                    if (point.getPosition().distanceTo(stepPos) < range) {
+                    if (point.getRenderPosition().distanceTo(stepPos) < range) {
                         pointPairList.add(new Pair<>(cable, point));
                     }
                 }

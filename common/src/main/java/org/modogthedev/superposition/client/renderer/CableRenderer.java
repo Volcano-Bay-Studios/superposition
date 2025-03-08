@@ -70,18 +70,18 @@ public class CableRenderer {
             CABLE_POINTS.clear();
             PREV_CABLE_POINTS.clear();
             for (RopeNode point : cable.getPoints()) {
-                Vec3 pos = point.getPosition();
+                Vec3 pos = point.getRenderPosition();
                 CABLE_POINTS.add(pos);
-                PREV_CABLE_POINTS.add(point.getPrevPosition());
+                PREV_CABLE_POINTS.add(point.getPrevRenderPosition());
             }
             List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
             List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
 
-            splinePoints.addFirst(cable.getPoints().getFirst().getPosition());
-            prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevPosition());
+            splinePoints.addFirst(cable.getPoints().getFirst().getRenderPosition());
+            prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
 
-            splinePoints.add(cable.getPoints().getLast().getPosition());
-            prevSplinePoints.add(cable.getPoints().getLast().getPrevPosition());
+            splinePoints.add(cable.getPoints().getLast().getRenderPosition());
+            prevSplinePoints.add(cable.getPoints().getLast().getPrevRenderPosition());
 
             int color = 0xFF000000 | cable.getColor().getRGB();
             float cableRadius = SuperpositionConstants.cableWidth / 2.0f;
@@ -363,9 +363,7 @@ public class CableRenderer {
                 if (level.getEntity(entry.getIntKey()) instanceof Player player) {
                     int i = Math.min(cable.getPoints().size() - 1, entry.getIntValue());
 
-                    Vec3 pointPos = cable.getPoints().get(i).getPosition();
-                    Vec3 prevPos = cable.getPoints().get(i).getPrevPosition();
-                    Vec3 pos = SuperpositionMth.lerpVec3(prevPos, pointPos, partialTicks);
+                    Vec3 pos = cable.getPoints().get(i).getRenderPosition(partialTicks);
                     if (Minecraft.getInstance().player.equals(player)) {
                         DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, 0.5f + stretch / 2, 0.9f - stretch / 2, 0.5f - stretch / 5, 0f + stretch / 2);
                         width += stretch / 32;
@@ -389,7 +387,7 @@ public class CableRenderer {
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
         oshi.util.tuples.Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getEyePosition().add(Minecraft.getInstance().player.getForward().subtract(Minecraft.getInstance().player.getEyePosition())).scale(5)), .7f);
         if (cablePointPair != null) {
-            Vec3 pos = cablePointPair.getB().getPosition(partialTicks);
+            Vec3 pos = cablePointPair.getB().getRenderPosition(partialTicks);
             if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getId())) {
                 boolean isLast = cablePointPair.getA().getPoints().get(cablePointPair.getA().getPoints().size() - 1).equals(cablePointPair.getB());
                 boolean isFirst = cablePointPair.getA().getPoints().get(0).equals(cablePointPair.getB());
@@ -408,7 +406,7 @@ public class CableRenderer {
 
                 for (RopeNode node : cablePointPair.getA().getPoints()) {
                     if (node == cablePointPair.getB() || node.getAnchor() == null) continue;
-                    Vec3 anchorPos = node.getPosition(partialTicks);
+                    Vec3 anchorPos = node.getRenderPosition(partialTicks);
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, anchorPos.x - cameraPos.x - width, anchorPos.y - cameraPos.y - width, anchorPos.z - cameraPos.z - width, anchorPos.x - cameraPos.x + width, anchorPos.y - cameraPos.y + width, anchorPos.z - cameraPos.z + width, 0.4f, 0.4f, 0.9f, 0.2f);
                 }
             }

@@ -204,19 +204,19 @@ public class Cable {
     }
 
     private void freeStuckPoints() {
-        for (int i = 0; i < ropeSimulation.getNodesCount() - 1; i++) {
-            RopeNode point = ropeSimulation.getNode(i);
-            RopeNode lastPoint = ropeSimulation.getNode(i + 1);
-            float distance = (float) point.getPosition().distanceTo(lastPoint.getPosition());
-            if (distance > SuperpositionConstants.cableRadius * 3) {
-                point.addNextPosition(lastPoint.getPosition());
-                lastPoint.addNextPosition(point.getPosition());
-            }
-        }
+//        for (int i = 0; i < ropeSimulation.getNodesCount() - 1; i++) {
+//            RopeNode point = ropeSimulation.getNode(i);
+//            RopeNode lastPoint = ropeSimulation.getNode(i + 1);
+//            float distance = (float) point.getPosition().distanceTo(lastPoint.getPosition());
+//            if (distance > SuperpositionConstants.cableRadius * 3) {
+//                point.addNextPosition(lastPoint.getPosition());
+//                lastPoint.addNextPosition(point.getPosition());
+//            }
+//        }
     }
 
     private void updateLight(PointLight light, RopeNode point) {
-        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
+        light.setPosition(point.getRenderPosition().x, point.getRenderPosition().y, point.getRenderPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
@@ -244,7 +244,7 @@ public class Cable {
         buf.writeBoolean(emitsLight);
         buf.writeVarInt(ropeSimulation.getNodesCount());
         for (RopeNode point : ropeSimulation.getNodes()) {
-            buf.writeVec3(point.getPosition());
+            buf.writeVec3(point.getRenderPosition());
             buf.writeVec3(point.getPrevPosition());
             AnchorConstraint constraint = point.getAnchor();
             buf.writeBoolean(constraint != null);
@@ -291,7 +291,7 @@ public class Cable {
         ropeSimulation.resizeRope(cable.getPointsCount());
         List<RopeNode> targetPoints = cable.getPoints();
         for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
-            ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
+            ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getRenderPosition());
             ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
             if (newAnchor != null) {
@@ -356,4 +356,9 @@ public class Cable {
         return ropeSimulation.isSleeping();
     }
 
+    public void preSimulate() {
+        for (RopeNode node : getPoints()) {
+            node.preSimulate();
+        }
+    }
 }
