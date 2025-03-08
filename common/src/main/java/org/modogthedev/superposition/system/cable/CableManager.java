@@ -102,6 +102,7 @@ public class CableManager {
                     if (result.getType() == HitResult.Type.BLOCK) {
                         holdGoalPos = result.getLocation();
                     }
+                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale(holdGoalPos.distanceTo(playerPoint.getPosition()))).add(0, 0.5f,0);
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
                     playerPoint.setLastDragGoalPos(holdGoalPos);
@@ -137,8 +138,8 @@ public class CableManager {
                     RopeNode playerPoint = pointIndexPair.getA();
                     
                     double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
-                    CableRenderer.stretch = (float) Math.clamp(stretch * 10f, 0, 1);
-                    if (stretch > 0.1f) {
+                    CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
+                    if (stretch > 0.2f) {
                         playerFinishDraggingCable(player, null, null);
                     }
                 }
