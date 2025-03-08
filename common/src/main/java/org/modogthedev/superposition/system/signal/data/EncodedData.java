@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
-public sealed interface EncodedData<T> {
+public sealed interface EncodedData<T> extends Cloneable {
 
     final class BoolData implements EncodedData<Boolean> {
 
@@ -506,6 +506,8 @@ public sealed interface EncodedData<T> {
     String stringValue();
 
     Type type();
+
+
 
     enum Type {
         BOOL(ByteBufCodecs.BOOL.map(BoolData::new, data -> ((BoolData) data).value)),

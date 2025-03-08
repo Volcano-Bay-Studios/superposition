@@ -1,7 +1,7 @@
 package org.modogthedev.superposition.compat;
 
 public class CompatabilityHandler {
-    public enum Mods {
+    public enum Mod {
         COMPUTERCRAFT;
 
         public boolean isLoaded = false;

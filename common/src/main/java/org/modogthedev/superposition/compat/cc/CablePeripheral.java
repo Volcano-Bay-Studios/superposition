@@ -3,6 +3,7 @@ package org.modogthedev.superposition.compat.cc;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.system.cable.CablePassthroughManager;
@@ -60,6 +61,24 @@ public class CablePeripheral implements IPeripheral {
             return signal.getEncodedData().booleanValue();
         }
         return false;
+    }
+
+    @LuaFunction
+    public final byte[] getByteArray() {
+        Signal signal = getSignal();
+        if (signal != null && signal.getEncodedData() != null) {
+            return signal.getEncodedData().byteArrayValue();
+        }
+        return new byte[0];
+    }
+
+    @LuaFunction
+    public final CompoundTag getCompoundTag() {
+        Signal signal = getSignal();
+        if (signal != null && signal.getEncodedData() != null) {
+            return signal.getEncodedData().compoundTagData();
+        }
+        return new CompoundTag();
     }
 
     public Signal getSignal() {

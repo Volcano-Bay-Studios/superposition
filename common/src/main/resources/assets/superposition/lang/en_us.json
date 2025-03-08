@@ -51,6 +51,7 @@
   "item.superposition.encapsulate_card" : "Encapsulate Card",
   "item.superposition.merge_card" : "Merge Card",
   "item.superposition.retrieve_card" : "Retrieve Card",
+  "item.superposition.slave_card" : "Slave Card",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.compat.CompatabilityHandler;
 import org.modogthedev.superposition.item.*;
 
 import java.awt.*;
@@ -58,6 +59,14 @@ public class SuperpositionItems {
     public static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item) {
         RegistryObject<T> object = ITEMS.register(name, item);
         ITEM_ORDER.add(object);
+        return object;
+    }
+
+    public static <T extends Item> RegistryObject<T> registerItem(String name, Supplier<T> item, CompatabilityHandler.Mod mod) {
+        RegistryObject<T> object = ITEMS.register(name, item);
+        if (mod.isLoaded) {
+            ITEM_ORDER.add(object);
+        }
         return object;
     }
 

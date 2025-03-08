@@ -1,6 +1,6 @@
 package org.modogthedev.superposition.compat.cc;
 
-public class ComputeCraftCompat {
+public class ComputerCraftCompat {
     public static void register() {
         registerWithDependency();
     }

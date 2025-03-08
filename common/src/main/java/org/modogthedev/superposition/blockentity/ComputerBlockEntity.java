@@ -73,7 +73,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         }
     }
 
-    public void acceptPeriphrealSignal(Signal signal) {
+    public void acceptPeripheralSignal(Signal signal) {
         if (signal != null) {
             if (periphrealSignal == null)
                 periphrealSignal = new Signal(signal);
@@ -99,7 +99,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
             Signal fromSignal = periphrealBlockEntity.getSignal();
             if (fromSignal != null && fromSignal.getEncodedData() != null)
-                acceptPeriphrealSignal(fromSignal);
+                acceptPeripheralSignal(fromSignal);
         }
         if (card != null) {
             for (Signal signal : getSignals()) {
@@ -159,7 +159,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
         if (face == Direction.UP) {
             for (Signal signal : signals) {
-                acceptPeriphrealSignal(signal);
+                acceptPeripheralSignal(signal);
             }
         } else {
             putSignalList(nextCall, signals);
@@ -169,7 +169,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     @Override
     public void putSignalFace(Signal signal, Direction face) {
         if (face == Direction.UP) {
-            acceptPeriphrealSignal(signal);
+            acceptPeripheralSignal(signal);
         }
         super.putSignalFace(signal, face);
     }

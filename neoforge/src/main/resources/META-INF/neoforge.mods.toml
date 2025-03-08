@@ -3,7 +3,7 @@ loaderVersion = "${neoforge_loader_version_range}"
 issueTrackerURL = "https://github.com/Volcano-Bay-Studios/superposition/issues"
 license = "${mod_license}"
 
-[[mods]]
+[[mod]]
 modId = "superposition"
 version = "${version}"
 displayName = "${mod_name}"

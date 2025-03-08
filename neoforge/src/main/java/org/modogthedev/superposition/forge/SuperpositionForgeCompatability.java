@@ -4,9 +4,9 @@ import org.modogthedev.superposition.compat.CompatabilityHandler;
 
 public class SuperpositionForgeCompatability {
     public static void setup() {
-        for (CompatabilityHandler.Mods mods : CompatabilityHandler.Mods.values()) {
+        for (CompatabilityHandler.Mod mod : CompatabilityHandler.Mod.values()) {
             if (true) { // TODO: add neoforge mod checking
-                mods.isLoaded = true;
+                mod.isLoaded = true;
             }
         }
     }

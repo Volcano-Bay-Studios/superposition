@@ -6,16 +6,16 @@ import org.modogthedev.superposition.fabric.compat.cc.SuperpositionFabricCompute
 
 public class FabricCompatibility {
     public static void setup() {
-        for (CompatabilityHandler.Mods mods : CompatabilityHandler.Mods.values()) {
-            if (FabricLoader.getInstance().isModLoaded(mods.name().toLowerCase())) {
-                mods.isLoaded = true;
+        for (CompatabilityHandler.Mod mod : CompatabilityHandler.Mod.values()) {
+            if (FabricLoader.getInstance().isModLoaded(mod.name().toLowerCase())) {
+                mod.isLoaded = true;
             }
         }
         setupMods();
     }
 
     public static void setupMods() {
-        if (CompatabilityHandler.Mods.COMPUTERCRAFT.isLoaded) {
+        if (CompatabilityHandler.Mod.COMPUTERCRAFT.isLoaded) {
             SuperpositionFabricComputerCraftCompatibility.setup();
         }
     }
