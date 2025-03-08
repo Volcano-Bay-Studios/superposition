@@ -27,8 +27,6 @@ public class RopeNode {
 
     List<Vec3> nextPositions = new ArrayList<>();
 
-    boolean fixed = false;
-
     public RopeNode(Vec3 position) {
         this.position = position;
         this.prevPosition = position;
@@ -36,11 +34,7 @@ public class RopeNode {
     }
 
     public boolean isFixed() {
-        return fixed || anchor != null;
-    }
-
-    public void setFixed(boolean fixed) {
-        this.fixed = fixed;
+        return anchor != null;
     }
 
     public RopeNode getNext() {
@@ -64,7 +58,7 @@ public class RopeNode {
             position = prevPosition.add(position.subtract(prevPosition).normalize().scale(10f));
         }
 
-        if (fixed || !level.isLoaded(BlockPos.containing(getPosition()))) return;
+        if (isFixed() || !level.isLoaded(BlockPos.containing(getPosition()))) return;
         Vec3 velocity = position.subtract(prevPosition);
         double initialYVelocity = velocity.y;
 

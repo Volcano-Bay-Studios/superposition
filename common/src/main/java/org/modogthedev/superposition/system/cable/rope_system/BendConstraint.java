@@ -9,10 +9,6 @@ public interface BendConstraint {
 
         Vec3 targetTo = middle.add(targetDirection.scale(width));
 
-//        if (to.distanceToSqr(targetTo) < 0.5) {
-//            return to;
-//        }
-
         return to.lerp(targetTo, Math.clamp(to.distanceToSqr(targetTo), 0, 1) / 10f);
     }
     

@@ -82,6 +82,7 @@ public class RopeSimulation {
                 velocity = node.getPosition().subtract(node.prevPosition);
 
                 velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
+
                 velocity = velocity.scale(0.9f * (velocity.length() < 1e-2 ? 0.1 : 1.0));
             }
             node.prevPosition = node.position;
@@ -100,7 +101,7 @@ public class RopeSimulation {
             node.resolveWorldCollisions(level);
         }
         
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             processLength(true);
             for (RopeNode node : nodes) {
                 node.resolveWorldCollisions(level);
@@ -147,13 +148,17 @@ public class RopeSimulation {
             double dist = node.position.distanceTo(nextNode.position);
             if (dist > 20) {
                 Vec3 midpoint = node.position.lerp(nextNode.position, 0.5);
-                node.position = midpoint;
-                nextNode.position = midpoint;
+                if (!node.isFixed())
+                    node.position = midpoint;
+                if (!nextNode.isFixed())
+                    nextNode.position = midpoint;
             } else {
                 double change = (dist - connectionWidth) / 4;
 
-                node.position = node.position.add(nextNode.position.subtract(node.position).normalize().scale(change));
-                nextNode.position = nextNode.position.add(node.position.subtract(nextNode.position).normalize().scale(change));
+                if (!node.isFixed())
+                    node.position = node.position.add(nextNode.position.subtract(node.position).normalize().scale(change));
+                if (!nextNode.isFixed())
+                    nextNode.position = nextNode.position.add(node.position.subtract(nextNode.position).normalize().scale(change));
             }
         }
     }
