@@ -69,4 +69,9 @@ public class HighPassFilter extends Filter {
     public Filter create() {
         return new HighPassFilter(getSelfReference());
     }
+
+    @Override
+    public String getTooltip() {
+        return SuperpositionMth.frequencyToHzReadable(frequency);
+    }
 }

@@ -45,6 +45,11 @@ public class LowPassFilter extends Filter {
     }
 
     @Override
+    public String getTooltip() {
+        return SuperpositionMth.frequencyToHzReadable(frequency);
+    }
+
+    @Override
     public void updateFromDials(List<WidgetScreen.Dial> dialList) {
         frequency = dialList.get(0).scrolledAmount;
     }

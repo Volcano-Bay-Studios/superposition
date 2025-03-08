@@ -60,6 +60,11 @@ public class BandPassFilter extends Filter {
     }
 
     @Override
+    public String getTooltip() {
+        return SuperpositionMth.frequencyToHzReadable(lowFrequency) + " - " + SuperpositionMth.frequencyToHzReadable(Math.abs(158 - highFrequency));
+    }
+
+    @Override
     public ItemStack getItem() {
         return new ItemStack(SuperpositionItems.BAND_PASS_FILTER.get());
     }

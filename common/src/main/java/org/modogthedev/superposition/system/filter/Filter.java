@@ -35,6 +35,8 @@ public abstract class Filter {
 
     public abstract Filter create();
 
+    public abstract String getTooltip();
+
     public ResourceLocation getSelfReference() {
         return selfReference;
     }
@@ -42,4 +44,5 @@ public abstract class Filter {
     public boolean openCustomScreen() {
         return false;
     }
+
 }

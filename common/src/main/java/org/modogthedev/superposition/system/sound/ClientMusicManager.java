@@ -23,9 +23,11 @@ public class ClientMusicManager {
             currentMusic = SimpleMusicInstance.forMusic(SuperpositionSounds.TRAVELERS.get());
             minecraft.getSoundManager().play(currentMusic);
         }
-
-        currentMusic.setVolume((float) (Math.log10(volume)+1.3f)/3f);
-
+        if (volume <= 0) {
+            currentMusic.setVolume(0);
+        } else {
+            currentMusic.setVolume((float) (Math.log10(volume) + 1.3f) / 3f);
+        }
         volume = 0;
     }
 

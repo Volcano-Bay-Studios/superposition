@@ -3,19 +3,24 @@ package org.modogthedev.superposition.item;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.filter.Filter;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -120,13 +125,15 @@ public class FilterItem extends Item {
     }
 
     @Override
-    public Component getName(ItemStack stack) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         Filter type = this.filter.get();
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         if (stack.getItem() instanceof FilterItem) {
             this.runIfHasData(stack, type::load);
-            return (Component.literal(type.toString()));
+            MutableComponent component = Component.literal(type.getTooltip());
+            component.setStyle(Style.EMPTY.withColor(Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb()));
+            tooltipComponents.add(component);
         }
-        return super.getName(stack);
     }
 
     public static boolean isPassFilter(Filter type) {
