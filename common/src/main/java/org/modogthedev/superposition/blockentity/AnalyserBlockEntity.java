@@ -23,7 +23,7 @@ public class AnalyserBlockEntity extends PeriphrealBlockEntity {
         resetTooltip();
         updateDistance();
         addTooltip("Analyser Status:");
-        addTooltip("Targeted Block - " + level.getBlockState(getAnalysisPosition()).getBlock().getName().getString());
+        addTooltip("Analyzing " + level.getBlockState(getAnalysisPosition()).getBlock().getName().getString()+"...");
         addTooltip("Distance - " + distance + " Blocks");
         super.tick();
     }

@@ -6,12 +6,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
@@ -21,10 +25,11 @@ import java.util.List;
 
 public class AmplifierBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
 
-    public float modRate;
-    public float redstoneMod;
-    public float temp = 26;
+    public float amplification;
+    public float redstoneAmplification;
+    public float temp = 26.1f;
     public float amplitude;
+    public float throttle = 0f;
     public float lastAmplitude;
     boolean updateNext = false;
     public int ticks = 0;
@@ -39,8 +44,8 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
-        this.modRate = tag.getFloat("modRate");
-        this.redstoneMod = tag.getFloat("redstoneMod");
+        this.amplification = tag.getFloat("amplification");
+        this.redstoneAmplification = tag.getFloat("redstoneAmplification");
 
         level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
 //        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
@@ -52,23 +57,23 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putFloat("modRate", modRate);
-        tag.putFloat("redstoneMod", redstoneMod);
+        tag.putFloat("amplification", amplification);
+        tag.putFloat("redstoneAmplification", redstoneAmplification);
         super.saveAdditional(tag, registries);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        this.modRate = tag.getFloat("modRate");
-        this.redstoneMod = tag.getFloat("redstoneMod");
+        this.amplification = tag.getFloat("amplification");
+        this.redstoneAmplification = tag.getFloat("redstoneAmplification");
     }
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         if (signal != null) {
-            signal.modulate(modRate + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneMod / 15)));
-            if (amplitude != signal.getAmplitude()) {
+            signal.modulate(Math.max(0, amplification - throttle + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneAmplification / 15))));
+            if (lastAmplitude != signal.getAmplitude()) {
                 level.updateNeighbourForOutputSignal(this.getBlockPos(), this.getBlockState().getBlock());
             }
             if (updateTooltip) {
@@ -76,6 +81,23 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
             }
         }
         return signal;
+    }
+
+    public float getColdness(BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (state.is(Blocks.AIR)) {
+            return 0.0F;
+        }
+        if (state.is(SuperpositionTags.COOL)) {
+            return 1.5f;
+        }
+        if (state.is(SuperpositionTags.COLD)) {
+            return 3f;
+        }
+        if (state.is(SuperpositionTags.VERY_COLD)) {
+            return 5f;
+        }
+        return 0.0F;
     }
 
     @Override
@@ -91,21 +113,36 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
                     ticks = 0;
                 }
                 this.addTooltip(Component.literal("Amplifier Status: "));
-                this.addTooltip(Component.literal("Amplitude - " + Math.floor(amplitude * 10) / 10));
+                this.addTooltip(Component.literal("Amplitude - " + Math.floor(Mth.map(amplitude, 0, 153, 3, 10) * 10f) / 10f + "dBi"));
+                if (temp >= 26) {
+                    this.addTooltip(Component.literal("Temperature - " + Math.floor(temp * 10) / 10 + "°C"));
+                    this.addTooltip(Component.literal("Throttling - " + Math.floor(Mth.map(throttle, 0, 153, 0, 10) * 10f) / 10f + "dBi"));
+                } else {
+                    this.addTooltip(Component.literal("Temperature - " + Math.floor(temp * 10) / 10 + "°C"));
+                    this.addTooltip(Component.literal("Overclocking - " + Math.floor(Mth.map(-throttle, 0, 153, 0, 10) * 10f) / 10f + "dBi"));
+                }
             } else {
                 ticks = -1;
                 this.addTooltip(Component.literal("No Signal"));
             }
-            if (temp > 26.1) {
-                this.addTooltip(Component.literal("Temperature - " + Math.floor(temp * 10) / 10 + "°C"));
-            }
+
         }
+        float coldness = 0f;
+        for (Direction direction : Direction.values()) {
+            coldness += getColdness(getBlockPos().relative(direction));
+        }
+
         float tempGoal = (amplitude / 10f) + 26;
-        if (temp > (tempGoal + .1f)) {
-            temp -= .01f;
-        } else if (temp < (tempGoal - .1f)) {
-            temp += .05f;
+        tempGoal -= coldness;
+        if (tempGoal > temp) {
+            temp += (tempGoal - temp) / 100f;
+        } else if (tempGoal < temp) {
+            temp += (tempGoal - temp) / 500f;
         }
+        throttle = (temp - 26f) * 10f;
+        amplitude -= throttle;
+
+
         if (lastAmplitude != amplitude) {
             updateNext = true;
         }
@@ -117,7 +154,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         lastAmplitude = amplitude;
         amplitude = 0;
         if (light != null) {
-            light.setBrightness((lastAmplitude/100f+0.2f));
+            light.setBrightness((lastAmplitude / 200f + 0.2f));
         }
         super.tick();
     }
@@ -140,7 +177,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     public void configurePointLight(PointLight light) {
         Vec3 center = this.getBlockPos().getCenter();
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
-        center = center.add(new Vec3(facing.getNormal().getX(),facing.getNormal().getY(),facing.getNormal().getZ()).scale(0.4f));
+        center = center.add(new Vec3(facing.getNormal().getX(), facing.getNormal().getY(), facing.getNormal().getZ()).scale(0.4f));
         light.setPosition(center.x, center.y, center.z);
         light.setColor(3979870);
         light.setBrightness(1.5f);

@@ -106,6 +106,10 @@ public class RopeNode {
         return tempPosition;
     }
 
+    public Vec3 getPrevRenderPosition() {
+        return prevRenderPosition;
+    }
+
     public void setPosition(Vec3 position) {
         this.position = position;
     }
@@ -172,10 +176,6 @@ public class RopeNode {
 
     public float calculateOverstretch() {
         return simulation.calculateOverstretch(this);
-    }
-
-    public Vec3 getPrevRenderPosition() {
-        return prevRenderPosition;
     }
 
     public void preSimulate() {

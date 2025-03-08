@@ -64,6 +64,7 @@ public class Cable {
     }
 
     public void updatePhysics() {
+        ropeSimulation.updatePrevRenderPos();
         if (!playerHoldingPointMap.isEmpty()) {
             ropeSimulation.invalidateSleepTime();
         }
@@ -103,28 +104,7 @@ public class Cable {
                 BlockEntity start = level.getBlockEntity(startPos);
                 BlockEntity end = level.getBlockEntity(endPos);
 
-                if (firstNode.getAnchor().getDirection() == Direction.UP && start instanceof ComputerBlockEntity cbe) {
-
-                    Card card = cbe.getCard();
-                    if (card != null && end instanceof SignalActorBlockEntity signalActorBlockEntity) { // Tells a periphreal what card is being used
-                        float frequency = SuperpositionConstants.periphrealFrequency;
-                        if (!cbe.getSignals().isEmpty())
-                            frequency = cbe.getSignal().getFrequency();
-                        BlockPos blockPos = cbe.getBlockPos();
-                        Vector3d pos = new Vector3d(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-                        Signal periphrealSignal = new Signal(pos, level, frequency, 1, frequency / 100000);
-                        periphrealSignal.encode(SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference()))); // Encode the id of the card for the analyser
-                        signalActorBlockEntity.putSignalFace(periphrealSignal, lastNode.getAnchor().getDirection());
-                    }
-
-                } else if (lastNode.getAnchor().getDirection() == Direction.UP && end instanceof ComputerBlockEntity cbe) { // Applies top port cable signal as peripheral
-
-                    Card card = cbe.getCard();
-                    if (card != null && start instanceof SignalActorBlockEntity signalActorBlockEntity) {
-                        cbe.acceptPeriphrealSignal(signalActorBlockEntity.getSignal());
-                    }
-
-                } else if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
+                if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
 
                     List<Signal> signalList = startSignalActor.getSideSignals(firstNode.getAnchor().getDirection());
                     if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {

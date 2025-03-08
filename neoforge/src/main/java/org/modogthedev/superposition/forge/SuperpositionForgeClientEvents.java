@@ -5,7 +5,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.modogthedev.superposition.Superposition;
 
@@ -19,8 +18,14 @@ public class SuperpositionForgeClientEvents {
     }
 
     @SubscribeEvent
-    public static void onEmptyClick(PlayerInteractEvent.RightClickEmpty event) {
+    public static void onLevelTick(LevelTickEvent.Post event) {
         Level level = event.getLevel();
         Superposition.tick((ServerLevel) level);
+    }
+
+    @SubscribeEvent
+    public static void onLevelPreTick(LevelTickEvent.Pre event) {
+        Level level = event.getLevel();
+        Superposition.preTick((ServerLevel) level);
     }
 }

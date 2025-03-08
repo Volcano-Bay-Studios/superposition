@@ -148,6 +148,12 @@ public class RopeSimulation {
             sleepTime = 0;
         }
     }
+
+    public void updatePrevRenderPos() {
+        for (RopeNode node : nodes) {
+            node.prevRenderPosition = node.position;
+        }
+    }
     
     private List<RopeConstraint> collectAllConstraints() {
         ArrayList<RopeConstraint> all = new ArrayList<>();
