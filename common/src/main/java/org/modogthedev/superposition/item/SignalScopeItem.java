@@ -19,7 +19,7 @@ import org.joml.Vector3d;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.sound.ClientMusicManager;
+import org.modogthedev.superposition.system.sound.ClientAudioManager;
 import org.modogthedev.superposition.util.LongRaycast;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
@@ -60,7 +60,7 @@ public class SignalScopeItem extends Item {
                     float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(entity.getX(), entity.getY(), entity.getZ()));
                     volume *= Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
-                    ClientMusicManager.addVolume(volume);
+                    ClientAudioManager.addVolume(volume);
 //                    SoundUtils.playUISound(SuperpositionSounds.SINE.get(),pitch,volume);
                 }
             }
