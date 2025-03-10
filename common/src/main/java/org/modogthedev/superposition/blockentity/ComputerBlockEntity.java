@@ -18,6 +18,7 @@ import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.cards.PeripheralCard;
+import org.modogthedev.superposition.system.cards.cards.SynchronizedCard;
 import org.modogthedev.superposition.system.cards.cards.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -108,6 +109,14 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             if (card instanceof TickingCard tickingCard) {
                 tickingCard.tick(getBlockPos(), level, this);
             }
+            if (card instanceof SynchronizedCard) {
+                if (periphrealSignal == null) {
+                    periphrealSignal = getOutboundSignal();
+                    periphrealSignal.clearEncodedData();
+                }
+                card.encodeSignal(periphrealSignal);
+                updatedLastTick = true;
+            }
         }
         if (!level.isClientSide && !updatedLastTick && periphrealSignal != null) {
             periphrealSignal.clearEncodedData();
@@ -147,7 +156,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (card != null && !(card instanceof PeripheralCard)) {
+        if (card != null && !(card instanceof PeripheralCard) && !(card instanceof SynchronizedCard)) {
             card.modulateSignal(signal, periphrealSignal);
         } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
             signal.setEncodedData(periphrealSignal.getEncodedData());

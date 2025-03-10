@@ -52,9 +52,20 @@ public abstract class Card {
     public abstract Card copy();
 
     /**
+     * Encodes a signal with the card
+     *
      * @param signal
      */
     public void modulateSignal(Signal signal, Signal periphrealSignal) {
+    }
+
+    /**
+     * Encodes a signal with the card using a signal signal
+     *
+     * @param signal
+     */
+    public void encodeSignal(Signal signal) {
+        modulateSignal(signal,signal);
     }
 
     public void affectBlock(Signal signal, Level level, BlockPos pos) {

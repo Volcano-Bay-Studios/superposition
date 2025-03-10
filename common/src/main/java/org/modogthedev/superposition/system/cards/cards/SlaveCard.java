@@ -5,7 +5,7 @@ import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 
-public class SlaveCard extends Card {
+public class SlaveCard extends Card implements SynchronizedCard {
 
     public SlaveCard(ResourceLocation card) {
         super(card);

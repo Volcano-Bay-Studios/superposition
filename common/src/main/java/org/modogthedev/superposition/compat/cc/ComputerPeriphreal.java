@@ -32,8 +32,8 @@ public class ComputerPeriphreal implements IPeripheral {
     }
 
     @LuaFunction
-    public final void setFloat(float f) {
-        setEncodedData(EncodedData.of(f));
+    public final void setFloat(double f) {
+        setEncodedData(EncodedData.of((float) f));
     }
 
     @LuaFunction
@@ -47,8 +47,14 @@ public class ComputerPeriphreal implements IPeripheral {
     }
 
     @LuaFunction
-    public final void setCompoundTag(CompoundTag tag) {
-        setEncodedData(EncodedData.of(tag));
+    public final boolean setCompoundTag(String string) {
+        CompoundTag tag = EncodedData.of(string).compoundTagData();
+        if (tag != null) {
+            setEncodedData(EncodedData.of(tag));
+            return true;
+        }
+        setEncodedData(EncodedData.of(string));
+        return false;
     }
 
     public void setEncodedData(EncodedData<?> encodedData) {
