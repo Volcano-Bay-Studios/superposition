@@ -60,7 +60,7 @@ public abstract class Card {
     }
 
     /**
-     * Encodes a signal with the card using a signal signal
+     * Encodes a signal with the card using a signal
      *
      * @param signal
      */
@@ -70,4 +70,6 @@ public abstract class Card {
 
     public void affectBlock(Signal signal, Level level, BlockPos pos) {
     }
+
+
 }

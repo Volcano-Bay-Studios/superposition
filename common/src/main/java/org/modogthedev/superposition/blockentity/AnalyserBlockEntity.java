@@ -9,7 +9,7 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class AnalyserBlockEntity extends PeriphrealBlockEntity {
+public class AnalyserBlockEntity extends PeripheralBlockEntity {
     public int distance = 0;
     public int startDistance = 0;
     public int endDistance = 0;

@@ -17,6 +17,7 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.cards.ManipulatorCard;
 import org.modogthedev.superposition.system.cards.cards.PeripheralCard;
 import org.modogthedev.superposition.system.cards.cards.SynchronizedCard;
 import org.modogthedev.superposition.system.cards.cards.TickingCard;
@@ -95,10 +96,10 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 addTooltip(Component.literal("Card - ").append(Component.translatable("item.superposition." + getCard().getSelfReference().getPath())));
             }
         }
-        if (!level.isClientSide && card != null && !level.getBlockState(getBlockPos().above()).is(Blocks.AIR) && level.getBlockEntity(getBlockPos().above()) instanceof PeriphrealBlockEntity periphrealBlockEntity) {
-            periphrealBlockEntity.putSignalFace(getOutboundSignal(), Direction.UP);
+        if (!level.isClientSide && card != null && !level.getBlockState(getBlockPos().above()).is(Blocks.AIR) && level.getBlockEntity(getBlockPos().above()) instanceof PeripheralBlockEntity peripheralBlockEntity) {
+            peripheralBlockEntity.putSignalFace(getOutboundSignal(), Direction.UP);
 
-            Signal fromSignal = periphrealBlockEntity.getSignal();
+            Signal fromSignal = peripheralBlockEntity.getSignal();
             if (fromSignal != null && fromSignal.getEncodedData() != null)
                 acceptPeripheralSignal(fromSignal);
         }
@@ -112,7 +113,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             if (card instanceof SynchronizedCard) {
                 if (periphrealSignal == null) {
                     periphrealSignal = getOutboundSignal();
-                    periphrealSignal.clearEncodedData();
                 }
                 card.encodeSignal(periphrealSignal);
                 updatedLastTick = true;
@@ -136,6 +136,9 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         Signal periphrealSignal = new Signal(new Vector3d(center.x, center.y, center.z), level, frequency, 1, frequency / 100000);
         if (card != null) {
             outboundTag.putInt("id", SuperpositionCards.CARDS.asVanillaRegistry().getId(SuperpositionCards.CARDS.asVanillaRegistry().get(card.getSelfReference())));
+            if (card instanceof ManipulatorCard manipulatorCard) {
+                manipulatorCard.addOutbound(outboundTag,this.periphrealSignal);
+            }
         }
         periphrealSignal.encode(outboundTag); // Encode the id of the card for the analyser
         return periphrealSignal;
@@ -181,6 +184,15 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             acceptPeripheralSignal(signal);
         }
         super.putSignalFace(signal, face);
+    }
+
+    @Override
+    public void addSignals(Object lastCall, List<Signal> signals, Direction face) {
+        if (face == Direction.UP) {
+            putSignalsFace(lastCall,signals,face);
+            return;
+        }
+        super.addSignals(lastCall, signals, face);
     }
 
     @Override

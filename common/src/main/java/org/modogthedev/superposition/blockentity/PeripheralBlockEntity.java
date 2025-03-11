@@ -15,8 +15,8 @@ import org.modogthedev.superposition.system.signal.SignalManager;
 
 import java.util.List;
 
-public class PeriphrealBlockEntity extends SignalActorBlockEntity {
-    private Card card;
+public class PeripheralBlockEntity extends SignalActorBlockEntity {
+    protected Card card;
     private final Signal processSignal;
 
     {
@@ -24,7 +24,7 @@ public class PeriphrealBlockEntity extends SignalActorBlockEntity {
         processSignal = new Signal(new Vector3d(center.x, center.y, center.z), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
     }
 
-    public PeriphrealBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
+    public PeripheralBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
     }
 
