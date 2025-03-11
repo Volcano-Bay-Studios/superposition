@@ -26,16 +26,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SPTooltipable;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
@@ -164,8 +162,11 @@ public class SuperpositionUITooltipRenderer {
             selected = false;
         }
     }
-
     public static void renderOverlay(GuiGraphics graphics, DeltaTracker deltaTracker) {
+        renderOverlay(graphics,deltaTracker.getRealtimeDeltaTicks());
+    }
+
+    public static void renderOverlay(GuiGraphics graphics, float partialTicks) {
         int width = graphics.guiWidth();
         int height = graphics.guiHeight();
         PoseStack stack = graphics.pose();
@@ -175,7 +176,8 @@ public class SuperpositionUITooltipRenderer {
             return;
         }
 
-        float partialTicks = deltaTracker.getRealtimeDeltaTicks();
+
+
         HitResult result = mc.hitResult;
         Vec3 pos = null;
         SPTooltipable tooltippable = null;
@@ -280,6 +282,11 @@ public class SuperpositionUITooltipRenderer {
             desiredX = (int) desiredScreenSpacePos.x();
             desiredY = (int) desiredScreenSpacePos.y();
         }
+        if (mc.screen instanceof WidgetScreen widgetScreen) {
+            Vec2 tooltipPosition = widgetScreen.getTooltipPosition(width,height);
+            tooltipX = (int) tooltipPosition.x;
+            tooltipY = (int) tooltipPosition.y;
+        }
         tooltippable.drawExtra();
         if (editableTooltip != null && editingEditable && flash < 40) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
@@ -301,7 +308,7 @@ public class SuperpositionUITooltipRenderer {
         if (flash > 80 || selected) {
             flash = 0;
         }
-        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset, tooltipY + (int) textYOffset, width, height, -1, background.argb(), borderTop.argb(), borderBottom.argb(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
+        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset - tooltipTextWidth/2, tooltipY + (int) textYOffset, width, height, -1, background.argb(), borderTop.argb(), borderBottom.argb(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
         graphics.blit(SAVE, 64, 64, 0, 0, 16, 16);
         stack.popPose();
     }
