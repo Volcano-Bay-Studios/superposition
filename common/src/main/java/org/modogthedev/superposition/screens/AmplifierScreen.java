@@ -21,7 +21,6 @@ import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
-import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SuperpositionMth;
@@ -196,7 +195,7 @@ public class AmplifierScreen extends WidgetScreen {
         super.tick();
         if (!mute && frequency > .72f) {
             float pitch = SuperpositionMth.getFromRange(30, 0, 2, .72f, frequency);
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch));
+//            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch)); TODO: use new thing
         }
         ticks++;
         assert Minecraft.getInstance().level != null : "Tried to access screen from server!";

@@ -15,7 +15,7 @@ import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
-import org.modogthedev.superposition.system.sound.ClientMusicManager;
+import org.modogthedev.superposition.system.sound.ClientAudioManager;
 import org.slf4j.Logger;
 
 public class Superposition {
@@ -55,7 +55,7 @@ public class Superposition {
         CarabinerManager.tick(level);
         CarabinerManager.clientTick(level);
         SuperpositionUITooltipRenderer.clientTick(level);
-        ClientMusicManager.tick(level);
+        ClientAudioManager.tick(level);
     }
 
     public static void playerLeaveEvent() {

@@ -9,10 +9,12 @@ import org.modogthedev.superposition.client.renderer.DebugRenderer;
 import org.modogthedev.superposition.client.renderer.block.*;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.platform.BlockEntityRegistry;
+import org.modogthedev.superposition.system.sound.ClientAudioManager;
 
 public class SuperpositionClient {
 
     public static void init() {
+        ClientAudioManager.setup();
         VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
                 CableRenderer.renderCables(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
