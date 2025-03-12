@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "RedStoneWireBlockMixin",
-    "self.CommonRedstoneMixin",
-    "self.SpeakerSoundInstanceMixin"
+    "self.CommonRedstoneMixin"
   ],
   "client": [
     "client.MinecraftMixin"

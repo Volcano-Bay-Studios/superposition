@@ -13,6 +13,8 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         super(SuperpositionBlockEntities.MANIPULATOR.get(), pos, state);
     }
 
+    private String lastUpdate = "";
+
     @Override
     public void tick() {
         resetTooltip();
@@ -20,7 +22,11 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         addTooltip("Manipulating " + level.getBlockState(getFrontPos()).getBlock().getName().getString() + "...");
         if (card != null) {
             Signal signal = SignalManager.randomSignal(putSignals);
-            card.affectBlock(signal,level,getFrontPos());
+            String value = signal.getEncodedData().stringValue();
+            if (!value.equals(lastUpdate)) {
+                card.affectBlock(signal,level,getFrontPos());
+                level.updateNeighborsAt(getFrontPos(),level.getBlockState(getFrontPos()).getBlock());
+            }
         }
         super.tick();
     }

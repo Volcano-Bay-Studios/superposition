@@ -168,6 +168,8 @@ public class SignalGeneratorScreen extends WidgetScreen {
             float pitch = 1.0F / Mth.map(0, 30, 2, .72f, frequency);
             // TODO make it work pls
             ClientAudioManager.playSine(frequency*100);
+        } else {
+            ClientAudioManager.stopSine();
         }
         ticks++;
     }
@@ -176,6 +178,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
     public void onClose() {
         super.onClose();
         this.updateBlock();
+        ClientAudioManager.stopSine();
     }
 
     @Override

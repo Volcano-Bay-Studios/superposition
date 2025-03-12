@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "superposition.refmap.json",
   "mixins": [
+    "BlockBehaviorMixin",
     "PlayerMixin",
     "ServerGameModeMixin"
   ],
@@ -12,7 +13,8 @@
     "GuiMixin",
     "KeyboardHandlerMixin",
     "MultiPlayerGameModeMixin",
-    "client.MinecraftMixin"
+    "client.MinecraftMixin",
+    "client.SoundSystemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

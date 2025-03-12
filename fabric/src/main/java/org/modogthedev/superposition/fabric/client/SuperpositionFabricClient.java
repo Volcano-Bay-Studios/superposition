@@ -22,6 +22,7 @@ public class SuperpositionFabricClient implements ClientModInitializer {
         SuperpositionClient.registerBlockEntityRenderers(BlockEntityRenderers::register);
 
         ClientTickEvents.END_WORLD_TICK.register(Superposition::clientTick);
+        ClientTickEvents.START_WORLD_TICK.register(Superposition::preTick);
 
         HudRenderCallback.EVENT.register(SuperpositionUITooltipRenderer::renderOverlay);
 

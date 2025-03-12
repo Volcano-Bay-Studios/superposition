@@ -16,6 +16,7 @@ import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.sound.ClientAudioManager;
+import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.slf4j.Logger;
 
 public class Superposition {
@@ -38,6 +39,13 @@ public class Superposition {
         SuperpositionSounds.bootstrap();
         SuperpositionMessages.register();
         LOGGER.info("Superposition has been initialized.");
+    }
+    public static void preTick(Level level) {
+        if (level.isClientSide) {
+            RedstoneWorld.clientTick(level);
+        } else {
+            RedstoneWorld.tick(level);
+        }
     }
 
     public static void tick(ServerLevel level) {
@@ -77,6 +85,4 @@ public class Superposition {
     public static ResourceLocation id(String loc) {
         return ResourceLocation.fromNamespaceAndPath(MODID, loc);
     }
-
-
 }

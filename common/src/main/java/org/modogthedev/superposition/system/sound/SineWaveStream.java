@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.system.sound;
 
+import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.sounds.AudioStream;
 import org.lwjgl.BufferUtils;
 
@@ -7,6 +8,7 @@ import javax.sound.sampled.AudioFormat;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.Executor;
 
 public class SineWaveStream implements AudioStream {
     ByteArrayInputStream byteArrayInputStream;
@@ -14,6 +16,9 @@ public class SineWaveStream implements AudioStream {
     public SineWaveStream(byte[] bytes) {
         byteArrayInputStream = new ByteArrayInputStream(bytes);
     }
+
+    public Channel channel;
+    public Executor executor;
 
     @Override
     public AudioFormat getFormat() {

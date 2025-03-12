@@ -1,6 +1,10 @@
 package org.modogthedev.superposition.system.sound;
 
+import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.level.Level;
 import org.lwjgl.BufferUtils;
 import org.modogthedev.superposition.core.SuperpositionSounds;
@@ -18,24 +22,41 @@ public class ClientAudioManager {
     private static final int sampleRate = 44100;
 
     public static final AudioFormat SINE_FORMAT = new AudioFormat(sampleRate, 8, 1, true, false);
+    public static SpeakerSoundInstance speakerSoundInstance;
+
+    public static int ticks = 0;
 
     public static void tick(Level level) {
+        SoundManager soundManager = minecraft.getSoundManager();
         if (volume == 0) {
-            minecraft.getSoundManager().stop(currentMusic);
+            soundManager.stop(currentMusic);
             currentMusic = null;
-            return;
+        } else {
+            if (currentMusic == null) {
+                currentMusic = SimpleMusicInstance.forMusic(SuperpositionSounds.TRAVELERS.get());
+                soundManager.play(currentMusic);
+            }
+
+            if (volume <= 0) {
+                currentMusic.setVolume(0);
+            } else {
+                currentMusic.setVolume((float) (Math.log10(volume) + 1.3f) / 3f);
+            }
         }
 
-        if (currentMusic == null) {
-            currentMusic = SimpleMusicInstance.forMusic(SuperpositionSounds.TRAVELERS.get());
-            minecraft.getSoundManager().play(currentMusic);
-        }
-        if (volume <= 0) {
-            currentMusic.setVolume(0);
-        } else {
-            currentMusic.setVolume((float) (Math.log10(volume) + 1.3f) / 3f);
-        }
         volume = 0;
+
+        if (speakerSoundInstance != null && !soundManager.isActive(speakerSoundInstance)) {
+            soundManager.stop(speakerSoundInstance);
+            speakerSoundInstance = null;
+        }
+
+        if (speakerSoundInstance != null) {
+            if (!(speakerSoundInstance.getStream() instanceof SineWaveStream sineWaveStream)) return;
+            if (sineWaveStream.channel == null) return;
+            sineWaveStream.channel.attachBufferStream(sineWaveStream);
+            sineWaveStream.channel.play();
+        }
     }
 
     public static void addVolume(float input) {
@@ -43,11 +64,35 @@ public class ClientAudioManager {
     }
 
     public static void playSine(float frequency) {
-        byte[] sineWaveData = generateSineWave(frequency, sampleRate, 1);
-        minecraft.getSoundManager().play(new SpeakerSoundInstance(new SineWaveStream(sineWaveData)));
+        SoundManager soundManager = minecraft.getSoundManager();
+        if (speakerSoundInstance != null && !soundManager.isActive(speakerSoundInstance)) {
+            soundManager.stop(speakerSoundInstance);
+            speakerSoundInstance = null;
+        }
+        if (speakerSoundInstance == null) {
+            byte[] sineWaveData = generateSineWave(frequency, sampleRate, 1);
+            speakerSoundInstance = new SpeakerSoundInstance(new SineWaveStream(sineWaveData));
+            soundManager.play(speakerSoundInstance);
+
+
+        }
+    }
+
+    public static void stopSine() {
+        SoundManager soundManager = minecraft.getSoundManager();
+        if (speakerSoundInstance != null) {
+            soundManager.stop(speakerSoundInstance);
+            speakerSoundInstance = null;
+        }
     }
 
     public static void setup() {
+    }
+
+    public static void playStreaming(SoundEngine soundEngine, Channel channel, AudioStream stream) {
+        if (!(stream instanceof SineWaveStream sineWaveStream)) return;
+
+        sineWaveStream.channel = channel;
     }
 
     public static void playBufffer(byte[] bytes, int sampleRate) {

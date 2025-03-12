@@ -7,7 +7,6 @@ import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
 
@@ -23,10 +22,6 @@ public class SpeakerSoundInstance extends AbstractSoundInstance implements Ticka
             STREAM, ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Sound.Type.FILE, true, false, 16
     );
 
-    protected SpeakerSoundInstance(SoundEvent soundEvent, AudioStream stream) {
-        super(soundEvent, SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
-        this.stream = stream;
-    }
     protected SpeakerSoundInstance(AudioStream stream) {
         super(STREAM, SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
         this.stream = stream;
@@ -54,5 +49,9 @@ public class SpeakerSoundInstance extends AbstractSoundInstance implements Ticka
     @Override
     public Sound getSound() {
         return EMPTY;
+    }
+
+    public AudioStream getStream() {
+        return stream;
     }
 }

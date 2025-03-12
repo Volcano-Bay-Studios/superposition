@@ -22,6 +22,13 @@ public class DataHelper {
         return null;
     }
 
+    public static int getIntValue(Signal signal) {
+        if (signal != null && signal.getEncodedData() != null) {
+            return signal.getEncodedData().intValue();
+        }
+        return -1;
+    }
+
     public static int getIntKey(Signal signal, String key) {
         CompoundTag tag = getTagValue(signal);
         if (tag != null && tag.contains(key, 3)) {
