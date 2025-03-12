@@ -41,5 +41,11 @@
     "sounds": [
       "superposition:travelers"
     ]
+  },
+  "timber_hearth": {
+    "subtitles": "sounds.superposition.timber_hearth",
+    "sounds": [
+      "superposition:timber_hearth"
+    ]
   }
 }

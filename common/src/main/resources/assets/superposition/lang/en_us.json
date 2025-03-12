@@ -55,6 +55,8 @@
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",
+  "sounds.superposition.travelers" : "Music",
+  "sounds.superposition.timber_hearth" : "Music",
 
   "creativemodetab.superposition" : "Superposition"
 }

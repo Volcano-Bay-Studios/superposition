@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.networking.SuperpositionMessages;
+import org.modogthedev.superposition.persistent.CableSavedData;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
@@ -50,6 +51,7 @@ public class Superposition {
 
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
+        CableSavedData.get(level);
         CableManager.tick(level);
         CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);

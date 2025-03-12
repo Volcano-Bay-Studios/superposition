@@ -8,6 +8,7 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.world.level.Level;
 import org.lwjgl.BufferUtils;
 import org.modogthedev.superposition.core.SuperpositionSounds;
+import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.IMusicInstance;
 import org.modogthedev.superposition.util.SimpleMusicInstance;
 
@@ -21,26 +22,33 @@ public class ClientAudioManager {
     private static IMusicInstance currentMusic;
     private static final int sampleRate = 44100;
 
+    public static Signal currentSignal;
+    public static Signal lastValidSignal;
+
     public static final AudioFormat SINE_FORMAT = new AudioFormat(sampleRate, 8, 1, true, false);
     public static SpeakerSoundInstance speakerSoundInstance;
 
     public static int ticks = 0;
 
-    public static void tick(Level level) {
+    public static void tick(Level level) { // TODO: play all sounds individually
         SoundManager soundManager = minecraft.getSoundManager();
         if (volume == 0) {
             soundManager.stop(currentMusic);
             currentMusic = null;
         } else {
-            if (currentMusic == null) {
-                currentMusic = SimpleMusicInstance.forMusic(SuperpositionSounds.TRAVELERS.get());
+            if (currentMusic == null && currentSignal != null && currentSignal.getEncodedData() != null) {
+                lastValidSignal = currentSignal;
+                currentMusic = SimpleMusicInstance.forMusic(SuperpositionSounds.getSong(currentSignal.getEncodedData().stringValue()));
                 soundManager.play(currentMusic);
             }
-
-            if (volume <= 0) {
-                currentMusic.setVolume(0);
-            } else {
-                currentMusic.setVolume((float) (Math.log10(volume) + 1.3f) / 3f);
+            if (currentMusic != null) {
+                if (volume <= 0) {
+                    currentMusic.setVolume(0);
+                    soundManager.stop(currentMusic);
+                    currentMusic = null;
+                } else {
+                    currentMusic.setVolume((float) (Math.log10(volume) + 1.3f) / 3f);
+                }
             }
         }
 

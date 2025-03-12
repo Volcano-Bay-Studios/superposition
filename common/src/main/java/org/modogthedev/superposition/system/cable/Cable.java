@@ -304,6 +304,15 @@ public class Cable {
         this.playerHoldingPointMap = new Int2IntArrayMap(cable.playerHoldingPointMap);
     }
 
+    public float calculateLength() {
+        float length = 0;
+        for (RopeNode node : ropeSimulation.getNodes()) {
+            RopeNode next = node.getNext();
+            if (next != null) length += (float) node.getPosition().distanceTo(next.getPosition());
+        }
+        return length;
+    }
+
     private int getPointsCount() {
         return ropeSimulation.getNodesCount();
     }

@@ -43,10 +43,14 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     signalForBroadcast.level = level;
                     signalForBroadcast.setSourceAntenna(this.getBlockPos(), antenna.antennaParts.size());
                     signalForBroadcast.mulAmplitude(1 / Math.max(1, Math.abs((signalForBroadcast.getFrequency() - frequency) / 100000)));
-                    SignalManager.updateSignal(signalForBroadcast);
-                    signal = signalForBroadcast;
-                    if (level.isClientSide) {
-                        tooltip.add(Component.literal("Broadcast Frequency - " + SuperpositionMth.frequencyToHzReadable(signalForBroadcast.getFrequency())));
+                    if (signalForBroadcast.getAmplitude() > 0.05f) {
+                        SignalManager.updateSignal(signalForBroadcast);
+                        signal = signalForBroadcast;
+                        if (level.isClientSide) {
+                            tooltip.add(Component.literal("Broadcast Frequency - " + SuperpositionMth.frequencyToHzReadable(signalForBroadcast.getFrequency())));
+                        }
+                    } else {
+                        this.stopTransmission();
                     }
                 } else if (signal != null) {
                     this.stopTransmission();

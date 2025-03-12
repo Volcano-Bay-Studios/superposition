@@ -290,10 +290,10 @@ public class SuperpositionUITooltipRenderer {
         tooltippable.drawExtra();
         if (editableTooltip != null && editingEditable && flash < 40) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
-            int xOffset = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));
+            int xOffset = (int) (tooltipX - tooltipTextWidth /2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));
             graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset + 1, tooltipY + (int) textYOffset + 10, -3092272);
             if (selected) {
-                xOffset = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
+                xOffset = (int) (tooltipX - tooltipTextWidth /2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
                 int xOffset2 = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
                 graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset2, tooltipY + (int) textYOffset + 10, -3092272);
             }
@@ -301,7 +301,7 @@ public class SuperpositionUITooltipRenderer {
         if (editableTooltip != null && editingEditable) {
             String focusText = "[PRESS ESC TO UNFOCUS]";
             RenderSystem.setShaderColor(.5f, 1, .5f, 1f);
-            graphics.drawString(Minecraft.getInstance().font, focusText, tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
+            graphics.drawString(Minecraft.getInstance().font, focusText, (tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8) - tooltipTextWidth/2, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
             RenderSystem.setShaderColor(1, 1, 1, 1);
         }
         flash++;
