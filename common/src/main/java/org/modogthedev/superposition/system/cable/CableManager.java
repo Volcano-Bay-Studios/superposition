@@ -174,6 +174,9 @@ public class CableManager {
 
     public static InteractionResult playerEmptyClickEvent(Player player, Level level) {
         int id = player.getId();
+        if (!player.getAbilities().mayBuild) {
+            return InteractionResult.PASS;
+        }
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
             for (Cable cable : cables.values()) {

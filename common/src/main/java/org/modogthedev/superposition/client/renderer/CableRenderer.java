@@ -321,6 +321,9 @@ public class CableRenderer {
                 boolean hasAnchor = cablePointPair.getB().getAnchor() != null;
 
                 Vector4f color = getColorForNodeHighlight(isLast, isFirst, hasAnchor);
+                if (!Minecraft.getInstance().player.getAbilities().mayBuild) {
+                    color = new Vector4f(0.5f,0.5f,0.5f,0.5f);
+                }
                 if (isLast || isFirst) {
                     width -= 0.03f;
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
