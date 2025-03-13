@@ -14,16 +14,17 @@ import org.modogthedev.superposition.util.SimpleMusicInstance;
 
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ClientAudioManager {
     private static final Minecraft minecraft = Minecraft.getInstance();
-    private static float volume = 0f;
 
-    private static IMusicInstance currentMusic;
     private static final int sampleRate = 44100;
+    private static final HashMap<String, IMusicInstance> tracks = new HashMap<>();
 
-    public static Signal currentSignal;
-    public static Signal lastValidSignal;
+    public static List<Signal> signals = new ArrayList<>();
 
     public static final AudioFormat SINE_FORMAT = new AudioFormat(sampleRate, 8, 1, true, false);
     public static SpeakerSoundInstance speakerSoundInstance;
@@ -32,27 +33,27 @@ public class ClientAudioManager {
 
     public static void tick(Level level) { // TODO: play all sounds individually
         SoundManager soundManager = minecraft.getSoundManager();
-        if (volume == 0) {
-            soundManager.stop(currentMusic);
-            currentMusic = null;
-        } else {
-            if (currentMusic == null && currentSignal != null && currentSignal.getEncodedData() != null) {
-                lastValidSignal = currentSignal;
-                currentMusic = SimpleMusicInstance.forMusic(SuperpositionSounds.getSong(currentSignal.getEncodedData().stringValue()));
-                soundManager.play(currentMusic);
-            }
-            if (currentMusic != null) {
-                if (volume <= 0) {
-                    currentMusic.setVolume(0);
-                    soundManager.stop(currentMusic);
-                    currentMusic = null;
-                } else {
-                    currentMusic.setVolume((float) (Math.log10(volume) + 1.3f) / 3f);
+        List<String> oldTracks = new ArrayList<>(tracks.keySet());
+        for (Signal signal : signals) {
+            if (signal != null && signal.getEncodedData() != null) {
+                String trackName = signal.getEncodedData().stringValue();
+                if (trackName != null) {
+                    oldTracks.remove(trackName);
+                    if (tracks.containsKey(trackName)) {
+                        tracks.get(trackName).setVolume(signal.getAmplitude());
+                    } else {
+                        IMusicInstance musicInstance = SimpleMusicInstance.forMusic(SuperpositionSounds.getSong(trackName));
+                        tracks.put(trackName, musicInstance);
+                        musicInstance.setVolume(signal.getAmplitude());
+                        soundManager.play(musicInstance);
+                    }
                 }
             }
         }
-
-        volume = 0;
+        for (String trackName : oldTracks) {
+            soundManager.stop(tracks.get(trackName));
+            tracks.remove(trackName);
+        }
 
         if (speakerSoundInstance != null && !soundManager.isActive(speakerSoundInstance)) {
             soundManager.stop(speakerSoundInstance);
@@ -65,10 +66,6 @@ public class ClientAudioManager {
             sineWaveStream.channel.attachBufferStream(sineWaveStream);
             sineWaveStream.channel.play();
         }
-    }
-
-    public static void addVolume(float input) {
-        volume += input;
     }
 
     public static void playSine(float frequency) {

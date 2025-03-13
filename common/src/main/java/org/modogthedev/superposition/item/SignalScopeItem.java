@@ -50,8 +50,7 @@ public class SignalScopeItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         if ((isSelected || (entity instanceof Player player && player.getOffhandItem().is(SuperpositionItems.SIGNAL_SCOPE.get()))) && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
-            float bestPower = 0;
-            Signal bestSignal = null;
+            ClientAudioManager.signals.clear();
             for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
                 float dist = (float) Vec3.atLowerCornerOf(entity.blockPosition()).distanceTo(Vec3.atLowerCornerOf(SuperpositionMth.blockPosFromVec3(signal.getPos())));
                 if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
@@ -62,15 +61,11 @@ public class SignalScopeItem extends Item {
                     float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(entity.getX(), entity.getY(), entity.getZ()));
                     volume *= Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
-                    if (volume > bestPower) {
-                        bestSignal = signal;
-                        bestPower = volume;
-                    }
-//                    SoundUtils.playUISound(SuperpositionSounds.SINE.get(),pitch,volume);
+                    Signal signal1 = new Signal(signal);
+                    signal1.setAmplitude(volume);
+                    ClientAudioManager.signals.add(signal1);
                 }
             }
-            ClientAudioManager.addVolume(Math.max(0,bestPower));
-            ClientAudioManager.currentSignal = bestSignal;
         }
     }
 
