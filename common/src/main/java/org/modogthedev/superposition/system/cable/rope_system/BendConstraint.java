@@ -9,7 +9,7 @@ public interface BendConstraint {
 
         Vec3 targetTo = middle.add(targetDirection.scale(width));
 
-        return to.lerp(targetTo, Math.clamp(to.distanceToSqr(targetTo), 0, 1) / 20f);
+        return to.lerp(targetTo, Math.clamp(to.distanceToSqr(targetTo), 0, 1) / 10f);
     }
     
     static Vec3 resolveAnchorBend(Vec3 from, Vec3 middle, Vec3 to, float width) {

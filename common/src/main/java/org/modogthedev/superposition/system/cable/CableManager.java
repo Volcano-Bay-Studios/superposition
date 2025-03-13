@@ -185,7 +185,7 @@ public class CableManager {
         }
 
         CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, level);
-        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(getPlayerHoldCablePos(player), .7f, !player.isCrouching());
+        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(getPlayerHoldCablePos(player), .7f, true);
         if (rayCast != null) {
             Cable cable = rayCast.getA();
             cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
