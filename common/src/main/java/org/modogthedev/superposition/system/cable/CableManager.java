@@ -281,7 +281,7 @@ public class CableManager {
         for (Map.Entry<UUID, Cable> entry : cables.entrySet()) {
             Cable cable = entry.getValue();
             if (cable.getPoints().size() < 4) {
-                removeCable(entry.getKey());
+                removeCable(player.level(),entry.getKey());
                 return;
             }
 
@@ -290,7 +290,7 @@ public class CableManager {
                 int index = cable.getPlayerHeldPoint(id).getB();
                 cable.stopPlayerDrag(id);
                 cable.getPoints().remove(index);
-                cable.addPlayerHoldingPoint(id, index - 1);
+                cable.addPlayerHoldingPoint(id, index == 0 ? 0 : (index - 1));
             }
         }
     }
@@ -304,8 +304,8 @@ public class CableManager {
         return cables != null ? cables.values() : Collections.emptyList();
     }
 
-    public static void removeCable(UUID cableId) {
-
+    public static void removeCable(Level level,UUID cableId) {
+        getCables(level).remove(cableId);
     }
 
     public static void wipeResidualData() {

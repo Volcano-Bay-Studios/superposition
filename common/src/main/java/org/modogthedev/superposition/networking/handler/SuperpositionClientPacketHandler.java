@@ -45,7 +45,7 @@ public class SuperpositionClientPacketHandler {
 
         UUID id = packet.getId();
         if (packet.isRemove()) {
-            CableManager.removeCable(id);
+            CableManager.removeCable(level,id);
             return;
         }
 

@@ -290,8 +290,8 @@ public class Cable {
 //                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
             } else {
 //                ropeSimulation.getNode(i).setPrevPosition(ropeSimulation.getNode(i).getPosition());
-                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(ropeSimulation.getNode(i).getPrevPosition(),0.8f));
-                ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition().lerp(ropeSimulation.getNode(i).getPosition(),0.8f));
+                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(ropeSimulation.getNode(i).getPrevPosition(), 0.8f));
+                ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition().lerp(ropeSimulation.getNode(i).getPosition(), 0.8f));
             }
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
             if (newAnchor != null) {
@@ -322,8 +322,10 @@ public class Cable {
     }
 
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
-        getPoints().get(pointIndex).removeAnchor();
-        playerHoldingPointMap.put(playerId, pointIndex);
+        if (getPointsCount() > pointIndex && pointIndex > -1) {
+            getPoints().get(pointIndex).removeAnchor();
+            playerHoldingPointMap.put(playerId, pointIndex);
+        }
     }
 
     public boolean hasPlayerHolding(int playerUUID) {
