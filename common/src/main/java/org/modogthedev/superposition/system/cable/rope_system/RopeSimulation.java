@@ -75,15 +75,16 @@ public class RopeSimulation {
 
 
     public void simulate(Level level) {
-        
+        float gravity = 0.5f * -9.8f / 40f;
         for (RopeNode node : nodes) {
             Vec3 velocity = Vec3.ZERO;
             if (!node.isFixed()) {
                 velocity = node.getPosition().subtract(node.prevPosition);
 
-                velocity = velocity.add(0, 0.5 * -9.8 / 40, 0);
+                velocity = velocity.add(0, gravity, 0);
 
-                velocity = velocity.scale(0.9f * (velocity.length() < 1e-2 ? 0.1 : 1.0));
+                float scaleFactor = 0.9f * (velocity.length() > -gravity ? 1.0f : 0.1f);
+                velocity = new Vec3(velocity.x * scaleFactor, velocity.y, velocity.z * scaleFactor);
             }
             node.prevPosition = node.position;
             node.position = node.position.add(velocity);

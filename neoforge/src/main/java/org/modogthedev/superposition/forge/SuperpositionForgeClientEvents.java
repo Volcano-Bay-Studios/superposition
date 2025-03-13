@@ -1,9 +1,11 @@
 package org.modogthedev.superposition.forge;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.sound.PlayStreamingSourceEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -21,17 +23,18 @@ public class SuperpositionForgeClientEvents {
     }
 
     @SubscribeEvent
+    public static void onClientTick(ClientTickEvent.Pre event) {
+        Superposition.clientAlwaysTick(Minecraft.getInstance());
+    }
+
+    @SubscribeEvent
     public static void onPreTick(LevelTickEvent.Pre event) {
         Superposition.preTick(event.getLevel());
     }
 
     @SubscribeEvent
-    public static void onLevelChange(PlayerEvent.PlayerChangedDimensionEvent event) {
-        Superposition.playerLeaveEvent();
-    }
-    @SubscribeEvent
     public static void onLevelLeave(PlayerEvent.PlayerLoggedOutEvent event) {
-        Superposition.playerLeaveEvent();
+        Superposition.playerLeaveEvent(event.getEntity().level());
     }
 
     @SubscribeEvent

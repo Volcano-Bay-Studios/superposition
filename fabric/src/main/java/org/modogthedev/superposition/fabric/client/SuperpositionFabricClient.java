@@ -32,7 +32,7 @@ public class SuperpositionFabricClient implements ClientModInitializer {
     }
 
     public static void playerLeaveEvent(Minecraft minecraft, ClientLevel clientLevel) {
-        Superposition.playerLeaveEvent();
+        Superposition.playerLeaveEvent(clientLevel);
     }
 
     private void registerBlockRenderLayers() {

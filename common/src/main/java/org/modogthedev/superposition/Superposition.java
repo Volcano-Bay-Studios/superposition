@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.api.client.color.ColorTheme;
 import foundry.veil.impl.client.render.pipeline.VeilBloomRenderer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -51,8 +52,8 @@ public class Superposition {
 
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
-        CableSavedData.get(level);
         CableManager.tick(level);
+        CableSavedData.get(level);
         CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
     }
@@ -68,8 +69,20 @@ public class Superposition {
         ClientAudioManager.tick(level);
     }
 
-    public static void playerLeaveEvent() {
-        CableManager.wipeClientData();
+    public static void clientAlwaysTick(Minecraft client) {
+        if (client.level == null) {
+            CableManager.wipeClientData();
+        }
+    }
+
+    public static void playerLeaveEvent(Level level) {
+        if (level.isClientSide) {
+            CableManager.wipeClientData();
+        }
+    }
+
+    public static void loadLevel(ServerLevel level) {
+        CableSavedData.get(level);
     }
 
     public static void initTheme() {

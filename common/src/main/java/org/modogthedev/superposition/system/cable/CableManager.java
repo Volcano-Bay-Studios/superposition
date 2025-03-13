@@ -97,11 +97,7 @@ public class CableManager {
                 if (level.getEntity(id) instanceof Player player) {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-                    Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-                    BlockHitResult result = level.clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
-                    if (result.getType() == HitResult.Type.BLOCK) {
-                        holdGoalPos = result.getLocation();
-                    }
+                    Vec3 holdGoalPos = getPlayerHeldCablePos(player);
                     holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale(holdGoalPos.distanceTo(playerPoint.getPosition()))).add(0, 0.5f,0);
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
@@ -189,7 +185,7 @@ public class CableManager {
         }
 
         CableClipResult cableClipResult = new CableClipResult(player.getEyePosition(), 8, level);
-        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5)), .7f, !player.isCrouching());
+        Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(getPlayerHoldCablePos(player), .7f, !player.isCrouching());
         if (rayCast != null) {
             Cable cable = rayCast.getA();
             cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
@@ -200,13 +196,41 @@ public class CableManager {
         return InteractionResult.PASS;
     }
 
+    /**
+     * Held position away from the player for raycasting for cables
+     * @param player
+     * @return
+     */
+    public static Vec3 getPlayerHoldCablePos(Player player) {
+        Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5));
+        BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+        if (result.getType() == HitResult.Type.BLOCK) {
+            holdGoalPos = result.getLocation();
+        }
+        return holdGoalPos;
+    }
+
+    /**
+     * Held position close for the player for when they are holding it
+     * @param player
+     * @return
+     */
+    public static Vec3 getPlayerHeldCablePos(Player player) {
+        Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
+        BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+        if (result.getType() == HitResult.Type.BLOCK) {
+            holdGoalPos = result.getLocation();
+        }
+        return holdGoalPos;
+    }
+
     private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color, boolean emitsLight) {
         if (player.level().isClientSide) {
             return;
         }
 
         Vec3 anchorPosition = Cable.getAnchoredPoint(pos, face);
-        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, player.getRopeHoldPosition(0), SuperpositionConstants.cableSpawnAmount, level, color, emitsLight);
+        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, getPlayerHoldCablePos(player), SuperpositionConstants.cableSpawnAmount, level, color, emitsLight);
         newCable.getPoints().getFirst().setAnchor(face, pos);
         newCable.setPlayerHolding(player);
         addCable(newCable, level);
@@ -239,7 +263,7 @@ public class CableManager {
             int id = player.getId();
             if (cable.hasPlayerHolding(id)) {
                 int index = cable.getPlayerHeldPoint(id).getB();
-                Vec3 pos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(3));
+                Vec3 pos = getPlayerHoldCablePos(player);
                 for (int i = 0; i < amount; i++) {
                     cable.addPointAtIndex(index, new RopeNode(pos));
                 }
@@ -284,8 +308,11 @@ public class CableManager {
 
     }
 
+    public static void wipeResidualData() {
+        cables.clear();
+    }
+
     public static void wipeClientData() {
         clientCables.clear(); // TODO: no worky
-        cables.clear();
     }
 }
