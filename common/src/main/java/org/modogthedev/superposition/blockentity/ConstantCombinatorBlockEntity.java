@@ -69,7 +69,10 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
 
     @Override
     public List<Signal> getSignals() {
-        return List.of(outputSignal);
+        if (outputSignal != null) {
+            return List.of(outputSignal);
+        }
+        return null;
     }
 
     @Override

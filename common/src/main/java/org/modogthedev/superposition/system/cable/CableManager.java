@@ -135,7 +135,7 @@ public class CableManager {
                     
                     double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
                     CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
-                    if (stretch > 0.2f) {
+                    if (stretch > 0.2f && cable.getStretchGrace() == 0) {
                         playerFinishDraggingCable(player, null, null);
                     }
                 }

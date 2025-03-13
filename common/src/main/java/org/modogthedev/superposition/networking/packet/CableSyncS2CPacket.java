@@ -33,7 +33,7 @@ public class CableSyncS2CPacket implements CustomPacketPayload {
     private CableSyncS2CPacket(FriendlyByteBuf buf) {
         this.id = buf.readUUID();
         this.remove = buf.readBoolean();
-        this.cable = this.remove ? null : Cable.fromBytes(this.id, buf, null);
+        this.cable = this.remove ? null : Cable.fromBytes(this.id, buf, null, false);
     }
 
     private void toBytes(FriendlyByteBuf buf) {

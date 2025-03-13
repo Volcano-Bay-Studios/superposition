@@ -53,7 +53,7 @@ public class CableSavedData extends SavedData {
         }
         for (int i = 0; i < size; i++) {
             UUID uuid = tag.getUUID("uuid_"+i);
-            Cable cable = Cable.fromBytes(uuid,new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))),level);
+            Cable cable = Cable.fromBytes(uuid,new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))),level,true);
             CableManager.addCable(cable,level);
         }
         return data;

@@ -40,6 +40,7 @@ public class Cable {
     private final boolean emitsLight;
     private List<PointLight> pointLights;
     private float brightness;
+    private int stretchGrace = 0;
 
     private LightRenderer lightRenderer = null;
 
@@ -61,6 +62,9 @@ public class Cable {
     }
 
     public void updatePhysics() {
+        if (stretchGrace > 0) {
+            stretchGrace--;
+        }
         if (!playerHoldingPointMap.isEmpty()) {
             ropeSimulation.invalidateSleepTime();
         }
@@ -254,7 +258,7 @@ public class Cable {
         }
     }
 
-    public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level) {
+    public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level, boolean isCreating) {
         Color color1 = new Color(buf.readInt());
         boolean emitsLight = buf.readBoolean();
         int size = buf.readVarInt();
@@ -271,6 +275,9 @@ public class Cable {
         int playerHoldingMapSize = buf.readVarInt();
         for (int i = 0; i < playerHoldingMapSize; i++) {
             cable.addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
+        }
+        if (isCreating) {
+            ropeSimulation.recalculateBaseRopeConstraints();
         }
         return cable;
     }
@@ -300,6 +307,7 @@ public class Cable {
                 targetPoints.get(i).removeAnchor();
             }
         }
+        level = cable.level;
         ropeSimulation.recalculateBaseRopeConstraints();
         this.playerHoldingPointMap = new Int2IntArrayMap(cable.playerHoldingPointMap);
     }
@@ -322,6 +330,7 @@ public class Cable {
     }
 
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
+        stretchGrace = 4;
         if (getPointsCount() > pointIndex && pointIndex > -1) {
             getPoints().get(pointIndex).removeAnchor();
             playerHoldingPointMap.put(playerId, pointIndex);
@@ -357,6 +366,14 @@ public class Cable {
 
     public Color getColor() {
         return color;
+    }
+
+    public int getStretchGrace() {
+        return stretchGrace;
+    }
+
+    public void setStretchGrace(int stretchGrace) {
+        this.stretchGrace = stretchGrace;
     }
 
     public static Vec3 getAnchoredPoint(BlockPos pos, Direction face) {
