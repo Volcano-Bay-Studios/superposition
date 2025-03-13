@@ -54,6 +54,7 @@ public class ClientAudioManager {
             soundManager.stop(tracks.get(trackName));
             tracks.remove(trackName);
         }
+        // TODO: stop sound when not looking
 
         if (speakerSoundInstance != null && !soundManager.isActive(speakerSoundInstance)) {
             soundManager.stop(speakerSoundInstance);
