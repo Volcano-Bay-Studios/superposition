@@ -85,7 +85,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         if (signal.getEncodedData() != null) {
             outputString = signal.getEncodedData().stringValue();
         }
-        return super.modulateSignal(signal, updateTooltip);
+        return signal;
     }
 
 

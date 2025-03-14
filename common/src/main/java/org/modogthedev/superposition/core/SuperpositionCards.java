@@ -27,6 +27,7 @@ public class SuperpositionCards {
     public static final RegistryObject<Card> ENCAPSULATE_CARD = registerCard("encapsulate_card", () -> new EncapsulateCard(Superposition.id("encapsulate_card")));
     public static final RegistryObject<Card> MERGE_CARD = registerCard("merge_card", () -> new MergeCard(Superposition.id("merge_card")));
     public static final RegistryObject<Card> RETRIEVE_CARD = registerCard("retrieve_card", () -> new RetriveCard(Superposition.id("retrieve_card")));
+    public static final RegistryObject<Card> SUBSTRING_CARD = registerCard("substring_card", () -> new SubstringCard(Superposition.id("substring_card")));
     public static final RegistryObject<Card> SLAVE_CARD = registerCard("slave_card", () -> new SlaveCard(Superposition.id("slave_card")),CompatabilityHandler.Mod.COMPUTERCRAFT);
 
     private static <T extends Card> RegistryObject<T> registerCard(String name, Supplier<T> card) {

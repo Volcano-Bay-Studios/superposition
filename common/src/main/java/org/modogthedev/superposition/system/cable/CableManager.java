@@ -61,11 +61,11 @@ public class CableManager {
             for (Cable cable : cables.values()) {
                 cable.preSimulate();
             }
+            applyPlayerStretch(level);
             dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
             }
-            applyPlayerStretch(level);
 
             for (Cable cable : cables.values()) {
                 syncCable(level, cable);
@@ -83,11 +83,11 @@ public class CableManager {
             for (Cable cable : cables.values()) {
                 cable.preSimulate();
             }
+            applyPlayerStretch(level);
             dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
             }
-            applyPlayerStretch(level);
         }
     }
 
@@ -132,11 +132,13 @@ public class CableManager {
                     //                    playerPoint.setPrevPosition(playerPoint.getPosition());
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
-                    
-                    double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
-                    CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
-                    if (stretch > 0.2f && cable.getStretchGrace() == 0) {
-                        playerFinishDraggingCable(player, null, null);
+
+                    if (playerPoint.getLastHoldGoalPos() != null) {
+                        double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
+                        CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
+                        if ((stretch > 0.2f && cable.getStretchGrace() == 0) || playerPoint.getPosition().distanceTo(player.getPosition(0f)) > 7) {
+                            playerFinishDraggingCable(player, null, null);
+                        }
                     }
                 }
             }

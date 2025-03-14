@@ -16,7 +16,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -336,22 +335,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
         super.setRemoved();
     }
-
-    public Signal createSignal(Object nextCall) {
-        Level level = this.getLevel();
-        if (level == null) {
-            return null;
-        }
-        BlockPos sidedPos = this.getInvertedSwappedPos();
-        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity && (lastCall == null || !lastCall.equals(nextCall))) {
-            lastCall = nextCall;
-            return this.modulateSignal(signalActorBlockEntity.createSignal(nextCall), false);
-        } else {
-            return null;
-        }
-    }
-
 
     @Override
     public void loadSyncedData(CompoundTag tag) {

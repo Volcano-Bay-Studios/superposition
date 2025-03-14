@@ -29,7 +29,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
         if (!passSignal(signal)) {
             return null;
         }
-        return super.modulateSignal(signal, updateTooltip);
+        return signal;
     }
 
     public Filter getFilterType() {

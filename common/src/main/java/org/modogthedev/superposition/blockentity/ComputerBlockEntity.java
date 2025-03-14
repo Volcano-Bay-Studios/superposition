@@ -25,6 +25,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ComputerBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
@@ -104,9 +105,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 acceptPeripheralSignal(fromSignal);
         }
         if (card != null) {
-            for (Signal signal : getSignals()) {
-                modulateSignal(signal, false);
-            }
             if (card instanceof TickingCard tickingCard) {
                 tickingCard.tick(getBlockPos(), level, this);
             }
@@ -146,7 +144,11 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public List<Signal> getSideSignals(Direction face) {
-        return List.of(getSideSignal(face));
+        Signal signal = getSideSignal(face);
+        if (signal != null) {
+            return List.of(signal);
+        }
+        return new ArrayList<>();
     }
 
     @Override
@@ -164,7 +166,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
             signal.setEncodedData(periphrealSignal.getEncodedData());
         }
-        return super.modulateSignal(signal, updateTooltip);
+        return signal;
     }
 
     @Override

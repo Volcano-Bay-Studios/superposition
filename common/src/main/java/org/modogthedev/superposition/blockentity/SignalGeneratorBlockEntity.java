@@ -80,12 +80,6 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         return connectedSignal;
     }
 
-    @Override
-    public Signal createSignal(Object nextObject) {
-        this.updateSignal();
-        return connectedSignal;
-    }
-
     public float getFrequency() {
         return frequency;
     }
