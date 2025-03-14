@@ -13,7 +13,9 @@
     "GuiMixin",
     "KeyboardHandlerMixin",
     "MultiPlayerGameModeMixin",
+    "client.ItemRendererMixin",
     "client.MinecraftMixin",
+    "client.ModelBakeryMixin",
     "client.SoundSystemMixin"
   ],
   "injectors": {

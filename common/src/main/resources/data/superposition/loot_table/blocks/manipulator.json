@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "superposition:signal_readout"
+          "name": "superposition:manipulator"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "superposition:blocks/signal_readout"
+  "random_sequence": "superposition:blocks/manipulator"
 }

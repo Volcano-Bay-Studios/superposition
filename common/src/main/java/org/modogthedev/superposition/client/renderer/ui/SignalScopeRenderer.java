@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +23,10 @@ import java.util.List;
 
 public class SignalScopeRenderer {
     private static final ResourceLocation SPYGLASS_SCOPE_LOCATION = Superposition.id("textures/misc/signal_scope_gui.png");
+    public static final ModelResourceLocation SIGNAL_SCOPE_MODEL = ModelResourceLocation.inventory(Superposition.id("signal_scope"));
+    public static final ModelResourceLocation SIGNAL_SCOPE_IN_HAND_MODEL = ModelResourceLocation.inventory(
+            Superposition.id("signal_scope_hand")
+    );
 
     public static void renderSignalScope(GuiGraphics guiGraphics, float scopeScale) {
         Level level = Minecraft.getInstance().level;
