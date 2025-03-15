@@ -51,12 +51,14 @@
   "item.superposition.encapsulate_card" : "Encapsulate Card",
   "item.superposition.merge_card" : "Merge Card",
   "item.superposition.retrieve_card" : "Retrieve Card",
+  "item.superposition.substring_card" : "Substring Card",
   "item.superposition.slave_card" : "Slave Card",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",
   "sounds.superposition.travelers" : "Music",
   "sounds.superposition.timber_hearth" : "Music",
+  "sounds.superposition.oxide_ambience" : "Ocean Sounds",
 
   "creativemodetab.superposition" : "Superposition"
 }

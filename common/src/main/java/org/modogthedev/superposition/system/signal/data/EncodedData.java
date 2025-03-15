@@ -242,7 +242,7 @@ public sealed interface EncodedData<T> extends Cloneable {
             if (this.asNumber == null) {
                 try {
                     this.asNumber = NumberUtils.createNumber(this.value);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                     this.asNumber = 0;
                 }
             }

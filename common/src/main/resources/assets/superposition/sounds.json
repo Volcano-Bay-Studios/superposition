@@ -47,5 +47,11 @@
     "sounds": [
       "superposition:timber_hearth"
     ]
+  },
+  "oxide_ambience": {
+    "subtitles": "sounds.superposition.oxide_ambience",
+    "sounds": [
+      "superposition:oxide_ambience"
+    ]
   }
 }

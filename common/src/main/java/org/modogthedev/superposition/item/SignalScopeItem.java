@@ -8,10 +8,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +20,7 @@ import org.modogthedev.superposition.system.sound.ClientAudioManager;
 import org.modogthedev.superposition.util.LongRaycast;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
-public class SignalScopeItem extends Item {
+public class SignalScopeItem extends SpyglassItem {
     public SignalScopeItem(Properties properties) {
         super(properties);
     }

@@ -16,6 +16,7 @@
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
+    "client.PlayerItemInHandLayerMixin",
     "client.SoundSystemMixin"
   ],
   "injectors": {

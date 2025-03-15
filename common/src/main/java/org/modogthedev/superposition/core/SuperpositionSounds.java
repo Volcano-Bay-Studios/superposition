@@ -26,6 +26,7 @@ public class SuperpositionSounds {
     // Songs
     public static final RegistryObject<SoundEvent> TRAVELERS = registerSong("travelers","travelers");
     public static final RegistryObject<SoundEvent> TIMBER = registerSong("timber_hearth","timber_hearth");
+    public static final RegistryObject<SoundEvent> OXIDE = registerSong("oxide_ambience","sounds_of_ocean");
 
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {

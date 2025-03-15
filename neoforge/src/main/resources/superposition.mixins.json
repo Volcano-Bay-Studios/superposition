@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "RedstoneCommonMixin",
-    "self.CommonRedstoneMixin",
-    "self.SpeakerSoundInstanceMixin"
+    "self.CommonRedstoneMixin"
   ],
   "client": [
     "client.ItemRendererMixin"
