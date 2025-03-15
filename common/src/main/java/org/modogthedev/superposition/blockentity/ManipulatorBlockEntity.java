@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 public class ManipulatorBlockEntity extends PeripheralBlockEntity {
@@ -22,8 +23,8 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         addTooltip("Manipulating " + level.getBlockState(getFrontPos()).getBlock().getName().getString() + "...");
         if (card != null) {
             Signal signal = SignalManager.randomSignal(putSignals);
-            String value = signal.getEncodedData().stringValue();
-            if (!value.equals(lastUpdate)) {
+            EncodedData<?> value = signal.getEncodedData();
+            if (value != null && !value.stringValue().equals(lastUpdate)) {
                 card.affectBlock(signal,level,getFrontPos());
                 level.updateNeighborsAt(getFrontPos(),level.getBlockState(getFrontPos()).getBlock());
             }

@@ -2,7 +2,6 @@ package org.modogthedev.superposition.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
@@ -37,11 +36,6 @@ public class TransmitterBlock extends AntennaActorTickingBlock implements Common
             swappedPos = state.getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
         }
         return swappedPos == direction;
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
-        return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
     }
 
     @Override

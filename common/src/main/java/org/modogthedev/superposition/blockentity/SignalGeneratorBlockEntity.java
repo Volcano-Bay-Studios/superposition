@@ -76,6 +76,9 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public Signal getSignal() {
+        if (frequency <= 0 || frequency > 150) {
+            return null;
+        }
         this.updateSignal();
         return connectedSignal;
     }

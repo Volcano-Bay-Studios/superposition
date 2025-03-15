@@ -75,10 +75,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
 
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext p_52669_) {
-        return this.defaultBlockState().setValue(FACING, p_52669_.getHorizontalDirection().getOpposite());
-    }
+
 
     @Nullable
     @Override
