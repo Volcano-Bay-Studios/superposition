@@ -2,6 +2,7 @@ package org.modogthedev.superposition.core;
 
 import foundry.veil.platform.registry.RegistrationProvider;
 import foundry.veil.platform.registry.RegistryObject;
+import net.minecraft.ResourceLocationException;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +44,11 @@ public class SuperpositionSounds {
         if (songs.containsKey(soundName)) {
             return songs.get(soundName).get();
         }
-        SoundEvent soundEvent = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(soundName));
+        SoundEvent soundEvent = null;
+        try {
+            soundEvent = BuiltInRegistries.SOUND_EVENT.get(ResourceLocation.parse(soundName));
+        } catch (ResourceLocationException ignored) {
+        }
         if (soundEvent != null) {
             return soundEvent;
         }

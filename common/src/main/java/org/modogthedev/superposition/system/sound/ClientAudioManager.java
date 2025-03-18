@@ -25,6 +25,7 @@ public class ClientAudioManager {
     private static final HashMap<String, IMusicInstance> tracks = new HashMap<>();
 
     public static List<Signal> signals = new ArrayList<>();
+    public static List<Signal> oldSignals = new ArrayList<>();
 
     public static final AudioFormat SINE_FORMAT = new AudioFormat(sampleRate, 8, 1, true, false);
     public static SpeakerSoundInstance speakerSoundInstance;
@@ -35,7 +36,7 @@ public class ClientAudioManager {
         SoundManager soundManager = minecraft.getSoundManager();
         List<String> oldTracks = new ArrayList<>(tracks.keySet());
         for (Signal signal : signals) {
-            if (signal != null && signal.getEncodedData() != null) {
+            if (signal != null && signal.getEncodedData() != null && signal.getAmplitude() > 0) {
                 String trackName = signal.getEncodedData().stringValue();
                 if (trackName != null) {
                     oldTracks.remove(trackName);
@@ -54,6 +55,9 @@ public class ClientAudioManager {
             soundManager.stop(tracks.get(trackName));
             tracks.remove(trackName);
         }
+        oldSignals.clear();
+        oldSignals.addAll(signals);
+        signals.clear();
         // TODO: stop sound when not looking
 
         if (speakerSoundInstance != null && !soundManager.isActive(speakerSoundInstance)) {

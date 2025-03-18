@@ -14,6 +14,7 @@ import org.joml.Vector3d;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.sound.ClientAudioManager;
 import org.modogthedev.superposition.util.LongRaycast;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
@@ -64,9 +65,10 @@ public class SignalScopeRenderer {
             }
         }
 
-        for (Float strength : signals) {
-            int height = (int) (43 - (strength * 250));
+        for (Signal signal : ClientAudioManager.oldSignals) {
+            float strength = signal.getAmplitude()/16.7f;
             strength = Math.min(0.084f, strength);
+            int height = (int) (43 - (strength * 250));
             int offset = (int) (67 - (strength * 800)) + 16;
             int alpha = (int) Mth.clamp(Mth.map(strength, 0.02f, 0.06f, 0, 255), 0, 255);
 

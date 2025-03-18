@@ -54,11 +54,12 @@ public class SignalScopeItem extends SpyglassItem {
                     float pitch = SuperpositionMth.getFromRange(15000000, 0, 2, .72f, signal.getFrequency());
                     Vec3 vec31 = new Vec3(signal.getPos().x - entity.getX(), signal.getPos().y - entity.getEyeY(), signal.getPos().z - entity.getZ());
                     float volume = signal.getAmplitude();
-                    volume *= (float) Math.pow(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize())), 4) - 0.8f;
                     float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(entity.getX(), entity.getY(), entity.getZ()));
                     volume *= Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
                     Signal signal1 = new Signal(signal);
+                    volume = Math.min(volume,2);
+                    volume *= (float) Math.log(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize()))+1);
                     signal1.setAmplitude(volume);
                     ClientAudioManager.signals.add(signal1);
                 }

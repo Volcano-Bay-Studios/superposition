@@ -112,19 +112,21 @@ public class Signal {
     }
 
     public void copy(Signal signal) {
-        this.level = signal.level;
-        this.uuid = signal.uuid;
-        this.modulation = signal.modulation;
-        this.emitting = signal.emitting;
-        this.lifetime = signal.lifetime;
-        this.level = signal.level;
-        this.frequency = signal.frequency;
-        this.amplitude = signal.amplitude;
-        this.pos.set(signal.pos);
-        this.sourceFrequency = signal.sourceFrequency;
-        this.sourceAntennaPos = signal.sourceAntennaPos;
-        this.sourceAntennaSize = signal.sourceAntennaSize;
-        this.encodedData = signal.encodedData;
+//        if (signal != null) {
+            this.level = signal.level;
+            this.uuid = signal.uuid;
+            this.modulation = signal.modulation;
+            this.emitting = signal.emitting;
+            this.lifetime = signal.lifetime;
+            this.level = signal.level;
+            this.frequency = signal.frequency;
+            this.amplitude = signal.amplitude;
+            this.pos.set(signal.pos);
+            this.sourceFrequency = signal.sourceFrequency;
+            this.sourceAntennaPos = signal.sourceAntennaPos;
+            this.sourceAntennaSize = signal.sourceAntennaSize;
+            this.encodedData = signal.encodedData;
+//        }
     }
 
     public void encode(boolean bool) {

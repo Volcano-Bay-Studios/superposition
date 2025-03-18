@@ -13,6 +13,7 @@ import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -48,7 +49,10 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
                 whole.append(" ").append(string);
             }
             String[] strings = (WordUtils.wrap(whole.toString(), 14, "\n", true)).split("\n" + "");
-            text = List.of(strings);
+            text = new ArrayList<>(Arrays.asList(strings));
+        }
+        while (text.size() > 7) {
+            text.removeLast();
         }
 
         if (stateData) {
