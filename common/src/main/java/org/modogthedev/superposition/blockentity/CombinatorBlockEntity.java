@@ -161,7 +161,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
 
     @Override
     public List<Signal> getSideSignals(Direction face) {
-        if (face == Direction.UP) {
+        if (face == Direction.UP && outputSignal != null) {
             return List.of(outputSignal);
         }
         return super.getSideSignals(face);

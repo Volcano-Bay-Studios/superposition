@@ -11,6 +11,7 @@
   "block.superposition.computer" : "Computer",
   "block.superposition.combinator" : "Combinator",
   "block.superposition.constant_combinator" : "Constant Combinator",
+  "block.superposition.spotlight" : "Spotlight",
 
   "item.superposition.pliant_sheet" : "Pliant Sheet",
   "item.superposition.integrated_circuit" : "Integrated Circuit",
