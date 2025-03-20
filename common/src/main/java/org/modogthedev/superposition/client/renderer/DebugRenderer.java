@@ -44,6 +44,7 @@ public class DebugRenderer {
         Vec3 translation = camera.getPosition().scale(-1);
         matrixStack.translate(translation.x, translation.y, translation.z);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.lines());
+        ClientSignalManager.ifAbsent(level);
         for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, signal.getPos().add(0, 1, 0, POS), 0.3f, 0.5f, 0.5f, 0.9f);
         }

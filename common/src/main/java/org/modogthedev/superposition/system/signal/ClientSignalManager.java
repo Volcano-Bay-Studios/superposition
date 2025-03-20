@@ -76,7 +76,7 @@ public class ClientSignalManager {
         }
     }
 
-    private static void ifAbsent(Level level) {
+    public static void ifAbsent(Level level) {
         if (!clientSignals.containsKey(level)) {
             clientSignals.put(level, new HashMap<>());
         }
