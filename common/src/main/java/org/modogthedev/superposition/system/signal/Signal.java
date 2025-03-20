@@ -26,6 +26,7 @@ public class Signal {
     private BlockPos sourceAntennaPos;
     private int sourceAntennaSize = 0;
     private EncodedData<?> encodedData = null;
+    private float distance = 0;
 
     @Deprecated
     public Level level;
@@ -258,6 +259,14 @@ public class Signal {
 
     public void setLifetime(int lifetime) {
         this.lifetime = lifetime;
+    }
+
+    public void setDistance(float distance) {
+        this.distance = distance;
+    }
+
+    public float getDistance() {
+        return distance;
     }
 
     public void setSourceAntenna(BlockPos sourceAntennaPos, int sourceAntennaSize) {

@@ -64,6 +64,7 @@ public class AntennaManager {
             signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
             Vec3 to = antenna.antennaActor.getCenter().add(antenna.relativeCenter.x, antenna.relativeCenter.y, antenna.relativeCenter.z);
             float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(to.x, to.y, to.z));
+            signal1.setDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
             // TODO: Synchronize the state of the signal when its received.
             signal1.mulAmplitude(Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0));
 
