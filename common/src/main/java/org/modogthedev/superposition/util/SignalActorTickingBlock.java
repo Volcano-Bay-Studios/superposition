@@ -32,6 +32,13 @@ public class SignalActorTickingBlock extends Block implements EntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
+        if (blockPlaceContext.getPlayer() != null) {
+            if (blockPlaceContext.getPlayer().isShiftKeyDown()) {
+                return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection());
+            } else {
+                return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite());
+            }
+        }
         return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite());
     }
 
