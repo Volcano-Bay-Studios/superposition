@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import org.modogthedev.superposition.client.renderer.SuperpositionLightSystem;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.networking.SuperpositionMessages;
@@ -67,6 +68,7 @@ public class Superposition {
         CarabinerManager.clientTick(level);
         SuperpositionUITooltipRenderer.clientTick(level);
         ClientAudioManager.tick(level);
+        SuperpositionLightSystem.tick(level);
     }
 
     public static void clientAlwaysTick(Minecraft client) {

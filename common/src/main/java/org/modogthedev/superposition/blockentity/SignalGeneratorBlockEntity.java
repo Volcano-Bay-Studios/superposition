@@ -49,7 +49,9 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        this.frequency = tag.getFloat("frequency");
+        if (tag.contains("frequency")) {
+            this.frequency = tag.getFloat("frequency");
+        }
         super.loadAdditional(tag, registries);
     }
 

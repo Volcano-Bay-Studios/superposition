@@ -1,7 +1,6 @@
 package org.modogthedev.superposition.blockentity;
 
 import foundry.veil.api.client.color.ColorTheme;
-import foundry.veil.api.client.render.VeilRenderSystem;
 import foundry.veil.api.client.render.light.AreaLight;
 import foundry.veil.api.client.render.light.Light;
 import foundry.veil.api.client.render.light.PointLight;
@@ -23,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
+import org.modogthedev.superposition.client.renderer.SuperpositionLightSystem;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
@@ -59,7 +59,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     Object lastCall;
     private Object lastCallList;
     protected final List<Signal> putSignals = new ArrayList<>();
-    private LightRenderer lightRenderer = null;
     Light light;
 
     public List<Component> getTooltip() {
@@ -330,9 +329,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     @Override
     public void setRemoved() {
-        if (level.isClientSide && light != null) {
-            lightRenderer.removeLight(light);
-        }
         super.setRemoved();
     }
 
@@ -407,12 +403,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void tick() {
         if (this.level != null && this.level.isClientSide) {
-            if (lightRenderer == null) {
-                lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
-            }
             if (this.lightEnabled() && light == null) {
                 this.createLight();
-                lightRenderer.addLight(light);
                 if (light instanceof AreaLight areaLight) {
                     this.configureAreaLight(areaLight);
                 }
@@ -424,6 +416,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
                 this.setupConfigTooltips();
                 this.checkEvents();
                 this.finaliseConfigTooltips();
+            }
+            if (light != null) {
+                SuperpositionLightSystem.modifyLight(level,getBlockPos(),light);
             }
         }
         if (signalsReceived == 0) {
