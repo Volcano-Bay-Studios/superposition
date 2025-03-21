@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.client.renderer;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import foundry.veil.api.client.render.MatrixStack;
@@ -14,24 +15,24 @@ import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.cable.Cable;
+import org.modogthedev.superposition.system.cable.CableClientState;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.util.CatmulRomSpline;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,168 +57,184 @@ public class CableRenderer {
 
     private static final BlockPos.MutableBlockPos LIGHT_POS = new BlockPos.MutableBlockPos();
 
+    public static void renderCable(Cable cable, CableClientState clientState, VertexConsumer vertexConsumer, BlockAndTintGetter level, float partialTicks) {
+        clientState.updateLights(partialTicks);
+        Vector3dc origin = clientState.getOrigin();
+
+        CABLE_POINTS.clear();
+        PREV_CABLE_POINTS.clear();
+        if (cable.getPoints().getFirst().getAnchor() != null) {
+            RopeNode point = cable.getPoints().getFirst();
+            Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
+            CABLE_POINTS.add(pos);
+            PREV_CABLE_POINTS.add(pos);
+        }
+        for (RopeNode point : cable.getPoints()) {
+            Vec3 pos = point.getPosition();
+            CABLE_POINTS.add(pos);
+            PREV_CABLE_POINTS.add(point.getPrevRenderPosition());
+        }
+        if (cable.getPoints().getLast().getAnchor() != null) {
+            RopeNode point = cable.getPoints().getLast();
+            Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
+            CABLE_POINTS.add(pos);
+            PREV_CABLE_POINTS.add(pos);
+        }
+        List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
+        List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
+
+        if (cable.getPoints().getFirst().getAnchor() != null) {
+            RopeNode point = cable.getPoints().getFirst();
+            Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
+            splinePoints.addFirst(pos);
+            prevSplinePoints.addFirst(pos);
+        } else {
+            splinePoints.addFirst(cable.getPoints().getFirst().getPosition());
+            prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
+        }
+
+        if (cable.getPoints().getLast().getAnchor() != null) {
+            RopeNode point = cable.getPoints().getLast();
+            Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
+            splinePoints.add(pos);
+            prevSplinePoints.add(pos);
+        } else {
+            splinePoints.add(cable.getPoints().getLast().getPosition());
+            prevSplinePoints.add(cable.getPoints().getLast().getPrevRenderPosition());
+        }
+
+        int color = 0xFF000000 | cable.getColor().getRGB();
+        float constantRadius = SuperpositionConstants.cableWidth / 2.0f;
+        float v = 0;
+        float nextV;
+
+        renderCableStart(vertexConsumer, origin, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), partialTicks);
+
+        for (int i = 0; i < splinePoints.size() - 1; i++) {
+            float delta = (float) i / (splinePoints.size() - 1);
+            float nextDelta = (float) (i + 1) / (splinePoints.size() - 1);
+            float cableRadius = constantRadius - (0.001f * delta);
+            float nextCableRadius = constantRadius - (0.001f * nextDelta);
+            Vec3 prevPoint = prevSplinePoints.get(i);
+            Vec3 point = splinePoints.get(i);
+            Vec3 prevNextPoint = prevSplinePoints.get(i + 1);
+            Vec3 nextPoint = splinePoints.get(i + 1);
+
+            double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
+            double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
+            double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
+            double nextX = Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
+            double nextY = Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
+            double nextZ = Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
+
+            if (i < splinePoints.size() - 2) {
+                calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevSplinePoints.get(i + 2), splinePoints.get(i + 2), partialTicks);
+            } else {
+                NEXT_ORIENTATION.set(ORIENTATION);
+            }
+
+            int lightStart = LevelRenderer.getLightColor(level, LIGHT_POS.set(x, y, z));
+            int lightEnd = LevelRenderer.getLightColor(level, LIGHT_POS.set(nextX, nextY, nextZ));
+            double length = Math.sqrt((nextX - x) * (nextX - x) + (nextY - y) * (nextY - y) + (nextZ - z) * (nextZ - z));
+            nextV = v + (float) (length * 16.0 / 6.0);
+
+            // Down
+            ORIENTATION.transform(NORMAL.set(0, -1, 0));
+            NEXT_ORIENTATION.transform(NEXT_NORMAL.set(0, -1, 0));
+
+            NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, -nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            NEXT_ORIENTATION.transform(POS.set(nextCableRadius, -nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            // Up
+            ORIENTATION.transform(NORMAL.set(0, 1, 0));
+            NEXT_ORIENTATION.transform(NEXT_NORMAL.set(0, 1, 0));
+
+            ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            NEXT_ORIENTATION.transform(POS.set(nextCableRadius, nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            // West
+            ORIENTATION.transform(NORMAL.set(-1, 0, 0));
+            NEXT_ORIENTATION.transform(NEXT_NORMAL.set(-1, 0, 0));
+
+            NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, -nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            // East
+            ORIENTATION.transform(NORMAL.set(1, 0, 0));
+            NEXT_ORIENTATION.transform(NEXT_NORMAL.set(1, 0, 0));
+
+            ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
+            vertexConsumer.addVertex((float) (x - origin.x() + POS.x), (float) (y - origin.y() + POS.y), (float) (z - origin.z() + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
+
+            NEXT_ORIENTATION.transform(POS.set(nextCableRadius, nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            NEXT_ORIENTATION.transform(POS.set(nextCableRadius, -nextCableRadius, 0));
+            vertexConsumer.addVertex((float) (nextX - origin.x() + POS.x), (float) (nextY - origin.y() + POS.y), (float) (nextZ - origin.z() + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
+
+            ORIENTATION.set(NEXT_ORIENTATION);
+            v = nextV;
+        }
+        renderCableEnd(vertexConsumer, origin, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
+    }
+
     public static void renderCables(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
         float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
-        VertexConsumer vertexConsumer = bufferSource.getBuffer(SuperpositionRenderTypes.cable());
         ClientLevel level = Minecraft.getInstance().level;
         Vec3 cameraPos = camera.getPosition();
         PoseStack.Pose pose = matrixStack.pose();
 
+        Matrix4fStack stack = RenderSystem.getModelViewStack();
+        stack.pushMatrix();
+        stack.mul(pose.pose());
         for (Cable cable : CableManager.getLevelCables(level)) {
-            float effectiveGeometryPartialTicks = cable.isSleeping() ? 1.0f : partialTicks;
-            cable.updateLights(partialTicks);
+            VertexConsumer vertexConsumer = bufferSource.getBuffer(SuperpositionRenderTypes.cable());
 
-            CABLE_POINTS.clear();
-            PREV_CABLE_POINTS.clear();
-            if (cable.getPoints().getFirst().getAnchor() != null) {
-                RopeNode point = cable.getPoints().getFirst();
-                Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
-                CABLE_POINTS.add(pos);
-                PREV_CABLE_POINTS.add(pos);
-            }
-            for (RopeNode point : cable.getPoints()) {
-                Vec3 pos = point.getPosition();
-                CABLE_POINTS.add(pos);
-                PREV_CABLE_POINTS.add(point.getPrevRenderPosition());
-            }
-            if (cable.getPoints().getLast().getAnchor() != null) {
-                RopeNode point = cable.getPoints().getLast();
-                Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
-                CABLE_POINTS.add(pos);
-                PREV_CABLE_POINTS.add(pos);
-            }
-            List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
-            List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
+            CableClientState renderState = cable.getRenderState();
+            Vector3dc origin = renderState.getOrigin();
+            renderCable(cable, renderState, vertexConsumer, level, cable.isSleeping() ? 1.0F : partialTicks);
 
-            if (cable.getPoints().getFirst().getAnchor() != null) {
-                RopeNode point = cable.getPoints().getFirst();
-                Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
-                splinePoints.addFirst(pos);
-                prevSplinePoints.addFirst(pos);
-            } else {
-                splinePoints.addFirst(cable.getPoints().getFirst().getPosition());
-                prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
-            }
-
-            if (cable.getPoints().getLast().getAnchor() != null) {
-                RopeNode point = cable.getPoints().getLast();
-                Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
-                splinePoints.add(pos);
-                prevSplinePoints.add(pos);
-            } else {
-                splinePoints.add(cable.getPoints().getLast().getPosition());
-                prevSplinePoints.add(cable.getPoints().getLast().getPrevRenderPosition());
-            }
-
-            int color = 0xFF000000 | cable.getColor().getRGB();
-            float constantRadius = SuperpositionConstants.cableWidth / 2.0f;
-            float v = 0;
-            float nextV;
-
-            renderCableStart(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), effectiveGeometryPartialTicks);
-
-            for (int i = 0; i < splinePoints.size() - 1; i++) {
-                float delta = (float) i / (splinePoints.size()-1) ;
-                float nextDelta = (float) (i+ 1) / (splinePoints.size()-1) ;
-                float cableRadius = constantRadius - (0.001f*delta);
-                float nextCableRadius = constantRadius - (0.001f*nextDelta);
-                Vec3 prevPoint = prevSplinePoints.get(i);
-                Vec3 point = splinePoints.get(i);
-                Vec3 prevNextPoint = prevSplinePoints.get(i + 1);
-                Vec3 nextPoint = splinePoints.get(i + 1);
-
-                double x = Mth.lerp(effectiveGeometryPartialTicks, prevPoint.x, point.x);
-                double y = Mth.lerp(effectiveGeometryPartialTicks, prevPoint.y, point.y);
-                double z = Mth.lerp(effectiveGeometryPartialTicks, prevPoint.z, point.z);
-                double nextX = Mth.lerp(effectiveGeometryPartialTicks, prevNextPoint.x, nextPoint.x);
-                double nextY = Mth.lerp(effectiveGeometryPartialTicks, prevNextPoint.y, nextPoint.y);
-                double nextZ = Mth.lerp(effectiveGeometryPartialTicks, prevNextPoint.z, nextPoint.z);
-
-                if (i < splinePoints.size() - 2) {
-                    calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevSplinePoints.get(i + 2), splinePoints.get(i + 2), effectiveGeometryPartialTicks);
-                } else {
-                    NEXT_ORIENTATION.set(ORIENTATION);
-                }
-
-                int lightStart = LevelRenderer.getLightColor(level, LIGHT_POS.set(x, y, z));
-                int lightEnd = LevelRenderer.getLightColor(level, LIGHT_POS.set(nextX, nextY, nextZ));
-                double length = Math.sqrt((nextX - x) * (nextX - x) + (nextY - y) * (nextY - y) + (nextZ - z) * (nextZ - z));
-                nextV = v + (float) (length * 16.0 / 6.0);
-
-                // Down
-                ORIENTATION.transform(NORMAL.set(0, -1, 0));
-                NEXT_ORIENTATION.transform(NEXT_NORMAL.set(0, -1, 0));
-
-                NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, -nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                NEXT_ORIENTATION.transform(POS.set(nextCableRadius, -nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                // Up
-                ORIENTATION.transform(NORMAL.set(0, 1, 0));
-                NEXT_ORIENTATION.transform(NEXT_NORMAL.set(0, 1, 0));
-
-                ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                NEXT_ORIENTATION.transform(POS.set(nextCableRadius, nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                // West
-                ORIENTATION.transform(NORMAL.set(-1, 0, 0));
-                NEXT_ORIENTATION.transform(NEXT_NORMAL.set(-1, 0, 0));
-
-                NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, -nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                NEXT_ORIENTATION.transform(POS.set(-nextCableRadius, nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                // East
-                ORIENTATION.transform(NORMAL.set(1, 0, 0));
-                NEXT_ORIENTATION.transform(NEXT_NORMAL.set(1, 0, 0));
-
-                ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(color).setUv(0, v).setLight(lightStart).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
-
-                NEXT_ORIENTATION.transform(POS.set(nextCableRadius, nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                NEXT_ORIENTATION.transform(POS.set(nextCableRadius, -nextCableRadius, 0));
-                vertexConsumer.addVertex(pose, (float) (nextX - cameraPos.x + POS.x), (float) (nextY - cameraPos.y + POS.y), (float) (nextZ - cameraPos.z + POS.z)).setColor(color).setUv(0.5F, nextV).setLight(lightEnd).setNormal(pose, NEXT_NORMAL.x, NEXT_NORMAL.y, NEXT_NORMAL.z);
-
-                ORIENTATION.set(NEXT_ORIENTATION);
-                v = nextV;
-            }
-            renderCableEnd(vertexConsumer, matrixStack, cameraPos, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), effectiveGeometryPartialTicks);
+            stack.pushMatrix();
+            stack.translate((float) (origin.x() - cameraPos.x), (float) (origin.y() - cameraPos.y), (float) (origin.z() - cameraPos.z));
+            RenderSystem.applyModelViewMatrix();
+            bufferSource.endBatch();
+            stack.popMatrix();
         }
-        bufferSource.endBatch();
+        stack.popMatrix();
+        RenderSystem.applyModelViewMatrix();
     }
 
-    private static void renderCableStart(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
-        PoseStack.Pose pose = matrixStack.pose();
+    private static void renderCableStart(VertexConsumer vertexConsumer, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         float cableRadius = (SuperpositionConstants.cableWidth / 2.0f);
         double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
         double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
@@ -230,22 +247,20 @@ public class CableRenderer {
         int startLight = LevelRenderer.getLightColor(Minecraft.getInstance().level, LIGHT_POS.set(x, y, z));
         ORIENTATION.transform(NORMAL.set(0, 0, -1));
         ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 0.5F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
 
         ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 1.0F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 1.0F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
 
         ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
 
         ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
     }
 
-
-    private static void renderCableEnd(VertexConsumer vertexConsumer, MatrixStack matrixStack, Vec3 cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
-        PoseStack.Pose pose = matrixStack.pose();
-        float cableRadius = (SuperpositionConstants.cableWidth / 2.0f) -0.001f;
+    private static void renderCableEnd(VertexConsumer vertexConsumer, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+        float cableRadius = (SuperpositionConstants.cableWidth / 2.0f) - 0.001f;
         double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
         double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
         double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
@@ -258,24 +273,24 @@ public class CableRenderer {
         int startLight = LevelRenderer.getLightColor(Minecraft.getInstance().level, LIGHT_POS.set(x, y, z));
         ORIENTATION.transform(NORMAL.set(0, 0, 1));
         ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 0.5F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
 
         ORIENTATION.transform(POS.set(cableRadius, cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 1.0F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 1.0F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
 
         ORIENTATION.transform(POS.set(-cableRadius, cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 1.0F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
 
         ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
-        vertexConsumer.addVertex(pose, (float) (x - cameraPos.x + POS.x), (float) (y - cameraPos.y + POS.y), (float) (z - cameraPos.z + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(pose, NORMAL.x, NORMAL.y, NORMAL.z);
+        vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
     }
 
-    private static Quaternionf calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+    private static void calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         double dx = (Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
         double dy = (Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
         double dz = (Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
         float factor = 0;//(float) Mth.smoothstep(1.0-Mth.clamp(8*Math.sqrt(dx * dx + dz * dz), 0.0, 1.0));
-        return store.identity().rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0).rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0).slerp(dy < 0 ? POSITIVE_Y : NEGATIVE_Y, factor);
+        store.identity().rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0).rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0).slerp(dy < 0 ? POSITIVE_Y : NEGATIVE_Y, factor);
     }
 
     public static void renderCableHeldPoint(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
@@ -326,7 +341,7 @@ public class CableRenderer {
 
                 Vector4f color = getColorForNodeHighlight(isLast, isFirst, hasAnchor);
                 if (!Minecraft.getInstance().player.getAbilities().mayBuild) {
-                    color = new Vector4f(0.5f,0.5f,0.5f,0.5f);
+                    color = new Vector4f(0.5f, 0.5f, 0.5f, 0.5f);
                 }
                 if (isLast || isFirst) {
                     width -= 0.03f;

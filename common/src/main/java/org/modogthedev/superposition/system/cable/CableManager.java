@@ -23,8 +23,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class CableManager {
     private static int grabTimer = 0;
@@ -98,7 +98,7 @@ public class CableManager {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
                     Vec3 holdGoalPos = getPlayerHeldCablePos(player);
-                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale(holdGoalPos.distanceTo(playerPoint.getPosition()))).add(0, 0.5f,0);
+                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale(holdGoalPos.distanceTo(playerPoint.getPosition()))).add(0, 0.5f, 0);
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
                     playerPoint.setLastDragGoalPos(holdGoalPos);
@@ -106,7 +106,7 @@ public class CableManager {
             }
         }
     }
-    
+
     public static void applyPlayerStretch(Level level) {
         for (Cable cable : getLevelCables(level)) {
             for (int id : cable.getPlayerHoldingPointMap().keySet()) {
@@ -202,12 +202,13 @@ public class CableManager {
 
     /**
      * Held position away from the player for raycasting for cables
+     *
      * @param player
      * @return
      */
     public static Vec3 getPlayerHoldCablePos(Player player) {
         Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(5));
-        BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+        BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(), holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
         if (result.getType() == HitResult.Type.BLOCK) {
             holdGoalPos = result.getLocation();
         }
@@ -216,12 +217,13 @@ public class CableManager {
 
     /**
      * Held position close for the player for when they are holding it
+     *
      * @param player
      * @return
      */
     public static Vec3 getPlayerHeldCablePos(Player player) {
         Vec3 holdGoalPos = player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(2));
-        BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(),holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE,player));
+        BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(), holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
         if (result.getType() == HitResult.Type.BLOCK) {
             holdGoalPos = result.getLocation();
         }
@@ -229,7 +231,7 @@ public class CableManager {
     }
 
     private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color, boolean emitsLight) {
-        if (player.level().isClientSide) {
+        if (player.level().isClientSide()) {
             return;
         }
 
@@ -285,7 +287,7 @@ public class CableManager {
         for (Map.Entry<UUID, Cable> entry : cables.entrySet()) {
             Cable cable = entry.getValue();
             if (cable.getPoints().size() < 4) {
-                removeCable(player.level(),entry.getKey());
+                removeCable(player.level(), entry.getKey());
                 return;
             }
 
@@ -300,7 +302,13 @@ public class CableManager {
     }
 
     public static void addCable(Cable cable, Level level) {
-        getCablesMap(level).computeIfAbsent(level.dimension(), unused -> new HashMap<>()).put(cable.getId(), cable);
+        Cable old = getCablesMap(level).computeIfAbsent(level.dimension(), unused -> new HashMap<>()).put(cable.getId(), cable);
+        if (old != null) {
+            CableClientState clientState = old.getClientState();
+            if (clientState != null) {
+                clientState.free();
+            }
+        }
     }
 
     public static Collection<Cable> getLevelCables(Level level) {
@@ -308,8 +316,15 @@ public class CableManager {
         return cables != null ? cables.values() : Collections.emptyList();
     }
 
-    public static void removeCable(Level level,UUID cableId) {
-        getCables(level).remove(cableId);
+    public static void removeCable(Level level, UUID cableId) {
+        Map<UUID, Cable> cables = getCables(level);
+        Cable cable = cables != null ? cables.remove(cableId) : null;
+        if (cable != null) {
+            CableClientState clientState = cable.getClientState();
+            if (clientState != null) {
+                clientState.free();
+            }
+        }
     }
 
     public static void wipeResidualData() {
@@ -317,6 +332,14 @@ public class CableManager {
     }
 
     public static void wipeClientData() {
+        for (Map<UUID, Cable> map : clientCables.values()) {
+            for (Cable value : map.values()) {
+                CableClientState clientState = value.getClientState();
+                if (clientState != null) {
+                    clientState.free();
+                }
+            }
+        }
         clientCables.clear(); // TODO: no worky
     }
 }

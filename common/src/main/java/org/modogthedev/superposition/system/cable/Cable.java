@@ -1,18 +1,16 @@
 package org.modogthedev.superposition.system.cable;
 
-import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.light.PointLight;
-import foundry.veil.api.client.render.light.renderer.LightRenderer;
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionTags;
@@ -20,12 +18,11 @@ import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
 public class Cable {
@@ -35,19 +32,17 @@ public class Cable {
     private Level level;
     public float radius = SuperpositionConstants.cableRadius;
     private final RopeSimulation ropeSimulation;
-    private Player playerHolding;
     private Color color;
     private final boolean emitsLight;
-    private List<PointLight> pointLights;
     private float brightness;
     private int stretchGrace = 0;
 
-    private LightRenderer lightRenderer = null;
+    private CableClientState clientState;
 
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
-        this.ropeSimulation = new RopeSimulation(radius);
-        ropeSimulation.createRope(points, starAnchor, endAnchor);
+        this.ropeSimulation = new RopeSimulation(this.radius);
+        this.ropeSimulation.createRope(points, starAnchor, endAnchor);
         this.level = level;
         this.color = color;
         this.emitsLight = emitsLight;
@@ -62,23 +57,23 @@ public class Cable {
     }
 
     public void updatePhysics() {
-        if (stretchGrace > 0) {
-            stretchGrace--;
+        if (this.stretchGrace > 0) {
+            this.stretchGrace--;
         }
-        if (!playerHoldingPointMap.isEmpty()) {
-            ropeSimulation.invalidateSleepTime();
+        if (!this.playerHoldingPointMap.isEmpty()) {
+            this.ropeSimulation.invalidateSleepTime();
         }
-        freeStuckPoints();
-        if (!isSleeping()) {
-            ropeSimulation.simulate(level);
+        this.freeStuckPoints();
+        if (!this.isSleeping()) {
+            this.ropeSimulation.simulate(this.level);
         }
         this.sendSignal();
     }
 
     private void sendSignal() {
-        if (level != null && playerHolding == null) {
-            RopeNode firstNode = ropeSimulation.getNodes().getFirst();
-            RopeNode lastNode = ropeSimulation.getNodes().getLast();
+        if (this.level != null) {
+            RopeNode firstNode = this.ropeSimulation.getNodes().getFirst();
+            RopeNode lastNode = this.ropeSimulation.getNodes().getLast();
 
 
             if (firstNode.getAnchor() == null) {
@@ -86,18 +81,18 @@ public class Cable {
             }
 
             BlockPos startPos = firstNode.getAnchor().getAnchorBlock();
-            if (emitsLight && level.isLoaded(startPos)) {
-                BlockEntity start = level.getBlockEntity(startPos);
+            if (this.emitsLight && this.level.isLoaded(startPos)) {
+                BlockEntity start = this.level.getBlockEntity(startPos);
                 if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    updateColor(startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()));
+                    this.updateColor(startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()));
                 }
             }
 
             if (lastNode.getAnchor() == null) {
-                if (emitsLight) {
-                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
+                if (this.emitsLight) {
+                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(this.level, startPos);
                     if (signalList != null && !signalList.isEmpty()) {
-                        updateColor(signalList);
+                        this.updateColor(signalList);
                     }
                 }
                 return;
@@ -105,10 +100,10 @@ public class Cable {
 
             BlockPos endPos = lastNode.getAnchor().getAnchorBlock();
 
-            if (level.isLoaded(startPos) && level.isLoaded(endPos)) {
+            if (this.level.isLoaded(startPos) && this.level.isLoaded(endPos)) {
 
-                BlockEntity start = level.getBlockEntity(startPos);
-                BlockEntity end = level.getBlockEntity(endPos);
+                BlockEntity start = this.level.getBlockEntity(startPos);
+                BlockEntity end = this.level.getBlockEntity(endPos);
 
                 if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
 
@@ -118,9 +113,9 @@ public class Cable {
                     }
 
                 } else if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    if (level.getBlockState(endPos).is(SuperpositionTags.SIGNAL_OFFSET)) {
+                    if (this.level.getBlockState(endPos).is(SuperpositionTags.SIGNAL_OFFSET)) {
                         CablePassthroughManager.addSignalsToBlock(
-                                level, endPos.relative(lastNode.getAnchor().getDirection()),
+                                this.level, endPos.relative(lastNode.getAnchor().getDirection()),
                                 startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()),
                                 lastNode.getAnchor().getDirection()
 
@@ -128,7 +123,7 @@ public class Cable {
                     } else {
 
                         CablePassthroughManager.addSignalsToBlock(
-                                level, endPos,
+                                this.level, endPos,
                                 startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()),
                                 lastNode.getAnchor().getDirection()
                         );
@@ -136,15 +131,15 @@ public class Cable {
 
                 } else {
 
-                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(level, startPos);
+                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(this.level, startPos);
                     if (signalList != null) {
                         if (end instanceof SignalActorBlockEntity endSignalActor) {
                             endSignalActor.putSignalsFace(new Object(), signalList, lastNode.getAnchor().getDirection());
                         } else {
-                            CablePassthroughManager.addSignalsToBlock(level, endPos, signalList, lastNode.getAnchor().getDirection());
+                            CablePassthroughManager.addSignalsToBlock(this.level, endPos, signalList, lastNode.getAnchor().getDirection());
                         }
-                        if (emitsLight) {
-                            updateColor(signalList);
+                        if (this.emitsLight) {
+                            this.updateColor(signalList);
                         }
                     }
 
@@ -159,52 +154,17 @@ public class Cable {
             return;
         }
         Signal signal = signalList.getFirst();
-        brightness = signal.getAmplitude();
-        if (signal.getEncodedData() != null) {
-            Color color;
-            int colorInt = signal.getEncodedData().intValue();
-            color = new Color(colorInt);
-            if (color != null) {
-                this.color = color;
-            }
-        }
-    }
-
-    public void updateLights(float partialTicks) {
-        if (lightRenderer == null) {
-            lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
-        }
-        if (emitsLight) {
-            if (pointLights == null) {
-                pointLights = new ArrayList<>();
-            }
-            if (pointLights.size() > ropeSimulation.getNodesCount()) {
-                ListIterator<PointLight> iterator = pointLights.listIterator();
-                while (iterator.hasNext()) {
-                    int i = iterator.nextIndex();
-                    PointLight point = iterator.next();
-                    if (i >= ropeSimulation.getNodesCount()) {
-                        lightRenderer.removeLight(point);
-                        iterator.remove();
-                    }
-                }
-            } else if (pointLights.size() < ropeSimulation.getNodesCount()) {
-                for (int i = pointLights.size(); i < ropeSimulation.getNodes().size(); i++) {
-                    pointLights.add(new PointLight());
-                    lightRenderer.addLight(pointLights.get(i));
-                }
-            }
-
-            for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
-                updateLight(pointLights.get(i), ropeSimulation.getNode(i));
-            }
+        this.brightness = signal.getAmplitude();
+        EncodedData<?> encodedData = signal.getEncodedData();
+        if (encodedData != null) {
+            this.color = new Color(encodedData.intValue());
         }
     }
 
     private void freeStuckPoints() {
-        for (int i = 0; i < ropeSimulation.getNodesCount() - 1; i++) {
-            RopeNode point = ropeSimulation.getNode(i);
-            RopeNode lastPoint = ropeSimulation.getNode(i + 1);
+        for (int i = 0; i < this.ropeSimulation.getNodesCount() - 1; i++) {
+            RopeNode point = this.ropeSimulation.getNode(i);
+            RopeNode lastPoint = this.ropeSimulation.getNode(i + 1);
             float distance = (float) point.getPosition().distanceTo(lastPoint.getPosition());
             if (distance > SuperpositionConstants.cableRadius * 3) {
                 point.addNextPosition(lastPoint.getPosition());
@@ -213,20 +173,13 @@ public class Cable {
         }
     }
 
-    private void updateLight(PointLight light, RopeNode point) {
-        light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
-        light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
-        light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
-        light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-    }
-
     public void shrink() {
-        if (ropeSimulation.getNodesCount() > 4)
-            ropeSimulation.resizeRope(ropeSimulation.getNodesCount() - 1);
+        if (this.ropeSimulation.getNodesCount() > 4)
+            this.ropeSimulation.resizeRope(this.ropeSimulation.getNodesCount() - 1);
     }
 
     public void setPlayerHolding(Player player) {
-        this.addPlayerHoldingPoint(player.getId(), getPoints().size() - 1);
+        this.addPlayerHoldingPoint(player.getId(), this.getPoints().size() - 1);
     }
 
     public void setLevel(Level level) {
@@ -234,14 +187,14 @@ public class Cable {
     }
 
     public List<RopeNode> getPoints() {
-        return ropeSimulation.getNodes();
+        return this.ropeSimulation.getNodes();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(color.getRGB());
-        buf.writeBoolean(emitsLight);
-        buf.writeVarInt(ropeSimulation.getNodesCount());
-        for (RopeNode point : ropeSimulation.getNodes()) {
+        buf.writeInt(this.color.getRGB());
+        buf.writeBoolean(this.emitsLight);
+        buf.writeVarInt(this.ropeSimulation.getNodesCount());
+        for (RopeNode point : this.ropeSimulation.getNodes()) {
             buf.writeVec3(point.getPosition());
             buf.writeVec3(point.getPrevPosition());
             AnchorConstraint constraint = point.getAnchor();
@@ -251,8 +204,8 @@ public class Cable {
                 buf.writeBlockPos(constraint.getAnchorBlock());
             }
         }
-        buf.writeVarInt(playerHoldingPointMap.size());
-        for (Int2IntMap.Entry entry : playerHoldingPointMap.int2IntEntrySet()) {
+        buf.writeVarInt(this.playerHoldingPointMap.size());
+        for (Int2IntMap.Entry entry : this.playerHoldingPointMap.int2IntEntrySet()) {
             buf.writeVarInt(entry.getIntKey());
             buf.writeVarInt(entry.getIntValue());
         }
@@ -283,38 +236,42 @@ public class Cable {
     }
 
     public Int2IntMap getPlayerHoldingPointMap() {
-        return playerHoldingPointMap;
+        return this.playerHoldingPointMap;
     }
 
     public void updateFromCable(Cable cable, boolean isHard) {
-        color = cable.color;
-        ropeSimulation.removeAllConstraints();
-        ropeSimulation.resizeRope(cable.getPointsCount());
+        this.color = cable.color;
+        this.ropeSimulation.removeAllConstraints();
+        this.ropeSimulation.resizeRope(cable.getPointsCount());
         List<RopeNode> targetPoints = cable.getPoints();
-        for (int i = 0; i < ropeSimulation.getNodesCount(); i++) {
+        for (int i = 0; i < this.ropeSimulation.getNodesCount(); i++) {
             if (this.playerHoldingPointMap.size() != cable.playerHoldingPointMap.size()) {
-                ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
+                this.ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
 //                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
             } else {
 //                ropeSimulation.getNode(i).setPrevPosition(ropeSimulation.getNode(i).getPosition());
-                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(ropeSimulation.getNode(i).getPrevPosition(), 0.8f));
-                ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition().lerp(ropeSimulation.getNode(i).getPosition(), 0.8f));
+                this.ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(this.ropeSimulation.getNode(i).getPrevPosition(), 0.8f));
+                this.ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition().lerp(this.ropeSimulation.getNode(i).getPosition(), 0.8f));
             }
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
             if (newAnchor != null) {
-                ropeSimulation.getNode(i).setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
+                this.ropeSimulation.getNode(i).setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
             } else {
                 targetPoints.get(i).removeAnchor();
             }
         }
-        level = cable.level;
-        ropeSimulation.recalculateBaseRopeConstraints();
+        this.level = cable.level;
+        this.ropeSimulation.recalculateBaseRopeConstraints();
         this.playerHoldingPointMap = new Int2IntArrayMap(cable.playerHoldingPointMap);
+        if (this.clientState != null) {
+            this.clientState.free();
+        }
+        this.clientState = cable.clientState;
     }
 
     public float calculateLength() {
         float length = 0;
-        for (RopeNode node : ropeSimulation.getNodes()) {
+        for (RopeNode node : this.ropeSimulation.getNodes()) {
             RopeNode next = node.getNext();
             if (next != null) length += (float) node.getPosition().distanceTo(next.getPosition());
         }
@@ -322,54 +279,78 @@ public class Cable {
     }
 
     private int getPointsCount() {
-        return ropeSimulation.getNodesCount();
+        return this.ropeSimulation.getNodesCount();
     }
 
     public UUID getId() {
-        return id;
+        return this.id;
     }
 
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
-        stretchGrace = 4;
-        if (getPointsCount() > pointIndex && pointIndex > -1) {
-            getPoints().get(pointIndex).removeAnchor();
-            playerHoldingPointMap.put(playerId, pointIndex);
+        this.stretchGrace = 4;
+        if (this.getPointsCount() > pointIndex && pointIndex > -1) {
+            this.getPoints().get(pointIndex).removeAnchor();
+            this.playerHoldingPointMap.put(playerId, pointIndex);
         }
     }
 
     public boolean hasPlayerHolding(int playerUUID) {
-        return playerHoldingPointMap.containsKey(playerUUID);
+        return this.playerHoldingPointMap.containsKey(playerUUID);
     }
 
     public Pair<RopeNode, Integer> getPlayerHeldPoint(int playerUUID) {
-        if (playerHoldingPointMap.containsKey(playerUUID)) {
-            int index = playerHoldingPointMap.get(playerUUID);
-            if (ropeSimulation.getNodesCount() > index) {
-                return new Pair<>(ropeSimulation.getNode(index), index);
+        if (this.playerHoldingPointMap.containsKey(playerUUID)) {
+            int index = this.playerHoldingPointMap.get(playerUUID);
+            if (this.ropeSimulation.getNodesCount() > index) {
+                return new Pair<>(this.ropeSimulation.getNode(index), index);
             }
         }
         return null;
     }
 
     public void addPointAtIndex(int index, RopeNode point) {
-        ropeSimulation.addNode(index, point);
-        ropeSimulation.recalculateBaseRopeConstraints();
+        this.ropeSimulation.addNode(index, point);
+        this.ropeSimulation.recalculateBaseRopeConstraints();
     }
 
     public int getPointIndex(RopeNode point) {
-        return ropeSimulation.getNodes().indexOf(point);
+        return this.ropeSimulation.getNodes().indexOf(point);
     }
 
     public void stopPlayerDrag(int playerUUID) {
-        playerHoldingPointMap.remove(playerUUID);
+        this.playerHoldingPointMap.remove(playerUUID);
     }
 
     public Color getColor() {
-        return color;
+        return this.color;
+    }
+
+    public @Nullable CableClientState getClientState() {
+        RenderSystem.assertOnRenderThread();
+        return this.clientState;
+    }
+
+    public CableClientState getRenderState() {
+        RenderSystem.assertOnRenderThread();
+        if (this.clientState == null) {
+            this.clientState = new CableClientState(this, this.ropeSimulation);
+            this.clientState.update();
+        } else if (!this.isSleeping()) {
+            this.clientState.update();
+        }
+        return this.clientState;
+    }
+
+    public float getBrightness() {
+        return this.brightness;
+    }
+
+    public boolean isEmitsLight() {
+        return this.emitsLight;
     }
 
     public int getStretchGrace() {
-        return stretchGrace;
+        return this.stretchGrace;
     }
 
     public void setStretchGrace(int stretchGrace) {
@@ -381,11 +362,11 @@ public class Cable {
     }
 
     public boolean isSleeping() {
-        return ropeSimulation.isSleeping();
+        return this.ropeSimulation.isSleeping();
     }
 
     public void preSimulate() {
-        for (RopeNode node : getPoints()) {
+        for (RopeNode node : this.getPoints()) {
             node.preSimulate();
         }
     }

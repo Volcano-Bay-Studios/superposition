@@ -16,10 +16,9 @@ import org.modogthedev.superposition.system.cable.CableManager;
 import java.awt.*;
 
 public class CableItem extends Item {
-    private Vec3 start;
-    private Vec3 end;
-    private Color color;
-    private boolean emitsLight;
+
+    private final Color color;
+    private final boolean emitsLight;
 
     public CableItem(Properties properties, Color color, boolean emitsLight) {
         super(properties);
@@ -27,12 +26,15 @@ public class CableItem extends Item {
         this.emitsLight = emitsLight;
     }
 
-    private static final int SIZE = 3;
-
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        CableManager.playerUsesCable(context.getPlayer(), context.getClickedPos(), color, emitsLight, context.getClickedFace());
-        if (!context.getPlayer().getAbilities().instabuild) {
+        Player player = context.getPlayer();
+        if (player == null) {
+            return InteractionResult.FAIL;
+        }
+
+        CableManager.playerUsesCable(player, context.getClickedPos(), this.color, this.emitsLight, context.getClickedFace());
+        if (!player.isCreative()) {
             context.getItemInHand().shrink(1);
         }
         return InteractionResult.SUCCESS;
@@ -42,10 +44,11 @@ public class CableItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         for (Cable cable : CableManager.getLevelCables(level)) {
             if (cable.hasPlayerHolding(player.getId())) {
-                if (!player.isShiftKeyDown())
+                if (!player.isShiftKeyDown()) {
                     CableManager.playerExtendsCable(player, SuperpositionConstants.cableSpawnAmount);
-                else
+                } else {
                     CableManager.playerShrinksCable(player);
+                }
                 return InteractionResultHolder.success(player.getItemInHand(usedHand));
             }
         }
