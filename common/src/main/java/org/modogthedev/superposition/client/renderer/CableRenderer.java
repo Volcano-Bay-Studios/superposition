@@ -211,11 +211,10 @@ public class CableRenderer {
         renderCableEnd(vertexConsumer, level, origin, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
     }
 
-    public static void renderCables(MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
+    public static void renderCables(MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc frustumMatrix, int renderTick, DeltaTracker deltaTracker, Camera camera) {
         float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
         ClientLevel level = Minecraft.getInstance().level;
         Vec3 cameraPos = camera.getPosition();
-        PoseStack.Pose pose = matrixStack.pose();
         RenderType renderType = SuperpositionRenderTypes.cable();
 
         renderType.setupRenderState();
@@ -227,19 +226,20 @@ public class CableRenderer {
         shader.apply();
 
         Matrix4fStack stack = RenderSystem.getModelViewStack();
-        stack.pushMatrix();
-        stack.mul(pose.pose());
         for (Cable cable : CableManager.getLevelCables(level)) {
             CableClientState renderState = cable.getRenderState(cable.isSleeping() ? 1.0F : partialTicks);
             Vector3dc origin = renderState.getOrigin();
 
-            stack.pushMatrix();
-            stack.translate((float) (origin.x() - cameraPos.x), (float) (origin.y() - cameraPos.y), (float) (origin.z() - cameraPos.z));
+            if (shader.CHUNK_OFFSET != null) {
+                shader.CHUNK_OFFSET.set((float) (origin.x() - cameraPos.x), (float) (origin.y() - cameraPos.y), (float) (origin.z() - cameraPos.z));
+                shader.CHUNK_OFFSET.upload();
+            }
             renderState.render(shader, stack, PROJECTION.set(projectionMatrix));
-            stack.popMatrix();
         }
-        stack.popMatrix();
 
+        if (shader.CHUNK_OFFSET != null) {
+            shader.CHUNK_OFFSET.set(0.0F, 0.0F, 0.0F);
+        }
         VertexArray.unbind();
         shader.clear();
         renderType.clearRenderState();

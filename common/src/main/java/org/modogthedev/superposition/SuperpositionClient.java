@@ -18,12 +18,12 @@ public class SuperpositionClient {
 
     public static void init() {
         ClientAudioManager.setup();
-        VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera, frustum) -> {
+        VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, partialTicks, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
-                CableRenderer.renderCables(matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
-                CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
-                CableRenderer.renderOverlays(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
-                DebugRenderer.renderDebug(levelRenderer, bufferSource, matrixStack, matrix4fc, matrix4fc2, partialTicks, deltaTracker, camera);
+                CableRenderer.renderCables(matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
+                CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
+                CableRenderer.renderOverlays(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
+                DebugRenderer.renderDebug(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
             }
         });
     }
