@@ -43,6 +43,7 @@ public class CableRenderer {
 
     private static final Quaternionf POSITIVE_Y = new Quaternionf().setAngleAxis(Math.PI / 2, 1, 0, 0);
     private static final Quaternionf NEGATIVE_Y = new Quaternionf().setAngleAxis(-Math.PI / 2, 1, 0, 0);
+    private static final Matrix4f FRUSTUM = new Matrix4f();
     private static final Matrix4f PROJECTION = new Matrix4f();
 
     private static final Quaternionf ORIENTATION = new Quaternionf();
@@ -211,7 +212,7 @@ public class CableRenderer {
         renderCableEnd(vertexConsumer, level, origin, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
     }
 
-    public static void renderCables(MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc frustumMatrix, int renderTick, DeltaTracker deltaTracker, Camera camera) {
+    public static void renderCables(Matrix4fc projectionMatrix, Matrix4fc frustumMatrix, DeltaTracker deltaTracker, Camera camera) {
         float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
         ClientLevel level = Minecraft.getInstance().level;
         Vec3 cameraPos = camera.getPosition();
@@ -220,12 +221,11 @@ public class CableRenderer {
         renderType.setupRenderState();
         ShaderInstance shader = RenderSystem.getShader();
         if (shader == null) {
+            renderType.clearRenderState();
             return;
         }
 
         shader.apply();
-
-        Matrix4fStack stack = RenderSystem.getModelViewStack();
         for (Cable cable : CableManager.getLevelCables(level)) {
             CableClientState renderState = cable.getRenderState(cable.isSleeping() ? 1.0F : partialTicks);
             Vector3dc origin = renderState.getOrigin();
@@ -234,7 +234,7 @@ public class CableRenderer {
                 shader.CHUNK_OFFSET.set((float) (origin.x() - cameraPos.x), (float) (origin.y() - cameraPos.y), (float) (origin.z() - cameraPos.z));
                 shader.CHUNK_OFFSET.upload();
             }
-            renderState.render(shader, stack, PROJECTION.set(projectionMatrix));
+            renderState.render(shader, FRUSTUM.set(frustumMatrix), PROJECTION.set(projectionMatrix));
         }
 
         if (shader.CHUNK_OFFSET != null) {
