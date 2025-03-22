@@ -38,6 +38,7 @@ public class Cable {
     private int stretchGrace = 0;
 
     private CableClientState clientState;
+    private boolean clientDirty;
 
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
@@ -242,6 +243,7 @@ public class Cable {
     }
 
     public void updateFromCable(Cable cable, boolean isHard) {
+        boolean clientDirty = !this.color.equals(cable.color);
         this.color = cable.color;
         this.ropeSimulation.removeAllConstraints();
         this.ropeSimulation.resizeRope(cable.getPointsCount());
@@ -265,6 +267,9 @@ public class Cable {
         this.level = cable.level;
         this.ropeSimulation.recalculateBaseRopeConstraints();
         this.playerHoldingPointMap = new Int2IntArrayMap(cable.playerHoldingPointMap);
+        if (clientDirty) {
+            this.clientDirty = true;
+        }
     }
 
     public float calculateLength() {
@@ -333,8 +338,10 @@ public class Cable {
         if (this.clientState == null) {
             this.clientState = new CableClientState(this, this.ropeSimulation);
             this.clientState.update(partialTicks);
-        } else if (!this.isSleeping()) {
+            this.clientDirty = false;
+        } else if (!this.isSleeping() || this.clientDirty) {
             this.clientState.update(partialTicks);
+            this.clientDirty = false;
         }
         return this.clientState;
     }
