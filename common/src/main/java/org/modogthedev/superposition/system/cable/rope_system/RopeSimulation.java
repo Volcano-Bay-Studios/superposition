@@ -7,17 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RopeSimulation {
-    
+
     float connectionWidth;
-    
+
     List<RopeNode> nodes = new ArrayList<>();
     List<RopeConstraint> baseConstraints = new ArrayList<>();
     List<RopeConstraint> constraints = new ArrayList<>();
-    
+
     int sleepTime = 0;
-    
-    public RopeSimulation(float connectionWidth) {
+
+    public RopeSimulation(float connectionWidth, boolean sleeping) {
         this.connectionWidth = connectionWidth;
+        this.sleepTime = sleeping ? 21 : 0;
     }
 
     public void createRope(int count, Vec3 from, Vec3 to) {
@@ -94,14 +95,14 @@ public class RopeSimulation {
         for (int i = 0; i < constraints.size(); i++) {
             constraints.get(i).applyConstraint();
         }
-        for (int i = constraints.size()-1; i >= 0; i--) {
+        for (int i = constraints.size() - 1; i >= 0; i--) {
             constraints.get(i).applyConstraint();
         }
 
         for (RopeNode node : nodes) {
             node.resolveWorldCollisions(level);
         }
-        
+
         for (int i = 0; i < 10; i++) {
             processLength(true);
             for (RopeNode node : nodes) {
@@ -142,7 +143,7 @@ public class RopeSimulation {
     }
 
     private void processLength(boolean forwards) {
-        for (int j = forwards ? 0 : nodes.size() -1; forwards ? (j < nodes.size() -1) : (j > 1); j += forwards ? 1 : -1) {
+        for (int j = forwards ? 0 : nodes.size() - 1; forwards ? (j < nodes.size() - 1) : (j > 1); j += forwards ? 1 : -1) {
             RopeNode node = nodes.get(j);
             RopeNode nextNode = nodes.get(j + (forwards ? 1 : -1));
 
@@ -184,9 +185,9 @@ public class RopeSimulation {
         double walkedNodesLength = 0;
         double maxWalkedNodeOverstretch = 0;
 
-        for (int i = originIndex; i < nodes.size()-1; i++) {
+        for (int i = originIndex; i < nodes.size() - 1; i++) {
             RopeNode current = nodes.get(i);
-            RopeNode next = nodes.get(i+1);
+            RopeNode next = nodes.get(i + 1);
 
             walkedNodes++;
             double dist = current.position.distanceTo(next.position);
@@ -197,7 +198,7 @@ public class RopeSimulation {
         }
         for (int i = originIndex; i > 1; i--) {
             RopeNode current = nodes.get(i);
-            RopeNode next = nodes.get(i-1);
+            RopeNode next = nodes.get(i - 1);
 
             walkedNodes++;
             double dist = current.position.distanceTo(next.position);
@@ -223,13 +224,13 @@ public class RopeSimulation {
     }
 
     public RopeNode getNode(int index) {
-        if (index < 0 || nodes.size() -1 < index) {
+        if (index < 0 || nodes.size() - 1 < index) {
             return null;
         }
         return nodes.get(index);
     }
 
-    public int getNodesCount() {
+    public int getNodeCount() {
         return nodes.size();
     }
 

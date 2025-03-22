@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import foundry.veil.api.client.render.MatrixStack;
+import foundry.veil.api.client.render.vertex.VertexArray;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -11,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.debug.DebugRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -40,6 +43,7 @@ public class CableRenderer {
 
     private static final Quaternionf POSITIVE_Y = new Quaternionf().setAngleAxis(Math.PI / 2, 1, 0, 0);
     private static final Quaternionf NEGATIVE_Y = new Quaternionf().setAngleAxis(-Math.PI / 2, 1, 0, 0);
+    private static final Matrix4f PROJECTION = new Matrix4f();
 
     private static final Quaternionf ORIENTATION = new Quaternionf();
     private static final Quaternionf NEXT_ORIENTATION = new Quaternionf();
@@ -58,7 +62,6 @@ public class CableRenderer {
     private static final BlockPos.MutableBlockPos LIGHT_POS = new BlockPos.MutableBlockPos();
 
     public static void renderCable(Cable cable, CableClientState clientState, VertexConsumer vertexConsumer, BlockAndTintGetter level, float partialTicks) {
-        clientState.updateLights(partialTicks);
         Vector3dc origin = clientState.getOrigin();
 
         CABLE_POINTS.clear();
@@ -108,7 +111,7 @@ public class CableRenderer {
         float v = 0;
         float nextV;
 
-        renderCableStart(vertexConsumer, origin, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), partialTicks);
+        renderCableStart(vertexConsumer, level, origin, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), partialTicks);
 
         for (int i = 0; i < splinePoints.size() - 1; i++) {
             float delta = (float) i / (splinePoints.size() - 1);
@@ -205,36 +208,44 @@ public class CableRenderer {
             ORIENTATION.set(NEXT_ORIENTATION);
             v = nextV;
         }
-        renderCableEnd(vertexConsumer, origin, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
+        renderCableEnd(vertexConsumer, level, origin, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
     }
 
-    public static void renderCables(LevelRenderer levelRenderer, MultiBufferSource.BufferSource bufferSource, MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
+    public static void renderCables(MatrixStack matrixStack, Matrix4fc projectionMatrix, Matrix4fc matrix4fc, int renderTick, DeltaTracker deltaTracker, Camera camera) {
         float partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
         ClientLevel level = Minecraft.getInstance().level;
         Vec3 cameraPos = camera.getPosition();
         PoseStack.Pose pose = matrixStack.pose();
+        RenderType renderType = SuperpositionRenderTypes.cable();
+
+        renderType.setupRenderState();
+        ShaderInstance shader = RenderSystem.getShader();
+        if (shader == null) {
+            return;
+        }
+
+        shader.apply();
 
         Matrix4fStack stack = RenderSystem.getModelViewStack();
         stack.pushMatrix();
         stack.mul(pose.pose());
         for (Cable cable : CableManager.getLevelCables(level)) {
-            VertexConsumer vertexConsumer = bufferSource.getBuffer(SuperpositionRenderTypes.cable());
-
-            CableClientState renderState = cable.getRenderState();
+            CableClientState renderState = cable.getRenderState(cable.isSleeping() ? 1.0F : partialTicks);
             Vector3dc origin = renderState.getOrigin();
-            renderCable(cable, renderState, vertexConsumer, level, cable.isSleeping() ? 1.0F : partialTicks);
 
             stack.pushMatrix();
             stack.translate((float) (origin.x() - cameraPos.x), (float) (origin.y() - cameraPos.y), (float) (origin.z() - cameraPos.z));
-            RenderSystem.applyModelViewMatrix();
-            bufferSource.endBatch();
+            renderState.render(shader, stack, PROJECTION.set(projectionMatrix));
             stack.popMatrix();
         }
         stack.popMatrix();
-        RenderSystem.applyModelViewMatrix();
+
+        VertexArray.unbind();
+        shader.clear();
+        renderType.clearRenderState();
     }
 
-    private static void renderCableStart(VertexConsumer vertexConsumer, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+    private static void renderCableStart(VertexConsumer vertexConsumer, BlockAndTintGetter level, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         float cableRadius = (SuperpositionConstants.cableWidth / 2.0f);
         double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
         double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
@@ -244,7 +255,7 @@ public class CableRenderer {
         calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
 
         // Draw first face
-        int startLight = LevelRenderer.getLightColor(Minecraft.getInstance().level, LIGHT_POS.set(x, y, z));
+        int startLight = LevelRenderer.getLightColor(level, LIGHT_POS.set(x, y, z));
         ORIENTATION.transform(NORMAL.set(0, 0, -1));
         ORIENTATION.transform(POS.set(-cableRadius, -cableRadius, 0));
         vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
@@ -259,7 +270,7 @@ public class CableRenderer {
         vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
     }
 
-    private static void renderCableEnd(VertexConsumer vertexConsumer, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+    private static void renderCableEnd(VertexConsumer vertexConsumer, BlockAndTintGetter level, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
         float cableRadius = (SuperpositionConstants.cableWidth / 2.0f) - 0.001f;
         double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
         double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
@@ -270,7 +281,7 @@ public class CableRenderer {
         ORIENTATION.rotateAxis((float) Math.PI, 0, 1, 0);
 
         // Draw first face
-        int startLight = LevelRenderer.getLightColor(Minecraft.getInstance().level, LIGHT_POS.set(x, y, z));
+        int startLight = LevelRenderer.getLightColor(level, LIGHT_POS.set(x, y, z));
         ORIENTATION.transform(NORMAL.set(0, 0, 1));
         ORIENTATION.transform(POS.set(cableRadius, -cableRadius, 0));
         vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(0.5F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
