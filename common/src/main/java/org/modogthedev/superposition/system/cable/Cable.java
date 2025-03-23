@@ -290,10 +290,11 @@ public class Cable {
     }
 
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
-        this.stretchGrace = 4;
-        if (this.getPointsCount() > pointIndex && pointIndex > -1) {
-            this.getPoints().get(pointIndex).removeAnchor();
-            this.playerHoldingPointMap.put(playerId, pointIndex);
+        stretchGrace = 4;
+        ropeSimulation.getNode(pointIndex).removeAnchor();
+        if (getPointsCount() > pointIndex && pointIndex > -1) {
+            getPoints().get(pointIndex).removeAnchor();
+            playerHoldingPointMap.put(playerId, pointIndex);
         }
     }
 
