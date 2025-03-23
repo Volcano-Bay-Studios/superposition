@@ -78,6 +78,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         public String toString() {
             return "BoolData[value=" + this.value + ']';
         }
+
+        @Override
+        public void writeTag(CompoundTag tag, String key) {
+            tag.putBoolean(key,value);
+        }
     }
 
     final class IntData implements EncodedData<Integer> {
@@ -148,6 +153,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         public String toString() {
             return "IntData[value=" + this.value + ']';
         }
+
+        @Override
+        public void writeTag(CompoundTag tag, String key) {
+            tag.putInt(key,value);
+        }
     }
 
     final class FloatData implements EncodedData<Float> {
@@ -215,6 +225,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         @Override
         public String toString() {
             return "FloatData[value=" + this.value + ']';
+        }
+
+        @Override
+        public void writeTag(CompoundTag tag, String key) {
+            tag.putFloat(key,value);
         }
     }
 
@@ -285,6 +300,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         public String toString() {
             return "StringData[value=" + this.value + ']';
         }
+
+        @Override
+        public void writeTag(CompoundTag tag, String key) {
+            tag.putString(key,value);
+        }
     }
 
     final class CompoundTagData implements EncodedData<CompoundTag> {
@@ -354,6 +374,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         public String toString() {
             return "CompoundTagData[value=" + this.value + ']';
         }
+
+        @Override
+        public void writeTag(CompoundTag tag, String key) {
+            tag.put(key,value);
+        }
     }
 
     final class ByteArrayData implements EncodedData<byte[]> {
@@ -391,7 +416,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public byte[] byteArrayValue() {
-            return new byte[0];
+            return value;
         }
 
         @Override
@@ -419,6 +444,10 @@ public sealed interface EncodedData<T> extends Cloneable {
         @Override
         public String toString() {
             return "IntData[value=" + Arrays.toString(this.value) + ']';
+        }
+
+        public void writeTag(CompoundTag tag, String key) {
+            tag.putByteArray(key,value);
         }
     }
 
@@ -453,6 +482,13 @@ public sealed interface EncodedData<T> extends Cloneable {
     Number numberValue();
 
     byte[] byteArrayValue();
+
+    /**
+     * Dumps the data into the given tag with the given key
+     * @param tag
+     * @param key
+     */
+    void writeTag(CompoundTag tag, String key);
 
     default CompoundTag compoundTagData() {
         String string = this.stringValue();

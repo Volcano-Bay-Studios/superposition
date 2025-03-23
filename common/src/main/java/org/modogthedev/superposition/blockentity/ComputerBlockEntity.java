@@ -11,10 +11,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionCards;
+import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.cards.ManipulatorCard;
@@ -22,30 +24,28 @@ import org.modogthedev.superposition.system.cards.cards.PeripheralCard;
 import org.modogthedev.superposition.system.cards.cards.SynchronizedCard;
 import org.modogthedev.superposition.system.cards.cards.TickingCard;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ComputerBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
+    private static final Logger log = LoggerFactory.getLogger(ComputerBlockEntity.class);
     private Card card;
     public Signal periphrealSignal;
     public boolean updatedLastTick = false;
     private CompoundTag outboundTag = new CompoundTag();
+    private boolean appendData = false;
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.COMPUTER.get(), pos, state);
     }
 
-    @Override
-    public void loadSyncedData(CompoundTag tag) {
-        super.loadSyncedData(tag);
-        card = Card.loadNew(tag);
-        if (card != null) {
-            card = card.copy();
-        }
-    }
+
 
     public static float getRedstoneOffset(Level level, BlockPos pos) {
         return level.getSignal(pos, level.getBlockState(pos).getValue(AmplifierBlock.FACING).getOpposite());
@@ -65,6 +65,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         super.saveAdditional(tag, registries);
         if (card != null)
             card.save(tag);
+        tag.putBoolean("appendData",appendData);
     }
 
     @Override
@@ -74,6 +75,28 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         if (card != null) {
             card = card.copy();
         }
+        if (tag.contains("appendData")) {
+            appendData = tag.getBoolean("appendData");
+        }
+    }
+
+    @Override
+    public void loadSyncedData(CompoundTag tag) {
+        super.loadSyncedData(tag);
+        if (tag.contains("appendData")) {
+            appendData = tag.getBoolean("appendData");
+        }
+    }
+
+    @Override
+    public void setupConfigTooltips() {
+        super.setupConfigTooltips();
+        this.addConfigTooltip("Append Data - " + appendData, () -> {
+            CompoundTag tag = new CompoundTag();
+            appendData = !appendData;
+            tag.putBoolean("appendData", appendData);
+            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, this.getBlockPos()));
+        });
     }
 
     public void acceptPeripheralSignal(Signal signal) {
@@ -161,12 +184,51 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
+        Signal dataSignal = new Signal(signal);
         if (card != null && !(card instanceof PeripheralCard) && !(card instanceof SynchronizedCard)) {
-            card.modulateSignal(signal, periphrealSignal);
+            card.modulateSignal(dataSignal,periphrealSignal);
         } else if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
-            signal.setEncodedData(periphrealSignal.getEncodedData());
+            dataSignal.setEncodedData(periphrealSignal.getEncodedData());
+        }
+        if (appendData) {
+            appendData(signal,dataSignal);
+        } else {
+            signal.setEncodedData(dataSignal.getEncodedData());
         }
         return signal;
+    }
+
+    public void appendData(Signal toAppend, Signal information) {
+        if (toAppend != null && information != null && information.getEncodedData() != null) {
+            if (toAppend.getEncodedData() != null && toAppend.getEncodedData().compoundTagData() != null) {
+                CompoundTag tag = toAppend.getEncodedData().compoundTagData();
+                int largestNumber = -1;
+                for (String s : tag.getAllKeys()) { // Evaluate a key
+                    try {
+                        int number = (int) NumberUtils.createNumber(s);
+                        if (number > largestNumber) {
+                            largestNumber = number;
+                        }
+                    } catch (NumberFormatException | StringIndexOutOfBoundsException ignored) {
+                    }
+                }
+                information.getEncodedData().writeTag(tag, String.valueOf(largestNumber+1));
+                toAppend.setEncodedData(EncodedData.of(tag));
+            } else {
+                EncodedData<?> oldData = toAppend.getEncodedData();
+                if (oldData != null) {
+                    CompoundTag tag = new CompoundTag();
+
+                    oldData.writeTag(tag,"0");
+                    information.getEncodedData().writeTag(tag,"1");
+                    toAppend.setEncodedData(EncodedData.of(tag));
+                } else {
+                    CompoundTag tag = new CompoundTag();
+                    information.getEncodedData().writeTag(tag,"0");
+                    toAppend.setEncodedData(EncodedData.of(tag));
+                }
+            }
+        }
     }
 
     @Override

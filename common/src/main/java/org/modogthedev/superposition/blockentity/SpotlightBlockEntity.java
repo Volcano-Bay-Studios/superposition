@@ -56,7 +56,7 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
         }
         if (tag.contains("iris")) {
             iris = tag.getFloat("iris");
-            iris = Mth.clamp(iris, 3f, 30f);
+            iris = Mth.clamp(iris, 5f, 30f);
         }
     }
 
