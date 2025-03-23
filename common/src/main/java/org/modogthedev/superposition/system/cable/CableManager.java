@@ -98,7 +98,7 @@ public class CableManager {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
                     Vec3 holdGoalPos = getPlayerHeldCablePos(player);
-                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale(holdGoalPos.distanceTo(playerPoint.getPosition()))).add(0, 0.5f, 0);
+                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale((Math.min(1f,holdGoalPos.distanceTo(playerPoint.getPosition()))))).add(0, 0.5f, 0);
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
                     playerPoint.setLastDragGoalPos(holdGoalPos);

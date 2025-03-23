@@ -3,7 +3,7 @@ loaderVersion = "${neoforge_loader_version_range}"
 issueTrackerURL = "https://github.com/Volcano-Bay-Studios/superposition/issues"
 license = "${mod_license}"
 
-[[mod]]
+[[mods]]
 modId = "superposition"
 version = "${version}"
 displayName = "${mod_name}"
@@ -19,21 +19,21 @@ config="${mod_id}-common.mixins.json"
 [[mixins]]
 config="${mod_id}.mixins.json"
 
-[[dependencies.superposition]]
+[[dependencies.${mod_id}]]
 modId = "neoforge"
 mandatory = true
 versionRange = "${neoforge_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.superposition]]
+[[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.superposition]]
+[[dependencies.${mod_id}]]
 modId = "veil"
 mandatory = true
 versionRange = "[1,)"

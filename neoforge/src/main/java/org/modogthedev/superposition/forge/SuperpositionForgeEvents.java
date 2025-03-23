@@ -26,6 +26,8 @@ public class SuperpositionForgeEvents {
 
     @SubscribeEvent
     public static void onPreTick(LevelTickEvent.Pre event) {
-        Superposition.tick((ServerLevel) event.getLevel());
+        if (event.getLevel() instanceof ServerLevel level) {
+            Superposition.preTick(level);
+        }
     }
 }

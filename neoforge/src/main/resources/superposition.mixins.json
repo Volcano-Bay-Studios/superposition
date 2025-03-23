@@ -8,6 +8,7 @@
     "self.CommonRedstoneMixin"
   ],
   "client": [
+    "client.ForgeSoundEngineMixin",
     "client.ItemRendererMixin"
   ],
   "injectors": {

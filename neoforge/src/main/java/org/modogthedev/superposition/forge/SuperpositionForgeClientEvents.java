@@ -19,7 +19,9 @@ public class SuperpositionForgeClientEvents {
     @SubscribeEvent
     public static void onClientTick(LevelTickEvent.Post event) {
         Level level = event.getLevel();
-        Superposition.clientTick(level);
+        if (level.isClientSide) {
+            Superposition.clientTick(level);
+        }
     }
 
     @SubscribeEvent

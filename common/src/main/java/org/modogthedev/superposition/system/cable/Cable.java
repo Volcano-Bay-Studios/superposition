@@ -261,7 +261,7 @@ public class Cable {
             if (newAnchor != null) {
                 this.ropeSimulation.getNode(i).setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
             } else {
-                targetPoints.get(i).removeAnchor();
+                getPoints().get(i).removeAnchor();
             }
         }
         this.level = cable.level;
@@ -290,9 +290,8 @@ public class Cable {
     }
 
     public void addPlayerHoldingPoint(int playerId, int pointIndex) {
-        stretchGrace = 4;
-        ropeSimulation.getNode(pointIndex).removeAnchor();
         if (getPointsCount() > pointIndex && pointIndex > -1) {
+            stretchGrace = 2;
             getPoints().get(pointIndex).removeAnchor();
             playerHoldingPointMap.put(playerId, pointIndex);
         }

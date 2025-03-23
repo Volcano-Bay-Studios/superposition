@@ -15,19 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(SoundEngine.class)
 public class SoundSystemMixin {
-    @WrapOperation(
-            method = "play",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/sounds/SoundBufferLibrary;getStream(Lnet/minecraft/resources/ResourceLocation;Z)Ljava/util/concurrent/CompletableFuture;"
-            )
-    )
-    private CompletableFuture<?> getStream(SoundBufferLibrary instance, ResourceLocation resourceLocation, boolean isWrapper, Operation<CompletableFuture<AudioStream>> original, SoundInstance soundInstance) {
-        if (soundInstance instanceof SpeakerSoundInstance speakerSoundInstance) {
-            return speakerSoundInstance.getSoundStream(instance,resourceLocation,isWrapper);
-        }
-        return original.call(instance,resourceLocation,isWrapper);
-    }
+
 
 
 }
