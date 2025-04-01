@@ -3,4 +3,28 @@ plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.78' apply false
+
+    id "io.github.pacifistmc.forgix" version '1.2.9'
+}
+
+forgix {
+    group = "org.modogthedev.superposition" // (Required Value)
+    mergedJarName = "superposition-${minecraft_version}-${version}.jar" // (Required Value)
+    outputDir = "build/libs/merged"
+
+    if (findProject(":neoforge")) {
+        neoforge {
+            projectName = "neoforge"
+            jarLocation = "build/libs/superposition-neoforge-${minecraft_version}-${version}.jar"
+            mixin "superposition.mixins.json"
+        }
+    }
+
+    if (findProject(":fabric")) {
+        fabric {
+            jarLocation = "build/libs/superposition-fabric-${minecraft_version}-${version}.jar"
+        }
+    }
+
+//    removeDuplicate "org.modogthedev.superposition.common"
 }

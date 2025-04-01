@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "RedStoneWireBlockMixin",
-    "self.CommonRedstoneMixin"
+    "self.CommonRedstoneMixin",
+    "self.PlatformHelperMixin"
   ],
   "client": [
     "client.ItemRendererMixin",
