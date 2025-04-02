@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3d;
+import org.modogthedev.superposition.client.renderer.ui.SignalScopeRenderer;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -51,6 +52,7 @@ public class SignalScopeItem extends SpyglassItem {
             for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
                 float dist = (float) Vec3.atLowerCornerOf(entity.blockPosition()).distanceTo(Vec3.atLowerCornerOf(SuperpositionMth.blockPosFromVec3(signal.getPos())));
                 if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
+                    float falloff = Math.min(signal.getFrequency() / 100000 - (SignalScopeRenderer.position - SignalScopeRenderer.selectorWidth), (SignalScopeRenderer.position + SignalScopeRenderer.selectorWidth) - signal.getFrequency() / 100000);
                     float pitch = SuperpositionMth.getFromRange(15000000, 0, 2, .72f, signal.getFrequency());
                     Vec3 vec31 = new Vec3(signal.getPos().x - entity.getX(), signal.getPos().y - entity.getEyeY(), signal.getPos().z - entity.getZ());
                     float volume = signal.getAmplitude();
@@ -60,6 +62,9 @@ public class SignalScopeItem extends SpyglassItem {
                     Signal signal1 = new Signal(signal);
                     volume = Math.min(volume,2);
                     volume *= (float) Math.log(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize()))+1);
+                    if (falloff < 0) {
+                        volume /= -falloff;
+                    }
                     signal1.setAmplitude(volume);
                     ClientAudioManager.signals.add(signal1);
                 }

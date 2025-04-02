@@ -12,6 +12,7 @@
   "client": [
     "GuiMixin",
     "KeyboardHandlerMixin",
+    "MouseHandelerMixin",
     "MultiPlayerGameModeMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",

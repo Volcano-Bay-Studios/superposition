@@ -319,7 +319,7 @@ public class CableManager {
     public static void removeCable(Level level, UUID cableId) {
         Map<UUID, Cable> cables = getCables(level);
         Cable cable = cables != null ? cables.remove(cableId) : null;
-        if (cable != null) {
+        if (level.isClientSide && cable != null) {
             CableClientState clientState = cable.getClientState();
             if (clientState != null) {
                 clientState.free();
