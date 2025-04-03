@@ -61,5 +61,8 @@
   "sounds.superposition.timber_hearth" : "Music",
   "sounds.superposition.oxide_ambience" : "Ocean Sounds",
 
+  "commands.superposition.removed_success" : "Successfully removed %s cables.",
+  "commands.superposition.removed_fail" : "Found nothing to remove.",
+
   "creativemodetab.superposition" : "Superposition"
 }

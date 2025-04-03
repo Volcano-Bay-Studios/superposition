@@ -9,6 +9,7 @@
     "self.PlatformHelperMixin"
   ],
   "client": [
+    "client.FabricSoundEngineMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin"
   ],

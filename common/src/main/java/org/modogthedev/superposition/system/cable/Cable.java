@@ -174,6 +174,12 @@ public class Cable {
         }
     }
 
+    public void remove() {
+        if (level.isClientSide && clientState != null) {
+            clientState.remove();
+        }
+    }
+
     public void shrink() {
         if (this.ropeSimulation.getNodeCount() > 4)
             this.ropeSimulation.resizeRope(this.ropeSimulation.getNodeCount() - 1);

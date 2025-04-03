@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.light.Light;
 import foundry.veil.api.client.render.light.PointLight;
 import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import foundry.veil.api.client.render.vertex.VertexArray;
@@ -33,6 +34,8 @@ public class CableClientState implements NativeResource {
     private final Vector3d origin;
     private final VertexArray vao;
 
+    private boolean removed = false;
+
     private List<PointLight> pointLights;
 
     public CableClientState(Cable cable, RopeSimulation ropeSimulation) {
@@ -54,7 +57,7 @@ public class CableClientState implements NativeResource {
     }
 
     private void updateLights() {
-        if (this.cable.isEmitsLight()) {
+        if (this.cable.isEmitsLight() && !removed) {
             if (this.pointLights == null) {
                 this.pointLights = new ArrayList<>(this.ropeSimulation.getNodeCount());
             }
@@ -115,6 +118,15 @@ public class CableClientState implements NativeResource {
     @Override
     public void free() {
         this.vao.free();
+    }
+
+    public void remove() {
+        LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
+        for (Light light : pointLights) {
+            lightRenderer.removeLight(light);
+        }
+        pointLights.clear();
+        removed = true;
     }
 
     public void render(ShaderInstance shader, Matrix4f modelView, Matrix4f projection) {

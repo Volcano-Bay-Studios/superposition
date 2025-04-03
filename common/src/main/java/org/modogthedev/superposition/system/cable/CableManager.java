@@ -98,7 +98,7 @@ public class CableManager {
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
                     RopeNode playerPoint = pointIndexPair.getA();
                     Vec3 holdGoalPos = getPlayerHeldCablePos(player);
-                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale((Math.min(1f,holdGoalPos.distanceTo(playerPoint.getPosition()))))).add(0, 0.5f, 0);
+                    holdGoalPos = holdGoalPos.add(holdGoalPos.subtract(playerPoint.getPosition()).scale((Math.min(1f, holdGoalPos.distanceTo(playerPoint.getPosition()))))).add(0, 0.5f, 0);
                     playerPoint.setPrevPosition(holdGoalPos);
                     playerPoint.setPosition(holdGoalPos);
                     playerPoint.setLastDragGoalPos(holdGoalPos);
@@ -131,15 +131,17 @@ public class CableManager {
 //                    }
                     //                    playerPoint.setPrevPosition(playerPoint.getPosition());
                     Pair<RopeNode, Integer> pointIndexPair = cable.getPlayerHeldPoint(id);
-                    RopeNode playerPoint = pointIndexPair.getA();
+                    if (pointIndexPair != null) {
+                        RopeNode playerPoint = pointIndexPair.getA();
 
-                    if (playerPoint.getLastHoldGoalPos() != null) {
-                        double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
-                        if (level.isClientSide) {
-                            CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
-                        }
-                        if ((stretch > 0.2f && cable.getStretchGrace() == 0) || playerPoint.getPosition().distanceTo(player.getPosition(0f)) > 7) {
-                            playerFinishDraggingCable(player, null, null);
+                        if (playerPoint.getLastHoldGoalPos() != null) {
+                            double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
+                            if (level.isClientSide) {
+                                CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
+                            }
+                            if ((stretch > 0.2f && cable.getStretchGrace() == 0) || playerPoint.getPosition().distanceTo(player.getPosition(0f)) > 7) {
+                                playerFinishDraggingCable(player, null, null);
+                            }
                         }
                     }
                 }
@@ -320,10 +322,15 @@ public class CableManager {
         Map<UUID, Cable> cables = getCables(level);
         Cable cable = cables != null ? cables.remove(cableId) : null;
         if (level.isClientSide && cable != null) {
+            cable.remove();
             CableClientState clientState = cable.getClientState();
             if (clientState != null) {
                 clientState.free();
             }
+        } else if (cable != null) {
+            CableSyncS2CPacket packet = new CableSyncS2CPacket(cable.getId());
+            Vec3 pos = cable.getPoints().getFirst().getPosition();
+            VeilPacketManager.around(null, (ServerLevel) level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(packet);
         }
     }
 
