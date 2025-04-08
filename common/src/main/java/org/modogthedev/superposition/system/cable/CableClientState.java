@@ -122,10 +122,12 @@ public class CableClientState implements NativeResource {
 
     public void remove() {
         LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
-        for (Light light : pointLights) {
-            lightRenderer.removeLight(light);
+        if (pointLights != null) {
+            for (Light light : pointLights) {
+                lightRenderer.removeLight(light);
+            }
+            pointLights.clear();
         }
-        pointLights.clear();
         removed = true;
     }
 

@@ -4,7 +4,6 @@ import foundry.veil.api.client.color.ColorTheme;
 import foundry.veil.api.client.render.light.AreaLight;
 import foundry.veil.api.client.render.light.Light;
 import foundry.veil.api.client.render.light.PointLight;
-import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
@@ -290,7 +289,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
         BlockPos sidedPos = this.getSwappedPos();
         BlockEntity blockEntity = level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
+        if (!level.getBlockState(sidedPos).is(Blocks.AIR) && blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
             if (signalActorBlockEntity.getInvertedSwappedPos().equals(this.getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
                 lastCallList = nextCall;
