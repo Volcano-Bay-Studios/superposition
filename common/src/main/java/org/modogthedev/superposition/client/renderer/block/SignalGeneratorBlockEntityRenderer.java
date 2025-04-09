@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 
 public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<SignalGeneratorBlockEntity> {
@@ -24,7 +25,12 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
     public void render(SignalGeneratorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
+        VertexConsumer buffer = null;
+        if (SuperpositionConstants.bloomEnabled) {
+            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
+        } else {
+            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
+        }
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);

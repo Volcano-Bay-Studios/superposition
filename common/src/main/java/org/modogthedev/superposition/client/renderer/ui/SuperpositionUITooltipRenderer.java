@@ -202,8 +202,11 @@ public class SuperpositionUITooltipRenderer {
                     editPos = new BlockPos.MutableBlockPos().set(BlockPos.containing(pos));
             }
         }
-        if (tooltippable == null) {
-
+        if (tooltippable == null && mc.screen instanceof WidgetScreen widgetScreen) {
+            BlockPos pos1 = widgetScreen.getBlockPos();
+            if (pos1 != null && mc.level.isLoaded(pos1) && mc.level.getBlockEntity(pos1) instanceof SPTooltipable tooltippable1) {
+                tooltippable = tooltippable1;
+            }
         }
         if (tooltippable == null || !tooltippable.isSuperpositionTooltipEnabled()) {
             hoverTicks = 0;
@@ -294,7 +297,7 @@ public class SuperpositionUITooltipRenderer {
             graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset + 1, tooltipY + (int) textYOffset + 10, -3092272);
             if (selected) {
                 xOffset = (int) (tooltipX - tooltipTextWidth /2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
-                int xOffset2 = (int) (tooltipX + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
+                int xOffset2 = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
                 graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset2, tooltipY + (int) textYOffset + 10, -3092272);
             }
         }

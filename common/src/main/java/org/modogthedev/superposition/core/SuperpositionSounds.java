@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import org.modogthedev.superposition.Superposition;
 
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class SuperpositionSounds {
         if (soundEvent != null) {
             return soundEvent;
         }
-        return TRAVELERS.get();
+        return SoundEvents.EMPTY;
     }
 
     public static void bootstrap() {

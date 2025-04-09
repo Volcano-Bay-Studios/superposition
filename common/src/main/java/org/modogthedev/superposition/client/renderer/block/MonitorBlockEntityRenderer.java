@@ -16,6 +16,7 @@ import org.joml.Quaternionf;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.MonitorBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SuperpositionMth;
@@ -74,7 +75,12 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
         ms.popPose();
         light = LightTexture.FULL_BRIGHT;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
+        VertexConsumer buffer = null;
+        if (SuperpositionConstants.bloomEnabled) {
+            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
+        } else {
+            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
+        }
         for (int i = 0; i < size; i++) {
             float x = (i * totalPart) + (offset / (size + 4f)) - min;
             float y = .21f;

@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
@@ -250,5 +251,10 @@ public class AmplifierScreen extends WidgetScreen {
     @Override
     public Vec2 getTooltipPosition(int w, int h) {
         return new Vec2(w/2f,(h/10f)*7f);
+    }
+
+    @Override
+    public @Nullable BlockPos getBlockPos() {
+        return pos;
     }
 }

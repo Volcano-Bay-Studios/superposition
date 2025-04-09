@@ -423,6 +423,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         if (signalsReceived == 0) {
             putSignals.clear();
         }
+        putSignals.clear();
         signalsReceived = 0;
     }
 

@@ -30,7 +30,19 @@ public class SuperpositionRenderTypes extends RenderType {
                 .setLightmapState(LIGHTMAP)
                 .setOverlayState(OVERLAY)
                 .createCompositeState(true);
-        return VeilRenderType.layered(create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffsetBloom), create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset));
+        return VeilRenderType.layered(create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffsetBloom), create(Superposition.MODID + ":block_polygon_offset_standard", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset));
+    };
+
+    private static final Function<ResourceLocation, RenderType> BLOCK_POLYGON_OFFSET = texture -> {
+        RenderType.CompositeState blockPolygonOffset = RenderType.CompositeState.builder()
+                .setShaderState(RENDERTYPE_CUTOUT_SHADER)
+                .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+                .setLayeringState(POLYGON_OFFSET_LAYERING)
+                .setCullState(NO_CULL)
+                .setLightmapState(LIGHTMAP)
+                .setOverlayState(OVERLAY)
+                .createCompositeState(true);
+        return create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset);
     };
 
 //    private static final Function<ResourceLocation, RenderType> BLOCK_POLYGON_OFFSET = texture -> {
@@ -57,6 +69,10 @@ public class SuperpositionRenderTypes extends RenderType {
 
     public static RenderType bloomBlockPolygonOffset(ResourceLocation location) {
         return BLOOM_BLOCK_POLYGON_OFFSET.apply(location);
+    }
+
+    public static RenderType blockPolygonOffset(ResourceLocation location) {
+        return BLOCK_POLYGON_OFFSET.apply(location);
     }
 
 //    public static RenderType blockPolygonOffset(ResourceLocation location) {

@@ -5,9 +5,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.util.SuperpositionMth;
@@ -181,5 +183,10 @@ public class WidgetScreen extends Screen {
 
     public Vec2 getTooltipPosition(int w, int h) {
         return new Vec2(w/2f,(h/5f)*3f);
+    }
+
+    @Nullable
+    public BlockPos getBlockPos() {
+        return null;
     }
 }

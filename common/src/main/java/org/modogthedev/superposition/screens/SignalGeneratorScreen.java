@@ -18,6 +18,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
@@ -192,6 +193,11 @@ public class SignalGeneratorScreen extends WidgetScreen {
         tag.putFloat("frequency", frequency);
         tag.putBoolean("swap", swap);
         VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, pos));
+    }
+
+    @Override
+    public @Nullable BlockPos getBlockPos() {
+        return pos;
     }
 
     @Override

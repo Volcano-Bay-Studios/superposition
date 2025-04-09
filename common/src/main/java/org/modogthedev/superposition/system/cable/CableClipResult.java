@@ -41,6 +41,8 @@ public class CableClipResult {
         List<Pair<Cable, RopeNode>> rayCast = this.rayCast(toPos, range);
         List<Pair<Float, RopeNode>> distancePointPairMap = new ArrayList<>();
 
+        assert range > 0;
+
         for (Pair<Cable, RopeNode> cablePointPair : rayCast) {
             distancePointPairMap.add(new Pair<>(999f, cablePointPair.getB()));
         }

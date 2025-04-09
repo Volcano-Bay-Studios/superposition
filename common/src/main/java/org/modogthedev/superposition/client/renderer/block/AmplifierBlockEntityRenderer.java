@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 
 public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<AmplifierBlockEntity> {
@@ -26,8 +27,12 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
             return;
         if (be.ticks == -1)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
-
+        VertexConsumer buffer = null;
+        if (SuperpositionConstants.bloomEnabled) {
+            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
+        } else {
+            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
+        }
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
