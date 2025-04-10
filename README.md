@@ -1,6 +1,6 @@
 ![Featured in BlanketCon '25](https://raw.githubusercontent.com/worldwidepixel/badges/642d312b71811b9d2696b562f735b07288844c71/bc25/featured_in/cozy.svg)
 # 🚧 THIS IS A DEMO OF THE MOD 🚧
-The mod is not complete and is certinly not meant to be played in survival. Most of the gameplay for the mod is either incomplete or just not added yet. They mod is also missing some important features that will make a complete mod.
+The mod is not complete and is certinly not meant to be played in survival. Most of the gameplay for the mod is either incomplete or just not added yet.
 
 # What is Superposition?
 Superposition in an in development mod that allows the player to manipulate data as they see fit. It has features for gathering information, for transferring it to another point, and for manipulating it into other forms.
