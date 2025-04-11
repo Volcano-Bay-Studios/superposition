@@ -39,6 +39,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
+        ms.pushPose();
 
         ms.translate(0.5, 0.748, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
@@ -120,9 +121,8 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
                     .setUv(uvMin + uvOffsetx, (uvMin / stages))
                     .setLight(light)
                     .setNormal(ms.last(), 0, 1, 0);
-
-
         }
+        ms.popPose();
 //        ms.translate(0,-.00025,.22);
 //        alpha = .4f;
 //        VertexConsumer screenBuffer = bufferSource.getBuffer(SuperpositionRenderTypes.entityTranslucentEmissive(Superposition.id("textures/screen/monitor_screen.png")));

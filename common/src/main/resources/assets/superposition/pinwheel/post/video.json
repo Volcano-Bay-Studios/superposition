@@ -1,0 +1,9 @@
+{
+  "stages": [
+    {
+      "type": "veil:blit",
+      "shader": "superposition:video",
+      "in": "minecraft:main"
+    }
+  ]
+}

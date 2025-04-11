@@ -36,6 +36,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
+        ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
         ms.translate(0, -.125, 0.03f);
@@ -85,6 +86,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
                 .setUv(1, (uvMin / stages) + lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
+        ms.popPose();
     }
 
     private float getMaxPlaneExtent(AmplifierBlockEntity be) {

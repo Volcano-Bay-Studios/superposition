@@ -30,6 +30,8 @@ public class ConstantCombinatorBlockEntityRenderer implements BlockEntityRendere
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
+        ms.pushPose();
+
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
 
@@ -55,6 +57,7 @@ public class ConstantCombinatorBlockEntityRenderer implements BlockEntityRendere
 
             ms.popPose();
         }
+        ms.popPose();
     }
 
     private float getMaxPlaneExtent(ConstantCombinatorBlockEntity be) {

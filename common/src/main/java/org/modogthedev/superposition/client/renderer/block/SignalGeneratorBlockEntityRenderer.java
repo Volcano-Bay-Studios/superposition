@@ -35,6 +35,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
+        ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
 
@@ -81,6 +82,7 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
                 .setUv(1 + uvOffsetx, (uvMin / stages) + offset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
+        ms.popPose();
     }
 
     private float getMaxPlaneExtent(SignalGeneratorBlockEntity be) {

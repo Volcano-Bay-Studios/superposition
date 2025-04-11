@@ -30,14 +30,14 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
 
+        ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
 
         String text = "";
         if (be.getMode() != null)
             text = be.getMode().getDisplayText();
-        ms.pushPose();
-        if (Objects.equals(text, "x")) {
+         if (Objects.equals(text, "x")) {
             ms.translate(0, 0, -.02);
         }
         if (text.length() > 1) {
@@ -50,7 +50,6 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
 
 
         this.font.drawInBatch(text, -this.font.width(text) / 2f, 9, 3979870, false, ms.last().pose(), bufferSource, Font.DisplayMode.POLYGON_OFFSET, 0, LightTexture.FULL_BRIGHT);
-
         ms.popPose();
     }
 

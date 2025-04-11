@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.client.renderer.SuperpositionLightSystem;
@@ -33,6 +34,7 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 public class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
 
@@ -191,9 +193,10 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
     }
 
+    @Nullable
     public BlockPos getInvertedSwappedPos() {
         BlockPos sidedPos2 = new BlockPos(0, 0, 0);
-        if (level.getBlockState(sidedPos2).is(Blocks.AIR)) {
+        if (!level.isLoaded(getBlockPos()) || level.getBlockState(getBlockPos()).is(Blocks.AIR)) {
             return null;
         }
         if (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
@@ -290,7 +293,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         BlockPos sidedPos = this.getSwappedPos();
         BlockEntity blockEntity = level.getBlockEntity(sidedPos);
         if (!level.getBlockState(sidedPos).is(Blocks.AIR) && blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            if (signalActorBlockEntity.getInvertedSwappedPos().equals(this.getBlockPos())) {
+            if (Objects.equals(signalActorBlockEntity.getInvertedSwappedPos(), this.getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
                 lastCallList = nextCall;
                 signalActorBlockEntity.putSignalsFace(nextCall, list, getInvertedSwappedSide());

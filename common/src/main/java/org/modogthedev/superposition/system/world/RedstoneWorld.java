@@ -45,6 +45,10 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
         return null; // Key not found
     }
 
+    public static void clear() {
+        clientRedstoneMap.clear();
+    }
+
     public static class RedstonePos {
         private int x;
         private int y;

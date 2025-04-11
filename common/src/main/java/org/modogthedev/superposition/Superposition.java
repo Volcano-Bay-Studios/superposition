@@ -80,6 +80,8 @@ public class Superposition {
     public static void playerLeaveEvent(Level level) {
         if (level.isClientSide) {
             CableManager.wipeClientData();
+            RedstoneWorld.clear();
+            ClientSignalManager.clientSignals.clear();
         }
     }
 

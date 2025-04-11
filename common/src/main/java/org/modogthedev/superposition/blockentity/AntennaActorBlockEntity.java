@@ -32,10 +32,12 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
 
     public float getBounusFrequency() {
         BlockPos sidedPos = getInvertedSwappedPos();
-        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
-        if (blockEntity instanceof SignalGeneratorBlockEntity signalGeneratorBlockEntity) {
-            if (signalGeneratorBlockEntity.getSwappedPos().equals(getBlockPos())) {
-                return signalGeneratorBlockEntity.getFrequency() * 100000;
+        if (sidedPos != null) {
+            BlockEntity blockEntity = level.getBlockEntity(sidedPos);
+            if (blockEntity instanceof SignalGeneratorBlockEntity signalGeneratorBlockEntity) {
+                if (signalGeneratorBlockEntity.getSwappedPos().equals(getBlockPos())) {
+                    return signalGeneratorBlockEntity.getFrequency() * 100000;
+                }
             }
         }
         return 0;
