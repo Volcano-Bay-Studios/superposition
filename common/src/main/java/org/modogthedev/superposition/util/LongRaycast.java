@@ -19,7 +19,7 @@ public class LongRaycast {
         List<BlockPos> posList = bresenham3D(from,to);
         for (int i = 0; i < posList.size();) {
             BlockPos blockPos = posList.get(i);
-            if (level.getChunk(blockPos).getSection(blockPos.getY() / 16).hasOnlyAir()) {
+            if (level.getChunk(blockPos).getSection((blockPos.getY()-Math.min(0,level.getMinBuildHeight()))/ 16).hasOnlyAir()) {
                 i += 16;
                 continue;
             }
