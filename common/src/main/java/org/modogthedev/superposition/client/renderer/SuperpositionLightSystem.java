@@ -14,13 +14,19 @@ public class SuperpositionLightSystem {
     public static HashMap<Level, HashMap<BlockPos, Light>> levelLightMap = new HashMap<>();
     public static HashMap<Level,List<BlockPos>> removablePositions = new HashMap<>();
 
-    private static LightRenderer renderer = VeilRenderSystem.renderer().getLightRenderer();
+    private static final LightRenderer renderer = VeilRenderSystem.renderer().getLightRenderer();
 
 
     public static void tick(Level level) {
         HashMap<BlockPos, Light> lightHashMap = levelLightMap.computeIfAbsent(level, (level1 -> new HashMap<>()));
-
         List<BlockPos> removable = removablePositions.computeIfAbsent(level, (level1 -> new ArrayList<>()));
+
+        for (BlockPos pos : lightHashMap.keySet()) {
+            if (!level.isLoaded(pos)) {
+                removable.add(pos);
+            }
+        }
+
         for (BlockPos pos : removable) {
             Light light = lightHashMap.get(pos);
             if (light != null) {
@@ -43,5 +49,10 @@ public class SuperpositionLightSystem {
 
         lightHashMap.put(pos,light);
         removable.remove(pos);
+    }
+
+    public static void clear() {
+        levelLightMap.clear();
+        removablePositions.clear();
     }
 }

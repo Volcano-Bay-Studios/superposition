@@ -75,7 +75,7 @@ public class CablePassthroughManager {
     }
 
     public static void updateList(List<Signal> oldSignals, List<Signal> newSignals) {
-        if (oldSignals != null) {
+        if (oldSignals != null && newSignals != null) {
             if (oldSignals.size() == newSignals.size()) {
                 for (int i = 0; i < newSignals.size(); i++) {
                     oldSignals.get(i).copy(newSignals.get(i));

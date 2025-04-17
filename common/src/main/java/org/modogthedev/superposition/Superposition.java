@@ -81,6 +81,7 @@ public class Superposition {
         if (level.isClientSide) {
             CableManager.wipeClientData();
             RedstoneWorld.clear();
+            SuperpositionLightSystem.clear();
             ClientSignalManager.clientSignals.clear();
         }
     }
