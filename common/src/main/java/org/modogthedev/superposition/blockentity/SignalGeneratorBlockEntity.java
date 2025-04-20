@@ -88,6 +88,11 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         return connectedSignal;
     }
 
+    @Override
+    public List<Signal> getSignals() {
+        return List.of(getSignal());
+    }
+
     public float getFrequency() {
         return frequency;
     }

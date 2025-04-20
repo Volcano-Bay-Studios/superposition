@@ -205,6 +205,7 @@ public class SuperpositionUITooltipRenderer {
         if (tooltippable == null && mc.screen instanceof WidgetScreen widgetScreen) {
             BlockPos pos1 = widgetScreen.getBlockPos();
             if (pos1 != null && mc.level.isLoaded(pos1) && mc.level.getBlockEntity(pos1) instanceof SPTooltipable tooltippable1) {
+                pos = Vec3.atCenterOf(pos1);
                 tooltippable = tooltippable1;
             }
         }
