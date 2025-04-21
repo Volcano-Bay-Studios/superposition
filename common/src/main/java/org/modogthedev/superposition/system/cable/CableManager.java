@@ -337,8 +337,8 @@ public class CableManager {
         }
     }
 
-    public static void wipeResidualData() {
-        cables.clear();
+    public static void wipeResidualData(Level level) {
+        cables.get(level.dimension()).clear();
     }
 
     public static void wipeClientData() {

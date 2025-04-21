@@ -49,7 +49,7 @@ public class CableSavedData extends SavedData {
         CableSavedData data = new CableSavedData();
         int size = tag.getInt("count");
         if (size>0) {
-            CableManager.wipeResidualData();
+            CableManager.wipeResidualData(level);
         }
         for (int i = 0; i < size; i++) {
             UUID uuid = tag.getUUID("uuid_"+i);
