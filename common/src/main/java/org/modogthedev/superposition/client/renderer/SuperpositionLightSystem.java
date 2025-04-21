@@ -52,6 +52,11 @@ public class SuperpositionLightSystem {
     }
 
     public static void clear() {
+        for (HashMap<BlockPos, Light> levelLightMap : levelLightMap.values()) {
+            for (Light light : levelLightMap.values()) {
+                renderer.removeLight(light);
+            }
+        }
         levelLightMap.clear();
         removablePositions.clear();
     }

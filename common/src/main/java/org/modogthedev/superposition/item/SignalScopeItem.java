@@ -49,24 +49,38 @@ public class SignalScopeItem extends SpyglassItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         if ((isSelected || (entity instanceof Player player && player.getOffhandItem().is(SuperpositionItems.SIGNAL_SCOPE.get()))) && level.isClientSide && ClientSignalManager.clientSignals.get(level) != null) {
             ClientAudioManager.signals.clear();
+            SignalScopeRenderer.screenSignals.clear();
             for (Signal signal : ClientSignalManager.clientSignals.get(level).values()) {
                 float dist = (float) Vec3.atLowerCornerOf(entity.blockPosition()).distanceTo(Vec3.atLowerCornerOf(SuperpositionMth.blockPosFromVec3(signal.getPos())));
                 if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
                     float falloff = Math.min(signal.getFrequency() / 100000 - (SignalScopeRenderer.position - SignalScopeRenderer.selectorWidth), (SignalScopeRenderer.position + SignalScopeRenderer.selectorWidth) - signal.getFrequency() / 100000);
                     float pitch = SuperpositionMth.getFromRange(15000000, 0, 2, .72f, signal.getFrequency());
                     Vec3 vec31 = new Vec3(signal.getPos().x - entity.getX(), signal.getPos().y - entity.getEyeY(), signal.getPos().z - entity.getZ());
-                    float volume = signal.getAmplitude();
+                    float volume = SuperpositionMth.mapAmplitude(signal.getAmplitude());
                     float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(entity.getX(), entity.getY(), entity.getZ()));
                     volume *= Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0);
                     volume *= 1.0F / (Math.max(1, dist / (1000000000 / signal.getFrequency())));
-                    Signal signal1 = new Signal(signal);
-                    volume = Math.min(volume,2);
-                    volume *= (float) Math.log(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize()))+1);
+                    Signal renderSignal = new Signal(signal);
+                    float displayVolume = volume;
+
+                    displayVolume = Math.min(displayVolume,2);
+                    displayVolume *= (float) Math.log(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize()))+1);
                     if (falloff < 0) {
-                        volume /= -falloff;
+                        displayVolume /= -falloff;
                     }
-                    signal1.setAmplitude(volume);
-                    ClientAudioManager.signals.add(signal1);
+                    renderSignal.setAmplitude(displayVolume);
+                    SignalScopeRenderer.screenSignals.add(renderSignal);
+
+                    float audioVolume = volume;
+                    Signal audioSignal = new Signal(signal);
+                    audioVolume = Math.min(volume,2);
+                    audioVolume = (float) Math.log(audioVolume);
+                    audioVolume *= (float) Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize())-0.2f)/2;
+                    if (falloff < 0) {
+                        audioVolume /= -falloff;
+                    }
+                    audioSignal.setAmplitude(audioVolume);
+                    ClientAudioManager.signals.add(audioSignal);
                 }
             }
         }

@@ -13,6 +13,7 @@ import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRe
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.networking.SuperpositionMessages;
 import org.modogthedev.superposition.persistent.CableSavedData;
+import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
@@ -83,6 +84,7 @@ public class Superposition {
             RedstoneWorld.clear();
             SuperpositionLightSystem.clear();
             ClientSignalManager.clientSignals.clear();
+            AntennaManager.clear();
         }
     }
 

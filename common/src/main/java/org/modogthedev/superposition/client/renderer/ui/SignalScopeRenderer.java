@@ -15,7 +15,6 @@ import org.joml.Vector3d;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.sound.ClientAudioManager;
 import org.modogthedev.superposition.util.LongRaycast;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
@@ -32,6 +31,8 @@ public class SignalScopeRenderer {
 
     private static final ResourceLocation SCROLL = Superposition.id("textures/screen/input/scroll_both.png");
     private static final ResourceLocation SHIFT = Superposition.id("textures/screen/input/shift.png");
+
+    public static List<Signal> screenSignals = new ArrayList<>();
 
     public static float position = 0;
     public static float selectorWidth = 10;
@@ -75,7 +76,7 @@ public class SignalScopeRenderer {
             }
         }
 
-        for (Signal signal : ClientAudioManager.oldSignals) {
+        for (Signal signal : screenSignals) {
             float falloff = Math.min(signal.getFrequency() / 100000- (position - selectorWidth), (position + selectorWidth) - signal.getFrequency() / 100000);
             float strength = signal.getAmplitude() / 16.7f;
 

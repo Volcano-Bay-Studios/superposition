@@ -37,6 +37,10 @@ public class SuperpositionMth {
         return new Vector3d(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
     }
 
+    public static float mapAmplitude(float value) {
+        return Mth.map(value, 0, 153, 3, 10);
+    }
+
     /**
      * Returns the hertz value of a given frequency in a string that is readable
      *

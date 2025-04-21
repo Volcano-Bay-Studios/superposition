@@ -154,4 +154,8 @@ public class AntennaManager {
             }
         }
     }
+
+    public static void clear() {
+        antennas.clear();
+    }
 }
