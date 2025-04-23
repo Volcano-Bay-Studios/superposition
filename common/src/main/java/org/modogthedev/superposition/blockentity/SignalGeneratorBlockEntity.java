@@ -90,7 +90,11 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public List<Signal> getSignals() {
-        return List.of(getSignal());
+        List<Signal> signals = new ArrayList<>();
+        if (getSignal() != null) {
+            signals.add(getSignal());
+        }
+        return signals;
     }
 
     public float getFrequency() {
