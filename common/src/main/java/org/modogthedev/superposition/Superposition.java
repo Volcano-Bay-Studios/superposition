@@ -75,6 +75,7 @@ public class Superposition {
     public static void clientAlwaysTick(Minecraft client) {
         if (client.level == null) {
             CableManager.wipeClientData();
+            CableManager.wipeResidualData();
         }
     }
 

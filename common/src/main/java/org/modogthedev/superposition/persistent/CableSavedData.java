@@ -48,9 +48,6 @@ public class CableSavedData extends SavedData {
         Superposition.LOGGER.info("Loading cables for level '"+ level+"'");
         CableSavedData data = new CableSavedData();
         int size = tag.getInt("count");
-        if (size>0) {
-            CableManager.wipeResidualData(level);
-        }
         for (int i = 0; i < size; i++) {
             UUID uuid = tag.getUUID("uuid_"+i);
             Cable cable = Cable.fromBytes(uuid,new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))),level,true);

@@ -19,18 +19,15 @@ import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
 import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
-import org.modogthedev.superposition.system.signal.Signal;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class CableManager {
     private static int grabTimer = 0;
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> cables = new HashMap<>();
     private static final Map<ResourceKey<Level>, Map<UUID, Cable>> clientCables = new HashMap<>();
-    private static final Map<BlockPos, List<Signal>> cableSignalRelays = new HashMap<>();
 
     public static Map<ResourceKey<Level>, Map<UUID, Cable>> getCablesMap(Level level) {
         return level.isClientSide() ? clientCables : cables;
@@ -337,8 +334,8 @@ public class CableManager {
         }
     }
 
-    public static void wipeResidualData(Level level) {
-        cables.get(level.dimension()).clear();
+    public static void wipeResidualData() {
+        cables.clear();
     }
 
     public static void wipeClientData() {
@@ -350,6 +347,6 @@ public class CableManager {
                 }
             }
         }
-        clientCables.clear(); // TODO: no worky
+        clientCables.clear();
     }
 }
