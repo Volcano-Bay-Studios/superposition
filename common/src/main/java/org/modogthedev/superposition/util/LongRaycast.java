@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +20,7 @@ public class LongRaycast {
         List<BlockPos> posList = bresenham3D(from,to);
         for (int i = 0; i < posList.size();) {
             BlockPos blockPos = posList.get(i);
-            if (level.getChunk(blockPos).getSection((blockPos.getY()-Math.min(0,level.getMinBuildHeight()))/ 16).hasOnlyAir()) {
+            if (level.getChunk(blockPos).getSection(Mth.clamp((blockPos.getY() - Math.min(0, level.getMinBuildHeight()))/16,0,(Math.abs(level.getMinBuildHeight()) + level.getMaxBuildHeight())/16-1)).hasOnlyAir()) {
                 i += 16;
                 continue;
             }

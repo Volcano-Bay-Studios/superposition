@@ -187,9 +187,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     public Direction getInvertedSwappedSide() {
         if (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            return level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise();
+            return getBlockState().getValue(SignalActorTickingBlock.FACING).getClockWise();
         } else {
-            return level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+            return getBlockState().getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
         }
     }
 
