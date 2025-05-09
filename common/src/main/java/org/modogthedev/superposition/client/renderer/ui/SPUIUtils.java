@@ -25,8 +25,9 @@ public class SPUIUtils {
                                      int maxTextWidth, int backgroundColor, int borderColorStart, int borderColorEnd, Font font,
                                      int tooltipTextWidthBonus, int tooltipTextHeightBonus, List<VeilUIItemTooltipDataHolder> items,
                                      int desiredX, int desiredY) {
-        if (textLines.isEmpty())
+        if (textLines.isEmpty()) {
             return;
+        }
 
         List<ClientTooltipComponent> list = gatherTooltipComponents(stack, textLines, stack.getTooltipImage().orElse(null), mouseX, screenWidth, screenHeight, font, font);
         // RenderSystem.disableRescaleNormal();
@@ -35,8 +36,9 @@ public class SPUIUtils {
 
         for (FormattedText textLine : textLines) {
             int textLineWidth = font.width(textLine);
-            if (textLineWidth > tooltipTextWidth)
+            if (textLineWidth > tooltipTextWidth) {
                 tooltipTextWidth = textLineWidth;
+            }
         }
 
         boolean needsWrap = false;
@@ -47,10 +49,11 @@ public class SPUIUtils {
             tooltipX = mouseX - 16 - tooltipTextWidth;
             if (tooltipX < 4) // if the tooltip doesn't fit on the screen
             {
-                if (mouseX > screenWidth / 2)
+                if (mouseX > screenWidth / 2) {
                     tooltipTextWidth = mouseX - 12 - 8;
-                else
+                } else {
                     tooltipTextWidth = screenWidth - 16 - mouseX;
+                }
                 needsWrap = true;
             }
         }
@@ -67,23 +70,26 @@ public class SPUIUtils {
                 FormattedText textLine = textLines.get(i);
                 List<FormattedText> wrappedLine = font.getSplitter()
                         .splitLines(textLine, tooltipTextWidth, Style.EMPTY);
-                if (i == 0)
+                if (i == 0) {
                     titleLinesCount = wrappedLine.size();
+                }
 
                 for (FormattedText line : wrappedLine) {
                     int lineWidth = font.width(line);
-                    if (lineWidth > wrappedTooltipWidth)
+                    if (lineWidth > wrappedTooltipWidth) {
                         wrappedTooltipWidth = lineWidth;
+                    }
                     wrappedTextLines.add(line);
                 }
             }
             tooltipTextWidth = wrappedTooltipWidth;
             textLines = wrappedTextLines;
 
-            if (mouseX > screenWidth / 2)
+            if (mouseX > screenWidth / 2) {
                 tooltipX = mouseX - 16 - tooltipTextWidth;
-            else
+            } else {
                 tooltipX = mouseX + 12;
+            }
         }
 
         int tooltipY = mouseY - 12;
@@ -91,13 +97,15 @@ public class SPUIUtils {
 
         if (textLines.size() > 1) {
             tooltipHeight += (textLines.size() - 1) * 10;
-            if (textLines.size() > titleLinesCount)
+            if (textLines.size() > titleLinesCount) {
                 tooltipHeight += 2; // gap between title lines and next lines
+            }
         }
-        if (tooltipY < 4)
+        if (tooltipY < 4) {
             tooltipY = 4;
-        else if (tooltipY + tooltipHeight + 4 > screenHeight)
+        } else if (tooltipY + tooltipHeight + 4 > screenHeight) {
             tooltipY = screenHeight - tooltipHeight - 4;
+        }
 
         final int zLevel = 400;
         tooltipTextWidth += tooltipTextWidthBonus;

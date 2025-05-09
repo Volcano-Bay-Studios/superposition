@@ -6,8 +6,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +58,9 @@ public class RopeNode {
             position = prevPosition.add(position.subtract(prevPosition).normalize().scale(10f));
         }
 
-        if (isFixed() || !level.isLoaded(BlockPos.containing(getPosition()))) return;
+        if (isFixed() || !level.isLoaded(BlockPos.containing(getPosition()))) {
+            return;
+        }
         Vec3 velocity = position.subtract(prevPosition);
         double initialYVelocity = velocity.y;
 
@@ -90,7 +92,9 @@ public class RopeNode {
     }
 
     public Vec3 getRenderPosition(float partialTicks) {
-        if (simulation.isSleeping()) return position;
+        if (simulation.isSleeping()) {
+            return position;
+        }
         return prevRenderPosition.lerp(position, partialTicks);
     }
 
@@ -120,7 +124,9 @@ public class RopeNode {
     }
 
     public void applyNextPositions() {
-        if (nextPositions.isEmpty() || isFixed()) return;
+        if (nextPositions.isEmpty() || isFixed()) {
+            return;
+        }
 
         Vec3 move = this.position;
         int count = 1;
@@ -129,8 +135,9 @@ public class RopeNode {
             count++;
         }
 
-        if (count != 0)
-            this.position = move.scale(1f/count);
+        if (count != 0) {
+            this.position = move.scale(1f / count);
+        }
         setNextPositions(new ArrayList<>());
     }
 
@@ -141,10 +148,10 @@ public class RopeNode {
 
     public void setAnchor(Direction direction, BlockPos pos) {
         this.anchor = new AnchorConstraint(
-            direction, pos, this,
-            () -> simulation.getNode(simulation.getNodes().indexOf(this) - 1),
-            () -> simulation.getNode(simulation.getNodes().indexOf(this) + 1),
-            simulation.connectionWidth
+                direction, pos, this,
+                () -> simulation.getNode(simulation.getNodes().indexOf(this) - 1),
+                () -> simulation.getNode(simulation.getNodes().indexOf(this) + 1),
+                simulation.connectionWidth
         );
         this.simulation.addConstraint(this.anchor);
     }

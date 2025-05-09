@@ -8,6 +8,7 @@ import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.system.sound.SpeakerSoundInstance;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(SoundEngine.class)
@@ -46,8 +46,8 @@ public class FabricSoundEngineMixin {
     )
     private CompletableFuture<?> getStream(SoundBufferLibrary instance, ResourceLocation resourceLocation, boolean isWrapper, Operation<CompletableFuture<AudioStream>> original, SoundInstance soundInstance) {
         if (soundInstance instanceof SpeakerSoundInstance speakerSoundInstance) {
-            return speakerSoundInstance.getSoundStream(instance,resourceLocation,isWrapper);
+            return speakerSoundInstance.getSoundStream(instance, resourceLocation, isWrapper);
         }
-        return original.call(instance,resourceLocation,isWrapper);
+        return original.call(instance, resourceLocation, isWrapper);
     }
 }

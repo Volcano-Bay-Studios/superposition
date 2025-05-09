@@ -1,9 +1,8 @@
 package org.modogthedev.superposition.util;
 
 import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.system.signal.Signal;
-
-import javax.annotation.Nullable;
 
 public class DataHelper {
     @Nullable
