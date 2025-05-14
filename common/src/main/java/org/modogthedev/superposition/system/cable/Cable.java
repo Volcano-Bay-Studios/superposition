@@ -19,6 +19,7 @@ import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.cable.rope_system.RopeSimulation;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
+import org.modogthedev.superposition.system.world.RedstoneWorld;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
@@ -144,8 +145,21 @@ public class Cable {
                         }
                     }
 
-                }
+                    int value = 0;
 
+                    value = level.getBestNeighborSignal(startPos);
+
+                    if (value == 0) {
+                        int oldValue = RedstoneWorld.getPower(level, startPos);
+                        if (oldValue > 0) {
+                            value = oldValue;
+                        }
+                    }
+
+                    if (value > 0) {
+                        RedstoneWorld.setPower(level, endPos,value);
+                    }
+                }
             }
         }
     }
@@ -363,7 +377,6 @@ public class Cable {
     public int getStretchGrace() {
         return this.stretchGrace;
     }
-
     public void setStretchGrace(int stretchGrace) {
         this.stretchGrace = stretchGrace;
     }

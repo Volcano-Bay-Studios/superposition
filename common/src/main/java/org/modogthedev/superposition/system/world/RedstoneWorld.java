@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class RedstoneWorld { // Forgive me for this class is a sin. There is probably a better way to do this.
+    private static final HashMap<Level, HashMap<BlockPos, Integer>> oldMap = new HashMap<>();
     private static final HashMap<Level, HashMap<BlockPos, Integer>> redstoneMap = new HashMap<>();
     private static final HashMap<Level, HashMap<BlockPos, Integer>> clientRedstoneMap = new HashMap<>();
 
@@ -16,7 +17,29 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
     }
 
     public static void tick(Level level) {
-        redstoneMap.computeIfAbsent(level, (key) -> new HashMap<>()).clear();
+        HashMap<BlockPos, Integer> redstone = redstoneMap.computeIfAbsent(level, (key) -> new HashMap<>());
+        HashMap<BlockPos, Integer> old = oldMap.computeIfAbsent(level, (key) -> new HashMap<>());
+
+        for (BlockPos pos : redstone.keySet()) {
+            if (old.containsKey(pos)) {
+                if (!Objects.equals(redstone.get(pos), old.get(pos))) {
+                    level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
+                    level.updateNeighborsAt(pos.above(), level.getBlockState(pos.above()).getBlock());
+                }
+            } else {
+                level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
+                level.updateNeighborsAt(pos.above(), level.getBlockState(pos.above()).getBlock());
+            }
+            old.remove(pos);
+        }
+        for (BlockPos pos : old.keySet()) {
+            level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
+            level.updateNeighborsAt(pos.above(), level.getBlockState(pos.above()).getBlock());
+        }
+
+        old.clear();
+        old.putAll(redstone);
+        redstone.clear();
     }
 
     public static void clientTick(Level level) {
@@ -29,6 +52,15 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
 
     public static int getPower(Level level, BlockPos pos) {
         Integer i = getValueIfKeyEquals(getMap(level),(pos));
+        if (i != null) {
+            return i;
+        }
+        return 0;
+    }
+
+    public static int getOldPower(Level level, BlockPos pos) {
+        if (level.isClientSide) { return 0; }
+        Integer i = getValueIfKeyEquals(oldMap.computeIfAbsent(level, (key) -> new HashMap<>()),(pos));
         if (i != null) {
             return i;
         }
