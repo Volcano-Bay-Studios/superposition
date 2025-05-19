@@ -1,28 +1,21 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.Action;
+import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class ColorCard extends Card implements PeripheralCard {
-    public ColorCard(ResourceLocation card) {
-        super(card);
-    }
+public class ColorAction extends Action implements ScanAction {
 
-    public ColorCard(Card card) {
-        super(card);
+    public ColorAction(ResourceLocation action) {
+        super(action);
     }
 
     @Override
-    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
+    public void scan(Signal signal, BlockEntity blockEntity) {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.getLevel().getBlockState(analyserBlockEntity.getAnalysisPosition()).getBlock().defaultMapColor().col);
-    }
-
-    @Override
-    public Card copy() {
-        return new ColorCard(this);
     }
 }

@@ -40,13 +40,16 @@ public class SuperpositionBlocks {
             () -> new AmplifierBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-
     public static final RegistryObject<FilterBlock> FILTER = registerBlock("filter",
             () -> new FilterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistryObject<ComputerBlock> COMPUTER = registerBlock("computer",
             () -> new ComputerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+    public static final RegistryObject<InscriberBlock> INSCRIBER = registerBlock("inscriber",
+            () -> new InscriberBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
     public static final RegistryObject<AnalyserBlock> ANALYSER = registerBlock("analyser",

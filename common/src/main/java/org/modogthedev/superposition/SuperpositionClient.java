@@ -21,9 +21,9 @@ public class SuperpositionClient {
         VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, partialTicks, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
                 CableRenderer.renderCables(projectionMatrix, frustumMatrix, deltaTracker, camera);
-                CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
                 CableRenderer.renderOverlays(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
                 DebugRenderer.renderDebug(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
+                CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
             }
         });
     }

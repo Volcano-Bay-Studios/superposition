@@ -173,7 +173,7 @@ public class SPUIUtils {
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
-    public static void drawGradientRect(Matrix4f mat, int zLevel, int left, int top, int right, int bottom, int startColor, int endColor) {
+    public static void drawGradientRect(Matrix4f mat, int zLevel, int minX, int minY, int maxX, int maxY, int startColor, int endColor) {
         float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
         float startRed = (float) (startColor >> 16 & 255) / 255.0F;
         float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
@@ -189,10 +189,10 @@ public class SPUIUtils {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
         BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.addVertex(mat, right, top, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
-        buffer.addVertex(mat, left, top, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
-        buffer.addVertex(mat, left, bottom, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
-        buffer.addVertex(mat, right, bottom, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
+        buffer.addVertex(mat, maxX, minY, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
+        buffer.addVertex(mat, minX, minY, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
+        buffer.addVertex(mat, minX, maxY, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
+        buffer.addVertex(mat, maxX, maxY, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
         BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         RenderSystem.disableBlend();

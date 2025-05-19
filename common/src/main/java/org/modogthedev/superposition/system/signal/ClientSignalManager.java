@@ -50,15 +50,15 @@ public class ClientSignalManager {
         BlockPos pos = buf.readBlockPos();
         if (level.getBlockEntity(pos) instanceof ComputerBlockEntity computerBlockEntity) {
             int count = buf.readVarInt();
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < count; i++) { //TODO: SYNCHRONISATION
                 UUID id = buf.readUUID();
-                if (computerBlockEntity.periphrealSignal != null) {
-                    computerBlockEntity.periphrealSignal.load(id, buf);
-                } else {
-                    Signal signal = new Signal(id, buf);
-                    signal.level = level;
-                    computerBlockEntity.periphrealSignal = signal;
-                }
+//                if (computerBlockEntity.periphrealSignal != null) {
+//                    computerBlockEntity.periphrealSignal.load(id, buf);
+//                } else {
+//                    Signal signal = new Signal(id, buf);
+//                    signal.level = level;
+//                    computerBlockEntity.periphrealSignal = signal;
+//                }
             }
         }
     }

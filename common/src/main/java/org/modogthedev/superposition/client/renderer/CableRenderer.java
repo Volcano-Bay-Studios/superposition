@@ -24,6 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
@@ -360,6 +361,11 @@ public class CableRenderer {
                     width += 0.03f;
                     color.w = 0.4f;
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
+                    if (isFirst) {
+                        DebugRenderer.renderFloatingText(poseStack, bufferSource, "Pull", pos.x, pos.y + 0.5f, pos.z, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    } else {
+                        DebugRenderer.renderFloatingText(poseStack, bufferSource, "Push", pos.x, pos.y + 0.5f, pos.z, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    }
                 } else {
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
                 }

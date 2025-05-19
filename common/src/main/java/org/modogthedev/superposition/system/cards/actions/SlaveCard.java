@@ -1,27 +1,27 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.resources.ResourceLocation;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.Action;
+import org.modogthedev.superposition.system.cards.MonoModifyAction;
+import org.modogthedev.superposition.system.cards.SynchronizedCard;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 
-public class SlaveCard extends Card implements SynchronizedCard {
+public class SlaveCard extends Action implements SynchronizedCard, MonoModifyAction {
 
     public SlaveCard(ResourceLocation card) {
         super(card);
     }
 
-    public SlaveCard(Card card) {
-        super(card);
-    }
 
     public EncodedData<?> encodedData;
 
     @Override
-    public void modulateSignal(Signal signal, Signal periphrealSignal) {
+    public Signal modify(Signal signal) {
         if (signal != null && encodedData != null) {
             signal.setEncodedData(encodedData);
         }
+        return signal;
     }
 
     public EncodedData<?> getEncodedData() {
@@ -32,8 +32,4 @@ public class SlaveCard extends Card implements SynchronizedCard {
         this.encodedData = encodedData;
     }
 
-    @Override
-    public Card copy() {
-        return new SlaveCard(this);
-    }
 }

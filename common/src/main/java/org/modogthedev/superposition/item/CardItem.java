@@ -15,9 +15,8 @@ import java.util.function.Consumer;
 public class CardItem extends Item {
     public Card card;
 
-    public CardItem(CardItem.Properties pProperties, Item.Properties properties) {
+    public CardItem(Item.Properties properties) {
         super(properties);
-        this.card = pProperties.card;
     }
 
     @Override
@@ -34,6 +33,11 @@ public class CardItem extends Item {
         if (tag != null) {
             tagConsumer.accept(tag);
         }
+    }
+
+    public Card getCard(ItemStack stack) {
+        CompoundTag tag = getTagElement(stack);
+        return new Card(tag);
     }
 
     public CompoundTag getTagElement(ItemStack stack) {
@@ -53,7 +57,6 @@ public class CardItem extends Item {
         if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof ComputerBlockEntity computerBlockEntity) {
             boolean creative = context.getPlayer().getAbilities().instabuild;
             if (computerBlockEntity.getCard() == null) {
-                computerBlockEntity.setCard(card.copy());
                 if (!creative)
                     return InteractionResult.CONSUME;
                 else
@@ -61,14 +64,5 @@ public class CardItem extends Item {
             }
         }
         return super.useOn(context);
-    }
-
-    public static class Properties {
-        public Card card;
-
-        public CardItem.Properties type(Card card) {
-            this.card = card;
-            return this;
-        }
     }
 }

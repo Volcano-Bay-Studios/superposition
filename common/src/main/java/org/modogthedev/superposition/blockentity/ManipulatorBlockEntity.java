@@ -24,8 +24,7 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         if (card != null) {
             Signal signal = SignalManager.randomSignal(putSignals);
             EncodedData<?> value = signal.getEncodedData();
-            if (value != null && !value.stringValue().equals(lastUpdate)) {
-                card.affectBlock(signal,level,getFrontPos());
+            if (value != null && !value.stringValue().equals(lastUpdate)) { //TODO: make it good
                 level.updateNeighborsAt(getFrontPos(),level.getBlockState(getFrontPos()).getBlock());
             }
         }

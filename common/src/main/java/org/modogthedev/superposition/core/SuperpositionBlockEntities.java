@@ -37,6 +37,10 @@ public class SuperpositionBlockEntities {
             registerBlockEntity("computer",
                     () -> BlockEntityType.Builder.of(ComputerBlockEntity::new, SuperpositionBlocks.COMPUTER.get()));
 
+    public static final RegistryObject<BlockEntityType<InscriberBlockEntity>> INSCRIBER =
+            registerBlockEntity("inscriber",
+                    () -> BlockEntityType.Builder.of(InscriberBlockEntity::new, SuperpositionBlocks.INSCRIBER.get()));
+
     public static final RegistryObject<BlockEntityType<MonitorBlockEntity>> MONITOR =
             registerBlockEntity("monitor",
                     () -> BlockEntityType.Builder.of(MonitorBlockEntity::new, SuperpositionBlocks.MONITOR.get()));
@@ -44,6 +48,7 @@ public class SuperpositionBlockEntities {
     public static final RegistryObject<BlockEntityType<AnalyserBlockEntity>> ANALYSER =
             registerBlockEntity("analyser",
                     () -> BlockEntityType.Builder.of(AnalyserBlockEntity::new, SuperpositionBlocks.ANALYSER.get()));
+
     public static final RegistryObject<BlockEntityType<ManipulatorBlockEntity>> MANIPULATOR =
             registerBlockEntity("manipulator",
                     () -> BlockEntityType.Builder.of(ManipulatorBlockEntity::new, SuperpositionBlocks.MANIPULATOR.get()));

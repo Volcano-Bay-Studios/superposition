@@ -36,7 +36,7 @@ public class Superposition {
         initTheme();
         SuperpositionBlocks.bootstrap();
         SuperpositionFilters.bootstrap();
-        SuperpositionCards.bootstrap();
+        SuperpositionActions.bootstrap();
         SuperpositionBlockEntities.bootstrap();
         SuperpositionItems.bootstrap();
         SuperpositionTabs.bootstrap();

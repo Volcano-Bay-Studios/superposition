@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -7,23 +7,19 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.*;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.modogthedev.superposition.util.DataHelper;
 
-public class RedstoneCard extends Card implements PeripheralCard, ManipulatorCard {
+public class RedstoneCard extends Action implements ScanAction, OutAction, ManipulateAction {
 
     public RedstoneCard(ResourceLocation card) {
         super(card);
     }
 
-    public RedstoneCard(Card card) {
-        super(card);
-    }
-
     @Override
-    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
+    public void scan(Signal signal, BlockEntity blockEntity) {
         int value = 0;
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
             value = blockEntity.getLevel().getBestNeighborSignal(analyserBlockEntity.getAnalysisPosition());
@@ -32,7 +28,7 @@ public class RedstoneCard extends Card implements PeripheralCard, ManipulatorCar
     }
 
     @Override
-    public void affectBlock(Signal signal, Level level, BlockPos pos) {
+    public void manipulate(Signal signal, Level level, BlockPos pos) {
         int power = DataHelper.getIntKey(signal,"power");
         if (power > 0) {
             RedstoneWorld.setPower(level,pos, Mth.clamp(power,0,15));
@@ -45,10 +41,5 @@ public class RedstoneCard extends Card implements PeripheralCard, ManipulatorCar
         if ( power > 0) {
             tag.putInt("power",power);
         }
-    }
-
-    @Override
-    public Card copy() {
-        return new RedstoneCard(this);
     }
 }

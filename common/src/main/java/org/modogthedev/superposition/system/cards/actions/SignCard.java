@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -9,21 +9,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.*;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.DataHelper;
 
-public class SignCard extends Card implements PeripheralCard, ManipulatorCard {
+public class SignCard extends Action implements ScanAction, OutAction, ManipulateAction {
     public SignCard(ResourceLocation card) {
         super(card);
     }
 
-    public SignCard(Card card) {
-        super(card);
-    }
 
     @Override
-    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
+    public void scan(Signal signal, BlockEntity blockEntity) {
         String text = "";
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
             BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
@@ -43,7 +40,7 @@ public class SignCard extends Card implements PeripheralCard, ManipulatorCard {
     }
 
     @Override
-    public void affectBlock(Signal signal, Level level, BlockPos pos) {
+    public void manipulate(Signal signal, Level level, BlockPos pos) {
         if (signal != null && signal.getEncodedData() != null) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof SignBlockEntity signBlockEntity) {
@@ -53,11 +50,6 @@ public class SignCard extends Card implements PeripheralCard, ManipulatorCard {
                 }
             }
         }
-    }
-
-    @Override
-    public Card copy() {
-        return new SignCard(this);
     }
 
     @Override

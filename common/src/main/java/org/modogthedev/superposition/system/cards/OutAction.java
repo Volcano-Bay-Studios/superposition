@@ -1,9 +1,9 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards;
 
 import net.minecraft.nbt.CompoundTag;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public interface ManipulatorCard {
+public interface OutAction {
     /**
      * Encodes extra data to be used by Manipulators
      * @param tag The tag that is being sent to the peripheral

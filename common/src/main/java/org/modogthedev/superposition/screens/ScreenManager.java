@@ -3,12 +3,14 @@ package org.modogthedev.superposition.screens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.modogthedev.superposition.SuperpositionClient;
+import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.filter.Filter;
 
 public class ScreenManager {
     private static SignalGeneratorScreen signalGeneratorScreen;
     private static AmplifierScreen amplifierScreen;
     private static FilterScreen filterScreen;
+    private static InscriberScreen inscriberScreen;
 
     public static void openSignalGenerator(BlockPos pos) {
         signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pos);
@@ -25,5 +27,10 @@ public class ScreenManager {
             filterScreen = new FilterScreen(Component.literal("Filter"), type, pos, editMode);
             SuperpositionClient.setScreen(filterScreen);
         }
+    }
+
+    public static void openInscriber(Card card) {
+        inscriberScreen = new InscriberScreen(card);
+        SuperpositionClient.setScreen(inscriberScreen);
     }
 }

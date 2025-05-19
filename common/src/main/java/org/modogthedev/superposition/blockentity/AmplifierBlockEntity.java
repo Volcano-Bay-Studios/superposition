@@ -158,11 +158,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         super.tick();
     }
 
-    @Override
-    public BlockPos getDataPos() {
-        return this.getBlockPos().relative(this.level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getOpposite(), 1);
-    }
-
     public boolean lightEnabled() {
         return true;
     }

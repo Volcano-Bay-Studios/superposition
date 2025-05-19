@@ -7,7 +7,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
-import org.modogthedev.superposition.system.cards.cards.SlaveCard;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 
 public class ComputerPeriphreal implements IPeripheral {
@@ -57,10 +56,10 @@ public class ComputerPeriphreal implements IPeripheral {
         return false;
     }
 
-    public void setEncodedData(EncodedData<?> encodedData) {
-        if (computerBlockEntity.getCard() instanceof SlaveCard card) {
-            card.setEncodedData(encodedData);
-        }
+    public void setEncodedData(EncodedData<?> encodedData) { // TODO: make it real
+//        if (computerBlockEntity.getCard() instanceof SlaveCard card) {
+//            card.setEncodedData(encodedData);
+//        }
     }
 
     @Override

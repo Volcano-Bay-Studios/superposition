@@ -6,10 +6,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import org.modogthedev.superposition.core.SuperpositionCards;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.cards.PeripheralCard;
+import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 
@@ -34,14 +33,11 @@ public class PeripheralBlockEntity extends SignalActorBlockEntity {
         if (signal != null && signal.getEncodedData() != null) {
             CompoundTag tag = signal.getEncodedData().compoundTagData();
             if (tag != null && tag.contains("id", 99)) {
-                int id = tag.getInt("id");
-                Card card1 = SuperpositionCards.CARDS.asVanillaRegistry().byId(id);
-                if (card1 != null)
-                    card = card1.copy();
+                //TODO: I borke it
             }
         }
-        if (card != null && card instanceof PeripheralCard peripheralCard)
-            peripheralCard.peripheralEncode(processSignal, this);
+        if (card != null && card instanceof ScanAction scanAction)
+            scanAction.scan(processSignal, this);
         super.tick();
     }
 

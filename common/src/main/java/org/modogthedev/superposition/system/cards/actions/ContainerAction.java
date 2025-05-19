@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -8,23 +8,21 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.Action;
+import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContainerCard extends Card implements PeripheralCard {
-    public ContainerCard(ResourceLocation card) {
-        super(card);
-    }
+public class ContainerAction extends Action implements ScanAction {
 
-    public ContainerCard(Card card) {
-        super(card);
+    public ContainerAction(ResourceLocation action) {
+        super(action);
     }
 
     @Override
-    public void peripheralEncode(Signal signal, BlockEntity blockEntity) {
+    public void scan(Signal signal, BlockEntity blockEntity) {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
             BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
             if (blockEntity1 instanceof BaseContainerBlockEntity container) {
@@ -44,10 +42,5 @@ public class ContainerCard extends Card implements PeripheralCard {
                 signal.encode(tag);
             }
         }
-    }
-
-    @Override
-    public Card copy() {
-        return new ContainerCard(this);
     }
 }

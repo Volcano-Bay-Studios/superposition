@@ -1,75 +1,46 @@
 package org.modogthedev.superposition.system.cards;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import org.modogthedev.superposition.core.SuperpositionCards;
-import org.modogthedev.superposition.system.cards.config.CardConfig;
-import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.core.SuperpositionActions;
 
-public abstract class Card {
+import java.util.HashMap;
+import java.util.UUID;
 
-    private final ResourceLocation selfReference;
+public class Card { //TODO: make this work!
 
-    public Card(ResourceLocation card) {
-        this.selfReference = card;
-    }
+    private final HashMap<UUID, Node> nodes = new HashMap<>();
 
-    public Card(Card card) {
-        this.selfReference = card.selfReference;
-    }
-
-    public static Card loadNew(CompoundTag pTag) {
-        Card card = SuperpositionCards.CARDS.asVanillaRegistry().get(ResourceLocation.fromNamespaceAndPath(pTag.getString("namespace"), pTag.getString("path")));
-        if (card != null) {
-            card.load(pTag);
+    public Card() {
+        for (int i = 0; i < 6; i++) {
+            nodes.put(UUID.randomUUID(), new Node(this));
         }
-        return card;
+        float y = 70;
+        for (Node node : nodes.values()) {
+            node.getPosition().set(40,y);
+            node.setTargetUUID((UUID) nodes.keySet().toArray()[0]);
+            y += 30;
+        }
     }
+
+    public Card(CompoundTag tag) {
+        load(tag);
+    }
+
 
     public void save(CompoundTag pTag) {
-        pTag.putString("namespace", selfReference.getNamespace());
-        pTag.putString("path", selfReference.getPath());
+
     }
 
     public void load(CompoundTag pTag) {
 
     }
 
-    public ResourceLocation getSelfReference() {
-        return this.selfReference;
+    public HashMap<UUID, Node> getNodes() {
+        return nodes;
     }
 
-    public CardConfig runCardConfig(CardConfig config) {
-        return config;
+    private Action getAction(ResourceLocation location) {
+        return SuperpositionActions.ACTION.asVanillaRegistry().get(location);
     }
-
-    public CardConfig getCardConfig() {
-        return runCardConfig(new CardConfig());
-    }
-
-    public abstract Card copy();
-
-    /**
-     * Encodes a signal with the card
-     *
-     * @param signal
-     */
-    public void modulateSignal(Signal signal, Signal periphrealSignal) {
-    }
-
-    /**
-     * Encodes a signal with the card using a signal
-     *
-     * @param signal
-     */
-    public void encodeSignal(Signal signal) {
-        modulateSignal(signal,signal);
-    }
-
-    public void affectBlock(Signal signal, Level level, BlockPos pos) {
-    }
-
-
 }

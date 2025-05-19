@@ -163,9 +163,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         super(pType, pPos, pBlockState);
     }
 
-    public BlockPos getDataPos() {
-        return this.getSwappedPos();
-    }
 
     public BlockPos getSwappedPos() {
         BlockPos sidedPos2;

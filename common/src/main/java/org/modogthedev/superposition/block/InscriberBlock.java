@@ -18,12 +18,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.screens.ScreenManager;
+import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-public class ComputerBlock extends SignalActorTickingBlock implements EntityBlock, IRedstoneConnectingBlock {
+public class InscriberBlock extends SignalActorTickingBlock implements EntityBlock, IRedstoneConnectingBlock {
 
-    public ComputerBlock(Properties properties) {
+    public InscriberBlock(Properties properties) {
         super(properties);
         this.registerDefaultState((this.stateDefinition.any()).setValue(FACING, Direction.NORTH).setValue(SWAP_SIDES, true));
     }
@@ -31,7 +33,7 @@ public class ComputerBlock extends SignalActorTickingBlock implements EntityBloc
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SuperpositionBlockEntities.COMPUTER.get().create(pos, state);
+        return SuperpositionBlockEntities.INSCRIBER.get().create(pos, state);
     }
 
     @Override
@@ -55,9 +57,8 @@ public class ComputerBlock extends SignalActorTickingBlock implements EntityBloc
 
     @Override
     protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (player.isCrouching()) {
-            BlockEntity be = level.getBlockEntity(pos);
-            //TODO: I borke it on purpose
+        if (level.isClientSide) {
+            ScreenManager.openInscriber(new Card());
         }
         return super.useWithoutItem(state, level, pos, player, hitResult);
     }

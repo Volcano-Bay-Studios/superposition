@@ -1,21 +1,19 @@
-package org.modogthedev.superposition.system.cards.cards;
+package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.resources.ResourceLocation;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.Action;
+import org.modogthedev.superposition.system.cards.BiModifyAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class SubstringCard extends Card {
+public class SubstringCard extends Action implements BiModifyAction {
 
     public SubstringCard(ResourceLocation card) {
         super(card);
     }
 
-    public SubstringCard(Card card) {
-        super(card);
-    }
 
     @Override
-    public void modulateSignal(Signal signal, Signal periphrealSignal) {
+    public Signal modify(Signal signal, Signal periphrealSignal) {
         if (periphrealSignal != null && signal.getEncodedData() != null && periphrealSignal.getEncodedData() != null) {
             String s = signal.getEncodedData().stringValue();
             int cutPosition = periphrealSignal.getEncodedData().intValue();
@@ -27,10 +25,6 @@ public class SubstringCard extends Card {
                 }
             }
         }
-    }
-
-    @Override
-    public Card copy() {
-        return new SubstringCard(this);
+        return signal;
     }
 }
