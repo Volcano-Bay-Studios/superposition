@@ -30,13 +30,13 @@ public class Bounds {
         return isColliding(minX, minY, maxX, maxY, node, x, y);
     }
 
-    public static boolean isColliding(int minX, int minY, int maxX, int maxY, Node node, int x, int y) {
+    public static boolean isColliding(int minX, int minY, int maxX, int maxY, Node node, float x, float y) {
         float positionX = node.getPosition().x;
         float positionY = node.getPosition().y;
-        return (x+positionX) >= minX && (x+positionX) <= maxX && (y+positionY) >= minY && (y+positionY) <= maxY;
+        return x >= minX+positionX && x <= maxX+positionX && y >= minY+positionY && y <= maxY+positionY;
     }
 
-    public static boolean isColliding(Node node, int x, int y) {
+    public static boolean isColliding(Node node, float x, float y) {
         float xSize = node.getSize().x;
         float ySize = node.getSize().y;
         return isColliding((int) (-xSize/2), (int) (-ySize/2), (int) (xSize/2), (int) (ySize/2), node, x, y);

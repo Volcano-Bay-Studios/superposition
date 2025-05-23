@@ -63,7 +63,7 @@ public class CableSavedData extends SavedData {
                 ID);
 
         data.level = level;
-        data.setDirty(true);
+        data.setDirty(true); //TODO: only make cable data dirty if cables have changed
 
         return data;
     }

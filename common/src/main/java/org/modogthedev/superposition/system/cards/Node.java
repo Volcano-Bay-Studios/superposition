@@ -62,7 +62,7 @@ public class Node {
         }
     }
 
-    public boolean isColliding(int x, int y) {
+    public boolean isColliding(float x, float y) {
         return Bounds.isColliding(this, x, y);
     }
 }
