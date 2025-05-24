@@ -4,6 +4,8 @@ import org.joml.Vector2f;
 import org.modogthedev.superposition.screens.utils.Bounds;
 import org.modogthedev.superposition.system.signal.Signal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Node {
@@ -13,8 +15,9 @@ public class Node {
     private int inputIndex = 0;
     private final Card card;
     private Vector2f position = new Vector2f();
-    private Vector2f size = new Vector2f(10,10);
+    private Vector2f size = new Vector2f(10, 10);
     private Signal[] signals;
+    private List<Attachment> attachments = new ArrayList<>();
 
     public Node(Card card) {
         this.card = card;
@@ -58,11 +61,23 @@ public class Node {
         size.x = 20;
         size.y = 20;
         if (signals != null) {
-            size.y = 10 + (10 * Math.max(1,signals.length));
+            size.y = 8 + (8 * Math.max(1, getInputCount()-1));
         }
+
+        attachments.clear();
+        attachments.add(new Attachment(new Vector2f(size.x / 2, 0), this));
+    }
+
+    public int getInputCount() {
+        return signals.length;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
     }
 
     public boolean isColliding(float x, float y) {
         return Bounds.isColliding(this, x, y);
     }
+
 }

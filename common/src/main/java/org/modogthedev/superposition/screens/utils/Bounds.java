@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.screens.utils;
 
+import org.joml.Vector2f;
 import org.modogthedev.superposition.system.cards.Node;
 
 public class Bounds {
@@ -31,9 +32,19 @@ public class Bounds {
     }
 
     public static boolean isColliding(int minX, int minY, int maxX, int maxY, Node node, float x, float y) {
-        float positionX = node.getPosition().x;
-        float positionY = node.getPosition().y;
-        return x >= minX+positionX && x <= maxX+positionX && y >= minY+positionY && y <= maxY+positionY;
+        float posX = node.getPosition().x;
+        float posY = node.getPosition().y;
+        return x >= minX+posX && x <= maxX+posX && y >= minY+posY && y <= maxY+posY;
+    }
+
+    public static boolean isColliding(int minX, int minY, int maxX, int maxY, float posX, float posY, float x, float y) {
+        return x >= minX+posX && x <= maxX+posX && y >= minY+posY && y <= maxY+posY;
+    }
+
+    public static boolean isColliding(Vector2f scale, float posX, float posY, float x, float y) {
+        float xSize = scale.x;
+        float ySize = scale.y;
+        return isColliding((int) (-xSize/2), (int) (-ySize/2), (int) (xSize/2), (int) (ySize/2), posX, posY, x, y);
     }
 
     public static boolean isColliding(Node node, float x, float y) {

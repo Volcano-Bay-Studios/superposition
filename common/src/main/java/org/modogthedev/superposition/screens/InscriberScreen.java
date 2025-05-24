@@ -2,7 +2,6 @@ package org.modogthedev.superposition.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import foundry.veil.api.client.color.Color;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -12,8 +11,12 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.client.renderer.ui.SPUIUtils;
+import org.modogthedev.superposition.system.cards.Attachment;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.Node;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class InscriberScreen extends Screen {
     public Card card;
@@ -25,6 +28,8 @@ public class InscriberScreen extends Screen {
     public float height = 0;
     public float scroll = 0;
     public Node selectedNode = null;
+    public Attachment connectingAttachment = null;
+    public Vector2f offset = new Vector2f();
     int animation = 0;
 
     public InscriberScreen(Card card) {
@@ -49,25 +54,25 @@ public class InscriberScreen extends Screen {
         height = guiGraphics.guiHeight();
 
         if (camera == null) {
-            camera = new Vector2f(width/2f, height/2f);
+            camera = new Vector2f(width / 2f, height / 2f);
         }
 
-        Vector3f mouse = new Vector3f((mouseX/zoom-camera.x), (mouseY/zoom-camera.y), 0);
+        Vector3f mouse = new Vector3f((mouseX / zoom - camera.x), (mouseY / zoom - camera.y), 0);
 
         int topBorder = Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb();
         int bottomBorder = Superposition.SUPERPOSITION_THEME.getColor("bottomBorder").argb();
 
         int topBackground = new Color().setInt(60, 186, 94, 60).argb();
         int bottomBackground = new Color().setInt(44, 150, 72, 40).argb();
+        int background = new Color().setInt(34, 120, 62, 255).argb();
 
-        zoomTarget += (float) scroll/3f;
+        zoomTarget += (float) scroll / 3f;
         zoomTarget = Mth.clamp(zoomTarget, 1f, 5f);
-        float oldZoom = zoom;
-        zoom = (zoom+zoomTarget)/2f;
+        zoom = (zoom + zoomTarget) / 2f;
         zoom = Mth.clamp(zoom, 1f, 5f);
         scroll = 0;
 
-        Vector3f adjustedMouse = new Vector3f((mouseX/zoom-camera.x), (mouseY/zoom-camera.y), 0);
+        Vector3f adjustedMouse = new Vector3f((mouseX / zoom - camera.x), (mouseY / zoom - camera.y), 0);
 
         camera.x += adjustedMouse.x - mouse.x;
 
@@ -75,7 +80,7 @@ public class InscriberScreen extends Screen {
 
         poseStack.pushPose();
         poseStack.scale(zoom, zoom, 1);
-        poseStack.translate(camera.x,camera.y,0); // Draw Nodes
+        poseStack.translate(camera.x, camera.y, 0); // Draw Nodes
 
 //        guiGraphics.drawString(Minecraft.getInstance().font,"HI", (int) mouse.x, (int) mouse.y, 0xFFFFFF);
 
@@ -83,88 +88,216 @@ public class InscriberScreen extends Screen {
 
 
         for (int i = 0; i < 300; i += 10) {
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, 0, i, 300, i +10, topBackground, bottomBackground);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, 0, i, 300, i + 10, topBackground, bottomBackground);
         }
 
-        dragNode(guiGraphics,mouseX, mouseY);
+        dragNode(guiGraphics, mouseX, mouseY);
+
+        List<Attachment> attachments = new ArrayList<>();
+
+        if (connectingAttachment != null) {
+            Vector2f pos1 = connectingAttachment.getAbsolutePosition();
+            drawConnection(guiGraphics, pos1.x, pos1.y, adjustedMouse.x, adjustedMouse.y, connectingAttachment.getSnapMode());
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) (adjustedMouse.x - 2), (int) (adjustedMouse.y  - 2), (int) (adjustedMouse.x  + 2), (int) (adjustedMouse.y + 2), topBorder, topBorder);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) (adjustedMouse.x  - 1), (int) (adjustedMouse.y - 1), (int) (adjustedMouse.x  + 1), (int) (adjustedMouse.y + 1), background, background);
+        }
 
         for (Node node : card.getNodes().values()) {
             float x = node.getPosition().x;
             float y = node.getPosition().y;
             float xLength = node.getSize().x / 2;
             float yLength = node.getSize().y / 2;
+
+            for (Attachment attachment : node.getAttachments()) {
+                exploreAttachment(attachment, attachments);
+            }
+
+
+
+            for (Attachment attachment : attachments) {
+                if (attachment.getTarget() != null) {
+                    drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode());
+                }
+            }
+
+            for (Attachment attachment : attachments) {
+                float attachX = attachment.getPosition().x;
+                float attachY = attachment.getPosition().y;
+                if (attachment.isColliding(adjustedMouse.x, adjustedMouse.y) && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null)) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), topBorder, topBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), bottomBorder, bottomBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
+                }
+
+            }
+            attachments.clear();
+
             if (node.isColliding(adjustedMouse.x, adjustedMouse.y)) {
                 SPUIUtils.drawGradientRect(poseStack.last().pose(), 5, (int) (x - xLength), (int) (y - yLength), (int) (x + xLength), (int) (y + yLength), topBorder, topBorder);
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 5, (int) (x - xLength + 1), (int) (y - yLength + 1), (int) (x + xLength - 1), (int) (y + yLength - 1), background, background);
             } else {
                 SPUIUtils.drawGradientRect(poseStack.last().pose(), 5, (int) (x - xLength), (int) (y - yLength), (int) (x + xLength), (int) (y + yLength), bottomBorder, bottomBorder);
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 5, (int) (x - xLength + 1), (int) (y - yLength + 1), (int) (x + xLength - 1), (int) (y + yLength - 1), background, background);
             }
-            Node targetNode = node.getTarget();
+
+
 //            guiGraphics.fill((int) (x-xLength), (int) y, (int) (x+xLength), (int) (y+yLength),topBorder);
         }
         poseStack.popPose();
     }
 
-    private void dragNode(GuiGraphics guiGraphics,float mouseX, float mouseY) {
+    private void exploreAttachment(Attachment attachment, List<Attachment> attachments) {
+        attachments.add(attachment);
+        if (attachment.getTarget() != null && attachment.getTarget() instanceof Attachment.SegmentAttachment) {
+            exploreAttachment(attachment.getTarget(), attachments);
+        }
+    }
+
+    private void dragNode(GuiGraphics guiGraphics, float mouseX, float mouseY) {
         if (selectedNode == null) {
             return;
         }
         int topBorder = Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb();
         PoseStack poseStack = guiGraphics.pose();
-        Vector3f mouse = new Vector3f((float) (mouseX/zoom-camera.x), (float) (mouseY/zoom-camera.y), 0);
-        selectedNode.getPosition().set(mouse.x,mouse.y);
+        Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
+        selectedNode.getPosition().set(mouse.x + offset.x, mouse.y + offset.y);
         for (Node node2 : card.getNodes().values()) {
             if (node2 != selectedNode) {
-                if (Math.abs(node2.getPosition().x-selectedNode.getPosition().x) < 5f) {
-                    selectedNode.getPosition().set(node2.getPosition().x,selectedNode.getPosition().y);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) (selectedNode.getPosition().x-1), (int) Math.min(node2.getPosition().y,selectedNode.getPosition().y), (int) (selectedNode.getPosition().x+1), (int) Math.max(selectedNode.getPosition().y,node2.getPosition().y), topBorder, topBorder);
+                if (Math.abs(node2.getPosition().x - selectedNode.getPosition().x) < 5f) {
+                    selectedNode.getPosition().set(node2.getPosition().x, selectedNode.getPosition().y);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) (selectedNode.getPosition().x - 1), (int) Math.min(node2.getPosition().y, selectedNode.getPosition().y), (int) (selectedNode.getPosition().x + 1), (int) Math.max(selectedNode.getPosition().y, node2.getPosition().y), topBorder, topBorder);
                 }
-                if (Math.abs(node2.getPosition().y-selectedNode.getPosition().y) < 5f) {
-                    selectedNode.getPosition().set(selectedNode.getPosition().x,node2.getPosition().y);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) Math.min(selectedNode.getPosition().x,node2.getPosition().x), (int) selectedNode.getPosition().y-1, (int) Math.max(node2.getPosition().x,selectedNode.getPosition().x), (int) selectedNode.getPosition().y+1, topBorder, topBorder);
+                if (Math.abs(node2.getPosition().y - selectedNode.getPosition().y) < 5f) {
+                    selectedNode.getPosition().set(selectedNode.getPosition().x, node2.getPosition().y);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) Math.min(selectedNode.getPosition().x, node2.getPosition().x), (int) selectedNode.getPosition().y - 1, (int) Math.max(node2.getPosition().x, selectedNode.getPosition().x), (int) selectedNode.getPosition().y + 1, topBorder, topBorder);
                 }
+            }
+        }
+    }
+
+    private void drawConnection(GuiGraphics guiGraphics, float x1, float y1, float x2, float y2, int snapMode) {
+        PoseStack poseStack = guiGraphics.pose();
+        float xMin = Math.min(x1, x2);
+        float xMax = Math.max(x1, x2);
+        float yMin = Math.min(y1, y2);
+        float yMax = Math.max(y1, y2);
+        float xMidpoint = ((xMax - xMin) / 2) + xMin;
+        float yMidpoint = ((yMax - yMin) / 2) + yMin;
+        switch (snapMode) {
+            case 0 -> {
+                if (y2 - y1 > 0) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMin - 1, (int) xMax, (int) yMin + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMax - 1, (int) xMax, (int) yMax + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                }
+                if (x2 - x1 > 0) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMax - 1, (int) yMin, (int) xMax + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin - 1, (int) yMin, (int) xMin + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                }
+            }
+            case 1 -> {
+                if (y2 - y1 > 0) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMax - 1, (int) xMax, (int) yMax + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMin - 1, (int) xMax, (int) yMin + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                }
+                if (x2 - x1 > 0) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin - 1, (int) yMin, (int) xMin + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMax - 1, (int) yMin, (int) xMax + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                }
+            }
+            case 2 -> {
+                if (y2 - y1 > 0) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMin, (int) x1 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMidpoint, (int) x2 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMin, (int) x2 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMidpoint, (int) x1 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                }
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMidpoint - 1, (int) xMax, (int) yMidpoint + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+            }
+            default -> {
+                if (x2 - x1 > 0) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1, (int) y1 - 1, (int) xMidpoint, (int) y1 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint, (int) y2 - 1, (int) x2, (int) y2 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2, (int) y2 - 1, (int) xMidpoint, (int) y2 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint, (int) y1 - 1, (int) x1, (int) y1 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                }
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint - 1, (int) yMin, (int) xMidpoint + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
             }
         }
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (button == 1 && camera != null) {
-            camera.add((float) dragX/zoom, (float) dragY/zoom);
+        if ((button == 2 || (button == 0 && selectedNode == null && connectingAttachment == null)) && camera != null) {
+            camera.add((float) dragX / zoom, (float) dragY / zoom);
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (button == 0) {
+            if (connectingAttachment != null) {
+                if (connectingAttachment.getAbsolutePosition().distance(mouse) > 3f) {
+                    connectingAttachment.setSegment(new Vector2f(mouse.x, mouse.y));
+                }
+            }
             selectedNode = null;
+            connectingAttachment = null;
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        Vector3f mouse = new Vector3f((float) (mouseX/zoom-camera.x), (float) (mouseY/zoom-camera.y), 0);
+        Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
         if (button == 0 && selectedNode == null) {
             boolean found = false;
+            List<Attachment> attachments = new ArrayList<>();
             for (Node node : card.getNodes().values()) {
+                for (Attachment attachment : node.getAttachments()) {
+                    exploreAttachment(attachment, attachments);
+                }
+                for (Attachment attachment : attachments) {
+                    float attachX = attachment.getPosition().x;
+                    float attachY = attachment.getPosition().y;
+                    if (attachment.isColliding(mouse.x, mouse.y)) {
+                        connectingAttachment = attachment;
+                        attachment.clearTarget();
+                        return true;
+                    }
+                }
+                attachments.clear();
                 if (node.isColliding(mouse.x, mouse.y)) {
+                    offset.set(node.getPosition().x - mouse.x, node.getPosition().y - mouse.y);
                     selectedNode = node;
                     found = true;
-                    break;
-
+                    return true;
                 }
             }
-            if (!found) {
-                selectedNode = null;
-            }
+            selectedNode = null;
+            connectingAttachment = null;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (connectingAttachment != null && Screen.hasShiftDown()) {
+            connectingAttachment.incrementSnapMode((int) Math.ceil(scrollY));
+            return true;
+        }
         scroll = (float) scrollY;
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return true;
     }
+
+
 }
