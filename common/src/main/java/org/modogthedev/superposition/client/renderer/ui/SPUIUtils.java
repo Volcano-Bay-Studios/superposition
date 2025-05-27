@@ -173,7 +173,7 @@ public class SPUIUtils {
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
-    public static void drawGradientRect(Matrix4f mat, int zLevel, int minX, int minY, int maxX, int maxY, int startColor, int endColor) {
+    public static void drawGradientRect(Matrix4f mat, int zLevel, float minX, float minY, float maxX, float maxY, int startColor, int endColor) {
         float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
         float startRed = (float) (startColor >> 16 & 255) / 255.0F;
         float startGreen = (float) (startColor >> 8 & 255) / 255.0F;

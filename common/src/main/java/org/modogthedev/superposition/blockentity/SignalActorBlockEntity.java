@@ -417,7 +417,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
                 this.finaliseConfigTooltips();
             }
             if (light != null) {
-                SuperpositionLightSystem.modifyLight(level,getBlockPos(),light);
+                SuperpositionLightSystem.modifyLight(level, getBlockPos(), light);
             }
         }
         if (signalsReceived == 0) {

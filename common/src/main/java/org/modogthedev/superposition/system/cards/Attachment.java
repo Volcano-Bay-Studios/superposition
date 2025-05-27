@@ -7,7 +7,7 @@ public class Attachment {
     private Vector2f position = new Vector2f();
     private Node node;
     private Attachment target = null;
-    private int snapMode = 0;
+    private int snapMode = 2;
 
     public Attachment(Vector2f position, Node node) {
         this.position.set(position);
@@ -35,7 +35,11 @@ public class Attachment {
     }
 
     public void incrementSnapMode(int amount) {
-        this.snapMode = (this.snapMode + amount) % 4;
+        this.snapMode = (this.snapMode + amount) % 2;
+    }
+
+    public void setSnapMode(int snapMode) {
+        this.snapMode = snapMode;
     }
 
     /**
@@ -43,7 +47,15 @@ public class Attachment {
      * @param position position will be modified to be relative to the node
      */
     public void setSegment(Vector2f position) {
-        this.target = new SegmentAttachment(position.sub(node.getPosition()), this);
+        if (target == null) {
+            this.target = new SegmentAttachment(position.sub(node.getPosition()), this);
+        } else {
+            this.target.getPosition().set(position.sub(node.getPosition()));
+        }
+    }
+
+    public void setTarget(Attachment target) {
+        this.target = target;
     }
 
     public void clearTarget() {
@@ -51,8 +63,18 @@ public class Attachment {
     }
 
     public static class SegmentAttachment extends Attachment {
+        private Attachment parent;
         public SegmentAttachment(Vector2f position, Attachment parent) {
             super(position, parent.node);
+            this.parent = parent;
+        }
+
+        public Attachment getParent() {
+            return parent;
+        }
+
+        public void setParent(Attachment parent) {
+            this.parent = parent;
         }
     }
 }
