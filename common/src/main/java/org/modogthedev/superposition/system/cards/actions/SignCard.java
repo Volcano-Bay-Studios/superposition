@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -58,5 +60,10 @@ public class SignCard extends Action implements ScanAction, OutAction, Manipulat
         if (string != null) {
             tag.putString("line", string);
         }
+    }
+
+    @Override
+    public ItemStack getThumbnailItem() {
+        return Items.OAK_SIGN.getDefaultInstance();
     }
 }

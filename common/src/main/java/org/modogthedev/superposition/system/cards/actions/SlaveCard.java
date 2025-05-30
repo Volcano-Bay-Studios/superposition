@@ -1,6 +1,8 @@
 package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.modogthedev.superposition.system.cards.Action;
 import org.modogthedev.superposition.system.cards.MonoModifyAction;
 import org.modogthedev.superposition.system.cards.SynchronizedCard;
@@ -32,4 +34,8 @@ public class SlaveCard extends Action implements SynchronizedCard, MonoModifyAct
         this.encodedData = encodedData;
     }
 
+    @Override
+    public ItemStack getThumbnailItem() {
+        return Items.LEAD.getDefaultInstance();
+    }
 }

@@ -7,6 +7,13 @@ public class Bounds {
     private int minX, minY, maxX, maxY;
     private Node node;
 
+    public Bounds() {
+        this.minX = 0;
+        this.minY = 0;
+        this.maxX = 0;
+        this.maxY = 0;
+    }
+
     public Bounds(int minX, int minY, int maxX, int maxY, Node node) {
         this.minX = minX;
         this.minY = minY;
@@ -27,8 +34,28 @@ public class Bounds {
         this.node = node;
     }
 
-    public boolean colliding(int x, int y) {
+    public void setMinX(int minX) {
+        this.minX = minX;
+    }
+
+    public void setMaxX(int maxX) {
+        this.maxX = maxX;
+    }
+
+    public void setMinY(int minY) {
+        this.minY = minY;
+    }
+
+    public void setMaxY(int maxY) {
+        this.maxY = maxY;
+    }
+
+    public boolean nodeColliding(int x, int y) {
         return isColliding(minX, minY, maxX, maxY, node, x, y);
+    }
+
+    public boolean isColliding( float x, float y) {
+        return x >= minX && x <= maxX && y >= minY && y <= maxY;
     }
 
     public static boolean isColliding(int minX, int minY, int maxX, int maxY, Node node, float x, float y) {
@@ -39,6 +66,10 @@ public class Bounds {
 
     public static boolean isColliding(int minX, int minY, int maxX, int maxY, float posX, float posY, float x, float y) {
         return x >= minX+posX && x <= maxX+posX && y >= minY+posY && y <= maxY+posY;
+    }
+
+    public static boolean isColliding(int minX, int minY, int maxX, int maxY, float x, float y) {
+        return x >= minX && x <= maxX && y >= minY && y <= maxY;
     }
 
     public static boolean isColliding(Vector2f scale, float posX, float posY, float x, float y) {

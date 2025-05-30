@@ -1,6 +1,8 @@
 package org.modogthedev.superposition.system.cards.actions;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.system.cards.Action;
@@ -16,5 +18,10 @@ public class IdentityCard extends Action implements ScanAction {
     public void scan(Signal signal, BlockEntity blockEntity) {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.getLevel().getBlockState(analyserBlockEntity.getAnalysisPosition()).getBlock().getName().getString());
+    }
+
+    @Override
+    public ItemStack getThumbnailItem() {
+        return Items.NAME_TAG.getDefaultInstance();
     }
 }

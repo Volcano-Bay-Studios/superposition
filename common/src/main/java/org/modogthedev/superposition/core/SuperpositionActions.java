@@ -5,12 +5,19 @@ import foundry.veil.platform.registry.RegistryObject;
 import net.minecraft.resources.ResourceKey;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.compat.CompatabilityHandler;
+import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
 import org.modogthedev.superposition.system.cards.Action;
 import org.modogthedev.superposition.system.cards.actions.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class SuperpositionActions {
+
+    private static final List<Action> actions = new ArrayList<>();
+
+    public static final ActionSpritesheet SPRITESHEET = new ActionSpritesheet(Superposition.id("textures/screen/action_spritesheet.png"),256);
 
     public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ResourceKey.createRegistryKey(Superposition.id("action")), Superposition.MODID);
     public static final RegistryObject<Action> COLOR_CARD = registerAction("color_card", () -> new ColorAction(Superposition.id("color")));
@@ -28,14 +35,31 @@ public class SuperpositionActions {
     public static final RegistryObject<Action> SUBSTRING_CARD = registerAction("substring_card", () -> new SubstringCard(Superposition.id("substring_card")));
     public static final RegistryObject<Action> SLAVE_CARD = registerAction("slave_card", () -> new SlaveCard(Superposition.id("slave_card")),CompatabilityHandler.Mod.COMPUTERCRAFT);
 
+
     private static <T extends Action> RegistryObject<T> registerAction(String name, Supplier<T> action) {
+        SPRITESHEET.addSprite(action.get().getSelfReference());
         return ACTION.register(name, action);
     }
 
     private static <T extends Action> RegistryObject<T> registerAction(String name, Supplier<T> action, CompatabilityHandler.Mod mod) {
+        SPRITESHEET.addSprite(action.get().getSelfReference());
         return ACTION.register(name, action);
     }
 
     public static void bootstrap() {
+
     }
+
+    /**
+     * This method will return and or gather all registered actions.
+     * The first time this action is called, it will collect all registered actions.
+     * @return A list of registered actions
+     */
+    public static List<Action> getAllRegisteredActions() {
+        if (actions.isEmpty()) {
+            actions.addAll(SuperpositionActions.ACTION.asVanillaRegistry().stream().toList());
+        }
+        return actions;
+    }
+
 }

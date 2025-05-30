@@ -197,4 +197,29 @@ public class SPUIUtils {
 
         RenderSystem.disableBlend();
     }
+
+    public static void drawHorizontalGradientRect(Matrix4f mat, int zLevel, float minX, float minY, float maxX, float maxY, int startColor, int endColor) {
+        float startAlpha = (float) (startColor >> 24 & 255) / 255.0F;
+        float startRed = (float) (startColor >> 16 & 255) / 255.0F;
+        float startGreen = (float) (startColor >> 8 & 255) / 255.0F;
+        float startBlue = (float) (startColor & 255) / 255.0F;
+        float endAlpha = (float) (endColor >> 24 & 255) / 255.0F;
+        float endRed = (float) (endColor >> 16 & 255) / 255.0F;
+        float endGreen = (float) (endColor >> 8 & 255) / 255.0F;
+        float endBlue = (float) (endColor & 255) / 255.0F;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.addVertex(mat, maxX, minY, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
+        buffer.addVertex(mat, minX, minY, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
+        buffer.addVertex(mat, minX, maxY, zLevel).setColor(endRed, endGreen, endBlue, endAlpha);
+        buffer.addVertex(mat, maxX, maxY, zLevel).setColor(startRed, startGreen, startBlue, startAlpha);
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
+
+        RenderSystem.disableBlend();
+    }
 }

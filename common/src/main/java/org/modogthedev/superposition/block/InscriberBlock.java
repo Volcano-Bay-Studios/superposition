@@ -60,7 +60,7 @@ public class InscriberBlock extends SignalActorTickingBlock implements EntityBlo
         if (level.isClientSide) {
             ScreenManager.openInscriber(new Card());
         }
-        return super.useWithoutItem(state, level, pos, player, hitResult);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
