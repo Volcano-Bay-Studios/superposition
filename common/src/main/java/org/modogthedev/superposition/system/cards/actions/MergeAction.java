@@ -9,10 +9,9 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 public class MergeAction extends Action implements AnyModifyAction {
 
-    public MergeAction(ResourceLocation card) {
-        super(card);
+    public MergeAction(ResourceLocation action, Information info) {
+        super(action, info);
     }
-
 
     @Override
     public Signal modify(Signal... signals) {

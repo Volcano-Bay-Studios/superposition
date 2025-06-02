@@ -10,8 +10,8 @@ import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class IdentityCard extends Action implements ScanAction {
-    public IdentityCard(ResourceLocation card) {
-        super(card);
+    public IdentityCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override

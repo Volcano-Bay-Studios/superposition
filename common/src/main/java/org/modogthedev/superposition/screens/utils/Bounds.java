@@ -50,6 +50,22 @@ public class Bounds {
         this.maxY = maxY;
     }
 
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
     public boolean nodeColliding(int x, int y) {
         return isColliding(minX, minY, maxX, maxY, node, x, y);
     }

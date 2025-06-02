@@ -9,10 +9,9 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 public class FrequencyCard extends Action implements MonoModifyAction {
 
-    public FrequencyCard(ResourceLocation card) {
-        super(card);
+    public FrequencyCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
-
 
     @Override
     public Signal modify(Signal signal) {

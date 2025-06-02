@@ -16,10 +16,9 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.DataHelper;
 
 public class SignCard extends Action implements ScanAction, OutAction, ManipulateAction {
-    public SignCard(ResourceLocation card) {
-        super(card);
+    public SignCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
-
 
     @Override
     public void scan(Signal signal, BlockEntity blockEntity) {

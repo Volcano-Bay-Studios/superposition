@@ -10,8 +10,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 public class EncapsulateAction extends Action implements BiModifyAction {
 
-    public EncapsulateAction(ResourceLocation card) {
-        super(card);
+    public EncapsulateAction(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override

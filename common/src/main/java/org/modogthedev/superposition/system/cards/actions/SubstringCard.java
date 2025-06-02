@@ -9,10 +9,9 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 public class SubstringCard extends Action implements BiModifyAction {
 
-    public SubstringCard(ResourceLocation card) {
-        super(card);
+    public SubstringCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
-
 
     @Override
     public Signal modify(Signal signal, Signal periphrealSignal) {

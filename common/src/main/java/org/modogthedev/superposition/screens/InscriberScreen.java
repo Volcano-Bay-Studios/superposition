@@ -1,16 +1,13 @@
 package org.modogthedev.superposition.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import foundry.veil.api.client.color.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -27,6 +24,7 @@ import org.modogthedev.superposition.system.cards.Node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class InscriberScreen extends Screen {
     public Card card;
@@ -45,8 +43,10 @@ public class InscriberScreen extends Screen {
     public float windowScrollTarget = 0;
     public float windowScroll = 0;
     public Bounds windowBounds = new Bounds();
+    public Action selectedAction = null;
+    public boolean scrolling = false;
 
-    public static int windowWidth = 300;
+    public int windowWidth = 300;
     public static int windowHeight = 180;
 
     public InscriberScreen(Card card) {
@@ -69,6 +69,7 @@ public class InscriberScreen extends Screen {
         PoseStack poseStack = guiGraphics.pose();
         width = guiGraphics.guiWidth();
         height = guiGraphics.guiHeight();
+
 
         if (camera == null) {
             camera = new Vector2f(width / 2f, height / 2f);
@@ -135,36 +136,29 @@ public class InscriberScreen extends Screen {
                 exploreAttachment(attachment, attachments);
             }
 
-            for (Attachment attachment : attachments) {
-                if (attachment.getTarget() != null) {
-//                    drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode(),2f, bottomBorder, bottomBorder);
-//                    drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode(), 2f, bottomBackground, bottomBackground);
+            if (node.isColliding(adjustedMouse.x, adjustedMouse.y)) {
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength), (int) (y - yLength), (int) (x + xLength), (int) (y + yLength), topBorder, topBorder);
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength + 1), (int) (y - yLength + 1), (int) (x + xLength - 1), (int) (y + yLength - 1), background, background);
+            } else {
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength), (int) (y - yLength), (int) (x + xLength), (int) (y + yLength), bottomBorder, bottomBorder);
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength + 1), (int) (y - yLength + 1), (int) (x + xLength - 1), (int) (y + yLength - 1), background, background);
+            }
+
+            Action action = node.getAction();
+            if (action != null) {
+                ItemStack item = action.getThumbnailItem();
+                if (item != null) {
+                    guiGraphics.renderItem(item, (int) (node.getPosition().x - node.getSize().x/2f) + 2, (int) (node.getPosition().y - node.getSize().y/2f)+3);
+                } else {
+                    ActionSpritesheet spritesheet = SuperpositionActions.SPRITESHEET;
+                    ActionSpritesheet.SpriteInformation sprite = spritesheet.get(action.getSelfReference());
+                    guiGraphics.blit(spritesheet.spritesheetLocation, (int) (node.getPosition().x - node.getSize().x/2f) + 2, (int) (node.getPosition().y - node.getSize().y/2f)+2, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
                 }
             }
 
             for (Attachment attachment : attachments) {
 
-                if (attachment instanceof Attachment.SegmentAttachment segmentAttachment && segmentAttachment.getParent() != null) { // Auto path snap mode
-                    float yDiff = segmentAttachment.getParent().getAbsolutePosition().y - segmentAttachment.getAbsolutePosition().y;
-                    float xDiff = segmentAttachment.getParent().getAbsolutePosition().x - segmentAttachment.getAbsolutePosition().x;
-                    if (segmentAttachment.getParent().getSnapMode() == 2) {
-                        if (yDiff < 0) {
-//                            segmentAttachment.setSnapMode(2);
-                        } else {
-//                            segmentAttachment.setSnapMode(3);
-                        }
-                    } else if (segmentAttachment.getParent().getSnapMode() == 3) {
-                        if (xDiff < 0) {
-//                            segmentAttachment.setSnapMode(2);
-                        } else {
-//                            segmentAttachment.setSnapMode(3);
-                        }
-                    }
-                }
-
                 if (attachment.getTarget() != null) {
-//                    drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode(),2f, bottomBorder, bottomBorder);
-//                    drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode(), 2f, topBackground, topBackground);
                     drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode(), 1f, topBorder, topBorder);
                 }
             }
@@ -182,50 +176,98 @@ public class InscriberScreen extends Screen {
 
             }
             attachments.clear();
-
-            if (node.isColliding(adjustedMouse.x, adjustedMouse.y)) {
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength), (int) (y - yLength), (int) (x + xLength), (int) (y + yLength), topBorder, topBorder);
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength + 1), (int) (y - yLength + 1), (int) (x + xLength - 1), (int) (y + yLength - 1), background, background);
-            } else {
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength), (int) (y - yLength), (int) (x + xLength), (int) (y + yLength), bottomBorder, bottomBorder);
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x - xLength + 1), (int) (y - yLength + 1), (int) (x + xLength - 1), (int) (y + yLength - 1), background, background);
-            }
-
-
-//            guiGraphics.fill((int) (x-xLength), (int) y, (int) (x+xLength), (int) (y+yLength),topBorder);
         }
 
-
+        // Render add window
         poseStack.popPose();
         poseStack.pushPose();
         if (windowPos != null) {
-            int width = 2;
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x - width), (int) (windowPos.y), (int) (windowPos.x), (int) (windowPos.y + windowHeight), transparentBackground, transparentBackground);
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + windowWidth), (int) (windowPos.y), (int) (windowPos.x + windowWidth + width), (int) (windowPos.y + windowHeight), transparentBackground, transparentBackground);
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x), (int) (windowPos.y - width), (int) (windowPos.x + windowWidth), (int) (windowPos.y + windowHeight + width), transparentBackground, transparentBackground);
+            Vector2f storedPos = new Vector2f(windowPos);
 
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x), (int) (windowPos.y), (int) (windowPos.x + width), (int) (windowPos.y + windowHeight), topBorder, bottomBorder);
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + windowWidth - width), (int) (windowPos.y), (int) (windowPos.x + windowWidth), (int) (windowPos.y + windowHeight), topBorder, bottomBorder);
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + width), (int) (windowPos.y), (int) (windowPos.x + windowWidth - width), (int) (windowPos.y + width), topBorder, topBorder);
-            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + width), (int) (windowPos.y + windowHeight - width), (int) (windowPos.x + windowWidth - width), (int) (windowPos.y + windowHeight), bottomBorder, bottomBorder);
-            windowScrollTarget = Math.min(0,windowScrollTarget);
-            windowScroll = windowScrollTarget+windowScroll/2;
-            Vector2f textPosition = new Vector2f(windowPos.x+ 25,windowPos.y+windowScroll);
-            guiGraphics.enableScissor((int) (windowPos.x+width), (int) (windowPos.y+width), (int) (windowPos.x+windowWidth-width), (int) (windowPos.y+windowHeight-width));
+            int windowWidth = 2;
+            windowPos.x = Math.min(width - this.windowWidth - windowWidth, windowPos.x);
+            windowPos.y = Math.min(height - windowHeight - windowWidth, windowPos.y);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x - windowWidth), (int) (windowPos.y), (int) (windowPos.x), (int) (windowPos.y + windowHeight), transparentBackground, transparentBackground);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + this.windowWidth), (int) (windowPos.y), (int) (windowPos.x + this.windowWidth + windowWidth), (int) (windowPos.y + windowHeight), transparentBackground, transparentBackground);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x), (int) (windowPos.y - windowWidth), (int) (windowPos.x + this.windowWidth), (int) (windowPos.y + windowHeight + windowWidth), transparentBackground, transparentBackground);
+
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x), (int) (windowPos.y), (int) (windowPos.x + windowWidth), (int) (windowPos.y + windowHeight), topBorder, bottomBorder);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + this.windowWidth - windowWidth), (int) (windowPos.y), (int) (windowPos.x + this.windowWidth), (int) (windowPos.y + windowHeight), topBorder, bottomBorder);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + windowWidth), (int) (windowPos.y), (int) (windowPos.x + this.windowWidth - windowWidth), (int) (windowPos.y + windowWidth), topBorder, topBorder);
+            SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + windowWidth), (int) (windowPos.y + windowHeight - windowWidth), (int) (windowPos.x + this.windowWidth - windowWidth), (int) (windowPos.y + windowHeight), bottomBorder, bottomBorder);
+
+
+            windowScrollTarget = Math.min(0, windowScrollTarget);
+            windowScrollTarget = Math.max(-SuperpositionActions.getAllRegisteredActions().size() * 4, windowScrollTarget);
+            windowScroll = windowScrollTarget + windowScroll / 2;
+
+
+            Vector2f textPosition = new Vector2f(windowPos.x + 25, windowPos.y + windowScroll);
+            guiGraphics.enableScissor((int) (windowPos.x + windowWidth), (int) (windowPos.y + windowWidth), (int) (windowPos.x + this.windowWidth - windowWidth), (int) (windowPos.y + windowHeight - windowWidth));
+            if (!Bounds.isColliding(windowBounds.getMinX(), windowBounds.getMinY(), windowBounds.getMaxX(), windowBounds.getMaxY(), (float) mouseX, (float) mouseY)) {
+                selectedAction = null;
+            }
             for (Action action : SuperpositionActions.getAllRegisteredActions()) {
-                textPosition.add(0,18);
+                if (textPosition.y > windowPos.y + windowHeight) {
+                    break;
+                }
+                if (Bounds.isColliding(windowBounds.getMinX(), (int) textPosition.y + 12, windowBounds.getMinX() + 150, (int) (textPosition.y + 30), (float) mouseX, (float) mouseY)) {
+                    selectedAction = action;
+                }
+                textPosition.add(0, 18);
                 ItemStack item = action.getThumbnailItem();
                 if (item != null) {
                     guiGraphics.renderItem(item, (int) (textPosition.x - 20), (int) textPosition.y - 4);
                 } else {
                     ActionSpritesheet spritesheet = SuperpositionActions.SPRITESHEET;
                     ActionSpritesheet.SpriteInformation sprite = spritesheet.get(action.getSelfReference());
-                    guiGraphics.blit(spritesheet.spritesheetLocation, (int) textPosition.x - 20, (int) textPosition.y - 4, sprite.u1(),sprite.u2(),sprite.v1(),sprite.v2(),spritesheet.scale,spritesheet.scale);
+                    guiGraphics.blit(spritesheet.spritesheetLocation, (int) textPosition.x - 20, (int) textPosition.y - 4, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
                 }
-                guiGraphics.drawString(Minecraft.getInstance().font,action.getSelfReference().getPath(), (int) textPosition.x, (int) textPosition.y,topBorder);
+                if (selectedAction == action || selectedAction == null) {
+                    guiGraphics.drawString(Minecraft.getInstance().font, action.getInfo().name(), (int) textPosition.x, (int) textPosition.y, topBorder);
+                } else {
+                    guiGraphics.drawString(Minecraft.getInstance().font, action.getInfo().name(), (int) textPosition.x, (int) textPosition.y, bottomBorder);
+                }
             }
+
+            if (Bounds.isColliding(windowBounds.getMinX() + 130, (int) (windowBounds.getMinY() - windowScroll), windowBounds.getMinX() + 150, (int) (windowBounds.getMinY() - windowScroll + (SuperpositionActions.getAllRegisteredActions().size() * 18 - windowHeight)), (float) mouseX, (float) mouseY)) {
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + 145), (int) (windowPos.y - windowScroll), (int) (windowPos.x + 148), (int) (windowPos.y - windowScroll + (SuperpositionActions.getAllRegisteredActions().size() * 18 - windowHeight)), topBorder, topBorder);
+            } else {
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x + 145), (int) (windowPos.y - windowScroll), (int) (windowPos.x + 148), (int) (windowPos.y - windowScroll + (SuperpositionActions.getAllRegisteredActions().size() * 18 - windowHeight)), bottomBorder, bottomBorder);
+            }
+            if (selectedAction != null) {
+                Action action = selectedAction;
+                ItemStack item = action.getThumbnailItem();
+                poseStack.pushPose();
+                poseStack.scale(5, 5, 1);
+                if (item != null) {
+                    guiGraphics.renderItem(item, (int) (windowPos.x + 180) / 5, (int) (windowPos.y + 10) / 5);
+                } else {
+                    ActionSpritesheet spritesheet = SuperpositionActions.SPRITESHEET;
+                    ActionSpritesheet.SpriteInformation sprite = spritesheet.get(action.getSelfReference());
+                    guiGraphics.blit(spritesheet.spritesheetLocation, (int) (windowPos.x + 180) / 5, (int) (windowPos.y + 10) / 5, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
+                }
+                poseStack.popPose();
+                guiGraphics.drawString(Minecraft.getInstance().font, action.getInfo().name(), (int) (windowPos.x + 150), (int) windowPos.y + 100, topBorder);
+                int textWrapY = (int) windowPos.y + 115;
+                for (FormattedCharSequence formattedcharsequence : font.split(action.getInfo().description(), 140)) {
+                    guiGraphics.drawString(font, formattedcharsequence, (int) (windowPos.x + 150), textWrapY, topBorder, true);
+                    textWrapY += 9;
+                }
+                this.windowWidth = 300;
+            } else {
+                this.windowWidth = 150;
+            }
+            windowBounds.setMinX((int) windowPos.x);
+            windowBounds.setMaxX((int) windowPos.x + this.windowWidth);
+            windowBounds.setMinY((int) windowPos.y);
+            windowBounds.setMaxY((int) windowPos.y + windowHeight);
             guiGraphics.disableScissor();
+
+            windowPos.set(storedPos);
         }
+
+        // Cleanup
         poseStack.popPose();
     }
 
@@ -326,7 +368,12 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (button == 0 && scrolling) {
+            windowScrollTarget += (float) -dragY / 2;
+            return true;
+        }
         if ((button == 2 || (button == 0 && selectedNode == null && connectingAttachment == null)) && camera != null) {
+
             camera.add((float) dragX / zoom, (float) dragY / zoom);
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
@@ -344,6 +391,7 @@ public class InscriberScreen extends Screen {
 
             selectedNode = null;
             connectingAttachment = null;
+            scrolling = false;
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
@@ -352,6 +400,27 @@ public class InscriberScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
         if (button == 0 && selectedNode == null) {
+            if (windowPos != null && windowBounds.isColliding((float) mouseX, (float) mouseY)) {
+                if (Bounds.isColliding(windowBounds.getMinX() + 130, (int) (windowBounds.getMinY() - windowScroll), windowBounds.getMinX() + 150, (int) (windowBounds.getMinY() - windowScroll + (SuperpositionActions.getAllRegisteredActions().size() * 18 - windowHeight)), (float) mouseX, (float) mouseY)) {
+                    scrolling = true;
+                    return true;
+                }
+                Vector2f textPosition = new Vector2f(windowPos.x + 25, windowPos.y + windowScroll);
+                for (Action action : SuperpositionActions.getAllRegisteredActions()) {
+                    if (Bounds.isColliding(windowBounds.getMinX(), (int) textPosition.y + 12, windowBounds.getMinX() + 150, (int) (textPosition.y + 30), (float) mouseX, (float) mouseY)) {
+                        Node node = new Node(card);
+                        node.updateAction(action.copy());
+                        node.getPosition().set(mouse.x,mouse.y);
+                        card.getNodes().put(UUID.randomUUID(),node);
+                        if (!Screen.hasShiftDown()) {
+                            windowPos = null;
+                        }
+                        return true;
+                    }
+                    textPosition.add(0, 18);
+                }
+            }
+
             boolean found = false;
             List<Attachment> attachments = new ArrayList<>();
             for (Node node : card.getNodes().values()) {
@@ -397,10 +466,7 @@ public class InscriberScreen extends Screen {
             } else {
                 windowPos.set(Math.round(mouseX), Math.round(mouseY));
             }
-            windowBounds.setMinX((int) windowPos.x);
-            windowBounds.setMaxX((int) windowPos.x+windowWidth);
-            windowBounds.setMinY((int) windowPos.y);
-            windowBounds.setMaxY((int) windowPos.y+windowHeight);
+
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -409,7 +475,7 @@ public class InscriberScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (windowPos != null && windowBounds.isColliding((float) mouseX, (float) mouseY)) {
-            windowScrollTarget += (float) scrollY*9;
+            windowScrollTarget += (float) scrollY * 9;
             return true;
         }
         if (connectingAttachment != null && Screen.hasShiftDown()) {
@@ -420,5 +486,8 @@ public class InscriberScreen extends Screen {
         return true;
     }
 
-
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
 }

@@ -11,10 +11,9 @@ import org.modogthedev.superposition.system.signal.data.EncodedData;
 
 public class SlaveCard extends Action implements SynchronizedCard, MonoModifyAction {
 
-    public SlaveCard(ResourceLocation card) {
-        super(card);
+    public SlaveCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
-
 
     public EncodedData<?> encodedData;
 

@@ -10,8 +10,8 @@ import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class AmplitudeAction extends Action implements MonoModifyAction {
 
-    public AmplitudeAction(ResourceLocation card) {
-        super(card);
+    public AmplitudeAction(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override

@@ -16,8 +16,8 @@ import org.modogthedev.superposition.util.DataHelper;
 
 public class RedstoneCard extends Action implements ScanAction, OutAction, ManipulateAction {
 
-    public RedstoneCard(ResourceLocation card) {
-        super(card);
+    public RedstoneCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override

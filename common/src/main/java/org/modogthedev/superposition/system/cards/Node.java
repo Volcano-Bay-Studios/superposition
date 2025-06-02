@@ -52,6 +52,10 @@ public class Node {
         }
     }
 
+    public Action getAction() {
+        return action;
+    }
+
     public void updateSize(int size) {
         signals = new Signal[size];
         calculateSize();
@@ -61,11 +65,16 @@ public class Node {
         size.x = 20;
         size.y = 20;
         if (signals != null) {
-            size.y = 8 + (8 * Math.max(1, getInputCount()-1));
+            size.y = 12 + (8 * Math.max(1, getInputCount()-1));
         }
 
         attachments.clear();
         attachments.add(new Attachment(new Vector2f(size.x / 2, 0), this));
+
+        int length = getInputCount();
+        for (int i = 0; i < length; i++) {
+            attachments.add(new Attachment(new Vector2f(-size.x / 2, i*8 - (Math.max(0, getInputCount()-1)*4)), this));
+        }
     }
 
     public int getInputCount() {

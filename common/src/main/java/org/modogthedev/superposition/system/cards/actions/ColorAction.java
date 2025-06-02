@@ -9,8 +9,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 public class ColorAction extends Action implements ScanAction {
 
-    public ColorAction(ResourceLocation action) {
-        super(action);
+    public ColorAction(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override

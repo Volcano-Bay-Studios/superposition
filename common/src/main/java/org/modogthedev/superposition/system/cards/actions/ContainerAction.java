@@ -17,8 +17,8 @@ import java.util.List;
 
 public class ContainerAction extends Action implements ScanAction {
 
-    public ContainerAction(ResourceLocation action) {
-        super(action);
+    public ContainerAction(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override

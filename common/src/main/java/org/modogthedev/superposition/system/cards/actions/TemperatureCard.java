@@ -11,10 +11,9 @@ import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class TemperatureCard extends Action implements ScanAction {
-    public TemperatureCard(ResourceLocation card) {
-        super(card);
+    public TemperatureCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
-
 
     @Override
     public void scan(Signal signal, BlockEntity blockEntity) {

@@ -9,8 +9,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 public class RetriveCard extends Action implements BiModifyAction {
 
-    public RetriveCard(ResourceLocation card) {
-        super(card);
+    public RetriveCard(ResourceLocation action, Information info) {
+        super(action, info);
     }
 
     @Override
