@@ -75,7 +75,7 @@ public class InscriberScreen extends Screen {
             camera = new Vector2f(width / 2f, height / 2f);
         }
 
-        Vector3f mouse = new Vector3f((mouseX / zoom - camera.x), (mouseY / zoom - camera.y), 0);
+        Vector2f mouse = new Vector2f((mouseX / zoom - camera.x), (mouseY / zoom - camera.y));
 
         int topBorder = Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb();
         int bottomBorder = Superposition.SUPERPOSITION_THEME.getColor("bottomBorder").argb();
@@ -171,7 +171,7 @@ public class InscriberScreen extends Screen {
                 if (connectingAttachment != null && attachment instanceof Attachment.SegmentAttachment segmentAttachment && segmentAttachment.getParent() == connectingAttachment && segmentAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 4) {
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), errorTopBorder, errorTopBorder);
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), errorBackground, errorBackground);
-                } else if (attachment.isColliding(adjustedMouse.x, adjustedMouse.y) && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null) || (connectingAttachment != null && connectingAttachment.getTarget() == attachment)) {
+                } else if (attachment.getAbsolutePosition().distance(mouse) < 5 && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null) || (connectingAttachment != null && connectingAttachment.getTarget() == attachment)) {
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), topBorder, topBorder);
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
                 } else {
@@ -287,7 +287,7 @@ public class InscriberScreen extends Screen {
         if (selectedNode == null) {
             return;
         }
-        int topBorder = Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb();
+        int topBorder = Superposition.SUPERPOSITION_THEME.getColor("bottomBorder").argb();
         PoseStack poseStack = guiGraphics.pose();
         Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
         selectedNode.getPosition().set(mouse.x + offset.x, mouse.y + offset.y);
@@ -388,13 +388,27 @@ public class InscriberScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (button == 0) {
+
+
             if (connectingAttachment != null && connectingAttachment.getTarget() != null && connectingAttachment.getAbsolutePosition().distance(connectingAttachment.getTarget().getAbsolutePosition()) < 4) {
                 connectingAttachment.clearTarget();
             }
             if (connectingAttachment != null) {
                 connectingAttachment.getPosition().x = (float) Math.floor(connectingAttachment.getPosition().x);
                 connectingAttachment.getPosition().y = (float) Math.floor(connectingAttachment.getPosition().y);
+                List<Attachment> attachments = new ArrayList<>();
+                for (Node node : card.getNodes().values()) {
+                    for (Attachment attachment : node.getAttachments()) {
+                        exploreAttachment(attachment, attachments);
+                    }
+                }
+                for (Attachment attachment : attachments) {
+                    if (attachment instanceof Attachment.InputAttachment inputAttachment && connectingAttachment.getTarget() != null && inputAttachment.getAbsolutePosition().distance(connectingAttachment.getTarget().getAbsolutePosition()) < 5) {
+                        connectingAttachment.setTarget(inputAttachment);
+                    }
+                }
             }
+
 
             selectedNode = null;
             connectingAttachment = null;
@@ -405,7 +419,7 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
+        Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (button == 0 && selectedNode == null) {
             if (windowPos != null && windowBounds.isColliding((float) mouseX, (float) mouseY)) {
                 if (Bounds.isColliding(windowBounds.getMinX() + 130, (int) (windowBounds.getMinY() - windowScroll), windowBounds.getMinX() + 150, (int) (windowBounds.getMinY() - windowScroll + (SuperpositionActions.getAllRegisteredActions().size() * 18 - windowHeight)), (float) mouseX, (float) mouseY)) {
@@ -434,26 +448,6 @@ public class InscriberScreen extends Screen {
                 for (Attachment attachment : node.getAttachments()) {
                     exploreAttachment(attachment, attachments);
                 }
-                for (Attachment attachment : attachments) {
-                    if (attachment.isColliding(mouse.x, mouse.y)) {
-                        if ((!Screen.hasShiftDown()) && attachment instanceof Attachment.SegmentAttachment segmentAttachment) {
-                            connectingAttachment = segmentAttachment.getParent();
-                        } else {
-                            if (attachment.getTarget() != null) {
-                                Attachment attachment1 = attachment.getTarget();
-                                attachment.clearTarget();
-                                attachment.setSegment(new Vector2f(mouse.x, mouse.y));
-                                attachment.getTarget().setTarget(attachment1);
-                                connectingAttachment = attachment;
-                            } else {
-                                connectingAttachment = attachment;
-                                attachment.clearTarget();
-                            }
-                        }
-                        return true;
-                    }
-                }
-                attachments.clear();
                 if (node.isColliding(mouse.x, mouse.y)) {
                     offset.set(node.getPosition().x - mouse.x, node.getPosition().y - mouse.y);
                     selectedNode = node;
@@ -461,6 +455,26 @@ public class InscriberScreen extends Screen {
                     return true;
                 }
             }
+            for (Attachment attachment : attachments) {
+                if (attachment.getAbsolutePosition().distance(mouse) < 5 && !(attachment instanceof Attachment.InputAttachment)) {
+                    if ((!Screen.hasShiftDown()) && attachment instanceof Attachment.SegmentAttachment segmentAttachment) {
+                        connectingAttachment = segmentAttachment.getParent();
+                    } else {
+                        if (attachment.getTarget() != null) {
+                            Attachment attachment1 = attachment.getTarget();
+                            attachment.clearTarget();
+                            attachment.setSegment(new Vector2f(mouse.x, mouse.y));
+                            attachment.getTarget().setTarget(attachment1);
+                            connectingAttachment = attachment;
+                        } else {
+                            connectingAttachment = attachment;
+                            attachment.clearTarget();
+                        }
+                    }
+                    return true;
+                }
+            }
+            attachments.clear();
             selectedNode = null;
             connectingAttachment = null;
         }
@@ -486,13 +500,30 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (windowPos != null && windowBounds.isColliding((float) mouseX, (float) mouseY)) {
             windowScrollTarget += (float) scrollY * 9;
             return true;
         }
-        if (connectingAttachment != null && Screen.hasShiftDown()) {
-            connectingAttachment.incrementSnapMode((int) Math.ceil(scrollY));
-            return true;
+        List<Attachment> attachments = new ArrayList<>();
+        if (Screen.hasShiftDown()) {
+            if (connectingAttachment == null) {
+                for (Node node : card.getNodes().values()) {
+                    for (Attachment attachment : node.getAttachments()) {
+                        exploreAttachment(attachment, attachments);
+                    }
+                }
+            }
+            for (Attachment attachment : attachments) {
+                if (attachment.getAbsolutePosition().distance(mouse) < 5) {
+                    attachment.incrementSnapMode((int) Math.ceil(scrollY));
+                    return true;
+                }
+            }
+            if (connectingAttachment != null) {
+                connectingAttachment.incrementSnapMode((int) Math.ceil(scrollY));
+                return true;
+            }
         }
         scroll = (float) scrollY;
         return true;
