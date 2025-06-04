@@ -84,8 +84,8 @@ public class InscriberScreen extends Screen {
         int bottomBackground = new Color().setInt(44, 150, 72, 40).argb();
         int background = new Color().setInt(34, 120, 62, 255).argb();
         int transparentBackground = new Color().setInt(34, 120, 62, 150).argb();
-        int errorTopBorder = new Color().setInt(186, 60, 94, 60).argb();
-        int errorBackground = new Color().setInt(150, 44, 72, 40).argb();
+        int errorTopBorder = new Color().setInt(186, 60, 94, 255).argb();
+        int errorBackground = new Color().setInt(150, 44, 72, 255).argb();
 
         zoomTarget += (float) scroll / 3f;
         zoomTarget = Mth.clamp(zoomTarget, 1f, 5f);
@@ -168,7 +168,7 @@ public class InscriberScreen extends Screen {
             for (Attachment attachment : attachments) {
                 float attachX = attachment.getPosition().x;
                 float attachY = attachment.getPosition().y;
-                if (connectingAttachment != null && connectingAttachment == attachment && connectingAttachment instanceof Attachment.SegmentAttachment segmentAttachment && connectingAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 5) {
+                if (connectingAttachment != null && attachment instanceof Attachment.SegmentAttachment segmentAttachment && segmentAttachment.getParent() == connectingAttachment && segmentAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 4) {
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), errorTopBorder, errorTopBorder);
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), errorBackground, errorBackground);
                 } else if (attachment.isColliding(adjustedMouse.x, adjustedMouse.y) && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null) || (connectingAttachment != null && connectingAttachment.getTarget() == attachment)) {
@@ -388,8 +388,10 @@ public class InscriberScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (button == 0) {
-            if (connectingAttachment != null && connectingAttachment instanceof Attachment.SegmentAttachment segmentAttachment && connectingAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 5) {
-                segmentAttachment.clearTarget();
+            if (connectingAttachment != null && connectingAttachment.getTarget() != null && connectingAttachment.getAbsolutePosition().distance(connectingAttachment.getTarget().getAbsolutePosition()) < 4) {
+                connectingAttachment.clearTarget();
+            }
+            if (connectingAttachment != null) {
                 connectingAttachment.getPosition().x = (float) Math.floor(connectingAttachment.getPosition().x);
                 connectingAttachment.getPosition().y = (float) Math.floor(connectingAttachment.getPosition().y);
             }
@@ -442,9 +444,6 @@ public class InscriberScreen extends Screen {
                                 attachment.clearTarget();
                                 attachment.setSegment(new Vector2f(mouse.x, mouse.y));
                                 attachment.getTarget().setTarget(attachment1);
-                                if (attachment1 instanceof Attachment.SegmentAttachment segmentAttachment) {
-                                    segmentAttachment.setParent(attachment.getTarget());
-                                }
                                 connectingAttachment = attachment;
                             } else {
                                 connectingAttachment = attachment;
@@ -497,6 +496,11 @@ public class InscriberScreen extends Screen {
         }
         scroll = (float) scrollY;
         return true;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override

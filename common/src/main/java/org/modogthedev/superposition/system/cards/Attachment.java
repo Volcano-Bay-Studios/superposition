@@ -52,10 +52,16 @@ public class Attachment {
         } else {
             this.target.getPosition().set(position.sub(node.getPosition()));
         }
+        if (this.target instanceof SegmentAttachment segmentAttachment) {
+            segmentAttachment.setParent(this);
+        }
     }
 
     public void setTarget(Attachment target) {
         this.target = target;
+        if (this.target instanceof SegmentAttachment segmentAttachment) {
+            segmentAttachment.setParent(this);
+        }
     }
 
     public void clearTarget() {
