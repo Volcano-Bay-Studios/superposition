@@ -73,7 +73,7 @@ public class Node {
 
         int length = getInputCount();
         for (int i = 0; i < length; i++) {
-            attachments.add(new Attachment(new Vector2f(-size.x / 2, i*8 - (Math.max(0, getInputCount()-1)*4)), this));
+            attachments.add(new Attachment.InputAttachment(new Vector2f(-size.x / 2, i*8 - (Math.max(0, getInputCount()-1)*4)), this));
         }
     }
 

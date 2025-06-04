@@ -77,4 +77,10 @@ public class Attachment {
             this.parent = parent;
         }
     }
+
+    public static class InputAttachment extends Attachment {
+        public InputAttachment(Vector2f position, Node node) {
+            super(position, node);
+        }
+    }
 }

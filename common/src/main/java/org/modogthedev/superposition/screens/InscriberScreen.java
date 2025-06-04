@@ -84,6 +84,8 @@ public class InscriberScreen extends Screen {
         int bottomBackground = new Color().setInt(44, 150, 72, 40).argb();
         int background = new Color().setInt(34, 120, 62, 255).argb();
         int transparentBackground = new Color().setInt(34, 120, 62, 150).argb();
+        int errorTopBorder = new Color().setInt(186, 60, 94, 60).argb();
+        int errorBackground = new Color().setInt(150, 44, 72, 40).argb();
 
         zoomTarget += (float) scroll / 3f;
         zoomTarget = Mth.clamp(zoomTarget, 1f, 5f);
@@ -148,11 +150,11 @@ public class InscriberScreen extends Screen {
             if (action != null) {
                 ItemStack item = action.getThumbnailItem();
                 if (item != null) {
-                    guiGraphics.renderItem(item, (int) (node.getPosition().x - node.getSize().x/2f) + 2, (int) (node.getPosition().y - node.getSize().y/2f)+3);
+                    guiGraphics.renderItem(item, (int) (node.getPosition().x - node.getSize().x / 2f) + 2, (int) (node.getPosition().y - node.getSize().y / 2f) + 2);
                 } else {
                     ActionSpritesheet spritesheet = SuperpositionActions.SPRITESHEET;
                     ActionSpritesheet.SpriteInformation sprite = spritesheet.get(action.getSelfReference());
-                    guiGraphics.blit(spritesheet.spritesheetLocation, (int) (node.getPosition().x - node.getSize().x/2f) + 2, (int) (node.getPosition().y - node.getSize().y/2f)+2, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
+                    guiGraphics.blit(spritesheet.spritesheetLocation, (int) (node.getPosition().x - node.getSize().x / 2f) + 2, (int) (node.getPosition().y - node.getSize().y / 2f) + 2, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
                 }
             }
 
@@ -166,7 +168,10 @@ public class InscriberScreen extends Screen {
             for (Attachment attachment : attachments) {
                 float attachX = attachment.getPosition().x;
                 float attachY = attachment.getPosition().y;
-                if (attachment.isColliding(adjustedMouse.x, adjustedMouse.y) && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null)) {
+                if (connectingAttachment != null && connectingAttachment == attachment && connectingAttachment instanceof Attachment.SegmentAttachment segmentAttachment && connectingAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 5) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), errorTopBorder, errorTopBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), errorBackground, errorBackground);
+                } else if (attachment.isColliding(adjustedMouse.x, adjustedMouse.y) && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null) || (connectingAttachment != null && connectingAttachment.getTarget() == attachment)) {
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), topBorder, topBorder);
                     SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
                 } else {
@@ -383,7 +388,7 @@ public class InscriberScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (button == 0) {
-            if (connectingAttachment != null && connectingAttachment.getAbsolutePosition().distance(mouse) < 3f && connectingAttachment instanceof Attachment.SegmentAttachment segmentAttachment) {
+            if (connectingAttachment != null && connectingAttachment instanceof Attachment.SegmentAttachment segmentAttachment && connectingAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 5) {
                 segmentAttachment.clearTarget();
                 connectingAttachment.getPosition().x = (float) Math.floor(connectingAttachment.getPosition().x);
                 connectingAttachment.getPosition().y = (float) Math.floor(connectingAttachment.getPosition().y);
@@ -410,8 +415,8 @@ public class InscriberScreen extends Screen {
                     if (Bounds.isColliding(windowBounds.getMinX(), (int) textPosition.y + 12, windowBounds.getMinX() + 150, (int) (textPosition.y + 30), (float) mouseX, (float) mouseY)) {
                         Node node = new Node(card);
                         node.updateAction(action.copy());
-                        node.getPosition().set(mouse.x,mouse.y);
-                        card.getNodes().put(UUID.randomUUID(),node);
+                        node.getPosition().set(mouse.x, mouse.y);
+                        card.getNodes().put(UUID.randomUUID(), node);
                         if (!Screen.hasShiftDown()) {
                             windowPos = null;
                         }
@@ -429,7 +434,7 @@ public class InscriberScreen extends Screen {
                 }
                 for (Attachment attachment : attachments) {
                     if (attachment.isColliding(mouse.x, mouse.y)) {
-                        if (Screen.hasShiftDown() && attachment instanceof Attachment.SegmentAttachment segmentAttachment) {
+                        if ((!Screen.hasShiftDown()) && attachment instanceof Attachment.SegmentAttachment segmentAttachment) {
                             connectingAttachment = segmentAttachment.getParent();
                         } else {
                             if (attachment.getTarget() != null) {
@@ -465,6 +470,14 @@ public class InscriberScreen extends Screen {
                 windowPos = new Vector2f(Math.round(mouseX), Math.round(mouseY));
             } else {
                 windowPos.set(Math.round(mouseX), Math.round(mouseY));
+            }
+            for (Node node : card.getNodes().values()) {
+                if (node.isColliding(mouse.x, mouse.y)) {
+                    Action action = node.getAction();
+                    if (action != null) {
+                        selectedAction = action;
+                    }
+                }
             }
 
             return true;
