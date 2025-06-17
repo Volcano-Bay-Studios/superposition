@@ -5,7 +5,7 @@
         "facing": "north"
       },
       "apply": {
-        "model": "superposition:block/computer"
+        "model": "superposition:block/inscriber"
       }
     },
     {
@@ -13,7 +13,7 @@
         "facing": "south"
       },
       "apply": {
-        "model": "superposition:block/computer",
+        "model": "superposition:block/inscriber",
         "y": 180
       }
     },
@@ -22,7 +22,7 @@
         "facing": "west"
       },
       "apply": {
-        "model": "superposition:block/computer",
+        "model": "superposition:block/inscriber",
         "y": 270
       }
     },
@@ -31,7 +31,7 @@
         "facing": "east"
       },
       "apply": {
-        "model": "superposition:block/computer",
+        "model": "superposition:block/inscriber",
         "y": 90
       }
     }

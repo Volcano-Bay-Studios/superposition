@@ -21,61 +21,80 @@ public class SuperpositionActions {
     public static final ActionSpritesheet SPRITESHEET = new ActionSpritesheet(Superposition.id("textures/screen/action_spritesheet.png"),256);
 
     public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ResourceKey.createRegistryKey(Superposition.id("action")), Superposition.MODID);
-    public static final RegistryObject<Action> COLOR_CARD = registerAction("color_card", () -> new ColorAction(Superposition.id("color"), new Action.Information(
+    public static final RegistryObject<Action> COLOR = registerAction("color", () -> new ColorAction(Superposition.id("color"), new Action.Information(
             Component.literal("Color"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the color of the block that is being analysed"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> SIGN_CARD = registerAction("sign_card", () -> new SignCard(Superposition.id("sign_card"), new Action.Information(
+    public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignCard(Superposition.id("sign"), new Action.Information(
             Component.literal("Sign"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the text of the block that is being analysed"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> REDSTONE_CARD = registerAction("redstone_card", () -> new RedstoneCard(Superposition.id("redstone_card"), new Action.Information(
+    public static final RegistryObject<Action> REDSTONE = registerAction("redstone", () -> new RedstoneCard(Superposition.id("redstone"), new Action.Information(
             Component.literal("Redstone"),
-            Component.literal("Something about this card being cool or smth like that, as well as some VERY long text to help myself test how far the text can go, along with testing just how far the scrolling can go and to help me ")
+            Component.literal("Retrieves the redstone value of the block that is being analysed, or sets the redstone value to the input in a manipulator"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> CONTAINER_CARD = registerAction("container_card", () -> new ContainerAction(Superposition.id("container_card"), new Action.Information(
+    public static final RegistryObject<Action> CONTAINER = registerAction("container", () -> new ContainerAction(Superposition.id("container"), new Action.Information(
             Component.literal("Container"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the contents of the block that is being analysed"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> IDENTITY_CARD = registerAction("identity_card", () -> new IdentityCard(Superposition.id("identity_card"), new Action.Information(
+    public static final RegistryObject<Action> IDENTITY = registerAction("identity", () -> new IdentityCard(Superposition.id("identity"), new Action.Information(
             Component.literal("Identity"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the name of the block that is being analysed"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> TEMPERATURE_CARD = registerAction("temperature_card", () -> new TemperatureCard(Superposition.id("temperature_card"), new Action.Information(
+    public static final RegistryObject<Action> TEMPERATURE = registerAction("temperature", () -> new TemperatureCard(Superposition.id("temperature"), new Action.Information(
             Component.literal("Temperature"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the temperature of the block that is being analysed"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> DISTANCE_CARD = registerAction("distance_card", () -> new DistanceAction(Superposition.id("distance_card"), new Action.Information(
+    public static final RegistryObject<Action> DISTANCE = registerAction("distance", () -> new DistanceAction(Superposition.id("distance"), new Action.Information(
             Component.literal("Distance"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the distance to the block that is being analysed"),
+            Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> AMPLITUDE_CARD = registerAction("amplitude_card", () -> new AmplitudeAction(Superposition.id("amplitude_card"), new Action.Information(
+    public static final RegistryObject<Action> AMPLITUDE = registerAction("amplitude", () -> new AmplitudeAction(Superposition.id("amplitude"), new Action.Information(
             Component.literal("Amplitude"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the amplitude of the signal"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> FREQUENCY_CARD = registerAction("frequency_card", () -> new FrequencyCard(Superposition.id("frequency_card"), new Action.Information(
+    public static final RegistryObject<Action> FREQUENCY = registerAction("frequency", () -> new FrequencyCard(Superposition.id("frequency"), new Action.Information(
             Component.literal("Frequency"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Retrieves the frequency of the signal"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> ENCAPSULATE_CARD = registerAction("encapsulate_card", () -> new EncapsulateAction(Superposition.id("encapsulate_card"), new Action.Information(
+    public static final RegistryObject<Action> ENCAPSULATE = registerAction("encapsulate", () -> new EncapsulateAction(Superposition.id("encapsulate"), new Action.Information(
             Component.literal("Encapsulate"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Something about this card being cool or smth like that"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> MERGE_CARD = registerAction("merge_card", () -> new MergeAction(Superposition.id("merge_card"), new Action.Information(
+    public static final RegistryObject<Action> MERGE = registerAction("merge", () -> new MergeAction(Superposition.id("merge"), new Action.Information(
             Component.literal("Merge"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Something about this card being cool or smth like that"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> RETRIEVE_CARD = registerAction("retrieve_card", () -> new RetriveCard(Superposition.id("retrieve_card"), new Action.Information(
+    public static final RegistryObject<Action> RETRIEVE = registerAction("retrieve", () -> new RetriveCard(Superposition.id("retrieve"), new Action.Information(
             Component.literal("Retrieve"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Something about this card being cool or smth like that"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> SUBSTRING_CARD = registerAction("substring_card", () -> new SubstringCard(Superposition.id("substring_card"), new Action.Information(
+    public static final RegistryObject<Action> SUBSTRING = registerAction("substring", () -> new SubstringCard(Superposition.id("substring"), new Action.Information(
             Component.literal("Substring"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Something about this card being cool or smth like that"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> SLAVE_CARD = registerAction("slave_card", () -> new SlaveCard(Superposition.id("slave_card"), new Action.Information(
+    public static final RegistryObject<Action> OUTPUT = registerAction("output", () -> new OutputAction(Superposition.id("output"), new Action.Information(
+            Component.literal("Output"),
+            Component.literal("Pushes the provided signal to the buffer of the selected face"),
+            Action.Type.OUTPUT
+    )));
+    public static final RegistryObject<Action> SLAVE = registerAction("slave", () -> new SlaveCard(Superposition.id("slave"), new Action.Information(
             Component.literal("Slave"),
-            Component.literal("Something about this card being cool or smth like that")
+            Component.literal("Something about this card being cool or smth like that"),
+            Action.Type.OTHER
     )),CompatabilityHandler.Mod.COMPUTERCRAFT);
 
 

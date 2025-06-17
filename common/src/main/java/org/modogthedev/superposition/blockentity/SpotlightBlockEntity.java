@@ -60,6 +60,10 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
         }
     }
 
+    public int getColor() {
+        return color;
+    }
+
     @Override
     public void loadSyncedData(CompoundTag tag) {
         if (tag.contains("iris")) {
@@ -92,7 +96,7 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
         BlockPos relativePos = BlockPos.containing(0, 0, 0).relative(facing, 1);
         Vec3 relative = new Vec3(relativePos.getX(), relativePos.getY(), relativePos.getZ()).normalize().scale(0.99f);
-        Vec3 center = this.getBlockPos().getCenter().add(relative.scale(0.5f)).subtract(0, 1 / 16f, 0);
+        Vec3 center = this.getBlockPos().getCenter().add(relative.scale(0.51f)).subtract(0, 1 / 16f, 0);
         light.setPosition(center.x, center.y, center.z);
         light.setSize(5 / 16f, 5 / 16f);
         light.setColor(color);

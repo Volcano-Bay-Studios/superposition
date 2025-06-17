@@ -29,4 +29,9 @@ public class TemperatureCard extends Action implements ScanAction {
     public ItemStack getThumbnailItem() {
         return Items.LAVA_BUCKET.getDefaultInstance();
     }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
+    }
 }

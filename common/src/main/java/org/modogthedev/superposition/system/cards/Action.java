@@ -33,6 +33,22 @@ public abstract class Action implements Cloneable {
             return null;
         }
     }
-    public record Information(Component name, Component description) {
+    public enum Type {
+        INPUT("Begins the data"),
+        MODIFY("Changes a signals data in some way"),
+        PERIPHERAL("Creates new data that can be used as instructions for a peripheral"),
+        OUTPUT("Finalizes data"),
+        OTHER("No information is available");
+
+        private final String description;
+        Type(String s) {
+            description = s;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+    public record Information(Component name, Component description, Type type) {
     }
 }

@@ -35,6 +35,7 @@ public class SuperpositionClient {
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.FILTER.get(), FilterBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.COMBINATOR.get(), CombinatorBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.CONSTANT_COMBINATOR.get(), ConstantCombinatorBlockEntityRenderer::new);
+        registry.registerBlockEntityRenderer(SuperpositionBlockEntities.SPOTLIGHT.get(), SpotlightBlockEntityRenderer::new);
     }
 
     public static void setScreen(Screen screen) {

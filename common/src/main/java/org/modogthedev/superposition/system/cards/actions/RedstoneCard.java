@@ -14,7 +14,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.modogthedev.superposition.util.DataHelper;
 
-public class RedstoneCard extends Action implements ScanAction, OutAction, ManipulateAction {
+public class RedstoneCard extends Action implements ScanAction, ManipulateAction {
 
     public RedstoneCard(ResourceLocation action, Information info) {
         super(action, info);
@@ -48,5 +48,10 @@ public class RedstoneCard extends Action implements ScanAction, OutAction, Manip
     @Override
     public ItemStack getThumbnailItem() {
         return Items.REDSTONE.getDefaultInstance();
+    }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
     }
 }

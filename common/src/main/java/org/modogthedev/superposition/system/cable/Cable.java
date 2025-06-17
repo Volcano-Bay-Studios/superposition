@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionTags;
@@ -23,6 +24,7 @@ import org.modogthedev.superposition.system.world.RedstoneWorld;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,81 +85,86 @@ public class Cable {
             }
 
             BlockPos startPos = firstNode.getAnchor().getAnchorBlock();
-            if (this.emitsLight && this.level.isLoaded(startPos)) {
-                BlockEntity start = this.level.getBlockEntity(startPos);
+
+            List<Signal> signalList = new ArrayList<>(); // Collect Signals
+
+            BlockEntity start = null;
+
+
+            if (this.level.isLoaded(startPos)) {
+                start = this.level.getBlockEntity(startPos);
                 if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    this.updateColor(startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()));
+                    List<Signal> signalsFromBlock = startSignalActor.getSideSignals(firstNode.getAnchor().getDirection());
+                    if (signalsFromBlock != null) {
+                        signalList.addAll(signalsFromBlock);
+                    }
+                } else {
+                    List<Signal> signalsFromBlock = CablePassthroughManager.getSignalsFromBlock(this.level, startPos);
+                    if (signalsFromBlock != null) {
+                        signalList.addAll(signalsFromBlock);
+                    }
                 }
+            }
+            if (this.emitsLight) {
+                this.updateColor(signalList);
             }
 
             if (lastNode.getAnchor() == null) {
-                if (this.emitsLight) {
-                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(this.level, startPos);
-                    if (signalList != null && !signalList.isEmpty()) {
-                        this.updateColor(signalList);
+                return;
+            }
+
+            if (signalList.isEmpty()) {
+                int value = 0;
+                value = level.getBestNeighborSignal(startPos);
+                if (value == 0) {
+                    int oldValue = RedstoneWorld.getPower(level, startPos);
+                    if (oldValue > 0) {
+                        value = oldValue;
                     }
                 }
-                return;
+                if (value > 0) {
+                    Signal signal = new Signal(new Vector3d(startPos.getX(),startPos.getY(),startPos.getZ()),level,value,1,1);
+                    signal.encode(value);
+                    signalList.add(signal);
+                }
             }
 
             BlockPos endPos = lastNode.getAnchor().getAnchorBlock();
 
-            if (this.level.isLoaded(startPos) && this.level.isLoaded(endPos)) {
-
-                BlockEntity start = this.level.getBlockEntity(startPos);
+            if (this.level.isLoaded(endPos)) {
                 BlockEntity end = this.level.getBlockEntity(endPos);
 
-                if (start instanceof SignalActorBlockEntity startSignalActor && end instanceof SignalActorBlockEntity endSignalActor) {
-
-                    List<Signal> signalList = startSignalActor.getSideSignals(firstNode.getAnchor().getDirection());
-                    if (signalList != null && !signalList.isEmpty() && startSignalActor != endSignalActor) {
+                if (end instanceof SignalActorBlockEntity endSignalActor){
+                    if (!signalList.isEmpty() && start != endSignalActor) {
                         endSignalActor.addSignals(new Object(), signalList, lastNode.getAnchor().getDirection());
                     }
-
-                } else if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    if (this.level.getBlockState(endPos).is(SuperpositionTags.SIGNAL_OFFSET)) {
-                        CablePassthroughManager.addSignalsToBlock(
-                                this.level, endPos.relative(lastNode.getAnchor().getDirection()),
-                                startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()),
-                                lastNode.getAnchor().getDirection()
-
-                        );
-                    } else {
-
-                        CablePassthroughManager.addSignalsToBlock(
-                                this.level, endPos,
-                                startSignalActor.getSideSignals(firstNode.getAnchor().getDirection()),
-                                lastNode.getAnchor().getDirection()
-                        );
-                    }
-
-                } else {
-
-                    List<Signal> signalList = CablePassthroughManager.getSignalsFromBlock(this.level, startPos);
-                    if (signalList != null) {
-                        if (end instanceof SignalActorBlockEntity endSignalActor) {
-                            endSignalActor.putSignalsFace(new Object(), signalList, lastNode.getAnchor().getDirection());
+                } else  {
+                    if (!signalList.isEmpty()) {
+                        if (this.level.getBlockState(endPos).is(SuperpositionTags.SIGNAL_OFFSET)) {
+                            CablePassthroughManager.addSignalsToBlock(
+                                    this.level, endPos.relative(lastNode.getAnchor().getDirection()),
+                                    signalList,
+                                    lastNode.getAnchor().getDirection()
+                            );
                         } else {
-                            CablePassthroughManager.addSignalsToBlock(this.level, endPos, signalList, lastNode.getAnchor().getDirection());
+                            CablePassthroughManager.addSignalsToBlock(
+                                    this.level, endPos,
+                                    signalList,
+                                    lastNode.getAnchor().getDirection()
+                            );
                         }
-                        if (this.emitsLight) {
-                            this.updateColor(signalList);
+
+                        int value = 0;
+                        for (Signal signal : signalList) {
+                            int power = 0;
+                            if (signal.getEncodedData() != null) {
+                                power = signal.getEncodedData().intValue();
+                                value = Math.max(value,power);
+                            }
                         }
-                    }
-
-                    int value = 0;
-
-                    value = level.getBestNeighborSignal(startPos);
-
-                    if (value == 0) {
-                        int oldValue = RedstoneWorld.getPower(level, startPos);
-                        if (oldValue > 0) {
-                            value = oldValue;
+                        if (value > 0) {
+                            RedstoneWorld.setPower(level, endPos, value);
                         }
-                    }
-
-                    if (value > 0) {
-                        RedstoneWorld.setPower(level, endPos,value);
                     }
                 }
             }
@@ -377,6 +384,7 @@ public class Cable {
     public int getStretchGrace() {
         return this.stretchGrace;
     }
+
     public void setStretchGrace(int stretchGrace) {
         this.stretchGrace = stretchGrace;
     }

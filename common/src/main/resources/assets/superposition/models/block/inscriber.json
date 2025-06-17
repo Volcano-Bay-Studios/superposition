@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [64, 48],
+	"textures": {
+		"0": "superposition:block/inscriber",
+		"particle": "superposition:block/inscriber"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [4, 5.33333, 8, 10.66667], "texture": "#0"},
+				"east": {"uv": [0, 5.33333, 4, 10.66667], "texture": "#0"},
+				"south": {"uv": [12, 5.33333, 16, 10.66667], "texture": "#0"},
+				"west": {"uv": [8, 5.33333, 12, 10.58333], "texture": "#0"},
+				"up": {"uv": [4, 5.33333, 8, 0], "texture": "#0"},
+				"down": {"uv": [12, 16, 16, 10.66667], "texture": "#0"}
+			}
+		}
+	]
+}

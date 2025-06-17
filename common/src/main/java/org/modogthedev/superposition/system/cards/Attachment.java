@@ -35,7 +35,7 @@ public class Attachment {
     }
 
     public void incrementSnapMode(int amount) {
-        this.snapMode = (this.snapMode + amount) % 2;
+        this.snapMode = (this.snapMode + amount) % 4;
     }
 
     public void setSnapMode(int snapMode) {

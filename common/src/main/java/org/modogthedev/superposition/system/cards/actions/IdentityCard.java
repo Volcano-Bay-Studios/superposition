@@ -24,4 +24,9 @@ public class IdentityCard extends Action implements ScanAction {
     public ItemStack getThumbnailItem() {
         return Items.NAME_TAG.getDefaultInstance();
     }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
+    }
 }

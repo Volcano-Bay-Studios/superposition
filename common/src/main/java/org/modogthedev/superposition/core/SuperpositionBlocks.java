@@ -64,15 +64,15 @@ public class SuperpositionBlocks {
             () -> new CombinatorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
-
-    public static final RegistryObject<SpotlightBlock> SPOTLIGHT = registerBlock("spotlight",
-            () -> new SpotlightBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
-                    .strength(2.0f, 8f).noOcclusion()
-            ));
     public static final RegistryObject<ConstantCombinatorBlock> CONSTANT_COMBINATOR = registerBlock("constant_combinator",
             () -> new ConstantCombinatorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistryObject<SpotlightBlock> SPOTLIGHT = registerBlock("spotlight",
+            () -> new SpotlightBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
+
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

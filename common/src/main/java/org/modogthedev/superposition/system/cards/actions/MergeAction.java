@@ -7,6 +7,9 @@ import org.modogthedev.superposition.system.cards.Action;
 import org.modogthedev.superposition.system.cards.AnyModifyAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MergeAction extends Action implements AnyModifyAction {
 
     public MergeAction(ResourceLocation action, Information info) {
@@ -14,8 +17,8 @@ public class MergeAction extends Action implements AnyModifyAction {
     }
 
     @Override
-    public Signal modify(Signal... signals) {
-        if (signals.length == 0) return null;
+    public List<Signal> modify(List<Signal> signals) {
+        if (signals.isEmpty()) return null;
         Signal main = null;
         for (Signal s : signals) {
             if (s == null || s.getEncodedData() == null || s.getEncodedData().compoundTagData() == null) continue;
@@ -25,7 +28,9 @@ public class MergeAction extends Action implements AnyModifyAction {
             }
             main.encode(s.getEncodedData().compoundTagData().merge(main.getEncodedData().compoundTagData()));
         }
-        return main;
+        List<Signal> returnSignals = new ArrayList<>();
+        returnSignals.add(main);
+        return returnSignals;
     }
 
     @Override

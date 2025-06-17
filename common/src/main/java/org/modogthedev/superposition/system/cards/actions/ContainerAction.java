@@ -48,4 +48,9 @@ public class ContainerAction extends Action implements ScanAction {
     public ItemStack getThumbnailItem() {
         return Items.CHEST.getDefaultInstance();
     }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
+    }
 }

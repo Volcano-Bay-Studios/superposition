@@ -69,7 +69,9 @@ public class Node {
         }
 
         attachments.clear();
-        attachments.add(new Attachment(new Vector2f(size.x / 2, 0), this));
+        if (!(action instanceof ExecutableAction executableAction) || executableAction.hasOutput()) {
+            attachments.add(new Attachment(new Vector2f(size.x / 2, 0), this));
+        }
 
         int length = getInputCount();
         for (int i = 0; i < length; i++) {

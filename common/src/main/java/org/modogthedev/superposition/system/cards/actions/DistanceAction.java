@@ -17,4 +17,9 @@ public class DistanceAction extends Action implements ScanAction {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.distance);
     }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
+    }
 }

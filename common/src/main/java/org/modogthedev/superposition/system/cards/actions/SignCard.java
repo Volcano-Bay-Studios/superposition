@@ -15,7 +15,7 @@ import org.modogthedev.superposition.system.cards.*;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.DataHelper;
 
-public class SignCard extends Action implements ScanAction, OutAction, ManipulateAction {
+public class SignCard extends Action implements ScanAction, ManipulateAction {
     public SignCard(ResourceLocation action, Information info) {
         super(action, info);
     }
@@ -64,5 +64,10 @@ public class SignCard extends Action implements ScanAction, OutAction, Manipulat
     @Override
     public ItemStack getThumbnailItem() {
         return Items.OAK_SIGN.getDefaultInstance();
+    }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
     }
 }

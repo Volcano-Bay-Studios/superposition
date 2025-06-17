@@ -37,7 +37,7 @@ public class PeripheralBlockEntity extends SignalActorBlockEntity {
             }
         }
         if (card != null && card instanceof ScanAction scanAction)
-            scanAction.scan(processSignal, this);
+            scanAction.scan(processSignal, this); //TODO: Change to analyser
         super.tick();
     }
 

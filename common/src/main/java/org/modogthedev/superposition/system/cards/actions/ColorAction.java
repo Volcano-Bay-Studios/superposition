@@ -18,4 +18,9 @@ public class ColorAction extends Action implements ScanAction {
         if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity)
             signal.encode(analyserBlockEntity.getLevel().getBlockState(analyserBlockEntity.getAnalysisPosition()).getBlock().defaultMapColor().col);
     }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return getSelfReference();
+    }
 }
