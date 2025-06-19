@@ -2,34 +2,40 @@ package org.modogthedev.superposition.client.renderer.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import foundry.veil.Veil;
-import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.modogthedev.superposition.util.SPTooltipable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static foundry.veil.api.client.util.UIUtils.*;
 
 public class SPUIUtils {
     public static void drawHoverText(SPTooltipable tooltippable, float pticks, final ItemStack stack, PoseStack pStack, List<? extends FormattedText> textLines, int mouseX, int mouseY, int screenWidth, int screenHeight,
                                      int maxTextWidth, int backgroundColor, int borderColorStart, int borderColorEnd, Font font,
-                                     int tooltipTextWidthBonus, int tooltipTextHeightBonus, List<VeilUIItemTooltipDataHolder> items,
+                                     int tooltipTextWidthBonus, int tooltipTextHeightBonus,
                                      int desiredX, int desiredY) {
         if (textLines.isEmpty()) {
             return;
         }
 
         List<ClientTooltipComponent> list = gatherTooltipComponents(stack, textLines, stack.getTooltipImage().orElse(null), mouseX, screenWidth, screenHeight, font, font);
+
         // RenderSystem.disableRescaleNormal();
         RenderSystem.disableDepthTest();
         int tooltipTextWidth = 0;
@@ -112,11 +118,10 @@ public class SPUIUtils {
         tooltipHeight += tooltipTextHeightBonus;
 
 
-        SuperpositionUITooltipRenderer.drawConnectionLine(pStack, tooltippable, tooltipX, tooltipY, desiredX, desiredY);
-        drawTooltipRects(pticks, pStack, zLevel, backgroundColor, borderColorStart, borderColorEnd, font, list, tooltipTextWidth, titleLinesCount, tooltipX, tooltipY, tooltipHeight, items);
+        drawTooltipRects(pticks, pStack, zLevel, backgroundColor, borderColorStart, borderColorEnd, font, list, tooltipTextWidth, titleLinesCount, tooltipX, tooltipY, tooltipHeight);
     }
 
-    private static void drawTooltipRects(float pticks, PoseStack pStack, int z, int backgroundColor, int borderColorStart, int borderColorEnd, Font font, List<ClientTooltipComponent> list, int tooltipTextWidth, int titleLinesCount, int tooltipX, int tooltipY, int tooltipHeight, List<VeilUIItemTooltipDataHolder> items) {
+    private static void drawTooltipRects(float pticks, PoseStack pStack, int z, int backgroundColor, int borderColorStart, int borderColorEnd, Font font, List<ClientTooltipComponent> list, int tooltipTextWidth, int titleLinesCount, int tooltipX, int tooltipY, int tooltipHeight) {
         pStack.pushPose();
         Matrix4f mat = pStack.last()
                 .pose();
@@ -129,24 +134,6 @@ public class SPUIUtils {
         drawGradientRect(mat, z, tooltipX + tooltipTextWidth + 2, tooltipY - 3 + 1, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3 - 1, borderColorStart, borderColorEnd);
         drawGradientRect(mat, z, tooltipX - 3, tooltipY - 3, tooltipX + tooltipTextWidth + 3, tooltipY - 3 + 1, borderColorStart, borderColorStart);
         drawGradientRect(mat, z, tooltipX - 3, tooltipY + tooltipHeight + 2, tooltipX + tooltipTextWidth + 3, tooltipY + tooltipHeight + 3, borderColorEnd, borderColorEnd);
-
-        int itemY = tooltipY;
-        for (int lineNumber = 0; lineNumber < list.size(); ++lineNumber) {
-            if (lineNumber + 1 == titleLinesCount) {
-                itemY += 2;
-            }
-
-            itemY += 10;
-        }
-        pStack.pushPose();
-        pStack.translate(0, 0, 300);
-        if (items != null && !items.isEmpty()) {
-            for (VeilUIItemTooltipDataHolder item : items) {
-                renderAndDecorateItem(item.getItemStack(), tooltipX + item.getX().apply(pticks), itemY + item.getY().apply(pticks));
-                drawTexturedRect(pStack.last().pose(), z + 100, tooltipX + item.getX().apply(pticks), itemY + item.getY().apply(pticks), 16, 16, 0, 0, 0, 0, 16, 16, Veil.veilPath("textures/gui/item_shadow.png"));
-            }
-        }
-        pStack.popPose();
 
         MultiBufferSource.BufferSource renderType = Minecraft.getInstance().renderBuffers().bufferSource();
         pStack.translate(0.0D, 0.0D, z);
@@ -221,5 +208,59 @@ public class SPUIUtils {
         BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         RenderSystem.disableBlend();
+    }
+
+    public static List<ClientTooltipComponent> gatherTooltipComponents(ItemStack stack, List<? extends FormattedText> textElements, @Nullable TooltipComponent itemComponent, int mouseX, int screenWidth, int screenHeight, @Nullable Font forcedFont, Font fallbackFont) {
+        Font font = forcedFont != null ? forcedFont : fallbackFont;
+        List<Either<FormattedText, TooltipComponent>> elements = textElements.stream()
+                .map((Function<FormattedText, Either<FormattedText, TooltipComponent>>) Either::left)
+                .collect(Collectors.toCollection(ArrayList::new));
+        if (itemComponent != null) {
+            elements.add(1, Either.right(itemComponent));
+        }
+
+        // text wrapping
+        int tooltipTextWidth = elements.stream()
+                .mapToInt(either -> either.map(font::width, component -> 0))
+                .max()
+                .orElse(0);
+
+        boolean needsWrap = false;
+
+        int tooltipX = mouseX + 12;
+        if (tooltipX + tooltipTextWidth + 4 > screenWidth) {
+            tooltipX = mouseX - 16 - tooltipTextWidth;
+            if (tooltipX < 4) // if the tooltip doesn't fit on the screen
+            {
+                if (mouseX > screenWidth / 2) {
+                    tooltipTextWidth = mouseX - 12 - 8;
+                } else {
+                    tooltipTextWidth = screenWidth - 16 - mouseX;
+                }
+                needsWrap = true;
+            }
+        }
+
+//        if (tooltipTextWidth > -1)
+//        {
+//            tooltipTextWidth = -1;
+//            needsWrap = true;
+//        }
+
+        int tooltipTextWidthF = tooltipTextWidth;
+        if (needsWrap) {
+            return elements.stream()
+                    .flatMap(either -> either.map(
+                            text -> font.split(text, tooltipTextWidthF).stream().map(ClientTooltipComponent::create),
+                            component -> Stream.of(ClientTooltipComponent.create(component))
+                    ))
+                    .toList();
+        }
+        return elements.stream()
+                .map(either -> either.map(
+                        text -> ClientTooltipComponent.create(text instanceof Component ? ((Component) text).getVisualOrderText() : Language.getInstance().getVisualOrder(text)),
+                        ClientTooltipComponent::create
+                ))
+                .toList();
     }
 }

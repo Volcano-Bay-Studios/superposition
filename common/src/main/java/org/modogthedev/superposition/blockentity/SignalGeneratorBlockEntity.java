@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.render.light.AreaLight;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -22,7 +21,6 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     public float dial = 0;
     Signal connectedSignal;
     public boolean transmitting;
-    private AreaLight light;
 
     private final Vector3d pos = new Vector3d();
 

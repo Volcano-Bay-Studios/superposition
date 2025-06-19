@@ -1,6 +1,8 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.render.light.PointLight;
+import foundry.veil.api.client.render.light.data.LightData;
+import foundry.veil.api.client.render.light.data.PointLightData;
+import foundry.veil.api.client.render.light.renderer.LightRenderHandle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -152,9 +154,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
 
         lastAmplitude = amplitude;
         amplitude = 0;
-        if (light != null) {
-            light.setBrightness((lastAmplitude / 200f + 0.2f));
-        }
         super.tick();
     }
 
@@ -163,12 +162,12 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public void createLight() {
-        light = new PointLight();
+    public LightData prepareLight() {
+        return new PointLightData();
     }
 
     @Override
-    public void configurePointLight(PointLight light) {
+    public void configurePointLight(PointLightData light) {
         Vec3 center = this.getBlockPos().getCenter();
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
         center = center.add(new Vec3(facing.getNormal().getX(), facing.getNormal().getY(), facing.getNormal().getZ()).scale(0.4f));

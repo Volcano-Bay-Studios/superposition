@@ -4,8 +4,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.light.Light;
-import foundry.veil.api.client.render.light.PointLight;
+import foundry.veil.api.client.render.light.data.PointLightData;
+import foundry.veil.api.client.render.light.renderer.LightRenderHandle;
 import foundry.veil.api.client.render.light.renderer.LightRenderer;
 import foundry.veil.api.client.render.vertex.VertexArray;
 import net.minecraft.client.Minecraft;
@@ -36,7 +36,7 @@ public class CableClientState implements NativeResource {
 
     private boolean removed = false;
 
-    private List<PointLight> pointLights;
+    private List<LightRenderHandle<PointLightData>> pointLights;
 
     public CableClientState(Cable cable, RopeSimulation ropeSimulation) {
         this.cable = cable;
@@ -46,14 +46,22 @@ public class CableClientState implements NativeResource {
         this.pointLights = null;
     }
 
-    private void updateLight(PointLight light, RopeNode point) {
+    private void updateLight(LightRenderHandle<PointLightData> renderHandle,PointLightData light, RopeNode point) {
         float brightness = this.cable.getBrightness();
         Color color = this.cable.getColor();
+        Vector3dc oldPos = light.getPosition();
+        float oldBrightness = light.getBrightness();
+        float oldRadius = light.getRadius();
+        foundry.veil.api.client.color.Color oldColor = light.getColor();
 
         light.setPosition(point.getPosition().x, point.getPosition().y, point.getPosition().z);
         light.setBrightness((float) Mth.map(brightness, 1, 200, 0.15, 0.2));
         light.setRadius(Mth.map(brightness, 1, 200, 3, 8));
         light.setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
+
+        if (!(oldPos.x() == light.getPosition().x() && oldPos.y() == light.getPosition().y() && oldPos.z() == light.getPosition().z() && oldBrightness == light.getBrightness() && oldRadius == light.getRadius() && oldColor.red() == light.getColor().red() && oldColor.green() == light.getColor().green() && oldColor.blue() == light.getColor().blue())) {
+            renderHandle.markDirty();
+        }
     }
 
     private void updateLights() {
@@ -64,24 +72,23 @@ public class CableClientState implements NativeResource {
 
             LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
             if (this.pointLights.size() > this.ropeSimulation.getNodeCount()) {
-                ListIterator<PointLight> iterator = this.pointLights.listIterator();
+                ListIterator<LightRenderHandle<PointLightData>> iterator = this.pointLights.listIterator();
                 while (iterator.hasNext()) {
                     int i = iterator.nextIndex();
-                    PointLight point = iterator.next();
+                    LightRenderHandle<PointLightData> renderHandle = iterator.next();
                     if (i >= this.ropeSimulation.getNodeCount()) {
-                        lightRenderer.removeLight(point);
+                        renderHandle.free();
                         iterator.remove();
                     }
                 }
             } else if (this.pointLights.size() < this.ropeSimulation.getNodeCount()) {
                 for (int i = this.pointLights.size(); i < this.ropeSimulation.getNodes().size(); i++) {
-                    this.pointLights.add(new PointLight());
-                    lightRenderer.addLight(this.pointLights.get(i));
+                    this.pointLights.add(lightRenderer.addLight(this.pointLights.get(i)));
                 }
             }
 
             for (int i = 0; i < this.ropeSimulation.getNodeCount(); i++) {
-                this.updateLight(this.pointLights.get(i), this.ropeSimulation.getNode(i));
+                this.updateLight(this.pointLights.get(i), this.pointLights.get(i).getLightData(), this.ropeSimulation.getNode(i));
             }
         }
     }
@@ -123,8 +130,8 @@ public class CableClientState implements NativeResource {
     public void remove() {
         LightRenderer lightRenderer = VeilRenderSystem.renderer().getLightRenderer();
         if (pointLights != null) {
-            for (Light light : pointLights) {
-                lightRenderer.removeLight(light);
+            for (LightRenderHandle<PointLightData> light : pointLights) {
+                light.free();
             }
             pointLights.clear();
         }

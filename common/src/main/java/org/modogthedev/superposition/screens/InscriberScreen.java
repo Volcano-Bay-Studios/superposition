@@ -80,8 +80,8 @@ public class InscriberScreen extends Screen {
 
         Vector2f mouse = new Vector2f((mouseX / zoom - camera.x), (mouseY / zoom - camera.y));
 
-        int topBorder = Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb();
-        int bottomBorder = Superposition.SUPERPOSITION_THEME.getColor("bottomBorder").argb();
+        int topBorder = Superposition.SUPERPOSITION_THEME.get("topBorder");
+        int bottomBorder = Superposition.SUPERPOSITION_THEME.get("bottomBorder");
 
         int topBackground = new Color().setInt(60, 186, 94, 60).argb();
         int bottomBackground = new Color().setInt(44, 150, 72, 40).argb();
@@ -313,7 +313,7 @@ public class InscriberScreen extends Screen {
         if (selectedNode == null) {
             return;
         }
-        int topBorder = Superposition.SUPERPOSITION_THEME.getColor("bottomBorder").argb();
+        int topBorder = Superposition.SUPERPOSITION_THEME.get("bottomBorder");
         PoseStack poseStack = guiGraphics.pose();
         Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
         selectedNode.getPosition().set(mouse.x + offset.x, mouse.y + offset.y);
@@ -366,23 +366,23 @@ public class InscriberScreen extends Screen {
             }
             case 2 -> {
                 if (y2 - y1 > 0) {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMin, (int) x1 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMidpoint, (int) x2 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMin, (int) x1 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMidpoint, (int) x2 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
                 } else {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMin, (int) x2 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMidpoint, (int) x1 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMin, (int) x2 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMidpoint, (int) x1 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
                 }
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMidpoint - 1, (int) xMax, (int) yMidpoint + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMidpoint - 1, (int) xMax, (int) yMidpoint + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
             }
             case 3 -> {
                 if (x2 - x1 > 0) {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1, (int) y1 - 1, (int) xMidpoint, (int) y1 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint, (int) y2 - 1, (int) x2, (int) y2 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1, (int) y1 - 1, (int) xMidpoint, (int) y1 + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint, (int) y2 - 1, (int) x2, (int) y2 + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
                 } else {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2, (int) y2 - 1, (int) xMidpoint, (int) y2 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint, (int) y1 - 1, (int) x1, (int) y1 + 1, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2, (int) y2 - 1, (int) xMidpoint, (int) y2 + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint, (int) y1 - 1, (int) x1, (int) y1 + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
                 }
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint - 1, (int) yMin, (int) xMidpoint + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb(), Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMidpoint - 1, yMin, (int) xMidpoint + 1, yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
             }
             default -> {
                 if (y2 - y1 > 0) {

@@ -1,10 +1,11 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.color.ColorTheme;
-import foundry.veil.api.client.render.light.AreaLight;
-import foundry.veil.api.client.render.light.Light;
-import foundry.veil.api.client.render.light.PointLight;
-import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
+import foundry.veil.api.client.render.VeilRenderSystem;
+import foundry.veil.api.client.render.VeilRenderer;
+import foundry.veil.api.client.render.light.data.AreaLightData;
+import foundry.veil.api.client.render.light.data.LightData;
+import foundry.veil.api.client.render.light.data.PointLightData;
+import foundry.veil.api.client.render.light.renderer.LightRenderHandle;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -20,9 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.modogthedev.superposition.Superposition;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
-import org.modogthedev.superposition.client.renderer.SuperpositionLightSystem;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
@@ -41,10 +41,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Unique
     private List<Component> veil$tooltip = new ArrayList<>();
     @Unique
-    private ColorTheme veil$theme = Superposition.SUPERPOSITION_THEME;
-    @Unique
-    private final List<VeilUIItemTooltipDataHolder> veil$tooltipDataHolder = new ArrayList<>();
-    @Unique
     private boolean veil$worldspace = true;
     @Unique
     private boolean veil$tooltipEnabled = false;
@@ -60,7 +56,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     Object lastCall;
     private Object lastCallList;
     protected final List<Signal> putSignals = new ArrayList<>();
-    Light light;
+    LightRenderHandle<?> light;
 
     public List<Component> getTooltip() {
         return this.veil$tooltip;
@@ -99,13 +95,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         this.veil$tooltip.add(Component.nullToEmpty(tooltip));
     }
 
-    public ColorTheme getTheme() {
-        return Superposition.SUPERPOSITION_THEME;
-    }
-
-    public void setTheme(ColorTheme theme) {
-        this.veil$theme = theme;
-    }
 
     public void setBackgroundColor(int color) {
     }
@@ -145,9 +134,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return 5;
     }
 
-    public List<VeilUIItemTooltipDataHolder> getItems() {
-        return this.veil$tooltipDataHolder;
-    }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -402,22 +388,32 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void tick() {
         if (this.level != null && this.level.isClientSide) {
-            if (this.lightEnabled() && light == null) {
+            if (isRemoved() && light != null) {
+                light.free();
+            }
+            if (this.lightEnabled() && light == null && !isRemoved()) {
                 this.createLight();
-                if (light instanceof AreaLight areaLight) {
+                if (light.getLightData() instanceof AreaLightData areaLight) {
                     this.configureAreaLight(areaLight);
                 }
-                if (light instanceof PointLight pointLight) {
+                if (light.getLightData() instanceof PointLightData pointLight) {
                     this.configurePointLight(pointLight);
                 }
+                light.markDirty();
+            }
+            if (lightEnabled() && shouldUpdateLight() && light != null && !isRemoved()) {
+                if (light.getLightData() instanceof AreaLightData areaLight) {
+                    this.configureAreaLight(areaLight);
+                }
+                if (light.getLightData() instanceof PointLightData pointLight) {
+                    this.configurePointLight(pointLight);
+                }
+                light.markDirty();
             }
             if (Minecraft.getInstance().player.getMainHandItem().getItem() instanceof ScrewdriverItem) {
                 this.setupConfigTooltips();
                 this.checkEvents();
                 this.finaliseConfigTooltips();
-            }
-            if (light != null) {
-                SuperpositionLightSystem.modifyLight(level, getBlockPos(), light);
             }
         }
         if (signalsReceived == 0) {
@@ -431,20 +427,26 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return false;
     }
 
-    public void createLight() {
-        light = new AreaLight();
+    public boolean shouldUpdateLight() { return false;}
+
+    public LightData prepareLight() {
+        return new AreaLightData();
     }
 
-    public void configureAreaLight(AreaLight light) {
+    public void createLight() {
+        light = VeilRenderSystem.renderer().getLightRenderer().addLight(prepareLight());
+    }
+
+    public void configureAreaLight(AreaLightData light) {
         Vec3 center = this.getBlockPos().getCenter();
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
-        light.setPosition(center.x, center.y, center.z);
-        light.setOrientation(facing.getRotation().rotateX((float) (Math.PI / 2f)).rotateY((float) Math.PI));
+        light.getPosition().set(center.x, center.y, center.z);
+        light.getOrientation().set(facing.getRotation().rotateX((float) (Math.PI / 2f)).rotateY((float) Math.PI));
     }
 
-    public void configurePointLight(PointLight light) {
+    public void configurePointLight(PointLightData light) {
 
     }
     //TODO: Weak power checking method PLEASE
-
+    // This needs a new method for checking the power!
 }

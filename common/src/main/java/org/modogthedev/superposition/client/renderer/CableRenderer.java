@@ -362,9 +362,9 @@ public class CableRenderer {
                     color.w = 0.4f;
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);
                     if (isFirst) {
-                        DebugRenderer.renderFloatingText(poseStack, bufferSource, "Pull", pos.x, pos.y + 0.5f, pos.z, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                        DebugRenderer.renderFloatingText(poseStack, bufferSource, "Pull", pos.x, pos.y + 0.5f, pos.z, Superposition.SUPERPOSITION_THEME.get("topBorder"));
                     } else {
-                        DebugRenderer.renderFloatingText(poseStack, bufferSource, "Push", pos.x, pos.y + 0.5f, pos.z, Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb());
+                        DebugRenderer.renderFloatingText(poseStack, bufferSource, "Push", pos.x, pos.y + 0.5f, pos.z, Superposition.SUPERPOSITION_THEME.get("topBorder"));
                     }
                 } else {
                     DebugRenderer.renderFilledBox(poseStack, bufferSource, pos.x - cameraPos.x - width, pos.y - cameraPos.y - width, pos.z - cameraPos.z - width, pos.x - cameraPos.x + width, pos.y - cameraPos.y + width, pos.z - cameraPos.z + width, color.x, color.y, color.z, color.w);

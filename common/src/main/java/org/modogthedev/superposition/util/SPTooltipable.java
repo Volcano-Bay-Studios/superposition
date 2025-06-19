@@ -1,7 +1,5 @@
 package org.modogthedev.superposition.util;
 
-import foundry.veil.api.client.color.ColorTheme;
-import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -23,9 +21,6 @@ public interface SPTooltipable {
 
     void addTooltip(String var1);
 
-    ColorTheme getTheme();
-
-    void setTheme(ColorTheme var1);
 
     void setBackgroundColor(int var1);
 
@@ -47,5 +42,4 @@ public interface SPTooltipable {
 
     int getTooltipYOffset();
 
-    List<VeilUIItemTooltipDataHolder> getItems();
 }

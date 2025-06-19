@@ -2,13 +2,11 @@ package org.modogthedev.superposition;
 
 import com.mojang.logging.LogUtils;
 import foundry.veil.api.client.color.Color;
-import foundry.veil.api.client.color.ColorTheme;
 import foundry.veil.impl.client.render.pipeline.VeilBloomRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import org.modogthedev.superposition.client.renderer.SuperpositionLightSystem;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.*;
 import org.modogthedev.superposition.networking.SuperpositionMessages;
@@ -23,11 +21,13 @@ import org.modogthedev.superposition.system.sound.ClientAudioManager;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
+
 public class Superposition {
 
     public static final String MODID = "superposition";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final ColorTheme SUPERPOSITION_THEME = new ColorTheme();
+    public static final HashMap<String, Integer> SUPERPOSITION_THEME = new HashMap<>();
     public static boolean DEBUG = false;
 
     public static void init() {
@@ -69,7 +69,6 @@ public class Superposition {
         CarabinerManager.clientTick(level);
         SuperpositionUITooltipRenderer.clientTick(level);
         ClientAudioManager.tick(level);
-        SuperpositionLightSystem.tick(level);
     }
 
     public static void clientAlwaysTick(Minecraft client) {
@@ -83,7 +82,6 @@ public class Superposition {
         if (level.isClientSide) {
             CableManager.wipeClientData();
             RedstoneWorld.clear();
-            SuperpositionLightSystem.clear();
             ClientSignalManager.clientSignals.clear();
             AntennaManager.clear();
         }
@@ -97,12 +95,9 @@ public class Superposition {
         Color background = new Color().setInt(50, 168, 82, 150);
         Color borderTop = new Color().setInt(60, 186, 94, 255);
         Color borderBottom = new Color().setInt(44, 150, 72, 255);
-        SUPERPOSITION_THEME.addColor(background);
-        SUPERPOSITION_THEME.addColor(borderTop);
-        SUPERPOSITION_THEME.addColor(borderBottom);
-        SUPERPOSITION_THEME.addColor("background", background);
-        SUPERPOSITION_THEME.addColor("topBorder", borderTop);
-        SUPERPOSITION_THEME.addColor("bottomBorder", borderBottom);
+        SUPERPOSITION_THEME.put("background", background.argb());
+        SUPERPOSITION_THEME.put("topBorder", borderTop.argb());
+        SUPERPOSITION_THEME.put("bottomBorder", borderBottom.argb());
     }
 
     public static ResourceLocation id(String loc) {

@@ -1,6 +1,6 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.render.light.AreaLight;
+import foundry.veil.api.client.render.light.data.AreaLightData;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,9 +41,6 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
                 iris = signal.getEncodedData().compoundTagData().getInt("iris");
                 iris = Mth.clamp(iris, 3f, 30f);
             }
-        }
-        if (light instanceof AreaLight areaLight) {
-            this.configureAreaLight(areaLight);
         }
         super.tick();
     }
@@ -91,13 +88,18 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public void configureAreaLight(AreaLight light) {
+    public boolean shouldUpdateLight() {
+        return true;
+    }
+
+    @Override
+    public void configureAreaLight(AreaLightData light) {
         super.configureAreaLight(light);
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
         BlockPos relativePos = BlockPos.containing(0, 0, 0).relative(facing, 1);
         Vec3 relative = new Vec3(relativePos.getX(), relativePos.getY(), relativePos.getZ()).normalize().scale(0.99f);
         Vec3 center = this.getBlockPos().getCenter().add(relative.scale(0.51f)).subtract(0, 1 / 16f, 0);
-        light.setPosition(center.x, center.y, center.z);
+        light.getPosition().set(center.x, center.y, center.z);
         light.setSize(5 / 16f, 5 / 16f);
         light.setColor(color);
         light.setDistance(30f);

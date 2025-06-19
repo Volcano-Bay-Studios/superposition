@@ -4,9 +4,6 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import foundry.veil.api.client.color.Color;
-import foundry.veil.api.client.color.theme.NumberThemeProperty;
-import foundry.veil.api.client.tooltip.VeilUIItemTooltipDataHolder;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
@@ -249,9 +246,9 @@ public class SuperpositionUITooltipRenderer {
         tooltipY = Math.min(tooltipY, height - tooltipHeight - 20);
 
         float fade = Mth.clamp((hoverTicks + partialTicks) / 24f, 0, 1);
-        Color background = (Color) Superposition.SUPERPOSITION_THEME.getColor("background");
-        Color borderTop = (Color) Superposition.SUPERPOSITION_THEME.getColor("topBorder");
-        Color borderBottom = (Color) Superposition.SUPERPOSITION_THEME.getColor("bottomBorder");
+        int background = Superposition.SUPERPOSITION_THEME.get("background");
+        int borderTop =  Superposition.SUPERPOSITION_THEME.get("topBorder");
+        int borderBottom =  Superposition.SUPERPOSITION_THEME.get("bottomBorder");
 //        background = resetAlpha(background).multiply(1,1,1,.7f);
 //        borderBottom = resetAlpha(borderBottom);
 //        borderTop = resetAlpha(borderTop);
@@ -259,7 +256,6 @@ public class SuperpositionUITooltipRenderer {
         float widthBonus = tooltippable.getTooltipWidth();
         float textXOffset = tooltippable.getTooltipXOffset();
         float textYOffset = tooltippable.getTooltipYOffset();
-        List<VeilUIItemTooltipDataHolder> items = tooltippable.getItems();
         ItemStack istack = tooltippable.getStack() == null ? ItemStack.EMPTY : tooltippable.getStack();
         if (pos != lastHoveredPos) {
             currentPos = null;
@@ -312,36 +308,11 @@ public class SuperpositionUITooltipRenderer {
         if (flash > 80 || selected) {
             flash = 0;
         }
-        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset - tooltipTextWidth/2, tooltipY + (int) textYOffset, width, height, -1, background.argb(), borderTop.argb(), borderBottom.argb(), mc.font, (int) widthBonus, (int) heightBonus, items, desiredX, desiredY);
+        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset - tooltipTextWidth/2, tooltipY + (int) textYOffset, width, height, -1, background, borderTop, borderBottom, mc.font, (int) widthBonus, (int) heightBonus, desiredX, desiredY);
         graphics.blit(SAVE, 64, 64, 0, 0, 16, 16);
         stack.popPose();
     }
 
-
-    public static void drawConnectionLine(PoseStack stack, SPTooltipable tooltippable, int tooltipX, int tooltipY, int desiredX, int desiredY) {
-        if (tooltippable.getTheme().getColor("connectingLine") != null) {
-            stack.pushPose();
-            Color color = (Color) tooltippable.getTheme().getColor("connectingLine");
-            float thickness = ((NumberThemeProperty) tooltippable.getTheme().getProperty("connectingLineThickness")).getValue(Float.class);
-//            stack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
-//            stack.mulPose(Vector3f.YP.rotationDegrees(180));
-            Matrix4f mat = stack.last().pose();
-            RenderSystem.enableDepthTest();
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.lineWidth(2);
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            BufferBuilder buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            // draw a quad of thickness thickness from desiredX, desiredY to tooltipX, tooltipY with a z value of 399, starting from the top right corner and going anti-clockwise
-            buffer.addVertex(mat, desiredX + thickness, desiredY, 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
-            buffer.addVertex(mat, desiredX - thickness, desiredY, 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
-            buffer.addVertex(mat, tooltipX - thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
-            buffer.addVertex(mat, tooltipX + thickness, tooltipY + 3 - (tooltippable.getTooltipHeight() / 2f), 399).setColor(color.red(), color.green(), color.blue(), color.alpha());
-            BufferUploader.drawWithShader(buffer.buildOrThrow());
-            RenderSystem.disableBlend();
-            stack.popPose();
-        }
-    }
 
     public static Vector3f worldToScreenSpace(Vec3 pos, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();

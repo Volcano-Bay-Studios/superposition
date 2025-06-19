@@ -131,7 +131,7 @@ public class FilterItem extends Item {
         if (stack.getItem() instanceof FilterItem) {
             this.runIfHasData(stack, type::load);
             MutableComponent component = Component.literal(type.getTooltip());
-            component.setStyle(Style.EMPTY.withColor(Superposition.SUPERPOSITION_THEME.getColor("topBorder").argb()));
+            component.setStyle(Style.EMPTY.withColor(Superposition.SUPERPOSITION_THEME.get("topBorder")));
             tooltipComponents.add(component);
         }
     }
