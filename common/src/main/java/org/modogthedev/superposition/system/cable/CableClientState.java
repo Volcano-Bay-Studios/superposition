@@ -83,7 +83,7 @@ public class CableClientState implements NativeResource {
                 }
             } else if (this.pointLights.size() < this.ropeSimulation.getNodeCount()) {
                 for (int i = this.pointLights.size(); i < this.ropeSimulation.getNodes().size(); i++) {
-                    this.pointLights.add(lightRenderer.addLight(this.pointLights.get(i)));
+                    this.pointLights.add(lightRenderer.addLight(new PointLightData()));
                 }
             }
 

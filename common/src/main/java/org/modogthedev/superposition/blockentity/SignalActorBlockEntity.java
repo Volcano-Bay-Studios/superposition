@@ -1,7 +1,6 @@
 package org.modogthedev.superposition.blockentity;
 
 import foundry.veil.api.client.render.VeilRenderSystem;
-import foundry.veil.api.client.render.VeilRenderer;
 import foundry.veil.api.client.render.light.data.AreaLightData;
 import foundry.veil.api.client.render.light.data.LightData;
 import foundry.veil.api.client.render.light.data.PointLightData;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
@@ -315,6 +313,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void setRemoved() {
         super.setRemoved();
+        if (light != null) {
+            light.free();
+        }
     }
 
     @Override
@@ -388,9 +389,6 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     public void tick() {
         if (this.level != null && this.level.isClientSide) {
-            if (isRemoved() && light != null) {
-                light.free();
-            }
             if (this.lightEnabled() && light == null && !isRemoved()) {
                 this.createLight();
                 if (light.getLightData() instanceof AreaLightData areaLight) {
@@ -422,6 +420,8 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         putSignals.clear();
         signalsReceived = 0;
     }
+
+
 
     public boolean lightEnabled() {
         return false;
