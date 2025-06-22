@@ -11,7 +11,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.cards.*;
+import org.modogthedev.superposition.system.cards.Action;
+import org.modogthedev.superposition.system.cards.ManipulateAction;
+import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.DataHelper;
 

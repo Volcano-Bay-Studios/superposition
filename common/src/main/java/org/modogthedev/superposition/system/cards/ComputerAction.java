@@ -6,12 +6,12 @@ import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.List;
 
-public interface ComputerAction extends ExecutableAction{
+public interface ComputerAction extends ExecutableAction {
     void computer(List<Signal> signals, Level level, BlockPos pos);
 
     @Override
     default List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {
-        computer(signals,level,pos);
+        computer(signals, level, pos);
         return signals;
     }
 

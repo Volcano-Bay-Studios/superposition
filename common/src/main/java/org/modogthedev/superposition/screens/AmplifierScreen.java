@@ -248,9 +248,10 @@ public class AmplifierScreen extends WidgetScreen {
     public boolean isPauseScreen() {
         return false;
     }
+
     @Override
     public Vec2 getTooltipPosition(int w, int h) {
-        return new Vec2(w/2f,(h/10f)*7f);
+        return new Vec2(w / 2f, (h / 10f) * 7f);
     }
 
     @Override

@@ -56,28 +56,28 @@ public class SpotlightBlockEntityRenderer implements BlockEntityRenderer<Spotlig
 
         buffer
                 .addVertex(m, -max, 0.5001f, -min)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
                 .setUv(0, 0)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, -max, 0.5001f, min)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
                 .setUv(0, 1)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, max, 0.5001f, min)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
                 .setUv(1, 1)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
 
         buffer
                 .addVertex(m, max, 0.5001f, -min)
-                .setColor(color.getRed()/255f, color.getGreen()/255f, color.getBlue()/255f, alpha)
+                .setColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, alpha)
                 .setUv(1, 0)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);

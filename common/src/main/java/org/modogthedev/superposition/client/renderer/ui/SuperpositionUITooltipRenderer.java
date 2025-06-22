@@ -2,7 +2,7 @@ package org.modogthedev.superposition.client.renderer.ui;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Camera;
@@ -10,7 +10,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +23,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.*;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -159,8 +157,9 @@ public class SuperpositionUITooltipRenderer {
             selected = false;
         }
     }
+
     public static void renderOverlay(GuiGraphics graphics, DeltaTracker deltaTracker) {
-        renderOverlay(graphics,deltaTracker.getRealtimeDeltaTicks());
+        renderOverlay(graphics, deltaTracker.getRealtimeDeltaTicks());
     }
 
     public static void renderOverlay(GuiGraphics graphics, float partialTicks) {
@@ -172,7 +171,6 @@ public class SuperpositionUITooltipRenderer {
         if (mc.level == null || mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) {
             return;
         }
-
 
 
         HitResult result = mc.hitResult;
@@ -247,8 +245,8 @@ public class SuperpositionUITooltipRenderer {
 
         float fade = Mth.clamp((hoverTicks + partialTicks) / 24f, 0, 1);
         int background = Superposition.SUPERPOSITION_THEME.get("background");
-        int borderTop =  Superposition.SUPERPOSITION_THEME.get("topBorder");
-        int borderBottom =  Superposition.SUPERPOSITION_THEME.get("bottomBorder");
+        int borderTop = Superposition.SUPERPOSITION_THEME.get("topBorder");
+        int borderBottom = Superposition.SUPERPOSITION_THEME.get("bottomBorder");
 //        background = resetAlpha(background).multiply(1,1,1,.7f);
 //        borderBottom = resetAlpha(borderBottom);
 //        borderTop = resetAlpha(borderTop);
@@ -283,17 +281,17 @@ public class SuperpositionUITooltipRenderer {
             desiredY = (int) desiredScreenSpacePos.y();
         }
         if (mc.screen instanceof WidgetScreen widgetScreen) {
-            Vec2 tooltipPosition = widgetScreen.getTooltipPosition(width,height);
+            Vec2 tooltipPosition = widgetScreen.getTooltipPosition(width, height);
             tooltipX = (int) tooltipPosition.x;
             tooltipY = (int) tooltipPosition.y;
         }
         tooltippable.drawExtra();
         if (editableTooltip != null && editingEditable && flash < 40) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
-            int xOffset = (int) (tooltipX - tooltipTextWidth /2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));
+            int xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));
             graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset + 1, tooltipY + (int) textYOffset + 10, -3092272);
             if (selected) {
-                xOffset = (int) (tooltipX - tooltipTextWidth /2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
+                xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
                 int xOffset2 = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
                 graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset2, tooltipY + (int) textYOffset + 10, -3092272);
             }
@@ -301,14 +299,14 @@ public class SuperpositionUITooltipRenderer {
         if (editableTooltip != null && editingEditable) {
             String focusText = "[PRESS ESC TO UNFOCUS]";
             RenderSystem.setShaderColor(.5f, 1, .5f, 1f);
-            graphics.drawString(Minecraft.getInstance().font, focusText, (tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8) - tooltipTextWidth/2, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
+            graphics.drawString(Minecraft.getInstance().font, focusText, (tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8) - tooltipTextWidth / 2, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
             RenderSystem.setShaderColor(1, 1, 1, 1);
         }
         flash++;
         if (flash > 80 || selected) {
             flash = 0;
         }
-        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset - tooltipTextWidth/2, tooltipY + (int) textYOffset, width, height, -1, background, borderTop, borderBottom, mc.font, (int) widthBonus, (int) heightBonus, desiredX, desiredY);
+        SPUIUtils.drawHoverText(tooltippable, partialTicks, istack, stack, tooltip, tooltipX + (int) textXOffset - tooltipTextWidth / 2, tooltipY + (int) textYOffset, width, height, -1, background, borderTop, borderBottom, mc.font, (int) widthBonus, (int) heightBonus, desiredX, desiredY);
         graphics.blit(SAVE, 64, 64, 0, 0, 16, 16);
         stack.popPose();
     }

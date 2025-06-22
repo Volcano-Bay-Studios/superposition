@@ -64,3 +64,11 @@ Cables are used for transmitting signals short distances. They have a physics si
 ![showcase of cable physics](https://file.garden/ZWUae22eyH6XVW5v/cable_gif.gif)
 
 ### ⚠️ Everything in the mod is still being worked on and is subject to change.
+
+
+## TODO
+- Make all signal information option data (Similar to an entity component system)
+- Make all scattered antenna code unified into one antenna system (for both in real and fake antennas)
+- Redo cable collision (Sable in future)
+- Inscriber, Cards, and Computers (In progress atm)
+- Data corruption with amplitude

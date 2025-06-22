@@ -17,7 +17,7 @@ public class Card { //TODO: make this work!
         }
         float y = 70;
         for (Node node : nodes.values()) {
-            node.getPosition().set(40,y);
+            node.getPosition().set(40, y);
             node.setTargetUUID((UUID) nodes.keySet().toArray()[0]);
             y += 30;
         }

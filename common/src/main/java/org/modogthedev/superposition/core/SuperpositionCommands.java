@@ -26,8 +26,8 @@ public class SuperpositionCommands {
         return Commands.literal("superposition").requires(stack -> stack.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("removeCables").then(Commands.argument("radius", FloatArgumentType.floatArg(0, 1000000))
                         .executes(commandContext ->
-                                removeCables(commandContext.getSource(), commandContext.getSource().getLevel(), commandContext.getSource().getPosition(), FloatArgumentType.getFloat(commandContext,"radius"))))
-        );
+                                removeCables(commandContext.getSource(), commandContext.getSource().getLevel(), commandContext.getSource().getPosition(), FloatArgumentType.getFloat(commandContext, "radius"))))
+                );
     }
 
     private static int removeCables(CommandSourceStack stack, Level level, Vec3 position, float radius) {

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(MouseHandler.class)
 public class MouseHandelerMixin {
 
-    @Inject(method = "onScroll", at = @At("HEAD"),cancellable = true)
+    @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
     public void scroll(long windowPointer, double xOffset, double yOffset, CallbackInfo ci) {
         if (windowPointer == Minecraft.getInstance().getWindow().getWindow()) {
             if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.getUseItem().is(SuperpositionItems.SIGNAL_SCOPE.get())) {

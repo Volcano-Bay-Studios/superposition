@@ -35,15 +35,15 @@ public class FilterScreen extends WidgetScreen {
     private VertexConsumer lineConsumer;
     private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/filter_screen.png");
     private static final ResourceLocation BAR = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/filter_bar.png");
-    private Filter filterType;
+    private final Filter filterType;
     private float value1;
     private float value2;
     public static int imageWidth = 0;
     public static int imageHeight = 0;
     public static int imageOffset = 0;
     public static int barOffset = 0;
-    private boolean editMode;
-    private BlockPos pos;
+    private final boolean editMode;
+    private final BlockPos pos;
 
     protected FilterScreen(Component pTitle, Filter filter, BlockPos pos, boolean editMode) {
         super(pTitle);

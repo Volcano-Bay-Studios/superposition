@@ -72,7 +72,7 @@ public class SignalGeneratorBlock extends SignalActorTickingBlock implements Ent
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES, ON});
+        stateBuilder.add(FACING, BASE_FREQUENCY, SWAP_SIDES, ON);
     }
 
 }

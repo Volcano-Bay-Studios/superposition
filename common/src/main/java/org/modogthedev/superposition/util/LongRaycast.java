@@ -17,10 +17,10 @@ public class LongRaycast {
 
 
         float length = (float) from.distance(to);
-        List<BlockPos> posList = bresenham3D(from,to);
-        for (int i = 0; i < posList.size();) {
+        List<BlockPos> posList = bresenham3D(from, to);
+        for (int i = 0; i < posList.size(); ) {
             BlockPos blockPos = posList.get(i);
-            if (level.getChunk(blockPos).getSection(Mth.clamp((blockPos.getY() - Math.min(0, level.getMinBuildHeight()))/16,0,(Math.abs(level.getMinBuildHeight()) + level.getMaxBuildHeight())/16-1)).hasOnlyAir()) {
+            if (level.getChunk(blockPos).getSection(Mth.clamp((blockPos.getY() - Math.min(0, level.getMinBuildHeight())) / 16, 0, (Math.abs(level.getMinBuildHeight()) + level.getMaxBuildHeight()) / 16 - 1)).hasOnlyAir()) {
                 i += 16;
                 continue;
             }
@@ -36,8 +36,8 @@ public class LongRaycast {
                     }
                 }
             } else {
-                 i += 16;
-                 continue;
+                i += 16;
+                continue;
             }
             i++;
         }

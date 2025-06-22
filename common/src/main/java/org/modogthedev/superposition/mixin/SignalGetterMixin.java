@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public interface SignalGetterMixin {
     @Inject(method = "hasNeighborSignal", at = @At("HEAD"), cancellable = true)
     default void getSignal(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        int power = RedstoneWorld.getPower(((Level)(Object)this),pos);
+        int power = RedstoneWorld.getPower(((Level) this), pos);
         if (power > 0) {
             cir.setReturnValue(true);
         }

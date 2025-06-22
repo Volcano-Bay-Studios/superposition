@@ -14,7 +14,7 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         super(SuperpositionBlockEntities.MANIPULATOR.get(), pos, state);
     }
 
-    private String lastUpdate = "";
+    private final String lastUpdate = "";
 
     @Override
     public void tick() {
@@ -25,7 +25,7 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
             Signal signal = SignalManager.randomSignal(putSignals);
             EncodedData<?> value = signal.getEncodedData();
             if (value != null && !value.stringValue().equals(lastUpdate)) { //TODO: make it good
-                level.updateNeighborsAt(getFrontPos(),level.getBlockState(getFrontPos()).getBlock());
+                level.updateNeighborsAt(getFrontPos(), level.getBlockState(getFrontPos()).getBlock());
             }
         }
         super.tick();

@@ -39,11 +39,11 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Unique
     private List<Component> veil$tooltip = new ArrayList<>();
     @Unique
-    private boolean veil$worldspace = true;
+    private final boolean veil$worldspace = true;
     @Unique
     private boolean veil$tooltipEnabled = false;
     @Unique
-    private int veil$tooltipY = 0;
+    private final int veil$tooltipY = 0;
     private int configSelection = 0;
     private boolean interactNext = false;
     private boolean stepNext = false;
@@ -422,12 +422,13 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
 
-
     public boolean lightEnabled() {
         return false;
     }
 
-    public boolean shouldUpdateLight() { return false;}
+    public boolean shouldUpdateLight() {
+        return false;
+    }
 
     public LightData prepareLight() {
         return new AreaLightData();

@@ -10,8 +10,8 @@ import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.signal.Signal;
 
 public class CablePeripheral implements IPeripheral {
-    private Level level;
-    private BlockPos pos;
+    private final Level level;
+    private final BlockPos pos;
 
     public CablePeripheral(Level level, BlockPos pos) {
         this.level = level;

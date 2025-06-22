@@ -289,8 +289,8 @@ public class InscriberScreen extends Screen {
         if (inspectingNode != null) {
             Action action = inspectingNode.getAction();
             if (action != null) {
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 200), (int) (0), (int) (width), (int) (height), background, background);
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 196), (int) (0), (int) (width - 192), (int) (height), topBorder, bottomBorder);
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 200), 0, (int) (width), (int) (height), background, background);
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 196), 0, (int) (width - 192), (int) (height), topBorder, bottomBorder);
                 guiGraphics.drawCenteredString(Minecraft.getInstance().font, action.getInfo().name(), (int) (width - 100), 20, topBorder);
             }
         }
@@ -315,7 +315,7 @@ public class InscriberScreen extends Screen {
         }
         int topBorder = Superposition.SUPERPOSITION_THEME.get("bottomBorder");
         PoseStack poseStack = guiGraphics.pose();
-        Vector3f mouse = new Vector3f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y), 0);
+        Vector3f mouse = new Vector3f(mouseX / zoom - camera.x, mouseY / zoom - camera.y, 0);
         selectedNode.getPosition().set(mouse.x + offset.x, mouse.y + offset.y);
         for (Node node2 : card.getNodes().values()) {
             if (node2 != selectedNode) {
@@ -366,13 +366,13 @@ public class InscriberScreen extends Screen {
             }
             case 2 -> {
                 if (y2 - y1 > 0) {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMin, (int) x1 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMidpoint, (int) x2 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, yMin, (int) x1 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMidpoint, (int) x2 + 1, yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
                 } else {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, (int) yMin, (int) x2 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMidpoint, (int) x1 + 1, (int) yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x2 - 1, yMin, (int) x2 + 1, (int) yMidpoint, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) x1 - 1, (int) yMidpoint, (int) x1 + 1, yMax, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
                 }
-                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, (int) xMin, (int) yMidpoint - 1, (int) xMax, (int) yMidpoint + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
+                SPUIUtils.drawGradientRect(poseStack.last().pose(), 10, xMin, (int) yMidpoint - 1, xMax, (int) yMidpoint + 1, Superposition.SUPERPOSITION_THEME.get("topBorder"), Superposition.SUPERPOSITION_THEME.get("topBorder"));
             }
             case 3 -> {
                 if (x2 - x1 > 0) {

@@ -15,8 +15,8 @@ import java.util.HashMap;
 public class SuperpositionSounds {
 
     public static final RegistrationProvider<SoundEvent> SOUNDS = RegistrationProvider.get(Registries.SOUND_EVENT, Superposition.MODID);
-    
-    private static final HashMap<String,RegistryObject<SoundEvent>> songs = new HashMap<>();
+
+    private static final HashMap<String, RegistryObject<SoundEvent>> songs = new HashMap<>();
 
     public static final RegistryObject<SoundEvent> EMPTY = registerSoundEvent("empty");
     public static final RegistryObject<SoundEvent> SCREWDRIVER = registerSoundEvent("screwdriver");
@@ -26,9 +26,9 @@ public class SuperpositionSounds {
     public static final RegistryObject<SoundEvent> SCROLL = registerSoundEvent("scroll");
 
     // Songs
-    public static final RegistryObject<SoundEvent> TRAVELERS = registerSong("travelers","travelers");
-    public static final RegistryObject<SoundEvent> TIMBER = registerSong("timber_hearth","timber_hearth");
-    public static final RegistryObject<SoundEvent> OXIDE = registerSong("oxide_ambience","sounds_of_ocean");
+    public static final RegistryObject<SoundEvent> TRAVELERS = registerSong("travelers", "travelers");
+    public static final RegistryObject<SoundEvent> TIMBER = registerSong("timber_hearth", "timber_hearth");
+    public static final RegistryObject<SoundEvent> OXIDE = registerSong("oxide_ambience", "sounds_of_ocean");
 
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
@@ -37,7 +37,7 @@ public class SuperpositionSounds {
 
     private static RegistryObject<SoundEvent> registerSong(String name, String key) {
         RegistryObject<SoundEvent> soundEventRegistryObject = registerSoundEvent(name);
-        songs.put(key,soundEventRegistryObject);
+        songs.put(key, soundEventRegistryObject);
         return soundEventRegistryObject;
     }
 

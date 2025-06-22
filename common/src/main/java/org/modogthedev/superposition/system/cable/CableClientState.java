@@ -46,7 +46,7 @@ public class CableClientState implements NativeResource {
         this.pointLights = null;
     }
 
-    private void updateLight(LightRenderHandle<PointLightData> renderHandle,PointLightData light, RopeNode point) {
+    private void updateLight(LightRenderHandle<PointLightData> renderHandle, PointLightData light, RopeNode point) {
         float brightness = this.cable.getBrightness();
         Color color = this.cable.getColor();
         Vector3dc oldPos = light.getPosition();

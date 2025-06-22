@@ -43,6 +43,6 @@ public class SuperpositionClient {
     }
 
     public static void playStreaming(SoundEngine soundEngine, Channel channel, AudioStream stream) {
-        ClientAudioManager.playStreaming(soundEngine,channel,stream);
+        ClientAudioManager.playStreaming(soundEngine, channel, stream);
     }
 }

@@ -37,7 +37,7 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
         String text = "";
         if (be.getMode() != null)
             text = be.getMode().getDisplayText();
-         if (Objects.equals(text, "x")) {
+        if (Objects.equals(text, "x")) {
             ms.translate(0, 0, -.02);
         }
         if (text.length() > 1) {

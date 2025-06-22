@@ -12,12 +12,12 @@ public class Node {
     private Action action = null;
     private Node target = null;
     private UUID targetUUID = null;
-    private int inputIndex = 0;
+    private final int inputIndex = 0;
     private final Card card;
-    private Vector2f position = new Vector2f();
-    private Vector2f size = new Vector2f(10, 10);
+    private final Vector2f position = new Vector2f();
+    private final Vector2f size = new Vector2f(10, 10);
     private Signal[] signals;
-    private List<Attachment> attachments = new ArrayList<>();
+    private final List<Attachment> attachments = new ArrayList<>();
 
     public Node(Card card) {
         this.card = card;
@@ -65,7 +65,7 @@ public class Node {
         size.x = 20;
         size.y = 20;
         if (signals != null) {
-            size.y = 12 + (8 * Math.max(1, getInputCount()-1));
+            size.y = 12 + (8 * Math.max(1, getInputCount() - 1));
         }
 
         attachments.clear();
@@ -75,7 +75,7 @@ public class Node {
 
         int length = getInputCount();
         for (int i = 0; i < length; i++) {
-            attachments.add(new Attachment.InputAttachment(new Vector2f(-size.x / 2, i*8 - (Math.max(0, getInputCount()-1)*4)), this));
+            attachments.add(new Attachment.InputAttachment(new Vector2f(-size.x / 2, i * 8 - (Math.max(0, getInputCount() - 1) * 4)), this));
         }
     }
 

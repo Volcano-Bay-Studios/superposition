@@ -10,13 +10,14 @@ import java.util.List;
 
 public interface ManipulateAction extends PeriphrealAction {
     void manipulate(Signal signal, Level level, BlockPos pos);
+
     @Override
     default List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {
         List<Signal> returnSignals = new ArrayList<>();
-        for (int i = 0 ; i < signals.size(); i += 2) {
+        for (int i = 0; i < signals.size(); i += 2) {
             CompoundTag tag = new CompoundTag();
-            tag.putString("id",getLocation().toString());
-            addOutbound(tag,signals.get(i+1));
+            tag.putString("id", getLocation().toString());
+            addOutbound(tag, signals.get(i + 1));
             signals.get(i).encode(tag);
             returnSignals.add(signals.get(i));
         }
@@ -25,7 +26,8 @@ public interface ManipulateAction extends PeriphrealAction {
 
     /**
      * Encodes extra data to be used by Manipulators
-     * @param tag The tag that is being sent to the peripheral
+     *
+     * @param tag    The tag that is being sent to the peripheral
      * @param signal The current peripheral signal
      */
     void addOutbound(CompoundTag tag, Signal signal);

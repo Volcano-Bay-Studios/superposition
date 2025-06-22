@@ -3,10 +3,10 @@ package org.modogthedev.superposition.util;
 import net.minecraft.world.phys.Vec3;
 
 public class Vec3LerpComponent {
-    private int steps;
+    private final int steps;
     private int step;
-    private Vec3 to;
-    private Vec3 from;
+    private final Vec3 to;
+    private final Vec3 from;
 
     public Vec3LerpComponent(Vec3 to, Vec3 from, int steps) {
         this.to = to;

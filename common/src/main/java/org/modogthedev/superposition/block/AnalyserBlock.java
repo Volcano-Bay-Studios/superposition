@@ -52,7 +52,7 @@ public class AnalyserBlock extends SignalActorTickingBlock implements EntityBloc
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, SWAP_SIDES});
+        stateBuilder.add(FACING, SWAP_SIDES);
     }
 
 }

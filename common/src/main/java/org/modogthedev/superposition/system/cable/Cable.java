@@ -123,7 +123,7 @@ public class Cable {
                     }
                 }
                 if (value > 0) {
-                    Signal signal = new Signal(new Vector3d(startPos.getX(),startPos.getY(),startPos.getZ()),level,value,1,1);
+                    Signal signal = new Signal(new Vector3d(startPos.getX(), startPos.getY(), startPos.getZ()), level, value, 1, 1);
                     signal.encode(value);
                     signalList.add(signal);
                 }
@@ -134,11 +134,11 @@ public class Cable {
             if (this.level.isLoaded(endPos)) {
                 BlockEntity end = this.level.getBlockEntity(endPos);
 
-                if (end instanceof SignalActorBlockEntity endSignalActor){
+                if (end instanceof SignalActorBlockEntity endSignalActor) {
                     if (!signalList.isEmpty() && start != endSignalActor) {
                         endSignalActor.addSignals(new Object(), signalList, lastNode.getAnchor().getDirection());
                     }
-                } else  {
+                } else {
                     if (!signalList.isEmpty()) {
                         if (this.level.getBlockState(endPos).is(SuperpositionTags.SIGNAL_OFFSET)) {
                             CablePassthroughManager.addSignalsToBlock(
@@ -159,7 +159,7 @@ public class Cable {
                             int power = 0;
                             if (signal.getEncodedData() != null) {
                                 power = signal.getEncodedData().intValue();
-                                value = Math.max(value,power);
+                                value = Math.max(value, power);
                             }
                         }
                         if (value > 0) {

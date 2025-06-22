@@ -77,14 +77,14 @@ public class SignalScopeRenderer {
         }
 
         for (Signal signal : screenSignals) {
-            float falloff = Math.min(signal.getFrequency() / 100000- (position - selectorWidth), (position + selectorWidth) - signal.getFrequency() / 100000);
+            float falloff = Math.min(signal.getFrequency() / 100000 - (position - selectorWidth), (position + selectorWidth) - signal.getFrequency() / 100000);
             float strength = signal.getAmplitude() / 16.7f;
 
             if (falloff < 0) {
                 strength *= -falloff;
             }
             // Render Frequency Finder Bar
-            float signalHeight = (float) (4f + (Math.random() * 2) - 1) * (strength*25);
+            float signalHeight = (float) (4f + (Math.random() * 2) - 1) * (strength * 25);
             float frequencyPosition = Mth.map(signal.getFrequency() / 100000, 0, 160, (screenWidth / 3), (int) ((screenWidth / 3) + (screenWidth / 3)));
             guiGraphics.fill(RenderType.guiOverlay(), (int) (frequencyPosition), (int) ((int) ((screenHeight / 3) + (screenHeight / 2)) - signalHeight), (int) (frequencyPosition) + 2, (int) ((int) ((screenHeight / 3) + (screenHeight / 2)) + signalHeight + 2), new Color(60, 186, 94, 255).getRGB());
 
@@ -124,14 +124,14 @@ public class SignalScopeRenderer {
         guiGraphics.fill(RenderType.guiOverlay(), (int) (start), (int) ((screenHeight / 3) + (screenHeight / 2)) - 8, (int) (start) + 2, (int) ((screenHeight / 3) + (screenHeight / 2)) + 10, new Color(128, 242, 130, 255).getRGB());
         guiGraphics.fill(RenderType.guiOverlay(), (int) (end), (int) ((screenHeight / 3) + (screenHeight / 2)) - 8, (int) (end) + 2, (int) ((screenHeight / 3) + (screenHeight / 2)) + 10, new Color(128, 242, 130, 255).getRGB());
 
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, "FREQUENCY: "+SuperpositionMth.frequencyToHzReadable((position-selectorWidth)*100000)+" - "+SuperpositionMth.frequencyToHzReadable((position+selectorWidth)*100000), (int) (screenWidth/2),(int) ((screenHeight / 3) + (screenHeight / 2))-35,new Color(78, 208, 114, 255).getRGB());
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, "FREQUENCY: " + SuperpositionMth.frequencyToHzReadable((position - selectorWidth) * 100000) + " - " + SuperpositionMth.frequencyToHzReadable((position + selectorWidth) * 100000), (int) (screenWidth / 2), (int) ((screenHeight / 3) + (screenHeight / 2)) - 35, new Color(78, 208, 114, 255).getRGB());
 
         //  Render inputs
-        guiGraphics.blit(SCROLL,4,14,0,0,12,16,12,16);
-        guiGraphics.blit(SHIFT,4,32,0,0,30,14,30,14);
-        guiGraphics.blit(SCROLL,37,32,0,0,12,16,12,16);
-        guiGraphics.drawString(Minecraft.getInstance().font, "Adjust Frequency", 22,16,new Color(78, 208, 114, 255).getRGB());
-        guiGraphics.drawString(Minecraft.getInstance().font, "Adjust Width", 54,32,new Color(78, 208, 114, 255).getRGB());
+        guiGraphics.blit(SCROLL, 4, 14, 0, 0, 12, 16, 12, 16);
+        guiGraphics.blit(SHIFT, 4, 32, 0, 0, 30, 14, 30, 14);
+        guiGraphics.blit(SCROLL, 37, 32, 0, 0, 12, 16, 12, 16);
+        guiGraphics.drawString(Minecraft.getInstance().font, "Adjust Frequency", 22, 16, new Color(78, 208, 114, 255).getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font, "Adjust Width", 54, 32, new Color(78, 208, 114, 255).getRGB());
     }
 
     public static void scroll(float value) {

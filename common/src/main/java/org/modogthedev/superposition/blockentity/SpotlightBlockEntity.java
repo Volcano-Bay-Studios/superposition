@@ -106,7 +106,7 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
         light.setAngle(iris / 100f);
         Color color1 = new Color(color);
         float brightness = (color1.getRed() / 255f) + (color1.getGreen() / 255f) + (color1.getBlue() / 255f);
-        light.setBrightness((float) (2f - (brightness / 3f)));
+        light.setBrightness(2f - (brightness / 3f));
     }
 
     @Override

@@ -6,7 +6,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -76,7 +75,6 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     }
 
 
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -94,7 +92,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
     }
 
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        switch ((Direction) pState.getValue(FACING)) {
+        switch (pState.getValue(FACING)) {
             case NORTH:
                 return SHAPE_NORTH;
             case SOUTH:
@@ -139,7 +137,7 @@ public class AmplifierBlock extends SignalActorTickingBlock implements EntityBlo
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
+        stateBuilder.add(FACING, BASE_FREQUENCY, SWAP_SIDES);
     }
 
     public void stepOn(Level pLevel, BlockPos pPos, BlockState pState, Entity pEntity) {

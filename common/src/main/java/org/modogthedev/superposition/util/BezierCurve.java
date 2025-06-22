@@ -7,9 +7,7 @@ public class BezierCurve {
     final Vector3d[] points = new Vector3d[4];
 
     public BezierCurve(Vector3d... points) {
-        for (int i = 0; i < this.points.length; i++) {
-            this.points[i] = points[i];
-        }
+        System.arraycopy(points, 0, this.points, 0, this.points.length);
     }
 
     public Vector3d evaluate(double t) {

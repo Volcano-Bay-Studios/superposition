@@ -27,10 +27,10 @@ public class Bounds {
         float ySize = node.getSize().y;
         float x = node.getPosition().x;
         float y = node.getPosition().y;
-        this.minX = (int) (x-xSize/2);
-        this.minY = (int) (y-ySize/2);
-        this.maxX = (int) (x+xSize/2);
-        this.maxY = (int) (y+ySize/2);
+        this.minX = (int) (x - xSize / 2);
+        this.minY = (int) (y - ySize / 2);
+        this.maxX = (int) (x + xSize / 2);
+        this.maxY = (int) (y + ySize / 2);
         this.node = node;
     }
 
@@ -70,18 +70,18 @@ public class Bounds {
         return isColliding(minX, minY, maxX, maxY, node, x, y);
     }
 
-    public boolean isColliding( float x, float y) {
+    public boolean isColliding(float x, float y) {
         return x >= minX && x <= maxX && y >= minY && y <= maxY;
     }
 
     public static boolean isColliding(int minX, int minY, int maxX, int maxY, Node node, float x, float y) {
         float posX = node.getPosition().x;
         float posY = node.getPosition().y;
-        return x >= minX+posX && x <= maxX+posX && y >= minY+posY && y <= maxY+posY;
+        return x >= minX + posX && x <= maxX + posX && y >= minY + posY && y <= maxY + posY;
     }
 
     public static boolean isColliding(int minX, int minY, int maxX, int maxY, float posX, float posY, float x, float y) {
-        return x >= minX+posX && x <= maxX+posX && y >= minY+posY && y <= maxY+posY;
+        return x >= minX + posX && x <= maxX + posX && y >= minY + posY && y <= maxY + posY;
     }
 
     public static boolean isColliding(int minX, int minY, int maxX, int maxY, float x, float y) {
@@ -91,12 +91,12 @@ public class Bounds {
     public static boolean isColliding(Vector2f scale, float posX, float posY, float x, float y) {
         float xSize = scale.x;
         float ySize = scale.y;
-        return isColliding((int) (-xSize/2), (int) (-ySize/2), (int) (xSize/2), (int) (ySize/2), posX, posY, x, y);
+        return isColliding((int) (-xSize / 2), (int) (-ySize / 2), (int) (xSize / 2), (int) (ySize / 2), posX, posY, x, y);
     }
 
     public static boolean isColliding(Node node, float x, float y) {
         float xSize = node.getSize().x;
         float ySize = node.getSize().y;
-        return isColliding((int) (-xSize/2), (int) (-ySize/2), (int) (xSize/2), (int) (ySize/2), node, x, y);
+        return isColliding((int) (-xSize / 2), (int) (-ySize / 2), (int) (xSize / 2), (int) (ySize / 2), node, x, y);
     }
 }

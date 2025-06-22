@@ -26,7 +26,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
 
     private Types type = Types.ARITHMETIC;
     private Modes mode = Modes.ADD;
-    private List<Signal> rightSignals = new ArrayList<>();
+    private final List<Signal> rightSignals = new ArrayList<>();
     private int rightSignalsReceived = 0;
     private Signal outputSignal;
 
@@ -377,9 +377,9 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
             }
             return 1f;
         }, Types.COMPARISON, ">=");
-        private MathFunction function;
+        private final MathFunction function;
         public Types type;
-        private String displayText;
+        private final String displayText;
 
         Modes(MathFunction function, Types type, String displayText) {
             this.function = function;
@@ -407,6 +407,6 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
         ARITHMETIC(),
         TRIGONOMETRIC(),
         SCIENTIFIC(),
-        COMPARISON();
+        COMPARISON()
     }
 }

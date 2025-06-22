@@ -43,7 +43,6 @@ public class SignalActorTickingBlock extends Block implements EntityBlock {
     }
 
 
-
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {

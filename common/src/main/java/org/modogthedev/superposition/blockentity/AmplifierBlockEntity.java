@@ -2,7 +2,6 @@ package org.modogthedev.superposition.blockentity;
 
 import foundry.veil.api.client.render.light.data.LightData;
 import foundry.veil.api.client.render.light.data.PointLightData;
-import foundry.veil.api.client.render.light.renderer.LightRenderHandle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;

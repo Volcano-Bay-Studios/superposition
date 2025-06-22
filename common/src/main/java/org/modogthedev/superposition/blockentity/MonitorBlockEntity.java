@@ -48,7 +48,7 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
             for (String string : text) {
                 whole.append(" ").append(string);
             }
-            String[] strings = (WordUtils.wrap(whole.toString(), 14, "\n", true)).split("\n" + "");
+            String[] strings = (WordUtils.wrap(whole.toString(), 14, "\n", true)).split("\n");
             text = new ArrayList<>(Arrays.asList(strings));
         }
         while (text.size() > 7) {

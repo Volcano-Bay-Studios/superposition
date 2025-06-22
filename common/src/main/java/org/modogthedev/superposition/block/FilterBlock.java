@@ -91,7 +91,7 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
                     if (creative && !player.getInventory().contains(itemStack)) {
                         player.getInventory().add(itemStack);
                     } else if (!creative)
-                        Containers.dropItemStack(level, (double) dropPos.getX(), (double) dropPos.getY(), (double) dropPos.getZ(), itemStack);
+                        Containers.dropItemStack(level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), itemStack);
                     filterBlockEntity.setFilter(null);
                 } else {
                     if (level.isClientSide) {
@@ -110,7 +110,7 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     }
 
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        switch ((Direction) pState.getValue(FACING)) {
+        switch (pState.getValue(FACING)) {
             case NORTH:
                 return SHAPE_NORTH;
             case SOUTH:
@@ -155,6 +155,6 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder) {
-        stateBuilder.add(new Property[]{FACING, BASE_FREQUENCY, SWAP_SIDES});
+        stateBuilder.add(FACING, BASE_FREQUENCY, SWAP_SIDES);
     }
 }

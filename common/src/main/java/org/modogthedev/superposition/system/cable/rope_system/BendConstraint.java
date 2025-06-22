@@ -11,7 +11,7 @@ public interface BendConstraint {
 
         return to.lerp(targetTo, Math.clamp(to.distanceToSqr(targetTo), 0, 1) / 10f);
     }
-    
+
     static Vec3 resolveAnchorBend(Vec3 from, Vec3 middle, Vec3 to, float width) {
         Vec3 targetDirection = from.subtract(middle).scale(-1).normalize();
 
@@ -19,5 +19,5 @@ public interface BendConstraint {
 
         return resultingPosition.subtract(middle).normalize().scale(width).add(middle);
     }
-    
+
 }

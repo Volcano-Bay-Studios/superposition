@@ -18,5 +18,7 @@ public interface MonoModifyAction extends ExecutableAction {
     }
 
     @Override
-    default int getParameterCount() { return 1; }
+    default int getParameterCount() {
+        return 1;
+    }
 }

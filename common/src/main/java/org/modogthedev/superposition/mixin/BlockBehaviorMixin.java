@@ -14,9 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockBehaviour.class)
 public class BlockBehaviorMixin {
-    @Inject(method = "getSignal", at = @At("HEAD"),cancellable = true)
+    @Inject(method = "getSignal", at = @At("HEAD"), cancellable = true)
     private void getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
-        int power = RedstoneWorld.getPower((Level) level,pos);
+        int power = RedstoneWorld.getPower((Level) level, pos);
         if (power > 0) {
             cir.setReturnValue(power);
         }

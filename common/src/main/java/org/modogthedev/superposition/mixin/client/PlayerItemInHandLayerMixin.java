@@ -17,12 +17,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerItemInHandLayer.class)
 public abstract class PlayerItemInHandLayerMixin {
 
-    @Shadow protected abstract void renderArmWithSpyglass(LivingEntity entity, ItemStack stack, HumanoidArm arm, PoseStack poseStack, MultiBufferSource buffer, int combinedLight);
+    @Shadow
+    protected abstract void renderArmWithSpyglass(LivingEntity entity, ItemStack stack, HumanoidArm arm, PoseStack poseStack, MultiBufferSource buffer, int combinedLight);
 
-    @Inject(method = "renderArmWithItem",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
     private void renderArmWithItem(LivingEntity livingEntity, ItemStack itemStack, ItemDisplayContext displayContext, HumanoidArm arm, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
         if (itemStack.is(SuperpositionItems.SIGNAL_SCOPE.get()) && livingEntity.getUseItem() == itemStack && livingEntity.swingTime == 0) {
-            renderArmWithSpyglass(livingEntity,itemStack,arm,poseStack,buffer,packedLight);
+            renderArmWithSpyglass(livingEntity, itemStack, arm, poseStack, buffer, packedLight);
             ci.cancel();
         }
     }

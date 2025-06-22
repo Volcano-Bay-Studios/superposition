@@ -4,8 +4,8 @@ import org.joml.Vector2f;
 import org.modogthedev.superposition.screens.utils.Bounds;
 
 public class Attachment {
-    private Vector2f position = new Vector2f();
-    private Node node;
+    private final Vector2f position = new Vector2f();
+    private final Node node;
     private Attachment target = null;
     private int snapMode = 2;
 
@@ -44,6 +44,7 @@ public class Attachment {
 
     /**
      * Sets the attachment to a segment
+     *
      * @param position position will be modified to be relative to the node
      */
     public void setSegment(Vector2f position) {
@@ -70,6 +71,7 @@ public class Attachment {
 
     public static class SegmentAttachment extends Attachment {
         private Attachment parent;
+
         public SegmentAttachment(Vector2f position, Attachment parent) {
             super(position, parent.node);
             this.parent = parent;

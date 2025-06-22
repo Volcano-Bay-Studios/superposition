@@ -9,7 +9,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.cards.*;
+import org.modogthedev.superposition.system.cards.Action;
+import org.modogthedev.superposition.system.cards.ManipulateAction;
+import org.modogthedev.superposition.system.cards.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.modogthedev.superposition.util.DataHelper;
@@ -31,17 +33,17 @@ public class RedstoneCard extends Action implements ScanAction, ManipulateAction
 
     @Override
     public void manipulate(Signal signal, Level level, BlockPos pos) {
-        int power = DataHelper.getIntKey(signal,"power");
+        int power = DataHelper.getIntKey(signal, "power");
         if (power > 0) {
-            RedstoneWorld.setPower(level,pos, Mth.clamp(power,0,15));
+            RedstoneWorld.setPower(level, pos, Mth.clamp(power, 0, 15));
         }
     }
 
     @Override
     public void addOutbound(CompoundTag tag, Signal signal) {
         int power = DataHelper.getIntValue(signal);
-        if ( power > 0) {
-            tag.putInt("power",power);
+        if (power > 0) {
+            tag.putInt("power", power);
         }
     }
 

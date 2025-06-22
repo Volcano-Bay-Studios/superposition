@@ -51,7 +51,7 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
     }
 
     public static int getPower(Level level, BlockPos pos) {
-        Integer i = getValueIfKeyEquals(getMap(level),(pos));
+        Integer i = getValueIfKeyEquals(getMap(level), (pos));
         if (i != null) {
             return i;
         }
@@ -59,8 +59,10 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
     }
 
     public static int getOldPower(Level level, BlockPos pos) {
-        if (level.isClientSide) { return 0; }
-        Integer i = getValueIfKeyEquals(oldMap.computeIfAbsent(level, (key) -> new HashMap<>()),(pos));
+        if (level.isClientSide) {
+            return 0;
+        }
+        Integer i = getValueIfKeyEquals(oldMap.computeIfAbsent(level, (key) -> new HashMap<>()), (pos));
         if (i != null) {
             return i;
         }
@@ -82,9 +84,9 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
     }
 
     public static class RedstonePos {
-        private int x;
-        private int y;
-        private int z;
+        private final int x;
+        private final int y;
+        private final int z;
 
         public RedstonePos(int x, int y, int z) {
             this.x = x;

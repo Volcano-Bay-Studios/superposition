@@ -25,7 +25,7 @@ public class CableSavedData extends SavedData {
 
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) { // This is cursed
-        Superposition.LOGGER.info("Saving cables for level '"+ level+"'");
+        Superposition.LOGGER.info("Saving cables for level '" + level + "'");
         Map<UUID, Cable> cableHashMap = CableManager.getCables(level);
         if (cableHashMap != null) {
             tag.putInt("count", cableHashMap.size());
@@ -33,7 +33,7 @@ public class CableSavedData extends SavedData {
             for (UUID uuid : cableHashMap.keySet()) {
                 FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                 cableHashMap.get(uuid).toBytes(buf);
-                tag.putUUID("uuid_"+i,uuid);
+                tag.putUUID("uuid_" + i, uuid);
                 byte[] bytes = new byte[buf.writerIndex()];
                 buf.readBytes(bytes);
                 tag.putByteArray(String.valueOf(i), bytes);
@@ -45,21 +45,21 @@ public class CableSavedData extends SavedData {
     }
 
     public static CableSavedData load(CompoundTag tag, ServerLevel level) {
-        Superposition.LOGGER.info("Loading cables for level '"+ level+"'");
+        Superposition.LOGGER.info("Loading cables for level '" + level + "'");
         CableSavedData data = new CableSavedData();
         int size = tag.getInt("count");
         for (int i = 0; i < size; i++) {
-            UUID uuid = tag.getUUID("uuid_"+i);
-            Cable cable = Cable.fromBytes(uuid,new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))),level,true);
-            CableManager.addCable(cable,level);
+            UUID uuid = tag.getUUID("uuid_" + i);
+            Cable cable = Cable.fromBytes(uuid, new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))), level, true);
+            CableManager.addCable(cable, level);
         }
         return data;
     }
 
     public static CableSavedData get(ServerLevel level) {
         CableSavedData data = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(CableSavedData::new,
-                (c,f) -> load(c,level),
-                DataFixTypes.LEVEL),
+                        (c, f) -> load(c, level),
+                        DataFixTypes.LEVEL),
                 ID);
 
         data.level = level;

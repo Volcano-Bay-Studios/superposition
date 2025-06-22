@@ -27,7 +27,7 @@ public class SpeakerSoundInstance extends AbstractSoundInstance implements Ticka
         this.stream = stream;
     }
 
-    public  CompletableFuture<AudioStream> getSoundStream(SoundBufferLibrary soundBuffers, ResourceLocation sound, boolean looping) {
+    public CompletableFuture<AudioStream> getSoundStream(SoundBufferLibrary soundBuffers, ResourceLocation sound, boolean looping) {
         return CompletableFuture.completedFuture(stream);
     }
 

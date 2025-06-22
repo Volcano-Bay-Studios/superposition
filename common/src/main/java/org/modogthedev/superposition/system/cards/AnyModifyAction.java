@@ -15,5 +15,7 @@ public interface AnyModifyAction extends ExecutableAction {
     }
 
     @Override
-    default int getParameterCount() { return 6; }
+    default int getParameterCount() {
+        return 6;
+    }
 }

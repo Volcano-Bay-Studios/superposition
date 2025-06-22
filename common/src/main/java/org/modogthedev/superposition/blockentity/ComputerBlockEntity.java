@@ -16,7 +16,6 @@ import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,8 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     private static final Logger log = LoggerFactory.getLogger(ComputerBlockEntity.class);
     private Card card;
     private boolean appendData = false;
-    private HashMap<Direction, List<Signal>> inboundSignals = new HashMap<>();
-    private HashMap<Direction, List<Signal>> outboundSignals = new HashMap<>();
+    private final HashMap<Direction, List<Signal>> inboundSignals = new HashMap<>();
+    private final HashMap<Direction, List<Signal>> outboundSignals = new HashMap<>();
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.COMPUTER.get(), pos, state);

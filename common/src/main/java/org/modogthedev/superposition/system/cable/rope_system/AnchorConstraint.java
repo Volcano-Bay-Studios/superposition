@@ -27,7 +27,7 @@ public class AnchorConstraint implements RopeConstraint {
 
     @Override
     public void applyConstraint() {
-        node.position = anchorBlock.getCenter().add(Vec3.atLowerCornerOf(direction.getNormal()).scale(0.5f + 1/16f));
+        node.position = anchorBlock.getCenter().add(Vec3.atLowerCornerOf(direction.getNormal()).scale(0.5f + 1 / 16f));
         RopeNode prevNode = adjacentPrev.get();
         if (prevNode != null) {
             prevNode.position = BendConstraint.resolveAnchorBend(anchorBlock.getCenter(), node.position, prevNode.position, width);

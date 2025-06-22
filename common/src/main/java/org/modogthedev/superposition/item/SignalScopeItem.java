@@ -8,7 +8,10 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
+import net.minecraft.world.item.SpyglassItem;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -63,8 +66,8 @@ public class SignalScopeItem extends SpyglassItem {
                     Signal renderSignal = new Signal(signal);
                     float displayVolume = volume;
 
-                    displayVolume = Math.min(displayVolume,2);
-                    displayVolume *= (float) Math.log(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize()))+1);
+                    displayVolume = Math.min(displayVolume, 2);
+                    displayVolume *= (float) Math.log(Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize())) + 1);
                     if (falloff < 0) {
                         displayVolume /= -falloff;
                     }
@@ -73,9 +76,9 @@ public class SignalScopeItem extends SpyglassItem {
 
                     float audioVolume = volume;
                     Signal audioSignal = new Signal(signal);
-                    audioVolume = Math.min(volume,2);
+                    audioVolume = Math.min(volume, 2);
                     audioVolume = (float) Math.log(audioVolume);
-                    audioVolume *= (float) Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize())-0.2f)/2;
+                    audioVolume *= (float) Math.max(0, entity.getViewVector(0).normalize().dot(vec31.normalize()) - 0.2f) / 2;
                     if (falloff < 0) {
                         audioVolume /= -falloff;
                     }

@@ -10,9 +10,9 @@ import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 
 public class ComputerPeriphreal implements IPeripheral {
-    private Level level;
-    private BlockPos pos;
-    private ComputerBlockEntity computerBlockEntity;
+    private final Level level;
+    private final BlockPos pos;
+    private final ComputerBlockEntity computerBlockEntity;
 
     public ComputerPeriphreal(ComputerBlockEntity computerBlockEntity) {
         level = computerBlockEntity.getLevel();

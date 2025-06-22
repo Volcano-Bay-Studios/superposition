@@ -44,6 +44,7 @@ public class Superposition {
         SuperpositionMessages.register();
         LOGGER.info("Superposition has been initialized.");
     }
+
     public static void preTick(Level level) {
         if (level.isClientSide) {
             RedstoneWorld.clientTick(level);

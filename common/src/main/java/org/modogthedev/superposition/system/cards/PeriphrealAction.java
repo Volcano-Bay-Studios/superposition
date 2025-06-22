@@ -12,7 +12,7 @@ public interface PeriphrealAction extends ExecutableAction {
     @Override
     default List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {
         CompoundTag tag = new CompoundTag();
-        tag.putString("id",getLocation().toString());
+        tag.putString("id", getLocation().toString());
         for (Signal signal : signals) {
             signal.encode(tag.copy());
         }

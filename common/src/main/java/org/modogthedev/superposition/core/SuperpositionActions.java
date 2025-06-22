@@ -18,7 +18,7 @@ public class SuperpositionActions {
 
     private static final List<Action> actions = new ArrayList<>();
 
-    public static final ActionSpritesheet SPRITESHEET = new ActionSpritesheet(Superposition.id("textures/screen/action_spritesheet.png"),256);
+    public static final ActionSpritesheet SPRITESHEET = new ActionSpritesheet(Superposition.id("textures/screen/action_spritesheet.png"), 256);
 
     public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ResourceKey.createRegistryKey(Superposition.id("action")), Superposition.MODID);
     public static final RegistryObject<Action> COLOR = registerAction("color", () -> new ColorAction(Superposition.id("color"), new Action.Information(
@@ -95,7 +95,7 @@ public class SuperpositionActions {
             Component.literal("Slave"),
             Component.literal("Something about this card being cool or smth like that"),
             Action.Type.OTHER
-    )),CompatabilityHandler.Mod.COMPUTERCRAFT);
+    )), CompatabilityHandler.Mod.COMPUTERCRAFT);
 
 
     private static <T extends Action> RegistryObject<T> registerAction(String name, Supplier<T> action) {
@@ -119,6 +119,7 @@ public class SuperpositionActions {
     /**
      * This method will return and or gather all registered actions.
      * The first time this action is called, it will collect all registered actions.
+     *
      * @return A list of registered actions
      */
     public static List<Action> getAllRegisteredActions() {

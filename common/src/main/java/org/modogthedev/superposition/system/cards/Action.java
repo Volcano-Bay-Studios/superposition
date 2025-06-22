@@ -33,6 +33,7 @@ public abstract class Action implements Cloneable {
             return null;
         }
     }
+
     public enum Type {
         INPUT("Begins the data"),
         MODIFY("Changes a signals data in some way"),
@@ -41,6 +42,7 @@ public abstract class Action implements Cloneable {
         OTHER("No information is available");
 
         private final String description;
+
         Type(String s) {
             description = s;
         }
@@ -49,6 +51,7 @@ public abstract class Action implements Cloneable {
             return description;
         }
     }
+
     public record Information(Component name, Component description, Type type) {
     }
 }

@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.screens.utils;
 
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;

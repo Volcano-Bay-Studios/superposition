@@ -81,7 +81,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void writeTag(CompoundTag tag, String key) {
-            tag.putBoolean(key,value);
+            tag.putBoolean(key, value);
         }
     }
 
@@ -156,7 +156,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void writeTag(CompoundTag tag, String key) {
-            tag.putInt(key,value);
+            tag.putInt(key, value);
         }
     }
 
@@ -229,7 +229,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void writeTag(CompoundTag tag, String key) {
-            tag.putFloat(key,value);
+            tag.putFloat(key, value);
         }
     }
 
@@ -303,7 +303,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void writeTag(CompoundTag tag, String key) {
-            tag.putString(key,value);
+            tag.putString(key, value);
         }
     }
 
@@ -377,7 +377,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void writeTag(CompoundTag tag, String key) {
-            tag.put(key,value);
+            tag.put(key, value);
         }
     }
 
@@ -447,7 +447,7 @@ public sealed interface EncodedData<T> extends Cloneable {
         }
 
         public void writeTag(CompoundTag tag, String key) {
-            tag.putByteArray(key,value);
+            tag.putByteArray(key, value);
         }
     }
 
@@ -485,6 +485,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
     /**
      * Dumps the data into the given tag with the given key
+     *
      * @param tag
      * @param key
      */
@@ -542,7 +543,6 @@ public sealed interface EncodedData<T> extends Cloneable {
     String stringValue();
 
     Type type();
-
 
 
     enum Type {

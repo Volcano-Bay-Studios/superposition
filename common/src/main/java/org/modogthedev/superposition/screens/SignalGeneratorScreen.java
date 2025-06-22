@@ -168,7 +168,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
         if (!mute && frequency > .72f) {
             float pitch = 1.0F / Mth.map(0, 30, 2, .72f, frequency);
             // TODO make it work pls
-            ClientAudioManager.playSine(frequency*100);
+            ClientAudioManager.playSine(frequency * 100);
         } else {
             ClientAudioManager.stopSine();
         }

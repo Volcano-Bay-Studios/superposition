@@ -50,7 +50,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
 
         float lastStage = be.lastStep;
         float stage = be.step;
-        float delta = (float) (be.ticks + pPartialTick) / AmplifierBlockEntity.ticksToChange;
+        float delta = (be.ticks + pPartialTick) / AmplifierBlockEntity.ticksToChange;
         float stages = 3;
         float alpha = 1 /*Mth.clamp(be.remainingPolishAmount / UnpolishedComponentBlockEntity.DEFAULT_POLISHING_AMOUNT, 0f, 1f)*/;
 

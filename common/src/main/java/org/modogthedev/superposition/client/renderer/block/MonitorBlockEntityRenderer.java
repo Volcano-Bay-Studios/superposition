@@ -89,12 +89,12 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             if (signal != null) {
                 float frequency = Mth.map(signal.getFrequency() / 100000, 0, 158, 0, 256);
                 int slot = Mth.clamp(Math.round(frequency), 2, 254);
-                float normalValue = Mth.map(signal.getAmplitude(),0,40,1,2);
-                signals[slot-2] = normalValue/1.6f;
-                signals[slot-1] = normalValue/1.2f;
+                float normalValue = Mth.map(signal.getAmplitude(), 0, 40, 1, 2);
+                signals[slot - 2] = normalValue / 1.6f;
+                signals[slot - 1] = normalValue / 1.2f;
                 signals[slot] = normalValue;
-                signals[slot+1] = normalValue/1.2f;
-                signals[slot+2] = normalValue/1.6f;
+                signals[slot + 1] = normalValue / 1.2f;
+                signals[slot + 2] = normalValue / 1.6f;
             }
         }
         for (int i = 0; i < size; i++) {
@@ -102,7 +102,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             float y = .21f;
             float yinverse;
             if (signals != null && signals[i] != null) {
-                y = Math.max(-.061f, (signals[i]/4)) * transformDown;
+                y = Math.max(-.061f, (signals[i] / 4)) * transformDown;
                 y = Mth.lerp(-(transformDown - 1), y, .21f);
             }
             y += (float) (Math.random() / 64) * transformDown;

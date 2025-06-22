@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ExecutableAction {
     List<Signal> execute(List<Signal> signals, Level level, BlockPos pos);
+
     int getParameterCount();
 
     default boolean hasOutput() {
