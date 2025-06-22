@@ -2,6 +2,7 @@ package org.modogthedev.superposition.core;
 
 import foundry.veil.platform.registry.RegistrationProvider;
 import foundry.veil.platform.registry.RegistryObject;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import org.modogthedev.superposition.Superposition;
@@ -9,6 +10,8 @@ import org.modogthedev.superposition.compat.CompatabilityHandler;
 import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
 import org.modogthedev.superposition.system.cards.Action;
 import org.modogthedev.superposition.system.cards.actions.*;
+import org.modogthedev.superposition.system.cards.actions.configuration.ActionConfiguration;
+import org.modogthedev.superposition.system.cards.actions.configuration.DirectionConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +23,15 @@ public class SuperpositionActions {
 
     public static final ActionSpritesheet SPRITESHEET = new ActionSpritesheet(Superposition.id("textures/screen/action_spritesheet.png"), 256);
 
-    public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ResourceKey.createRegistryKey(Superposition.id("action")), Superposition.MODID);
+    public static final ResourceKey<Registry<ActionConfiguration>> ACTION_CONFIGURATION_KEY = ResourceKey.createRegistryKey(Superposition.id("action_configurations"));
+    public static final RegistrationProvider<ActionConfiguration> ACTION_CONFIGURATIONS = RegistrationProvider.get(ACTION_CONFIGURATION_KEY, Superposition.MODID);
+
+    public static final RegistryObject<ActionConfiguration> DIRECTION = ACTION_CONFIGURATIONS.register("direction", () -> (new DirectionConfiguration(Component.literal("Direction"))));
+
+
+    public static final ResourceKey<Registry<Action>> ACTION_KEY = ResourceKey.createRegistryKey(Superposition.id("action"));
+    public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ACTION_KEY, Superposition.MODID);
+
     public static final RegistryObject<Action> COLOR = registerAction("color", () -> new ColorAction(Superposition.id("color"), new Action.Information(
             Component.literal("Color"),
             Component.literal("Retrieves the color of the block that is being analysed"),
@@ -97,20 +108,20 @@ public class SuperpositionActions {
             Action.Type.OTHER
     )), CompatabilityHandler.Mod.COMPUTERCRAFT);
 
-
     private static <T extends Action> RegistryObject<T> registerAction(String name, Supplier<T> action) {
         if (action.get().getThumbnailItem() == null) {
-            SPRITESHEET.addSprite(action.get().getSelfReference());
+            SPRITESHEET.addSprite(Superposition.id(name));
         }
         return ACTION.register(name, action);
     }
 
     private static <T extends Action> RegistryObject<T> registerAction(String name, Supplier<T> action, CompatabilityHandler.Mod mod) {
         if (action.get().getThumbnailItem() == null) {
-            SPRITESHEET.addSprite(action.get().getSelfReference());
+            SPRITESHEET.addSprite(Superposition.id(name));
         }
         return ACTION.register(name, action);
     }
+
 
     public static void bootstrap() {
 

@@ -21,6 +21,7 @@ import org.modogthedev.superposition.system.cards.Action;
 import org.modogthedev.superposition.system.cards.Attachment;
 import org.modogthedev.superposition.system.cards.Card;
 import org.modogthedev.superposition.system.cards.Node;
+import org.modogthedev.superposition.system.cards.actions.configuration.ActionConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -292,6 +293,15 @@ public class InscriberScreen extends Screen {
                 SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 200), 0, (int) (width), (int) (height), background, background);
                 SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 196), 0, (int) (width - 192), (int) (height), topBorder, bottomBorder);
                 guiGraphics.drawCenteredString(Minecraft.getInstance().font, action.getInfo().name(), (int) (width - 100), 20, topBorder);
+                poseStack.pushPose();
+                poseStack.translate(width - 186, 40, 0);
+                int y = 40;
+                for (ActionConfiguration configuration : action.getConfigurations()) {
+                    configuration.render(guiGraphics, (int) (mouseX - (width - 186)), mouseY - y);
+                    poseStack.translate(0, configuration.getHeight(), 0);
+                    y += configuration.getHeight();
+                }
+                poseStack.popPose();
             }
         }
 //        SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (windowPos.x), (int) (windowPos.y), (int) (windowPos.x + windowWidth), (int) (windowPos.y + windowHeight), topBorder, bottomBorder);
@@ -457,7 +467,21 @@ public class InscriberScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
+        if (inspectingNode != null) {
+            if (mouseX > width - 200) {
+                int y = 40;
+                for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
+                    if (mouseY > y && mouseY < y + configuration.getHeight()) {
+                        configuration.mouse(button,(int) (mouseX - (width - 186)),mouseY-y);
+                        return true;
+                    }
+                    y += configuration.getHeight();
+                }
+                return true;
+            }
+        }
         if (button == 0 && selectedNode == null) {
+
             if (windowPos != null && windowBounds.isColliding((float) mouseX, (float) mouseY)) {
                 if (Bounds.isColliding(windowBounds.getMinX() + 130, (int) (windowBounds.getMinY() - windowScroll), windowBounds.getMinX() + 150, (int) (windowBounds.getMinY() - windowScroll + (SuperpositionActions.getAllRegisteredActions().size() * 18 - windowHeight)), (float) mouseX, (float) mouseY)) {
                     scrolling = true;

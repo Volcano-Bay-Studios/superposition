@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import org.modogthedev.superposition.core.SuperpositionActions;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.cards.Action;
 import org.modogthedev.superposition.system.cards.ComputerAction;
@@ -15,6 +16,7 @@ public class OutputAction extends Action implements ComputerAction {
 
     public OutputAction(ResourceLocation action, Information info) {
         super(action, info);
+        getConfigurations().add(SuperpositionActions.DIRECTION.get());
     }
 
     @Override
