@@ -32,12 +32,6 @@ public class InscriberBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     public void setupConfigTooltips() {
         super.setupConfigTooltips();
-//        this.addConfigTooltip("Append Data - " + appendData, () -> {
-//            CompoundTag tag = new CompoundTag();
-//            appendData = !appendData;
-//            tag.putBoolean("appendData", appendData);
-//            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, this.getBlockPos()));
-//        });
     }
 
     @Override

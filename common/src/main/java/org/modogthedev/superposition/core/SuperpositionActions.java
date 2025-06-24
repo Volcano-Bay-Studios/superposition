@@ -102,6 +102,11 @@ public class SuperpositionActions {
             Component.literal("Pushes the provided signal to the buffer of the selected face"),
             Action.Type.OUTPUT
     )));
+    public static final RegistryObject<Action> INPUT = registerAction("input", () -> new InputAction(Superposition.id("input"), new Action.Information(
+            Component.literal("Input"),
+            Component.literal("Retrieves the signal from the specified input buffer"),
+            Action.Type.OUTPUT
+    )));
     public static final RegistryObject<Action> SLAVE = registerAction("slave", () -> new SlaveCard(Superposition.id("slave"), new Action.Information(
             Component.literal("Slave"),
             Component.literal("Something about this card being cool or smth like that"),

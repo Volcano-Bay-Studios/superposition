@@ -14,6 +14,7 @@ public abstract class Action implements Cloneable {
     private final Information info;
     private final List<ActionConfiguration> configurations = new ArrayList<>();
     private ResourceLocation selfReference = null;
+    private Node node;
 
     public Action(ResourceLocation action, Information info) {
         this.info = info;
@@ -24,6 +25,14 @@ public abstract class Action implements Cloneable {
             selfReference = SuperpositionActions.ACTION.asVanillaRegistry().getKey(this);
         }
         return selfReference;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
+    }
+
+    public Node getNode() {
+        return node;
     }
 
     public Information getInfo() {

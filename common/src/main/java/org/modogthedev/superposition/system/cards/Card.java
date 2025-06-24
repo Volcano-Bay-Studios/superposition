@@ -12,8 +12,11 @@ public class Card { //TODO: make this work!
     private final HashMap<UUID, Node> nodes = new HashMap<>();
 
     public Card() {
+
         for (int i = 0; i < 6; i++) {
-            nodes.put(UUID.randomUUID(), new Node(this));
+            Node node = new Node(this);
+            node.updateAction(SuperpositionActions.INPUT.get());
+            nodes.put(UUID.randomUUID(), node);
         }
         float y = 70;
         for (Node node : nodes.values()) {

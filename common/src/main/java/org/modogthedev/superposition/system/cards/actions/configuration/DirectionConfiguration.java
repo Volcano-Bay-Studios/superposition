@@ -41,6 +41,10 @@ public class DirectionConfiguration extends ActionConfiguration {
         }
     }
 
+    public Direction value() {
+        return Direction.values()[ordinal];
+    }
+
     @Override
     public void mouse(int button, double x, double y) {
         if (x > 86) {

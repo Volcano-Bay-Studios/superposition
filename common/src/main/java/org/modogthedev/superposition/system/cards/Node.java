@@ -16,7 +16,7 @@ public class Node {
     private final Card card;
     private final Vector2f position = new Vector2f();
     private final Vector2f size = new Vector2f(10, 10);
-    private Signal[] signals;
+    private List<List<Signal>> signals;
     private final List<Attachment> attachments = new ArrayList<>();
 
     public Node(Card card) {
@@ -47,6 +47,7 @@ public class Node {
 
     public void updateAction(Action action) {
         this.action = action;
+        action.setNode(this);
         if (action instanceof ExecutableAction executableAction) {
             updateSize(executableAction.getParameterCount());
         }
@@ -57,7 +58,10 @@ public class Node {
     }
 
     public void updateSize(int size) {
-        signals = new Signal[size];
+        signals = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            signals.add(new ArrayList<>());
+        }
         calculateSize();
     }
 
@@ -80,7 +84,7 @@ public class Node {
     }
 
     public int getInputCount() {
-        return signals.length;
+        return signals.size();
     }
 
     public List<Attachment> getAttachments() {

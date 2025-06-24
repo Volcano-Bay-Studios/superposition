@@ -13,6 +13,10 @@ import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.cards.ExecutableAction;
+import org.modogthedev.superposition.system.cards.Node;
+import org.modogthedev.superposition.system.cards.actions.InputAction;
+import org.modogthedev.superposition.system.cards.actions.configuration.DirectionConfiguration;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
@@ -30,6 +34,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     private boolean appendData = false;
     private final HashMap<Direction, List<Signal>> inboundSignals = new HashMap<>();
     private final HashMap<Direction, List<Signal>> outboundSignals = new HashMap<>();
+
 
     public ComputerBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.COMPUTER.get(), pos, state);
@@ -93,10 +98,18 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     public void tick() {
         if (level.isClientSide) {
             resetTooltip();
+            addTooltip(Component.literal("Computer Status:"));
             if (card == null)
                 addTooltip(Component.literal("No Card"));
             else {
-                addTooltip(Component.literal("Computer Status:"));
+                addTooltip(Component.literal("Card Present"));
+                for (Node node : card.getNodes().values()) {
+                    if (node.getAction() instanceof InputAction inputAction && inputAction instanceof ExecutableAction executableAction) {
+                        if (inputAction.getConfigurations().getFirst() instanceof DirectionConfiguration directionConfiguration) {
+                            executableAction.execute(inboundSignals.get(directionConfiguration.value()), level, getBlockPos());
+                        }
+                    }
+                }
             }
         }
         super.tick();
@@ -123,14 +136,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     public Signal getSideSignal(Direction face) {
         return SignalManager.randomSignal(getSideSignals(face));
     }
-
-    //    @Override
-//    public Signal getSideSignal(Direction face) {
-//        if (face == Direction.UP) {
-//            return getOutboundSignal();
-//        }
-//        return super.getSideSignal(face);
-//    }
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
