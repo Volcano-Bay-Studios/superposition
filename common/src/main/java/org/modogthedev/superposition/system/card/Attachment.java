@@ -81,7 +81,7 @@ public class Attachment {
             return;
         }
         attachments.add(attachment);
-        if (attachment.getTarget() != null && attachment.getTarget() instanceof Attachment.SegmentAttachment) {
+        if (attachment.getTarget() != null) {
             exploreAttachment(attachment.getTarget(), attachments);
         }
     }

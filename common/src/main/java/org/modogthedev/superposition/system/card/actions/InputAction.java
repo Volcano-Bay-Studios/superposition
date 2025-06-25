@@ -30,7 +30,7 @@ public class InputAction extends Action implements ExecutableAction {
 
     @Override
     public List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {
-        return List.of();
+        return signals;
     }
 
     @Override

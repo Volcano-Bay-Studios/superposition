@@ -54,10 +54,16 @@ public class DirectionConfiguration extends ActionConfiguration {
                 return direction.getClockWise().getClockWise();
             }
             case WEST -> {
-                return direction.getCounterClockWise();
+                return direction.getClockWise();
             }
             case EAST -> {
-                return direction.getClockWise();
+                return direction.getCounterClockWise();
+            }
+            case UP -> {
+                return Direction.UP;
+            }
+            case DOWN -> {
+                return Direction.DOWN;
             }
         }
         return direction;

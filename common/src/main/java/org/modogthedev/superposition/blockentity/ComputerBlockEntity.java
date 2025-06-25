@@ -111,8 +111,14 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
         }
         if (card != null) {
             for (Node node : card.getNodes()) {
+                node.clearForExecution();
+            }
+            for (Node node : card.getNodes()) {
                 if (node.getAction() instanceof InputAction inputAction && inputAction.getConfigurations().getFirst() instanceof DirectionConfiguration directionConfiguration) {
-                    node.execute(inboundSignals.get(directionConfiguration.relative(getBlockState().getValue(ComputerBlock.FACING))),level,getBlockPos());
+                    List<Signal> signals = inboundSignals.get(directionConfiguration.relative(getBlockState().getValue(ComputerBlock.FACING)));
+                    if (!signals.isEmpty()) {
+                        node.execute(signals, level, getBlockPos());
+                    }
                 }
             }
         }

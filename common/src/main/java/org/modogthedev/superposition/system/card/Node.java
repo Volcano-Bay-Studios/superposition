@@ -73,7 +73,7 @@ public class Node {
     }
 
     public void execute(List<Signal> signals, Level level, BlockPos pos) {
-        if (action instanceof ExecutableAction executableAction) {
+        if (action instanceof ExecutableAction executableAction && !signals.isEmpty()) {
             List<Signal> returns = executableAction.execute(signals, level, pos);
             if (executableAction.hasOutput()) {
                 Attachment target = attachments.getFirst().getFinalTargetAttachment();
@@ -187,7 +187,7 @@ public class Node {
         if (tag.contains("action")) {
             Action newAction = Action.loadNew(tag.getCompound("action"));
             if (newAction != null) {
-                updateAction(newAction);
+                updateAction(newAction.copy());
             }
         }
         if (tag.contains("attachments")) {
