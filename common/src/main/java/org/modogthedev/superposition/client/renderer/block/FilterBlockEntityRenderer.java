@@ -26,7 +26,7 @@ public class FilterBlockEntityRenderer implements BlockEntityRenderer<FilterBloc
     public void render(FilterBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
-        if (be.getFilterType() == null)
+        if (be.getFilter() == null)
             return;
         VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png")));
 
@@ -55,7 +55,7 @@ public class FilterBlockEntityRenderer implements BlockEntityRenderer<FilterBloc
 //                stage = 2;
 //        }
         float stages = 1;
-        Color color = be.getFilterType().getColor();
+        Color color = be.getFilter().getColor();
         float offset = (stage / stages) + .5f;
 
         light = LevelRenderer.getLightColor(be.getLevel(), be.getBlockPos().relative(be.getBlockState().getValue(SignalGeneratorBlock.FACING), 1));

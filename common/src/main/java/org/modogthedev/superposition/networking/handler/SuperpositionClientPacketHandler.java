@@ -5,9 +5,12 @@ import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
+import org.modogthedev.superposition.networking.packet.InscriberScreenS2CPacket;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
+import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
 import java.util.Map;
@@ -26,10 +29,20 @@ public class SuperpositionClientPacketHandler {
         ClientSignalManager.processTag(level, packet.getBuf());
     }
 
+    public static void handleInscriberScreen(InscriberScreenS2CPacket packet, ClientPacketContext ctx) {
+        Level level = ctx.level();
+        if (level == null) {
+            Superposition.LOGGER.warn("Server sent inscriber screen for unknown level");
+            return;
+        }
+
+        ScreenManager.openInscriber(new Card(packet.tag().getCompound("card")),packet.pos());
+    }
+
     public static void handleBlockSignalSync(BlockSignalSyncS2CPacket packet, ClientPacketContext ctx) {
         Level level = ctx.level();
         if (level == null) {
-            Superposition.LOGGER.warn("Server sent signal sync for unknown level");
+            Superposition.LOGGER.warn("Server sent block signal for unknown level");
             return;
         }
 

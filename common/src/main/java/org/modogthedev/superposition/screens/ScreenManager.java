@@ -3,7 +3,7 @@ package org.modogthedev.superposition.screens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.modogthedev.superposition.SuperpositionClient;
-import org.modogthedev.superposition.system.cards.Card;
+import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.filter.Filter;
 
 public class ScreenManager {
@@ -29,8 +29,8 @@ public class ScreenManager {
         }
     }
 
-    public static void openInscriber(Card card) {
-        inscriberScreen = new InscriberScreen(card);
+    public static void openInscriber(Card card, BlockPos pos) {
+        inscriberScreen = new InscriberScreen(card, pos);
         SuperpositionClient.setScreen(inscriberScreen);
     }
 }

@@ -32,7 +32,7 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
         return signal;
     }
 
-    public Filter getFilterType() {
+    public Filter getFilter() {
         return type;
     }
 
@@ -58,9 +58,9 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     @Override
     public void tick() {
         resetTooltip();
-        if (level.isClientSide && getFilterType() != null) {
+        if (level.isClientSide && getFilter() != null) {
             addTooltip(Component.literal("Filter Status: "));
-            addTooltip(Component.translatable(getFilterType().toString()));
+            addTooltip(Component.translatable(getFilter().toString()));
         }
         super.tick();
     }

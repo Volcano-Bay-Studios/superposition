@@ -2,9 +2,12 @@ package org.modogthedev.superposition.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import foundry.veil.api.client.color.Color;
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -15,17 +18,17 @@ import org.joml.Vector3f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.client.renderer.ui.SPUIUtils;
 import org.modogthedev.superposition.core.SuperpositionActions;
+import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
 import org.modogthedev.superposition.screens.utils.Bounds;
-import org.modogthedev.superposition.system.cards.Action;
-import org.modogthedev.superposition.system.cards.Attachment;
-import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.Node;
-import org.modogthedev.superposition.system.cards.actions.configuration.ActionConfiguration;
+import org.modogthedev.superposition.system.card.Action;
+import org.modogthedev.superposition.system.card.Attachment;
+import org.modogthedev.superposition.system.card.Card;
+import org.modogthedev.superposition.system.card.Node;
+import org.modogthedev.superposition.system.card.actions.configuration.ActionConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class InscriberScreen extends Screen {
     public Card card;
@@ -54,9 +57,12 @@ public class InscriberScreen extends Screen {
     public int windowWidth = 300;
     public static int windowHeight = 180;
 
-    public InscriberScreen(Card card) {
+    private final BlockPos blockPos;
+
+    public InscriberScreen(Card card, BlockPos pos) {
         super(Component.literal("Inscriber"));
         this.card = card;
+        this.blockPos = pos;
     }
 
     @Override
@@ -139,7 +145,7 @@ public class InscriberScreen extends Screen {
             connectingAttachment.setSegment(new Vector2f(mouse.x, mouse.y));
         }
 
-        for (Node node : card.getNodes().values()) { // Render Attachments
+        for (Node node : card.getNodes()) { // Render Attachments
             float x = node.getPosition().x;
             float y = node.getPosition().y;
 
@@ -171,7 +177,7 @@ public class InscriberScreen extends Screen {
             attachments.clear();
         }
 
-        for (Node node : card.getNodes().values()) { // Render Nodes
+        for (Node node : card.getNodes()) { // Render Nodes
             float x = node.getPosition().x;
             float y = node.getPosition().y;
             float xLength = node.getSize().x / 2;
@@ -313,6 +319,9 @@ public class InscriberScreen extends Screen {
     }
 
     private void exploreAttachment(Attachment attachment, List<Attachment> attachments) {
+        if (attachments.contains(attachment)) {
+            return;
+        }
         attachments.add(attachment);
         if (attachment.getTarget() != null && attachment.getTarget() instanceof Attachment.SegmentAttachment) {
             exploreAttachment(attachment.getTarget(), attachments);
@@ -327,7 +336,7 @@ public class InscriberScreen extends Screen {
         PoseStack poseStack = guiGraphics.pose();
         Vector3f mouse = new Vector3f(mouseX / zoom - camera.x, mouseY / zoom - camera.y, 0);
         selectedNode.getPosition().set(mouse.x + offset.x, mouse.y + offset.y);
-        for (Node node2 : card.getNodes().values()) {
+        for (Node node2 : card.getNodes()) {
             if (node2 != selectedNode) {
                 if (Math.abs(node2.getPosition().x - selectedNode.getPosition().x) < 5f) {
                     selectedNode.getPosition().set(node2.getPosition().x, selectedNode.getPosition().y);
@@ -443,7 +452,7 @@ public class InscriberScreen extends Screen {
                 connectingAttachment.getPosition().x = (float) Math.floor(connectingAttachment.getPosition().x);
                 connectingAttachment.getPosition().y = (float) Math.floor(connectingAttachment.getPosition().y);
                 List<Attachment> attachments = new ArrayList<>();
-                for (Node node : card.getNodes().values()) {
+                for (Node node : card.getNodes()) {
                     for (Attachment attachment : node.getAttachments()) {
                         exploreAttachment(attachment, attachments);
                     }
@@ -500,7 +509,7 @@ public class InscriberScreen extends Screen {
                         Node node = new Node(card);
                         node.updateAction(action.copy());
                         node.getPosition().set(mouse.x, mouse.y);
-                        card.getNodes().put(UUID.randomUUID(), node);
+                        card.getNodes().add(node);
                         windowPos.set(storedPos);
                         if (!Screen.hasShiftDown()) {
                             windowPos = null;
@@ -514,7 +523,7 @@ public class InscriberScreen extends Screen {
 
             boolean found = false;
             List<Attachment> attachments = new ArrayList<>();
-            for (Node node : card.getNodes().values()) {
+            for (Node node : card.getNodes()) {
                 for (Attachment attachment : node.getAttachments()) {
                     exploreAttachment(attachment, attachments);
                 }
@@ -565,7 +574,7 @@ public class InscriberScreen extends Screen {
             } else {
                 windowPos.set(Math.round(mouseX), Math.round(mouseY));
             }
-            for (Node node : card.getNodes().values()) {
+            for (Node node : card.getNodes()) {
                 if (node.isColliding(mouse.x, mouse.y)) {
                     Action action = node.getAction();
                     if (action != null) {
@@ -588,7 +597,7 @@ public class InscriberScreen extends Screen {
         List<Attachment> attachments = new ArrayList<>();
         if (Screen.hasShiftDown()) {
             if (connectingAttachment == null) {
-                for (Node node : card.getNodes().values()) {
+                for (Node node : card.getNodes()) {
                     for (Attachment attachment : node.getAttachments()) {
                         exploreAttachment(attachment, attachments);
                     }
@@ -611,11 +620,27 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if ((keyCode == 261 || keyCode == 259) && inspectingNode != null) {
+            card.getNodes().remove(inspectingNode);
+            inspectingNode = null;
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public void onClose() {
+        updateBlock();
+        super.onClose();
+    }
+
+    public void updateBlock() {
+        CompoundTag tag = new CompoundTag();
+        tag.put("card",card.save(new CompoundTag()));
+        VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, blockPos));
     }
 }

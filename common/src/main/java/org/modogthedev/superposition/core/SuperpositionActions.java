@@ -8,10 +8,10 @@ import net.minecraft.resources.ResourceKey;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.compat.CompatabilityHandler;
 import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
-import org.modogthedev.superposition.system.cards.Action;
-import org.modogthedev.superposition.system.cards.actions.*;
-import org.modogthedev.superposition.system.cards.actions.configuration.ActionConfiguration;
-import org.modogthedev.superposition.system.cards.actions.configuration.DirectionConfiguration;
+import org.modogthedev.superposition.system.card.Action;
+import org.modogthedev.superposition.system.card.actions.*;
+import org.modogthedev.superposition.system.card.actions.configuration.ActionConfiguration;
+import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 public class SuperpositionActions {
 
     private static final List<Action> actions = new ArrayList<>();
+    private static final List<ActionConfiguration> actionConfigurations = new ArrayList<>();
 
     public static final ActionSpritesheet SPRITESHEET = new ActionSpritesheet(Superposition.id("textures/screen/action_spritesheet.png"), 256);
 
@@ -37,7 +38,7 @@ public class SuperpositionActions {
             Component.literal("Retrieves the color of the block that is being analysed"),
             Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignCard(Superposition.id("sign"), new Action.Information(
+    public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignAction(Superposition.id("sign"), new Action.Information(
             Component.literal("Sign"),
             Component.literal("Retrieves the text of the block that is being analysed"),
             Action.Type.PERIPHERAL
@@ -129,7 +130,12 @@ public class SuperpositionActions {
 
 
     public static void bootstrap() {
-
+        for (Action action : getAllRegisteredActions()) {
+            action.getSelfReference();
+        }
+        for (ActionConfiguration action : getAllRegisteredActionConfigurations()) {
+            action.getSelfReference();
+        }
     }
 
     /**
@@ -143,6 +149,13 @@ public class SuperpositionActions {
             actions.addAll(SuperpositionActions.ACTION.asVanillaRegistry().stream().toList());
         }
         return actions;
+    }
+
+    public static List<ActionConfiguration> getAllRegisteredActionConfigurations() {
+        if (actionConfigurations.isEmpty()) {
+            actionConfigurations.addAll(SuperpositionActions.ACTION_CONFIGURATIONS.asVanillaRegistry().stream().toList());
+        }
+        return actionConfigurations;
     }
 
 }

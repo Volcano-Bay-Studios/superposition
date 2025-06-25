@@ -1,7 +1,7 @@
 package org.modogthedev.superposition.screens.utils;
 
 import org.joml.Vector2f;
-import org.modogthedev.superposition.system.cards.Node;
+import org.modogthedev.superposition.system.card.Node;
 
 public class Bounds {
     private int minX, minY, maxX, maxY;

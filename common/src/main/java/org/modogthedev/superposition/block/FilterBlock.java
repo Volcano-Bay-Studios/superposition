@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -28,6 +27,7 @@ import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
 import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.SuperpositionItemHelper;
 
 import java.util.stream.Stream;
 
@@ -82,26 +82,38 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof FilterBlockEntity filterBlockEntity) {
-            if (filterBlockEntity.getFilterType() != null) {
+            if (filterBlockEntity.getFilter() != null) {
                 if (player.isCrouching()) {
                     BlockPos dropPos = pos.relative(state.getValue(FACING));
-                    ItemStack itemStack = filterBlockEntity.getFilterType().getItem();
-                    ((FilterItem) itemStack.getItem()).putData(itemStack, filterBlockEntity.getFilterType());
+                    ItemStack itemStack = filterBlockEntity.getFilter().getItem();
+                    ((FilterItem) itemStack.getItem()).putData(itemStack, filterBlockEntity.getFilter());
                     boolean creative = player.getAbilities().instabuild;
-                    if (creative && !player.getInventory().contains(itemStack)) {
+                    if (creative) {
+                        if (player.getInventory().contains(itemStack)) {
+                            ItemStack foundItem = player.getInventory().getItem(player.getInventory().findSlotMatchingItem(itemStack));
+                            if (foundItem.getItem() instanceof FilterItem filterItem) {
+                                filterItem.putData(foundItem,filterBlockEntity.getFilter());
+                            }
+                        } else {
+                            if (!SuperpositionItemHelper.putItem(itemStack,player)) {
+                                Containers.dropItemStack(level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), itemStack);
+                            }
+                        }
+                    } else if (player.getInventory().getFreeSlot() >= 0) {
                         player.getInventory().add(itemStack);
-                    } else if (!creative)
+                    } else {
                         Containers.dropItemStack(level, dropPos.getX(), dropPos.getY(), dropPos.getZ(), itemStack);
+                    }
                     filterBlockEntity.setFilter(null);
                 } else {
                     if (level.isClientSide) {
-                        ScreenManager.openFilterScreen(filterBlockEntity.getFilterType(), pos, true);
+                        ScreenManager.openFilterScreen(filterBlockEntity.getFilter(), pos, true);
                         return InteractionResult.SUCCESS;
                     }
                 }
             }
         }
-        return super.useWithoutItem(state, level, pos, player, hitResult);
+        return InteractionResult.SUCCESS;
     }
 
     @Override

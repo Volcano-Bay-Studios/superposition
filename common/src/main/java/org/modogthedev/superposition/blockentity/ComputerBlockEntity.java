@@ -10,13 +10,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.modogthedev.superposition.block.AmplifierBlock;
+import org.modogthedev.superposition.block.ComputerBlock;
+import org.modogthedev.superposition.blockentity.util.CardHolder;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
-import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.ExecutableAction;
-import org.modogthedev.superposition.system.cards.Node;
-import org.modogthedev.superposition.system.cards.actions.InputAction;
-import org.modogthedev.superposition.system.cards.actions.configuration.DirectionConfiguration;
+import org.modogthedev.superposition.system.card.Card;
+import org.modogthedev.superposition.system.card.Node;
+import org.modogthedev.superposition.system.card.actions.InputAction;
+import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ComputerBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity { // TODO: It no longer works (intentional)
+public class ComputerBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity, CardHolder { // TODO: It no longer works (intentional)
     private static final Logger log = LoggerFactory.getLogger(ComputerBlockEntity.class);
     private Card card;
     private boolean appendData = false;
@@ -69,7 +70,6 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        card = new Card(tag);
         if (tag.contains("appendData")) {
             appendData = tag.getBoolean("appendData");
         }
@@ -103,16 +103,27 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 addTooltip(Component.literal("No Card"));
             else {
                 addTooltip(Component.literal("Card Present"));
-                for (Node node : card.getNodes().values()) {
-                    if (node.getAction() instanceof InputAction inputAction && inputAction instanceof ExecutableAction executableAction) {
-                        if (inputAction.getConfigurations().getFirst() instanceof DirectionConfiguration directionConfiguration) {
-                            executableAction.execute(inboundSignals.get(directionConfiguration.value()), level, getBlockPos());
-                        }
-                    }
+            }
+        }
+        for (Direction direction : Direction.values()) {
+            inboundSignals.get(direction).addAll(outboundSignals.get(direction));
+            outboundSignals.get(direction).clear();
+        }
+        if (card != null) {
+            for (Node node : card.getNodes()) {
+                if (node.getAction() instanceof InputAction inputAction && inputAction.getConfigurations().getFirst() instanceof DirectionConfiguration directionConfiguration) {
+                    node.execute(inboundSignals.get(directionConfiguration.relative(getBlockState().getValue(ComputerBlock.FACING))),level,getBlockPos());
                 }
             }
         }
+        for (Direction direction : Direction.values()) {
+            inboundSignals.get(direction).clear();
+        }
         super.tick();
+    }
+
+    public void addOutbound(Direction face, List<Signal> signals) {
+        outboundSignals.get(face).addAll(signals);
     }
 
 //    public Signal getOutboundSignal() {

@@ -101,7 +101,7 @@ public class FilterItem extends Item {
         if (!context.getPlayer().isShiftKeyDown()) {
             if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof FilterBlockEntity filterBlockEntity) {
                 boolean creative = context.getPlayer().getAbilities().instabuild;
-                if (filterBlockEntity.getFilterType() == null || creative) {
+                if (filterBlockEntity.getFilter() == null || creative) {
                     filterBlockEntity.setFilter(type);
                     if (context.getLevel().isClientSide) {
                         return InteractionResult.SUCCESS;

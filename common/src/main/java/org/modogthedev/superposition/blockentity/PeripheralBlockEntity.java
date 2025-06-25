@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.core.SuperpositionConstants;
-import org.modogthedev.superposition.system.cards.Card;
-import org.modogthedev.superposition.system.cards.ScanAction;
+import org.modogthedev.superposition.system.card.Card;
+import org.modogthedev.superposition.system.card.ScanAction;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 
