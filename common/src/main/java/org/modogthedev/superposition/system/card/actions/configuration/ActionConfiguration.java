@@ -9,7 +9,7 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.core.SuperpositionActions;
 
 public class ActionConfiguration implements Cloneable {
-    private Component title = null;
+    private final Component title;
     private ResourceLocation selfReference = null;
 
     public ActionConfiguration(Component title) {

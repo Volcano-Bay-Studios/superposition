@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.system.card;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -13,13 +14,12 @@ import java.util.List;
 
 public abstract class Action implements Cloneable {
     private final Information info;
-    private final List<ActionConfiguration> configurations = new ArrayList<>();
+    private List<ActionConfiguration> configurations = new ArrayList<>();
     private ResourceLocation selfReference = null;
     private Node node;
 
     public Action(ResourceLocation action, Information info) {
         this.info = info;
-        setupConfigurations();
     }
 
     protected void setupConfigurations() {
@@ -52,7 +52,7 @@ public abstract class Action implements Cloneable {
     public Action copy() {
         try {
             Action action = (Action) clone();
-            action.configurations.clear();
+            action.configurations = new ArrayList<>();
             action.setupConfigurations();
             return action;
         } catch (CloneNotSupportedException e) {
@@ -62,6 +62,9 @@ public abstract class Action implements Cloneable {
 
     public List<ActionConfiguration> getConfigurations() {
         return configurations;
+    }
+
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
     }
 
     public CompoundTag save(CompoundTag tag) {

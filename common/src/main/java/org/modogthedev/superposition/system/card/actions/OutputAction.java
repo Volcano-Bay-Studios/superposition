@@ -2,12 +2,10 @@ package org.modogthedev.superposition.system.card.actions;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.block.ComputerBlock;
 import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionActions;
-import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.ComputerAction;
 import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
@@ -31,11 +29,6 @@ public class OutputAction extends Action implements ComputerAction {
         if (getConfigurations().getFirst() instanceof DirectionConfiguration directionConfiguration) {
             computerBlockEntity.addOutbound(directionConfiguration.relative(computerBlockEntity.getBlockState().getValue(ComputerBlock.FACING)), signal);
         }
-    }
-
-    @Override
-    public ItemStack getThumbnailItem() {
-        return SuperpositionBlocks.COMPUTER.get().asItem().getDefaultInstance();
     }
 
     @Override

@@ -7,22 +7,22 @@ import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.BiModifyAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class MergeAction extends Action implements BiModifyAction {
+public class EncodeAction extends Action implements BiModifyAction {
 
-    public MergeAction(ResourceLocation action, Information info) {
+    public EncodeAction(ResourceLocation action, Information info) {
         super(action, info);
     }
 
     @Override
     public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (signal != null && signal.getEncodedData() != null && periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
-            signal.encode(signal.getEncodedData().compoundTagData().merge(periphrealSignal.getEncodedData().compoundTagData()));
+        if (signal != null && periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
+            signal.setEncodedData(periphrealSignal.getEncodedData());
         }
         return signal;
     }
 
     @Override
     public ItemStack getThumbnailItem() {
-        return Items.CRAFTER.getDefaultInstance();
+        return Items.GLASS_BOTTLE.getDefaultInstance();
     }
 }

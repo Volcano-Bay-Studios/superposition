@@ -16,17 +16,6 @@ public class Card { //TODO: make this work!
     private final List<Node> nodes = new ArrayList<>();
 
     public Card() {
-
-        for (int i = 0; i < 6; i++) {
-            Node node = new Node(this);
-            node.updateAction(SuperpositionActions.INPUT.get());
-            nodes.add(node);
-        }
-        float y = 70;
-        for (Node node : nodes) {
-            node.getPosition().set(40, y);
-            y += 30;
-        }
     }
 
     public Card(CompoundTag tag) {

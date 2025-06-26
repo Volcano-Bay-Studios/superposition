@@ -497,7 +497,7 @@ public sealed interface EncodedData<T> extends Cloneable {
         try {
             tag = TagParser.parseTag(string);
         } catch (CommandSyntaxException e) {
-            tag = null;
+            tag = new CompoundTag();
         }
         return tag;
     }

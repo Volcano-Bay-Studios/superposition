@@ -27,16 +27,21 @@ public class SuperpositionActions {
     public static final ResourceKey<Registry<ActionConfiguration>> ACTION_CONFIGURATION_KEY = ResourceKey.createRegistryKey(Superposition.id("action_configurations"));
     public static final RegistrationProvider<ActionConfiguration> ACTION_CONFIGURATIONS = RegistrationProvider.get(ACTION_CONFIGURATION_KEY, Superposition.MODID);
 
-    public static final RegistryObject<ActionConfiguration> DIRECTION = ACTION_CONFIGURATIONS.register("direction", () -> (new DirectionConfiguration(Component.literal("Direction"))));
+    public static final RegistryObject<ActionConfiguration> DIRECTION = ACTION_CONFIGURATIONS.register("direction", () -> new DirectionConfiguration(Component.literal("Direction")));
 
 
     public static final ResourceKey<Registry<Action>> ACTION_KEY = ResourceKey.createRegistryKey(Superposition.id("action"));
     public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ACTION_KEY, Superposition.MODID);
 
-    public static final RegistryObject<Action> COLOR = registerAction("color", () -> new ColorAction(Superposition.id("color"), new Action.Information(
-            Component.literal("Color"),
-            Component.literal("Retrieves the color of the block that is being analysed"),
-            Action.Type.PERIPHERAL
+    public static final RegistryObject<Action> INPUT = registerAction("input", () -> new InputAction(Superposition.id("input"), new Action.Information(
+            Component.literal("Input"),
+            Component.literal("Retrieves the signal from the specified input buffer"),
+            Action.Type.OUTPUT
+    )));
+    public static final RegistryObject<Action> OUTPUT = registerAction("output", () -> new OutputAction(Superposition.id("output"), new Action.Information(
+            Component.literal("Output"),
+            Component.literal("Pushes the provided signal to the buffer of the selected face"),
+            Action.Type.OUTPUT
     )));
     public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignAction(Superposition.id("sign"), new Action.Information(
             Component.literal("Sign"),
@@ -48,26 +53,6 @@ public class SuperpositionActions {
             Component.literal("Retrieves the redstone value of the block that is being analysed, or sets the redstone value to the input in a manipulator"),
             Action.Type.PERIPHERAL
     )));
-    public static final RegistryObject<Action> CONTAINER = registerAction("container", () -> new ContainerAction(Superposition.id("container"), new Action.Information(
-            Component.literal("Container"),
-            Component.literal("Retrieves the contents of the block that is being analysed"),
-            Action.Type.PERIPHERAL
-    )));
-    public static final RegistryObject<Action> IDENTITY = registerAction("identity", () -> new IdentityCard(Superposition.id("identity"), new Action.Information(
-            Component.literal("Identity"),
-            Component.literal("Retrieves the name of the block that is being analysed"),
-            Action.Type.PERIPHERAL
-    )));
-    public static final RegistryObject<Action> TEMPERATURE = registerAction("temperature", () -> new TemperatureCard(Superposition.id("temperature"), new Action.Information(
-            Component.literal("Temperature"),
-            Component.literal("Retrieves the temperature of the block that is being analysed"),
-            Action.Type.PERIPHERAL
-    )));
-    public static final RegistryObject<Action> DISTANCE = registerAction("distance", () -> new DistanceAction(Superposition.id("distance"), new Action.Information(
-            Component.literal("Distance"),
-            Component.literal("Retrieves the distance to the block that is being analysed"),
-            Action.Type.PERIPHERAL
-    )));
     public static final RegistryObject<Action> AMPLITUDE = registerAction("amplitude", () -> new AmplitudeAction(Superposition.id("amplitude"), new Action.Information(
             Component.literal("Amplitude"),
             Component.literal("Retrieves the amplitude of the signal"),
@@ -76,6 +61,11 @@ public class SuperpositionActions {
     public static final RegistryObject<Action> FREQUENCY = registerAction("frequency", () -> new FrequencyCard(Superposition.id("frequency"), new Action.Information(
             Component.literal("Frequency"),
             Component.literal("Retrieves the frequency of the signal"),
+            Action.Type.MODIFY
+    )));
+    public static final RegistryObject<Action> ENCODE = registerAction("encode", () -> new EncodeAction(Superposition.id("encode"), new Action.Information(
+            Component.literal("Encode"),
+            Component.literal("Replaces the first signals encoded data with the seconds"),
             Action.Type.MODIFY
     )));
     public static final RegistryObject<Action> ENCAPSULATE = registerAction("encapsulate", () -> new EncapsulateAction(Superposition.id("encapsulate"), new Action.Information(
@@ -97,16 +87,6 @@ public class SuperpositionActions {
             Component.literal("Substring"),
             Component.literal("Something about this card being cool or smth like that"),
             Action.Type.MODIFY
-    )));
-    public static final RegistryObject<Action> OUTPUT = registerAction("output", () -> new OutputAction(Superposition.id("output"), new Action.Information(
-            Component.literal("Output"),
-            Component.literal("Pushes the provided signal to the buffer of the selected face"),
-            Action.Type.OUTPUT
-    )));
-    public static final RegistryObject<Action> INPUT = registerAction("input", () -> new InputAction(Superposition.id("input"), new Action.Information(
-            Component.literal("Input"),
-            Component.literal("Retrieves the signal from the specified input buffer"),
-            Action.Type.OUTPUT
     )));
     public static final RegistryObject<Action> SLAVE = registerAction("slave", () -> new SlaveCard(Superposition.id("slave"), new Action.Information(
             Component.literal("Slave"),
@@ -130,10 +110,10 @@ public class SuperpositionActions {
 
 
     public static void bootstrap() {
-        for (Action action : getAllRegisteredActions()) {
+        for (ActionConfiguration action : getAllRegisteredActionConfigurations()) {
             action.getSelfReference();
         }
-        for (ActionConfiguration action : getAllRegisteredActionConfigurations()) {
+        for (Action action : getAllRegisteredActions()) {
             action.getSelfReference();
         }
     }

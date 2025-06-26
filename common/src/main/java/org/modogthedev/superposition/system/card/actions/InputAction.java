@@ -23,10 +23,6 @@ public class InputAction extends Action implements ExecutableAction {
         getConfigurations().add(SuperpositionActions.DIRECTION.get().copy());
     }
 
-    @Override
-    public ItemStack getThumbnailItem() {
-        return SuperpositionBlocks.COMPUTER.get().asItem().getDefaultInstance();
-    }
 
     @Override
     public List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {

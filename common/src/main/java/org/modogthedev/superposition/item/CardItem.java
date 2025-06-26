@@ -39,11 +39,10 @@ public class CardItem extends Item {
         ItemStack itemStack = super.getDefaultInstance();
         CompoundTag cardData = new CompoundTag();
         CompoundTag tag = new CompoundTag();
-        tag.put("card",new Card().save(cardData));
+        tag.put("card", new Card().save(cardData));
         itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         return itemStack;
     }
-
 
 
     public Card getCard(ItemStack stack) {
@@ -57,7 +56,7 @@ public class CardItem extends Item {
 
     public void putData(ItemStack stack, CompoundTag cardData) {
         CompoundTag tag = new CompoundTag();
-        tag.put("card",cardData);
+        tag.put("card", cardData);
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 
@@ -66,7 +65,7 @@ public class CardItem extends Item {
         CompoundTag cardData = new CompoundTag();
         card.save(cardData);
         CompoundTag tag = new CompoundTag();
-        tag.put("card",cardData);
+        tag.put("card", cardData);
         itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
         return itemStack;
     }
@@ -81,19 +80,24 @@ public class CardItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        if (context.getItemInHand().getItem() instanceof CardItem)
+        if (context.getItemInHand().getItem() instanceof CardItem) {
+            card = null;
             runIfHasData(context.getItemInHand(), (a) -> {
                 System.out.println(a.toString());
                 card = new Card(a);
             });
-        if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof CardHolder cardHolder) {
-            boolean creative = context.getPlayer().getAbilities().instabuild;
-            if (cardHolder.getCard() == null) {
-                cardHolder.setCard(card);
-                if (!creative)
-                    return InteractionResult.CONSUME;
-                else
-                    return InteractionResult.SUCCESS;
+            if (card == null) {
+                card = new Card();
+            }
+            if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof CardHolder cardHolder) {
+                boolean creative = context.getPlayer().getAbilities().instabuild;
+                if (cardHolder.getCard() == null) {
+                    cardHolder.setCard(card);
+                    if (!creative)
+                        return InteractionResult.CONSUME;
+                    else
+                        return InteractionResult.SUCCESS;
+                }
             }
         }
         return super.useOn(context);

@@ -72,3 +72,4 @@ Cables are used for transmitting signals short distances. They have a physics si
 - Redo cable collision (Sable in future)
 - Inscriber, Cards, and Computers (In progress atm)
 - Data corruption with amplitude
+- Periphreal Behaviors
