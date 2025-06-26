@@ -20,9 +20,4 @@ public class EncodeAction extends Action implements BiModifyAction {
         }
         return signal;
     }
-
-    @Override
-    public ItemStack getThumbnailItem() {
-        return Items.GLASS_BOTTLE.getDefaultInstance();
-    }
 }

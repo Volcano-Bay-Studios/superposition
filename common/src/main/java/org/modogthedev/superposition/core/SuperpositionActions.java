@@ -35,23 +35,23 @@ public class SuperpositionActions {
 
     public static final RegistryObject<Action> INPUT = registerAction("input", () -> new InputAction(Superposition.id("input"), new Action.Information(
             Component.literal("Input"),
-            Component.literal("Retrieves the signal from the specified input buffer"),
+            Component.literal("Retrieves the signal from the specified buffer"),
             Action.Type.OUTPUT
     )));
     public static final RegistryObject<Action> OUTPUT = registerAction("output", () -> new OutputAction(Superposition.id("output"), new Action.Information(
             Component.literal("Output"),
-            Component.literal("Pushes the provided signal to the buffer of the selected face"),
+            Component.literal("Pushes the provided signal to the specified buffer"),
             Action.Type.OUTPUT
     )));
-    public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignAction(Superposition.id("sign"), new Action.Information(
-            Component.literal("Sign"),
-            Component.literal("Retrieves the text of the block that is being analysed"),
-            Action.Type.PERIPHERAL
+    public static final RegistryObject<Action> ENCODE = registerAction("encode", () -> new EncodeAction(Superposition.id("encode"), new Action.Information(
+            Component.literal("Encode"),
+            Component.literal("Replaces the first signals encoded data with the seconds"),
+            Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> REDSTONE = registerAction("redstone", () -> new RedstoneCard(Superposition.id("redstone"), new Action.Information(
-            Component.literal("Redstone"),
-            Component.literal("Retrieves the redstone value of the block that is being analysed, or sets the redstone value to the input in a manipulator"),
-            Action.Type.PERIPHERAL
+    public static final RegistryObject<Action> GROUP = registerAction("group", () -> new GroupAction(Superposition.id("group"), new Action.Information(
+            Component.literal("Group"),
+            Component.literal("Groups multiple signal lists into one"),
+            Action.Type.MODIFY
     )));
     public static final RegistryObject<Action> AMPLITUDE = registerAction("amplitude", () -> new AmplitudeAction(Superposition.id("amplitude"), new Action.Information(
             Component.literal("Amplitude"),
@@ -63,34 +63,40 @@ public class SuperpositionActions {
             Component.literal("Retrieves the frequency of the signal"),
             Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> ENCODE = registerAction("encode", () -> new EncodeAction(Superposition.id("encode"), new Action.Information(
-            Component.literal("Encode"),
-            Component.literal("Replaces the first signals encoded data with the seconds"),
-            Action.Type.MODIFY
-    )));
+
     public static final RegistryObject<Action> ENCAPSULATE = registerAction("encapsulate", () -> new EncapsulateAction(Superposition.id("encapsulate"), new Action.Information(
             Component.literal("Encapsulate"),
-            Component.literal("Something about this card being cool or smth like that"),
+            Component.literal("Captures the first signal as a tag with a key of the second signal"),
             Action.Type.MODIFY
     )));
     public static final RegistryObject<Action> MERGE = registerAction("merge", () -> new MergeAction(Superposition.id("merge"), new Action.Information(
             Component.literal("Merge"),
-            Component.literal("Something about this card being cool or smth like that"),
+            Component.literal("Merges tags together"),
             Action.Type.MODIFY
     )));
     public static final RegistryObject<Action> RETRIEVE = registerAction("retrieve", () -> new RetriveCard(Superposition.id("retrieve"), new Action.Information(
             Component.literal("Retrieve"),
-            Component.literal("Something about this card being cool or smth like that"),
+            Component.literal("Retrieve the contents of a tag using the second signal as a tag"),
             Action.Type.MODIFY
     )));
     public static final RegistryObject<Action> SUBSTRING = registerAction("substring", () -> new SubstringCard(Superposition.id("substring"), new Action.Information(
             Component.literal("Substring"),
-            Component.literal("Something about this card being cool or smth like that"),
+            Component.literal("Cuts a strings length at the the length of the second signal, if the second signal is negative it will cut from the front instead"),
             Action.Type.MODIFY
+    )));
+    public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignAction(Superposition.id("sign"), new Action.Information(
+            Component.literal("Sign"),
+            Component.literal("Retrieves the text of the block that is being analysed"),
+            Action.Type.PERIPHERAL
+    )));
+    public static final RegistryObject<Action> REDSTONE = registerAction("redstone", () -> new RedstoneCard(Superposition.id("redstone"), new Action.Information(
+            Component.literal("Redstone"),
+            Component.literal("Retrieves the redstone value of the block that is being analysed, or sets the redstone value to the input in a manipulator"),
+            Action.Type.PERIPHERAL
     )));
     public static final RegistryObject<Action> SLAVE = registerAction("slave", () -> new SlaveCard(Superposition.id("slave"), new Action.Information(
             Component.literal("Slave"),
-            Component.literal("Something about this card being cool or smth like that"),
+            Component.literal("DEPRECATED"),
             Action.Type.OTHER
     )), CompatabilityHandler.Mod.COMPUTERCRAFT);
 

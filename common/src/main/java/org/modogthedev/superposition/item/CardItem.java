@@ -79,6 +79,12 @@ public class CardItem extends Item {
     }
 
     @Override
+    public Component getName(ItemStack stack) {
+        CompoundTag tag = getTagElement(stack);
+        return Component.literal(tag.getString("title"));
+    }
+
+    @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getItemInHand().getItem() instanceof CardItem) {
             card = null;

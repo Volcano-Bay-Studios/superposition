@@ -14,6 +14,7 @@ import java.util.UUID;
 public class Card { //TODO: make this work!
 
     private final List<Node> nodes = new ArrayList<>();
+    public String title = "Card";
 
     public Card() {
     }
@@ -23,6 +24,7 @@ public class Card { //TODO: make this work!
     }
 
     public CompoundTag save(CompoundTag tag) {
+        tag.putString("title", title);
         ListTag nodesTag = new ListTag();
         for (Node node : nodes) {
             nodesTag.add(node.save(new CompoundTag()));
@@ -32,14 +34,17 @@ public class Card { //TODO: make this work!
     }
 
     public CompoundTag load(CompoundTag tag) {
-        ListTag nodesTag = tag.getList("nodes",10);
-        nodes.clear();
-        for (int i = 0; i < nodesTag.size(); i++) {
-            CompoundTag tag1 = nodesTag.getCompound(i);
-            Node node = new Node(this);
-            node.load(tag1);
-            nodes.add(node);
-        }
+        try {
+            title = tag.getString("title");
+            ListTag nodesTag = tag.getList("nodes", 10);
+            nodes.clear();
+            for (int i = 0; i < nodesTag.size(); i++) {
+                CompoundTag tag1 = nodesTag.getCompound(i);
+                Node node = new Node(this);
+                node.load(tag1);
+                nodes.add(node);
+            }
+        } catch (Exception ignored) {}
         return tag;
     }
 

@@ -24,21 +24,21 @@ public class DirectionConfiguration extends ActionConfiguration {
         boolean mouse = mouseX > 0 && mouseY > 0 && mouseY < getHeight();
         String name = relativeName(Direction.values()[ordinal]);
         Font font = Minecraft.getInstance().font;
-        guiGraphics.drawCenteredString(font, name, 86, 20, topBorder);
+        guiGraphics.drawCenteredString(font, name, 86, 13, topBorder);
         if (mouse) {
             float width = font.width(name);
             if (mouseX > 86) {
                 String name1 = relativeName(Direction.values()[step(1)]);
                 String name2 = relativeName(Direction.values()[step(-1)]);
-                guiGraphics.drawCenteredString(font, ">", 106, 20, topBorder);
-                guiGraphics.drawCenteredString(font, name1, 126, 20, bottomBorder);
-                guiGraphics.drawCenteredString(font, name2, 46, 20, bottomBorder);
+                guiGraphics.drawCenteredString(font, ">", 106, 13, topBorder);
+                guiGraphics.drawCenteredString(font, name1, 126, 13, bottomBorder);
+                guiGraphics.drawCenteredString(font, name2, 46, 13, bottomBorder);
             } else {
                 String name1 = relativeName(Direction.values()[step(-1)]);
                 String name2 = relativeName(Direction.values()[step(1)]);
-                guiGraphics.drawCenteredString(font, "<", 66, 20, topBorder);
-                guiGraphics.drawCenteredString(font, name1, 46, 20, bottomBorder);
-                guiGraphics.drawCenteredString(font, name2, 126, 20, bottomBorder);
+                guiGraphics.drawCenteredString(font, "<", 66, 13, topBorder);
+                guiGraphics.drawCenteredString(font, name1, 46, 13, bottomBorder);
+                guiGraphics.drawCenteredString(font, name2, 126, 13, bottomBorder);
             }
         }
     }
