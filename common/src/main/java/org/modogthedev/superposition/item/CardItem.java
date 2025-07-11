@@ -81,7 +81,11 @@ public class CardItem extends Item {
     @Override
     public Component getName(ItemStack stack) {
         CompoundTag tag = getTagElement(stack);
-        return Component.literal(tag.getString("title"));
+        if (tag != null) {
+            return Component.literal(tag.getString("title"));
+        } else {
+            return Component.translatable("item.superposition.card");
+        }
     }
 
     @Override
@@ -99,6 +103,7 @@ public class CardItem extends Item {
                 boolean creative = context.getPlayer().getAbilities().instabuild;
                 if (cardHolder.getCard() == null) {
                     cardHolder.setCard(card);
+                    context.getItemInHand().shrink(1);
                     if (!creative)
                         return InteractionResult.CONSUME;
                     else

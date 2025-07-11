@@ -21,7 +21,7 @@ public class OutputAction extends Action implements ComputerAction {
 
     @Override
     protected void setupConfigurations() {
-        getConfigurations().add(SuperpositionActions.DIRECTION.get().copy());
+        getConfigurations().add(SuperpositionActions.DIRECTION_CONFIGURATION.get().copy());
     }
 
     @Override
@@ -31,8 +31,4 @@ public class OutputAction extends Action implements ComputerAction {
         }
     }
 
-    @Override
-    public boolean hasOutput() {
-        return false;
-    }
 }

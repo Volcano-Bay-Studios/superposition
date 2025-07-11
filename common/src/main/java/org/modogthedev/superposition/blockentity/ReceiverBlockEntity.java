@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
-import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.SuperpositionMth;
@@ -33,11 +32,11 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
     @Override
     public List<Signal> getSignals() {
         if (antenna == null) {
-            return null;
+            return new ArrayList<>();
         }
         antenna.signals.clear();
         if (level.isClientSide)
-            ClientSignalManager.postSignalsToAntenna(antenna);
+            return putSignals;
         else
             SignalManager.postSignalsToAntenna(antenna);
 
@@ -55,6 +54,7 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         List<Component> tooltip = new ArrayList<>();
         tooltip.add(Component.literal("Receiver Status:"));
         if (antenna != null) {
+            List<Signal> signals = getSignals();
             if (level.isClientSide) {
                 tooltip.add(Component.literal("Antenna Classification - " + classifyAntenna()));
                 tooltip.add(Component.literal("Antenna Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()))));
@@ -62,9 +62,9 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
                 if (bonusFrequency != 0) {
                     tooltip.add(Component.literal("Actual Frequency - " + SuperpositionMth.frequencyToHzReadable(SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()) + bonusFrequency)));
                 }
+            } else {
+                updatePutSignals(signals);
             }
-            List<Signal> signals = getSignals();
-            updatePutSignals(signals);
             int currentSize = signals.size();
             tooltip.add(Component.literal("Signal - " + (signals.isEmpty() ? "NONE" : "OK")));
             if (currentSize != lastSize || (antennaBrokenLastTick != (antenna == null))) {

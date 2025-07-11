@@ -1,32 +1,30 @@
-package org.modogthedev.superposition.system.card.actions;
+package org.modogthedev.superposition.system.behavior.behaviors;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
-import org.modogthedev.superposition.system.card.Action;
-import org.modogthedev.superposition.system.card.ManipulateAction;
-import org.modogthedev.superposition.system.card.ScanAction;
+import org.modogthedev.superposition.system.behavior.Behavior;
+import org.modogthedev.superposition.system.behavior.types.ManipulateBehavior;
+import org.modogthedev.superposition.system.behavior.types.ScanBehavior;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.DataHelper;
 
-public class SignAction extends Action implements ScanAction, ManipulateAction {
-    public SignAction(ResourceLocation action, Information info) {
-        super(action, info);
+public class SignBehavior extends Behavior implements ScanBehavior, ManipulateBehavior {
+    public SignBehavior(ResourceLocation selfReference) {
+        super(selfReference);
     }
 
     @Override
-    public void scan(Signal signal, BlockEntity blockEntity) {
+    public void scan(CompoundTag tag, AnalyserBlockEntity analyserBlockEntity, Level level, BlockPos pos, BlockState state) {
         String text = "";
-        if (blockEntity instanceof AnalyserBlockEntity analyserBlockEntity) {
-            BlockEntity blockEntity1 = blockEntity.getLevel().getBlockEntity(analyserBlockEntity.getAnalysisPosition());
+            BlockEntity blockEntity1 = level.getBlockEntity(pos);
             if (blockEntity1 instanceof SignBlockEntity signBlockEntity) {
                 for (Component component : signBlockEntity.getFrontText().getMessages(true)) {
                     if (!component.getString().isEmpty())
@@ -37,9 +35,8 @@ public class SignAction extends Action implements ScanAction, ManipulateAction {
                         text = text.concat((text.isEmpty() ? "" : " ") + component.getString());
                 }
             }
-        }
         if (!text.isEmpty())
-            signal.encode(text);
+            tag.putString(getSelfReference().getPath(),text);
     }
 
     @Override
@@ -54,18 +51,4 @@ public class SignAction extends Action implements ScanAction, ManipulateAction {
             }
         }
     }
-
-    @Override
-    public void addOutbound(CompoundTag tag, Signal signal) {
-        String string = DataHelper.getStringValue(signal);
-        if (string != null) {
-            tag.putString("line", string);
-        }
-    }
-
-    @Override
-    public ItemStack getThumbnailItem() {
-        return Items.OAK_SIGN.getDefaultInstance();
-    }
-
 }

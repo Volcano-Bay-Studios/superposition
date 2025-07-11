@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
@@ -48,7 +49,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         if (tag.contains("frequency")) {
-            this.frequency = tag.getFloat("frequency");
+            this.frequency = Mth.clamp(tag.getFloat("frequency"),0,150);
         }
         super.loadAdditional(tag, registries);
     }
@@ -67,6 +68,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             float speed = SuperpositionMth.getFromRange(150, 0, 3, .1f, frequency);
             if (frequency <= 0 || frequency > 150) {
                 speed = 0;
+                dial = 0;
             }
             dial += speed;
             if (dial > 24) {

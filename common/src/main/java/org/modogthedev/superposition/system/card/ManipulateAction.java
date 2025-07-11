@@ -8,7 +8,6 @@ import org.modogthedev.superposition.system.signal.Signal;
 import java.util.List;
 
 public interface ManipulateAction extends PeriphrealAction {
-    void manipulate(Signal signal, Level level, BlockPos pos);
 
     @Override
     default List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {

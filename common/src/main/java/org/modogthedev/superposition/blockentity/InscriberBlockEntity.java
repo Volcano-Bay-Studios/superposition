@@ -65,7 +65,7 @@ public class InscriberBlockEntity extends SignalActorBlockEntity implements Tick
             resetTooltip();
             addTooltip(Component.literal("Inscriber Status:"));
             if (card != null) {
-                addTooltip(Component.literal("Card Present"));
+                addTooltip(Component.literal("Editing '"+card.title+"'"));
             } else {
                 addTooltip(Component.literal("No Information"));
             }

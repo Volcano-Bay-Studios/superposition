@@ -8,6 +8,6 @@ public class SuperpositionConstants {
     public static final float endPreference = 1f;
     public static final int analyserRange = 16;
     public static final float periphrealFrequency = 42f;
-    public static final boolean bloomEnabled = false;
+    public static final boolean bloomEnabled = true;
 
 }

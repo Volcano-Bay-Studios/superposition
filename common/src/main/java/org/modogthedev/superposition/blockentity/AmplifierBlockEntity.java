@@ -141,15 +141,16 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         }
         throttle = (temp - 26f) * 10f;
         amplitude -= throttle;
+        amplitude = Math.max(amplitude,0);
 
-
+        if (updateNext) {
+            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+            updateNext = false;
+        }
         if (lastAmplitude != amplitude) {
             updateNext = true;
         }
-        if (updateNext) {
-            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
-            updateNext = true;
-        }
+
 
         lastAmplitude = amplitude;
         amplitude = 0;
@@ -171,8 +172,13 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
         center = center.add(new Vec3(facing.getNormal().getX(), facing.getNormal().getY(), facing.getNormal().getZ()).scale(0.4f));
         light.setPosition(center.x, center.y, center.z);
-        light.setColor(3979870);
-        light.setBrightness(1.5f);
-        light.setRadius(3f);
+        light.setColor(0xc76528);
+        light.setBrightness((float) Math.clamp((temp-26.1f)/4f,0,3));
+        light.setRadius(2f);
+    }
+
+    @Override
+    public boolean shouldUpdateLight() {
+        return true;
     }
 }

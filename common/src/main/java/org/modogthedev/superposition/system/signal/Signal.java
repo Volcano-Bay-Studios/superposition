@@ -27,7 +27,6 @@ public class Signal {
     private int sourceAntennaSize = 0;
     private EncodedData<?> encodedData = null;
     private float distance = 0;
-
     @Deprecated
     public Level level;
     private int endTime = 0;
@@ -272,6 +271,16 @@ public class Signal {
     public void setSourceAntenna(BlockPos sourceAntennaPos, int sourceAntennaSize) {
         this.sourceAntennaPos = sourceAntennaPos;
         this.sourceAntennaSize = sourceAntennaSize;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Signal signal) {
+            if (getEncodedData() != null && getEncodedData().equals(signal.getEncodedData())) {
+                return true;
+            }
+        }
+        return super.equals(obj);
     }
 
     @Override

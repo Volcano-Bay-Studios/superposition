@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -24,8 +25,8 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.*;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -47,12 +48,14 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private int configSelection = 0;
     private boolean interactNext = false;
     private boolean stepNext = false;
+    private boolean signalsDirty = false;
     private final List<String> configurationTooltipString = new ArrayList<>();
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
     int signalsReceived = 0;
 
     Object lastCall;
     private Object lastCallList;
+    protected final List<Signal> lastSignals = new ArrayList<>();
     protected final List<Signal> putSignals = new ArrayList<>();
     LightRenderHandle<?> light;
 
@@ -192,14 +195,23 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     }
 
+    public void markDirty() {
+        signalsDirty = true;
+    }
+
     public Signal getSignal() {
-        return SignalManager.randomSignal(getSignals());
+        return SignalHelper.randomSignal(getSignals());
     }
 
     public Signal getSideSignal(Direction face) {
         return getSignal();
     }
 
+    /**
+     * Returns the list of signals inside the block. It should be deep cloned if you are going to modify it elsewhere.
+     *
+     * @return the putSignals field
+     */
     public List<Signal> getSignals() {
         return putSignals;
     }
@@ -414,10 +426,30 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
                 this.finaliseConfigTooltips();
             }
         }
-        if (signalsReceived == 0) {
-            putSignals.clear();
+        if (getLevel() != null && !getLevel().isClientSide) {
+            if (signalsReceived == 0) {
+                putSignals.clear();
+                markDirty();
+            }
+            if (lastSignals.size() != putSignals.size()) {
+                markDirty();
+            } else {
+                for (int i = 0; i < putSignals.size(); i++) {
+                    if (!putSignals.get(i).equals(lastSignals.get(i))) {
+                        markDirty();
+                        break;
+                    }
+                }
+            }
+
+            lastSignals.clear();
+            SignalHelper.updateSignalList(lastSignals, putSignals);
+            lastSignals.addAll(putSignals);
+            if (signalsDirty) {
+                VeilPacketManager.around(null,(ServerLevel) level,getBlockPos().getX(),getBlockPos().getY(),getBlockPos().getZ(),100).sendPacket(new BlockSignalSyncS2CPacket(putSignals,getBlockPos()));
+            }
+            signalsDirty = false;
         }
-        putSignals.clear();
         signalsReceived = 0;
     }
 

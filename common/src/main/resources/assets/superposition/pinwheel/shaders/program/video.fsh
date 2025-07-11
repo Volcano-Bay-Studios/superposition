@@ -9,7 +9,7 @@ out vec4 fragColor;
 
 
 void main() {
-    vec4 source = texture(DiffuseSampler0,texCoord.xy);
+    vec4 source = texture(DiffuseSampler0,texCoord);
 //    float depth = distance(vec3(0,0,0),screenToLocalSpace(texCoord,texture(DiffuseDepthSampler,texCoord).r).rgb/10);
     fragColor = source;
 }

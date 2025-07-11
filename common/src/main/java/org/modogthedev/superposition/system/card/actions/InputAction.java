@@ -2,10 +2,8 @@ package org.modogthedev.superposition.system.card.actions;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.core.SuperpositionActions;
-import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.ExecutableAction;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -20,7 +18,7 @@ public class InputAction extends Action implements ExecutableAction {
 
     @Override
     protected void setupConfigurations() {
-        getConfigurations().add(SuperpositionActions.DIRECTION.get().copy());
+        getConfigurations().add(SuperpositionActions.DIRECTION_CONFIGURATION.get().copy());
     }
 
 

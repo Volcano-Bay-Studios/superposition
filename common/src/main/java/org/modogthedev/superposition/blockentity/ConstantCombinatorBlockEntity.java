@@ -11,8 +11,10 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.SignalHelper;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implements EditableTooltip {
@@ -70,9 +72,9 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
     @Override
     public List<Signal> getSignals() {
         if (outputSignal != null) {
-            return List.of(outputSignal);
+            return SignalHelper.listOf(outputSignal);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

@@ -7,6 +7,8 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector2f;
 import org.modogthedev.superposition.screens.utils.Bounds;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.SignalHelper;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +51,7 @@ public class Node {
 
     public void fillData(int index, List<Signal> signals, Level level, BlockPos pos) {
         List<Signal> fill = this.signals.get(index); // Add signals to node buffer
-        fill.addAll(signals);
+        SignalHelper.updateSignalList(fill,signals);
         int maxSize = 0;
         for (List<Signal> signalList : this.signals) { // Check if all signals have been submitted
             if (signalList.isEmpty()) {
@@ -75,10 +77,11 @@ public class Node {
     public void execute(List<Signal> signals, Level level, BlockPos pos) {
         if (action instanceof ExecutableAction executableAction && !signals.isEmpty()) {
             List<Signal> returns = executableAction.execute(signals, level, pos);
-            if (executableAction.hasOutput()) {
-                Attachment target = attachments.getFirst().getFinalTargetAttachment();
-                if (target != null && attachments.getFirst().getNode() != target.getNode() && target instanceof Attachment.InputAttachment inputAttachment) {
-                    target.getNode().fillData(inputAttachment.getIndex(), returns, level, pos);
+            for (int i = 0; i < executableAction.getOutputCount(); i++) {
+                Attachment attachment = attachments.get(i);
+                Attachment target = attachment.getFinalTargetAttachment();
+                if (target != null && attachment.getNode() != target.getNode() && target instanceof Attachment.InputAttachment inputAttachment) {
+                    target.getNode().fillData(inputAttachment.getIndex(), executableAction.sameOutput() ? new ArrayList<>(returns) : List.of(returns.get(i)), level, pos);
                 }
             }
         }
@@ -102,9 +105,9 @@ public class Node {
 
 
     public void clearForExecution() {
-        for (List<Signal> signalList : signals) {
-            signalList.clear();
-        }
+//        for (List<Signal> signalList : signals) {
+//            signalList.clear();
+//        }
     }
 
     private void calculateSize() {
@@ -115,8 +118,12 @@ public class Node {
         }
 
         attachments.clear();
-        if (!(action instanceof ExecutableAction executableAction) || executableAction.hasOutput()) {
-            attachments.add(new Attachment(new Vector2f(size.x / 2, 0), this));
+        if (action instanceof ExecutableAction executableAction) {
+            int count = executableAction.getOutputCount();
+            for (int i = 0; i < count; i++) {
+                attachments.add(new Attachment(new Vector2f(size.x / 2, i * 8 - (Math.max(0, executableAction.getOutputCount() - 1) * 4)) , this));
+            }
+
         }
 
         int inputCount = getInputCount();

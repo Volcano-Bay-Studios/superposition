@@ -10,8 +10,11 @@ public interface ExecutableAction {
     List<Signal> execute(List<Signal> signals, Level level, BlockPos pos);
 
     int getParameterCount();
+    default int getOutputCount() {
+        return 1;
+    }
 
-    default boolean hasOutput() {
-        return true;
+    default boolean sameOutput() {
+        return false;
     }
 }

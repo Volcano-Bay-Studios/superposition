@@ -70,6 +70,8 @@ Cables are used for transmitting signals short distances. They have a physics si
 - Make all signal information option data (Similar to an entity component system)
 - Make all scattered antenna code unified into one antenna system (for both in real and fake antennas)
 - Redo cable collision (Sable in future)
-- Inscriber, Cards, and Computers (In progress atm)
+- ~~Inscriber, Cards, and Computers~~
 - Data corruption with amplitude
 - Periphreal Behaviors
+- Make signals in blocks calculate when they are changed
+- Make block signals get sent from server, no client propagation

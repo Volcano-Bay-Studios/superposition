@@ -6,12 +6,14 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.blockentity.CombinatorBlockEntity;
 import org.modogthedev.superposition.compat.CompatabilityHandler;
 import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.actions.*;
 import org.modogthedev.superposition.system.card.actions.configuration.ActionConfiguration;
 import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
+import org.modogthedev.superposition.system.card.actions.configuration.EnumConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,8 @@ public class SuperpositionActions {
     public static final ResourceKey<Registry<ActionConfiguration>> ACTION_CONFIGURATION_KEY = ResourceKey.createRegistryKey(Superposition.id("action_configurations"));
     public static final RegistrationProvider<ActionConfiguration> ACTION_CONFIGURATIONS = RegistrationProvider.get(ACTION_CONFIGURATION_KEY, Superposition.MODID);
 
-    public static final RegistryObject<ActionConfiguration> DIRECTION = ACTION_CONFIGURATIONS.register("direction", () -> new DirectionConfiguration(Component.literal("Direction")));
+    public static final RegistryObject<ActionConfiguration> DIRECTION_CONFIGURATION = ACTION_CONFIGURATIONS.register("direction", () -> new DirectionConfiguration(Component.literal("Direction")));
+    public static final RegistryObject<ActionConfiguration> COMBINATOR_CONFIGURATION = ACTION_CONFIGURATIONS.register("combinator", () -> new EnumConfiguration(Component.literal("Combinator"), CombinatorBlockEntity.Modes.values()));
 
 
     public static final ResourceKey<Registry<Action>> ACTION_KEY = ResourceKey.createRegistryKey(Superposition.id("action"));
@@ -53,6 +56,16 @@ public class SuperpositionActions {
             Component.literal("Groups multiple signal lists into one"),
             Action.Type.MODIFY
     )));
+    public static final RegistryObject<Action> SPLIT = registerAction("split", () -> new SplitAction(Superposition.id("split"), new Action.Information(
+            Component.literal("Split"),
+            Component.literal("Duplicates a signal list into two copies"),
+            Action.Type.MODIFY
+    )));
+    public static final RegistryObject<Action> OPTIONAL = registerAction("optional", () -> new OptionalAction(Superposition.id("optional"), new Action.Information(
+            Component.literal("Optional"),
+            Component.literal("Returns the first signal if, and only if, the second signals boolean value is true"),
+            Action.Type.MODIFY
+    )));
     public static final RegistryObject<Action> AMPLITUDE = registerAction("amplitude", () -> new AmplitudeAction(Superposition.id("amplitude"), new Action.Information(
             Component.literal("Amplitude"),
             Component.literal("Retrieves the amplitude of the signal"),
@@ -63,7 +76,6 @@ public class SuperpositionActions {
             Component.literal("Retrieves the frequency of the signal"),
             Action.Type.MODIFY
     )));
-
     public static final RegistryObject<Action> ENCAPSULATE = registerAction("encapsulate", () -> new EncapsulateAction(Superposition.id("encapsulate"), new Action.Information(
             Component.literal("Encapsulate"),
             Component.literal("Captures the first signal as a tag with a key of the second signal"),
@@ -83,16 +95,6 @@ public class SuperpositionActions {
             Component.literal("Substring"),
             Component.literal("Cuts a strings length at the the length of the second signal, if the second signal is negative it will cut from the front instead"),
             Action.Type.MODIFY
-    )));
-    public static final RegistryObject<Action> SIGN = registerAction("sign", () -> new SignAction(Superposition.id("sign"), new Action.Information(
-            Component.literal("Sign"),
-            Component.literal("Retrieves the text of the block that is being analysed"),
-            Action.Type.PERIPHERAL
-    )));
-    public static final RegistryObject<Action> REDSTONE = registerAction("redstone", () -> new RedstoneCard(Superposition.id("redstone"), new Action.Information(
-            Component.literal("Redstone"),
-            Component.literal("Retrieves the redstone value of the block that is being analysed, or sets the redstone value to the input in a manipulator"),
-            Action.Type.PERIPHERAL
     )));
     public static final RegistryObject<Action> SLAVE = registerAction("slave", () -> new SlaveCard(Superposition.id("slave"), new Action.Information(
             Component.literal("Slave"),

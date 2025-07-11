@@ -64,5 +64,6 @@
   "commands.superposition.removed_success" : "Successfully removed %s cables.",
   "commands.superposition.removed_fail" : "Found nothing to remove.",
 
-  "creativemodetab.superposition" : "Superposition"
+  "creativemodetab.superposition" : "Superposition",
+  "item.superposition.card": "Card"
 }

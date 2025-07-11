@@ -97,11 +97,4 @@ public class SignalManager {
         }
     }
 
-    public static Signal randomSignal(List<Signal> signalList) {
-        if (signalList == null || signalList.isEmpty()) {
-            return null;
-        }
-        int ordinal = (int) Math.floor(Math.random() * signalList.size());
-        return signalList.get(ordinal);
-    }
 }

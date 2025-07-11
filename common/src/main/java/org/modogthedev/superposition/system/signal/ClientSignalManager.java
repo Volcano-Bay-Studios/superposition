@@ -3,7 +3,7 @@ package org.modogthedev.superposition.system.signal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
-import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
@@ -48,16 +48,31 @@ public class ClientSignalManager {
     public static void processBlockBoundTag(Level level, FriendlyByteBuf buf) {
         ifAbsent(level);
         BlockPos pos = buf.readBlockPos();
-        if (level.getBlockEntity(pos) instanceof ComputerBlockEntity computerBlockEntity) {
+        if (level.getBlockEntity(pos) instanceof SignalActorBlockEntity signalActorBlockEntity) {
             int count = buf.readVarInt();
-            for (int i = 0; i < count; i++) { //TODO: SYNCHRONISATION
+            List<Signal> signals = signalActorBlockEntity.getSignals();
+            for (int i = 0; i < Math.min(count,signals.size()); i++) {
                 UUID id = buf.readUUID();
+                signals.get(i).load(id,buf);
+            }
+            if (signals.size() > count) {
+                for (int i = signals.size(); i > count; i--) {
+                    signals.remove(i-1);
+                }
+            }
+            if (signals.size() < count) {
+                for (int i = 0; i < count; i++) {
+                    UUID id = buf.readUUID();
+                    Signal signal = new Signal(id, buf);
+                    signal.level = level;
+                    signals.add(signal);
+                }
+            }
+
+            for (int i = 0; i < count; i++) { //TODO: SYNCHRONISATION
 //                if (computerBlockEntity.periphrealSignal != null) {
 //                    computerBlockEntity.periphrealSignal.load(id, buf);
 //                } else {
-//                    Signal signal = new Signal(id, buf);
-//                    signal.level = level;
-//                    computerBlockEntity.periphrealSignal = signal;
 //                }
             }
         }

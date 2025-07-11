@@ -2,10 +2,12 @@ package org.modogthedev.superposition.client.renderer.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import foundry.veil.api.client.render.rendertype.VeilRenderType;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -16,7 +18,11 @@ import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 
+import java.util.Objects;
+
 public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<AmplifierBlockEntity> {
+
+    private static ResourceLocation HEAT_RENDER_TYPE = Superposition.id("heat");
 
     public AmplifierBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -28,6 +34,7 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
         if (be.ticks == -1)
             return;
         VertexConsumer buffer = null;
+        VertexConsumer heatBuffer = null;
         if (SuperpositionConstants.bloomEnabled) {
             buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png")));
         } else {
@@ -86,6 +93,18 @@ public class AmplifierBlockEntityRenderer implements BlockEntityRenderer<Amplifi
                 .setUv(1, (uvMin / stages) + lastOffset)
                 .setLight(light)
                 .setNormal(ms.last(), 0, 1, 0);
+
+        heatBuffer = bufferSource.getBuffer(Objects.requireNonNull(VeilRenderType.get(HEAT_RENDER_TYPE, "superposition:textures/screen/heat.png")));
+
+        heatBuffer.addVertex(-1,1,-1)
+                .setColor(1,1,1,1);
+        heatBuffer.addVertex(-1,1,1)
+                .setColor(1,1,1,1);
+        heatBuffer.addVertex(1,1,1)
+                .setColor(1,1,1,1);
+        heatBuffer.addVertex(1,1,-1)
+                .setColor(1,1,1,1);
+
         ms.popPose();
     }
 

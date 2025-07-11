@@ -19,8 +19,8 @@ import org.modogthedev.superposition.system.card.Node;
 import org.modogthedev.superposition.system.card.actions.InputAction;
 import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
+import org.modogthedev.superposition.util.SignalHelper;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +151,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     @Override
     public Signal getSideSignal(Direction face) {
-        return SignalManager.randomSignal(getSideSignals(face));
+        return SignalHelper.randomSignal(getSideSignals(face));
     }
 
     @Override

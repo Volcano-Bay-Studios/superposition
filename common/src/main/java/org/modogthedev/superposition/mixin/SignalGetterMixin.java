@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.mixin;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SignalGetter;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
@@ -16,6 +17,14 @@ public interface SignalGetterMixin {
         int power = RedstoneWorld.getPower(((Level) this), pos);
         if (power > 0) {
             cir.setReturnValue(true);
+        }
+    }
+
+    @Inject(method = "getSignal", at = @At("HEAD"), cancellable = true)
+    default void getSignal(BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
+        int power = Math.max(RedstoneWorld.getPower(((Level) this), pos),RedstoneWorld.getPower(((Level) this), pos.relative(direction.getOpposite())));
+        if (power > 0) {
+            cir.setReturnValue(power);
         }
     }
 }
