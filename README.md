@@ -72,6 +72,6 @@ Cables are used for transmitting signals short distances. They have a physics si
 - Redo cable collision (Sable in future)
 - ~~Inscriber, Cards, and Computers~~
 - Data corruption with amplitude
-- Periphreal Behaviors
+- ~~Periphreal Behaviors~~
 - Make signals in blocks calculate when they are changed
-- Make block signals get sent from server, no client propagation
+- ~~Make block signals get sent from server, no client propagation~~

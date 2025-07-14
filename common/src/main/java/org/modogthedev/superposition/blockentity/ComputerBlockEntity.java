@@ -15,6 +15,7 @@ import org.modogthedev.superposition.blockentity.util.CardHolder;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.card.Card;
+import org.modogthedev.superposition.system.card.ExecutableAction;
 import org.modogthedev.superposition.system.card.Node;
 import org.modogthedev.superposition.system.card.actions.InputAction;
 import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
@@ -119,6 +120,8 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                     if (!signals.isEmpty()) {
                         node.execute(signals, level, getBlockPos());
                     }
+                } else if (node.getAction() instanceof ExecutableAction action && action.getParameterCount() == 0) {
+                    node.execute(SignalHelper.listOf(SignalHelper.getEmptySignal(getLevel(),getBlockPos())), level, getBlockPos());
                 }
             }
         }

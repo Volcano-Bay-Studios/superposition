@@ -91,16 +91,21 @@ public class SuperpositionActions {
             Component.literal("Retrieve the contents of a tag using the second signal as a tag"),
             Action.Type.MODIFY
     )));
+    public static final RegistryObject<Action> REPROGRAM = registerAction("reprogram", () -> new ReprogramAction(Superposition.id("reprogram"), new Action.Information(
+            Component.literal("Reprogram"),
+            Component.literal("Updates the program inside the computer with the tag in the signal"),
+            Action.Type.OUTPUT
+    )));
+    public static final RegistryObject<Action> PROGRAM = registerAction("program", () -> new ProgramAction(Superposition.id("program"), new Action.Information(
+            Component.literal("Program"),
+            Component.literal("Returns the program stored inside the computer"),
+            Action.Type.OUTPUT
+    )));
     public static final RegistryObject<Action> SUBSTRING = registerAction("substring", () -> new SubstringCard(Superposition.id("substring"), new Action.Information(
             Component.literal("Substring"),
-            Component.literal("Cuts a strings length at the the length of the second signal, if the second signal is negative it will cut from the front instead"),
+            Component.literal("Cuts a string at the the number encoded the second signal, if the second signal is negative it will cut from the front instead"),
             Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> SLAVE = registerAction("slave", () -> new SlaveCard(Superposition.id("slave"), new Action.Information(
-            Component.literal("Slave"),
-            Component.literal("DEPRECATED"),
-            Action.Type.OTHER
-    )), CompatabilityHandler.Mod.COMPUTERCRAFT);
 
     private static <T extends Action> RegistryObject<T> registerAction(String name, Supplier<T> action) {
         if (action.get().getThumbnailItem() == null) {

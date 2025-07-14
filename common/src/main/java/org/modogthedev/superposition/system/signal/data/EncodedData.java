@@ -349,6 +349,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         }
 
         @Override
+        public CompoundTag compoundTagData() {
+            return value.copy();
+        }
+
+        @Override
         public Type type() {
             return Type.COMPOUND_TAG;
         }

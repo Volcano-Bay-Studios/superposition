@@ -29,9 +29,4 @@ public class EncapsulateAction extends Action implements BiModifyAction {
         }
         return signal;
     }
-
-    @Override
-    public ItemStack getThumbnailItem() {
-        return Items.SHULKER_SHELL.getDefaultInstance();
-    }
 }

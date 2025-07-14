@@ -19,9 +19,4 @@ public class AmplitudeAction extends Action implements MonoModifyAction {
         signal.encode(SuperpositionMth.mapAmplitude(signal.getAmplitude()));
         return signal;
     }
-
-    @Override
-    public ItemStack getThumbnailItem() {
-        return Items.BLAZE_ROD.getDefaultInstance();
-    }
 }

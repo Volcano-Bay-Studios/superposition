@@ -33,7 +33,6 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Objects;
 
 public class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
 
@@ -220,11 +219,24 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         return getSignals();
     }
 
+    /**
+     * If you want special behavior when signals are inserted on difference faces, override this method and return true. You must also clear signals each tick if you use this, or use an update signals method. This method does not catch signals that are inserted without a face.
+     * @param signals The signals that were inserted
+     * @param face The face they were added too
+     * @return This tells the method that called it not to continue its default behavior
+     */
+    public boolean specialAddSignals(List<Signal> signals, Direction face) {
+        return false;
+    }
+
     public void addSignals(Object lastCall, List<Signal> signals, Direction face) {
         if (lastCall == this.lastCall) {
             return;
         }
         this.lastCall = lastCall;
+        if (specialAddSignals(signals,face)) {
+            return;
+        }
         List<Signal> signals1 = new ArrayList<>();
         for (Signal signal : signals) {
             signals1.add(new Signal(signal));
@@ -274,19 +286,34 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         modulateSignals(putSignals, true);
     }
 
+    /**
+     * If you need to put signals into a block entity, call this method.
+     * @param nextCall
+     * @param signals
+     * @param face
+     */
     public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
+        if (specialAddSignals(signals,face)) {
+            return;
+        }
         putSignalList(nextCall, signals);
     }
 
-    public void putSignalList(Object nextCall, List<Signal> list) {
-        this.updatePutSignals(list);
+    /**
+     * This method should not be called on another blockEntity, this method exists as an easy way for block entitys to start signal propagation
+     * @param nextCall
+     * @param list
+     */
+    protected void putSignalList(Object nextCall, List<Signal> list) {
         if ((lastCallList != null && lastCallList.equals(nextCall)) || level == null) {
             return;
         }
+        this.updatePutSignals(list);
         BlockPos sidedPos = this.getSwappedPos();
         BlockEntity blockEntity = level.getBlockEntity(sidedPos);
         if (!level.getBlockState(sidedPos).is(Blocks.AIR) && blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            if (Objects.equals(signalActorBlockEntity.getInvertedSwappedPos(), this.getBlockPos())) {
+            BlockPos invertedSwappedPos = signalActorBlockEntity.getInvertedSwappedPos();
+            if (invertedSwappedPos != null && invertedSwappedPos.equals(this.getBlockPos())) {
                 list = signalActorBlockEntity.modulateSignals(list, true);
                 lastCallList = nextCall;
                 signalActorBlockEntity.putSignalsFace(nextCall, list, getInvertedSwappedSide());
@@ -294,16 +321,21 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         }
     }
 
+    /**
+     * This method has no special behavior. All it does is call { @link {@link #putSignalsFace(Object, List, Direction)}} but encapsulates the provided signal into a list
+     * @param signal Signal to be encapsulated into a list
+     * @param face The face it should be inserted into
+     */
     public void putSignalFace(Signal signal, Direction face) {
-        List<Signal> signals = new ArrayList<>();
-        signals.add(signal);
-        this.putSignalsFace(new Object(), signals, face);
+        putSignalsFace(new Object(),SignalHelper.listOf(signal),face);
     }
 
+    /**
+     * This method has no special behavior. It calls { @link {@link #putSignalList(Object, List)}} but encapsulates the provided signal into a list, it does this to start signal propagation of a signal
+     * @param signal Signal to be encapsulated into a list
+     */
     public void putSignal(Signal signal) {
-        List<Signal> signals = new ArrayList<>();
-        signals.add(signal);
-        this.putSignalList(new Object(), signals);
+        putSignalList(new Object(),SignalHelper.listOf(signal));
     }
 
 

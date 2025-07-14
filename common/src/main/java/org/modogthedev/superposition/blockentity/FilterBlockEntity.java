@@ -70,11 +70,6 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
         sendData();
     }
 
-    @Override
-    public void putSignalList(Object nextCall, List<Signal> list) {
-        super.putSignalList(nextCall, modulateSignals(list, false));
-    }
-
     public List<Signal> getUnmodulated() {
         return unmodulated;
     }

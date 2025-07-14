@@ -7,12 +7,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
-import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SignalHelper;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
     @Override
     public void tick() {
         if (outputSignal == null) {
-            outputSignal = new Signal(SuperpositionMth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
+            outputSignal = SignalHelper.getEmptySignal(getLevel(),getBlockPos());
         }
         if (outputString != null)
             outputSignal.encode(outputString);

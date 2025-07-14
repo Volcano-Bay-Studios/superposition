@@ -20,9 +20,4 @@ public class MergeAction extends Action implements BiModifyAction {
         }
         return signal;
     }
-
-    @Override
-    public ItemStack getThumbnailItem() {
-        return Items.CRAFTER.getDefaultInstance();
-    }
 }

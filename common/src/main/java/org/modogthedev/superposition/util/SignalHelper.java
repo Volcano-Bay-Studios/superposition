@@ -1,5 +1,9 @@
 package org.modogthedev.superposition.util;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.ArrayList;
@@ -83,5 +87,9 @@ public class SignalHelper {
         }
         int ordinal = (int) Math.floor(Math.random() * signalList.size());
         return signalList.get(ordinal);
+    }
+
+    public static @NotNull Signal getEmptySignal(Level level, BlockPos pos) {
+        return new Signal(SuperpositionMth.convertVec(pos), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
     }
 }

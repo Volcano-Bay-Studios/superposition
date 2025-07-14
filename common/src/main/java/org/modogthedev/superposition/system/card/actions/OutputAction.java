@@ -31,4 +31,8 @@ public class OutputAction extends Action implements ComputerAction {
         }
     }
 
+    @Override
+    public int getOutputCount() {
+        return 0;
+    }
 }

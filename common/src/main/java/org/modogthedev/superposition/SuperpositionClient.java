@@ -17,6 +17,7 @@ import org.modogthedev.superposition.system.sound.ClientAudioManager;
 public class SuperpositionClient {
 
     public static void init() {
+
         ClientAudioManager.setup();
         VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, partialTicks, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {

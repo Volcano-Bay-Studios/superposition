@@ -75,7 +75,7 @@ public class Cable {
     }
 
     private void sendSignal() {
-        if (this.level != null) {
+        if (this.level != null && !this.level.isClientSide) {
             RopeNode firstNode = this.ropeSimulation.getNodes().getFirst();
             RopeNode lastNode = this.ropeSimulation.getNodes().getLast();
 
