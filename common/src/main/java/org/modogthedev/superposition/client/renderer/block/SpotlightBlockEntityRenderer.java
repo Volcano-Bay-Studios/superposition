@@ -4,8 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -24,14 +26,19 @@ public class SpotlightBlockEntityRenderer implements BlockEntityRenderer<Spotlig
     public SpotlightBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
+    private static RenderType renderType = null;
+
     @Override
     public void render(SpotlightBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
-        VertexConsumer buffer = null;
-        if (SuperpositionConstants.bloomEnabled) {
-            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/spotlight_block_screen.png")));
-        } else {
-            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/spotlight_block_screen.png")));
+        if (renderType == null) {
+            if (SuperpositionConstants.bloomEnabled) {
+                renderType = SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/spotlight_block_screen.png"));
+            } else {
+                renderType = SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/spotlight_block_screen.png"));
+            }
         }
+        VertexConsumer buffer = bufferSource.getBuffer(renderType);
+
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);
         Color color = new Color(be.getColor());
@@ -39,7 +46,14 @@ public class SpotlightBlockEntityRenderer implements BlockEntityRenderer<Spotlig
         ms.pushPose();
         ms.translate(0.5, 0.5, 0.5);
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
-        ms.translate(0, 0f, 0.06f);
+
+        if (be.getBlockState().getValue(SignalGeneratorBlock.FACING) == Direction.DOWN) {
+            ms.translate(0,-12/16f,0);
+        } else if (be.getBlockState().getValue(SignalGeneratorBlock.FACING) == Direction.UP) {
+            ms.translate(0,-12/16f,0);
+        } else {
+            ms.translate(0, 0f, 0.06f);
+        }
 
 
         Matrix4f m = ms.last().pose();

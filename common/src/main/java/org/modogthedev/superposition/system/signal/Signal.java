@@ -118,7 +118,6 @@ public class Signal {
         this.modulation = signal.modulation;
         this.emitting = signal.emitting;
         this.lifetime = signal.lifetime;
-        this.level = signal.level;
         this.frequency = signal.frequency;
         this.amplitude = signal.amplitude;
         this.pos.set(signal.pos);

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.Blocks;
@@ -21,6 +22,7 @@ public class FilterBlockEntityRenderer implements BlockEntityRenderer<FilterBloc
 
     public FilterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
+    private static RenderType renderType = null;
 
     @Override
     public void render(FilterBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
@@ -28,7 +30,11 @@ public class FilterBlockEntityRenderer implements BlockEntityRenderer<FilterBloc
             return;
         if (be.getFilter() == null)
             return;
-        VertexConsumer buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png")));
+
+        if (renderType == null) {
+                renderType = SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png"));
+        }
+        VertexConsumer buffer = bufferSource.getBuffer(renderType);
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);

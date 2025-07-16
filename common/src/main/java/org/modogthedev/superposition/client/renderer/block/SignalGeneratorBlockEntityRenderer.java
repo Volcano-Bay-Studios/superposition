@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.Blocks;
@@ -21,16 +22,20 @@ public class SignalGeneratorBlockEntityRenderer implements BlockEntityRenderer<S
     public SignalGeneratorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
     }
 
+    private static RenderType renderType = null;
+
     @Override
     public void render(SignalGeneratorBlockEntity be, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
         if (isInvalid(be))
             return;
-        VertexConsumer buffer = null;
-        if (SuperpositionConstants.bloomEnabled) {
-            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
-        } else {
-            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png")));
+        if (renderType == null) {
+            if (SuperpositionConstants.bloomEnabled) {
+                renderType = SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png"));
+            } else {
+                renderType = SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/block/signal_generator/front.png"));
+            }
         }
+        VertexConsumer buffer = bufferSource.getBuffer(renderType);
 
         float min = getMinPlaneExtent(be);
         float max = getMaxPlaneExtent(be);

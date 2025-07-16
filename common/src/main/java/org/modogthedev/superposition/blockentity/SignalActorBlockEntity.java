@@ -149,30 +149,44 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
         super(pType, pPos, pBlockState);
     }
 
+    private Direction getClockWise(Direction direction) {
+        if (direction == Direction.UP || direction == Direction.DOWN) {
+            return direction;
+        }
+        return direction.getClockWise();
+    }
+
+    private Direction getCounterClockWise(Direction direction) {
+        if (direction == Direction.UP || direction == Direction.DOWN) {
+            return direction;
+        }
+        return direction.getCounterClockWise();
+    }
+
 
     public BlockPos getSwappedPos() {
         BlockPos sidedPos2;
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            sidedPos2 = this.getBlockPos().relative(getBlockState().getValue(SignalActorTickingBlock.FACING).getClockWise(), 1);
+            sidedPos2 = this.getBlockPos().relative(getClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING)), 1);
         } else {
-            sidedPos2 = this.getBlockPos().relative(getBlockState().getValue(SignalActorTickingBlock.FACING).getCounterClockWise(), 1);
+            sidedPos2 = this.getBlockPos().relative(getCounterClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING)), 1);
         }
         return sidedPos2;
     }
 
     public Direction getSwappedSide() {
         if (!this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            return getBlockState().getValue(SignalActorTickingBlock.FACING).getClockWise();
+            return getClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING));
         } else {
-            return getBlockState().getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+            return getCounterClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING));
         }
     }
 
     public Direction getInvertedSwappedSide() {
         if (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            return getBlockState().getValue(SignalActorTickingBlock.FACING).getClockWise();
+            return getClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING));
         } else {
-            return getBlockState().getValue(SignalActorTickingBlock.FACING).getCounterClockWise();
+            return getCounterClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING));
         }
     }
 
@@ -183,9 +197,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             return null;
         }
         if (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES)) {
-            sidedPos2 = this.getBlockPos().relative(level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getClockWise(), 1);
+            sidedPos2 = this.getBlockPos().relative(getClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING)), 1);
         } else {
-            sidedPos2 = this.getBlockPos().relative(level.getBlockState(this.getBlockPos()).getValue(SignalActorTickingBlock.FACING).getCounterClockWise(), 1);
+            sidedPos2 = this.getBlockPos().relative(getCounterClockWise(getBlockState().getValue(SignalActorTickingBlock.FACING)), 1);
         }
         return sidedPos2;
     }

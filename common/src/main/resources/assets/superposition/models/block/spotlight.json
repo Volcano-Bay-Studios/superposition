@@ -1,8 +1,9 @@
 {
+	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
-	"texture_size": [48, 32],
 	"ambientocclusion": false,
 	"render_type": "cutout_mipped",
+	"texture_size": [48, 32],
 	"textures": {
 		"0": "superposition:block/spotlight",
 		"particle": "superposition:block/spotlight"
@@ -30,6 +31,17 @@
 				"east": {"uv": [5.33333, 14, 8.66667, 15], "texture": "#0"},
 				"south": {"uv": [5.33333, 15, 8, 16], "texture": "#0"},
 				"west": {"uv": [5.33333, 14, 8.66667, 15], "texture": "#0"}
+			}
+		},
+		{
+			"from": [4, 2, 3],
+			"to": [12, 0, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [4, 2, 3]},
+			"faces": {
+				"north": {"uv": [5.33333, 16, 8, 15], "texture": "#0"},
+				"east": {"uv": [5.33333, 15, 8.66667, 14], "texture": "#0"},
+				"south": {"uv": [5.33333, 16, 8, 15], "texture": "#0"},
+				"west": {"uv": [5.33333, 15, 8.66667, 14], "texture": "#0"}
 			}
 		},
 		{
@@ -82,7 +94,7 @@
 			"scale": [0.25, 0.25, 0.25]
 		},
 		"gui": {
-			"rotation": [30, 225, 0],
+			"rotation": [30, -135, 0],
 			"scale": [0.625, 0.625, 0.625]
 		},
 		"fixed": {

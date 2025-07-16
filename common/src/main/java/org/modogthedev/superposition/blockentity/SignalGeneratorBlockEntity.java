@@ -1,5 +1,7 @@
 package org.modogthedev.superposition.blockentity;
 
+import foundry.veil.api.client.render.light.data.AreaLightData;
+import foundry.veil.api.client.render.light.data.LightData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -112,5 +114,23 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             connectedSignal.setAmplitude(1);
             connectedSignal.clearEncodedData();
         }
+    }
+
+    public boolean lightEnabled() {
+        return true;
+    }
+
+    @Override
+    public LightData prepareLight() {
+        return new AreaLightData();
+    }
+
+    @Override
+    public void configureAreaLight(AreaLightData light) {
+        super.configureAreaLight(light);
+        light.setSize(0.25f, 0.25f);
+        light.setColor(3979870);
+        light.setDistance(5f);
+        light.setBrightness(0.75f);
     }
 }

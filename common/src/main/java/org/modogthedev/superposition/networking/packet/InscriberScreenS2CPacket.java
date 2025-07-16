@@ -10,7 +10,7 @@ import org.modogthedev.superposition.Superposition;
 
 public record InscriberScreenS2CPacket(CompoundTag tag, BlockPos pos) implements CustomPacketPayload {
 
-    public static final Type<InscriberScreenS2CPacket> TYPE = new Type<>(Superposition.id("block_entity_modification"));
+    public static final Type<InscriberScreenS2CPacket> TYPE = new Type<>(Superposition.id("inscriber_screen_data"));
     public static final StreamCodec<FriendlyByteBuf, InscriberScreenS2CPacket> CODEC = StreamCodec.composite(
             ByteBufCodecs.COMPOUND_TAG,
             InscriberScreenS2CPacket::tag,

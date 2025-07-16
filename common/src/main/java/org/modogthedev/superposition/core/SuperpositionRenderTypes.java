@@ -33,6 +33,25 @@ public class SuperpositionRenderTypes extends RenderType {
         return VeilRenderType.layered(create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffsetBloom), create(Superposition.MODID + ":block_polygon_offset_standard", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset));
     };
 
+    private static final RenderType  BLOOM_POSITION_COLOR_POLYGON_OFFSET =
+        VeilRenderType.layered(
+        create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
+            RenderType.CompositeState.builder()
+                .setOutputState(VeilRenderSystem.BLOOM_SHARD)
+                .setShaderState(RenderStateShard.RENDERTYPE_CUTOUT_SHADER)
+                .setWriteMaskState(RenderType.COLOR_WRITE)
+                .setLightmapState(LIGHTMAP)
+                .createCompositeState(true)),
+        create(Superposition.MODID + ":block_polygon_offset_standard", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
+            RenderType.CompositeState.builder()
+                .setShaderState(RENDERTYPE_CUTOUT_SHADER)
+                .setLayeringState(POLYGON_OFFSET_LAYERING)
+                .setCullState(NO_CULL)
+                .setLightmapState(LIGHTMAP)
+                .setOverlayState(OVERLAY)
+                .createCompositeState(true)));
+    ;
+
     private static final Function<ResourceLocation, RenderType> BLOCK_POLYGON_OFFSET = texture -> {
         RenderType.CompositeState blockPolygonOffset = RenderType.CompositeState.builder()
                 .setShaderState(RENDERTYPE_CUTOUT_SHADER)
@@ -44,6 +63,16 @@ public class SuperpositionRenderTypes extends RenderType {
                 .createCompositeState(true);
         return create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true, blockPolygonOffset);
     };
+
+    private static final RenderType POSITION_COLOR_POLYGON_OFFSET =
+        create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
+           RenderType.CompositeState.builder()
+                .setShaderState(RENDERTYPE_CUTOUT_SHADER)
+                .setLayeringState(POLYGON_OFFSET_LAYERING)
+                .setCullState(NO_CULL)
+                .setLightmapState(LIGHTMAP)
+                .setOverlayState(OVERLAY)
+                .createCompositeState(true));
 
 //    private static final Function<ResourceLocation, RenderType> BLOCK_POLYGON_OFFSET = texture -> {
 //
@@ -71,9 +100,18 @@ public class SuperpositionRenderTypes extends RenderType {
         return BLOOM_BLOCK_POLYGON_OFFSET.apply(location);
     }
 
+    public static RenderType bloomPositionColorPolygonOffset() {
+        return BLOOM_POSITION_COLOR_POLYGON_OFFSET;
+    }
+
     public static RenderType blockPolygonOffset(ResourceLocation location) {
         return BLOCK_POLYGON_OFFSET.apply(location);
     }
+
+    public static RenderType positionColorPolygonOffset() {
+        return POSITION_COLOR_POLYGON_OFFSET;
+    }
+
 
 //    public static RenderType blockPolygonOffset(ResourceLocation location) {
 //        return BLOCK_POLYGON_OFFSET.apply(location);

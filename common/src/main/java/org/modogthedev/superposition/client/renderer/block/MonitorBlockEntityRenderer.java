@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.util.Mth;
@@ -13,7 +14,6 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.MonitorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
@@ -30,6 +30,8 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
     public MonitorBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         font = context.getFont();
     }
+
+    private static RenderType renderType = null;
 
     static final int size = 256;
 
@@ -76,13 +78,15 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
         }
 
         ms.popPose();
-        light = LightTexture.FULL_BRIGHT;
-        VertexConsumer buffer = null;
-        if (SuperpositionConstants.bloomEnabled) {
-            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
-        } else {
-            buffer = bufferSource.getBuffer(SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/pixel.png")));
+        if (renderType == null) {
+            if (SuperpositionConstants.bloomEnabled) {
+                renderType = SuperpositionRenderTypes.bloomPositionColorPolygonOffset();
+            } else {
+                renderType = SuperpositionRenderTypes.positionColorPolygonOffset();
+            }
         }
+        VertexConsumer buffer = bufferSource.getBuffer(renderType);
+
         Float[] signals = new Float[size];
         Arrays.fill(signals, 1f);
         for (Signal signal : be.signals) {
@@ -110,31 +114,19 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
             buffer
                     .addVertex(m, x + part, 0.5001f, yinverse)
-                    .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMax + uvOffsetx, (uvMin / stages))
-                    .setLight(light)
-                    .setNormal(ms.last(), 0, 1, 0);
+                    .setColor(1f, 1f, 1f, alpha);
 
             buffer
                     .addVertex(m, x + part, 0.5001f, y)
-                    .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMax + uvOffsetx, (uvMin / stages))
-                    .setLight(light)
-                    .setNormal(ms.last(), 0, 1, 0);
+                    .setColor(1f, 1f, 1f, alpha);
 
             buffer
                     .addVertex(m, x, 0.5001f, y)
-                    .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMin + uvOffsetx, (uvMax / stages))
-                    .setLight(light)
-                    .setNormal(ms.last(), 0, 1, 0);
+                    .setColor(1f, 1f, 1f, alpha);
 
             buffer
                     .addVertex(m, x, 0.5001f, yinverse)
-                    .setColor(1f, 1f, 1f, alpha)
-                    .setUv(uvMin + uvOffsetx, (uvMin / stages))
-                    .setLight(light)
-                    .setNormal(ms.last(), 0, 1, 0);
+                    .setColor(1f, 1f, 1f, alpha);
         }
         ms.popPose();
 //        ms.translate(0,-.00025,.22);

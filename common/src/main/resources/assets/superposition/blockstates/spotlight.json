@@ -34,6 +34,22 @@
         "model": "superposition:block/spotlight",
         "y": 90
       }
+    },
+    {
+      "when": {
+        "facing": "up"
+      },
+      "apply": {
+        "model": "superposition:block/spotlight_bottom"
+      }
+    },
+    {
+      "when": {
+        "facing": "down"
+      },
+      "apply": {
+        "model": "superposition:block/spotlight_top"
+      }
     }
   ]
 }
