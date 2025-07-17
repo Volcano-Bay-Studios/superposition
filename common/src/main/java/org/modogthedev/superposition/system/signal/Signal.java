@@ -62,7 +62,7 @@ public class Signal {
         setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()), 0);
     }
 
-    public Signal(UUID uuid, FriendlyByteBuf buf) {
+    public Signal(Level level,UUID uuid, FriendlyByteBuf buf) {
         this.pos = new Vector3d();
         this.load(uuid, buf);
     }
@@ -112,20 +112,18 @@ public class Signal {
     }
 
     public void copy(Signal signal) {
-//        if (signal != null) {
-        this.level = signal.level;
-        this.uuid = signal.uuid;
-        this.modulation = signal.modulation;
-        this.emitting = signal.emitting;
-        this.lifetime = signal.lifetime;
-        this.frequency = signal.frequency;
-        this.amplitude = signal.amplitude;
-        this.pos.set(signal.pos);
-        this.sourceFrequency = signal.sourceFrequency;
-        this.sourceAntennaPos = signal.sourceAntennaPos;
-        this.sourceAntennaSize = signal.sourceAntennaSize;
-        this.encodedData = signal.encodedData;
-//        }
+            this.level = signal.level;
+            this.uuid = signal.uuid;
+            this.modulation = signal.modulation;
+            this.emitting = signal.emitting;
+            this.lifetime = signal.lifetime;
+            this.frequency = signal.frequency;
+            this.amplitude = signal.amplitude;
+            this.pos.set(signal.pos);
+            this.sourceFrequency = signal.sourceFrequency;
+            this.sourceAntennaPos = signal.sourceAntennaPos;
+            this.sourceAntennaSize = signal.sourceAntennaSize;
+            this.encodedData = signal.encodedData;
     }
 
     public void encode(boolean bool) {
@@ -198,16 +196,8 @@ public class Signal {
         return this.sourceFrequency;
     }
 
-    public float getModulation() {
-        return this.modulation;
-    }
-
     public boolean isEmitting() {
         return this.emitting;
-    }
-
-    public int getLifetime() {
-        return this.lifetime;
     }
 
     public BlockPos getSourceAntennaPos() {
@@ -253,10 +243,6 @@ public class Signal {
 
     public void setEmitting(boolean emitting) {
         this.emitting = emitting;
-    }
-
-    public void setLifetime(int lifetime) {
-        this.lifetime = lifetime;
     }
 
     public void setDistance(float distance) {

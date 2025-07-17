@@ -273,6 +273,13 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
             }
             return value;
         }, Types.ARITHMETIC, "/"),
+        MODULO((floats) -> {
+            float value = floats[0];
+            for (int i = 1; i < floats.length; i++) {
+                value %= floats[i];
+            }
+            return value;
+        }, Types.ARITHMETIC, "%"),
         SIN((floats) -> {
             float value = 0;
             for (float f : floats) {

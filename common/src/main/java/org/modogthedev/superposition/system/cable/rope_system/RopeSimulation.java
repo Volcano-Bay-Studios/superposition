@@ -76,7 +76,7 @@ public class RopeSimulation {
 
 
     public void simulate(Level level) {
-        float gravity = 0.5f * -9.8f / 40f;
+        float gravity = 0.25f * -9.8f / 40f;
         for (RopeNode node : nodes) {
             Vec3 velocity = Vec3.ZERO;
             if (!node.isFixed()) {

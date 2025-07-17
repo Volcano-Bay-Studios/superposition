@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -132,10 +133,7 @@ public class CableManager {
                         RopeNode playerPoint = pointIndexPair.getA();
 
                         if (playerPoint.getLastHoldGoalPos() != null) {
-                            double stretch = Math.max(playerPoint.calculateOverstretch(), playerPoint.getPosition().distanceTo(playerPoint.getLastHoldGoalPos()) / 20f);
-                            if (player.getAbilities().instabuild) {
-                                stretch = 0;
-                            }
+                            double stretch = playerPoint.calculateOverstretch()/Mth.map(cable.getPoints().size(),3,100,1,2.5f);
                             if (level.isClientSide) {
                                 CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
                             }
@@ -214,6 +212,8 @@ public class CableManager {
         if (result.getType() == HitResult.Type.BLOCK) {
             holdGoalPos = result.getLocation();
         }
+        float length = (float) Math.min(5,player.getEyePosition().distanceTo(holdGoalPos));
+        holdGoalPos = player.getEyePosition().add(holdGoalPos.subtract(player.getEyePosition()).normalize().scale(length)); // Verifies the end result is the correct length
         return holdGoalPos;
     }
 

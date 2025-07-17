@@ -353,7 +353,7 @@ public class CableRenderer {
             }
         }
         CableClipResult cableClipResult = new CableClipResult(camera.getPosition(), 8, level);
-        oshi.util.tuples.Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(CableManager.getPlayerHoldCablePos(Minecraft.getInstance().player), .7f, true);
+        oshi.util.tuples.Pair<Cable, RopeNode> cablePointPair = cableClipResult.rayCastForClosest(CableManager.getPlayerHoldCablePos(Minecraft.getInstance().player), .7f, !Minecraft.getInstance().player.isShiftKeyDown());
         if (cablePointPair != null) {
             Vec3 pos = cablePointPair.getB().getRenderPosition(partialTicks);
             if (!cablePointPair.getA().getPlayerHoldingPointMap().containsKey(Minecraft.getInstance().player.getId())) {
@@ -395,7 +395,7 @@ public class CableRenderer {
         } else if (isFirst) {
             return new Vector4f(0.9f, 0.5f, 0.5f, 0.6f);
         } else if (hasAnchor) {
-            return new Vector4f(0.4f, 0.4f, 0.9f, 0.4f);
+            return new Vector4f(0.4f, 0.4f, 0.9f, 0.6f);
         } else {
             return new Vector4f(0.4f, 0.9f, 0.4f, 0.4f);
         }

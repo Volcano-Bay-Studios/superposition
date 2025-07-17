@@ -26,7 +26,9 @@ public class BlockSignalSyncS2CPacket implements CustomPacketPayload {
         buf.writeBlockPos(pos);
         buf.writeVarInt(signals.size());
         for (Signal signal : signals) {
-            signal.write(buf);
+            if (signal != null && signal.getUuid() != null) {
+                signal.write(buf);
+            }
         }
         this.data = new byte[buf.writerIndex()];
         buf.readBytes(this.data);

@@ -37,7 +37,7 @@ public class ClientSignalManager {
             if (removed.remove(id)) {
                 signalMap.get(id).load(id, buf);
             } else {
-                Signal signal = new Signal(id, buf);
+                Signal signal = new Signal(level,id, buf);
                 signal.level = level;
                 signalMap.put(id, signal);
             }
@@ -63,7 +63,7 @@ public class ClientSignalManager {
             if (signals.size() < count) {
                 for (int i = 0; i < count; i++) {
                     UUID id = buf.readUUID();
-                    Signal signal = new Signal(id, buf);
+                    Signal signal = new Signal(level,id, buf);
                     signal.level = level;
                     signals.add(signal);
                 }

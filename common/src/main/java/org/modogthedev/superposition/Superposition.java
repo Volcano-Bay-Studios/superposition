@@ -56,8 +56,8 @@ public class Superposition {
 
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
-        CableManager.tick(level);
         CableSavedData.get(level);
+        CableManager.tick(level);
         CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
     }
@@ -74,7 +74,7 @@ public class Superposition {
     }
 
     public static void clientAlwaysTick(Minecraft client) {
-        if (client.level == null) {
+        if (client.level == null && !client.isLocalServer()) {
             CableManager.wipeClientData();
             CableManager.wipeResidualData();
         }

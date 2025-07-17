@@ -235,8 +235,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     /**
      * If you want special behavior when signals are inserted on difference faces, override this method and return true. You must also clear signals each tick if you use this, or use an update signals method. This method does not catch signals that are inserted without a face.
+     *
      * @param signals The signals that were inserted
-     * @param face The face they were added too
+     * @param face    The face they were added too
      * @return This tells the method that called it not to continue its default behavior
      */
     public boolean specialAddSignals(List<Signal> signals, Direction face) {
@@ -248,12 +249,14 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             return;
         }
         this.lastCall = lastCall;
-        if (specialAddSignals(signals,face)) {
+        if (specialAddSignals(signals, face)) {
             return;
         }
         List<Signal> signals1 = new ArrayList<>();
         for (Signal signal : signals) {
-            signals1.add(new Signal(signal));
+            if (signal != null) {
+                signals1.add(new Signal(signal));
+            }
         }
         this.modulateSignals(signals1, true);
         BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
@@ -264,7 +267,9 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             this.updatePutSignals(signals1);
         } else {
             for (Signal signal : signals1) {
-                putSignals.add(new Signal(signal));
+                if (signal != null) {
+                    putSignals.add(new Signal(signal));
+                }
             }
             signalsReceived++;
         }
@@ -302,12 +307,13 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     /**
      * If you need to put signals into a block entity, call this method.
+     *
      * @param nextCall
      * @param signals
      * @param face
      */
     public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
-        if (specialAddSignals(signals,face)) {
+        if (specialAddSignals(signals, face)) {
             return;
         }
         putSignalList(nextCall, signals);
@@ -315,6 +321,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     /**
      * This method should not be called on another blockEntity, this method exists as an easy way for block entitys to start signal propagation
+     *
      * @param nextCall
      * @param list
      */
@@ -337,19 +344,21 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     /**
      * This method has no special behavior. All it does is call { @link {@link #putSignalsFace(Object, List, Direction)}} but encapsulates the provided signal into a list
+     *
      * @param signal Signal to be encapsulated into a list
-     * @param face The face it should be inserted into
+     * @param face   The face it should be inserted into
      */
     public void putSignalFace(Signal signal, Direction face) {
-        putSignalsFace(new Object(),SignalHelper.listOf(signal),face);
+        putSignalsFace(new Object(), SignalHelper.listOf(signal), face);
     }
 
     /**
      * This method has no special behavior. It calls { @link {@link #putSignalList(Object, List)}} but encapsulates the provided signal into a list, it does this to start signal propagation of a signal
+     *
      * @param signal Signal to be encapsulated into a list
      */
     public void putSignal(Signal signal) {
-        putSignalList(new Object(),SignalHelper.listOf(signal));
+        putSignalList(new Object(), SignalHelper.listOf(signal));
     }
 
 
@@ -492,7 +501,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             SignalHelper.updateSignalList(lastSignals, putSignals);
             lastSignals.addAll(putSignals);
             if (signalsDirty) {
-                VeilPacketManager.around(null,(ServerLevel) level,getBlockPos().getX(),getBlockPos().getY(),getBlockPos().getZ(),100).sendPacket(new BlockSignalSyncS2CPacket(putSignals,getBlockPos()));
+                VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(putSignals, getBlockPos()));
             }
             signalsDirty = false;
         }
