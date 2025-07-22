@@ -54,6 +54,7 @@ public abstract class Action implements Cloneable {
             Action action = (Action) clone();
             action.configurations = new ArrayList<>();
             action.setupConfigurations();
+            action.selfReference = getSelfReference();
             return action;
         } catch (CloneNotSupportedException e) {
             return null;
