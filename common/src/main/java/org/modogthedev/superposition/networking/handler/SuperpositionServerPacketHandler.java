@@ -33,7 +33,7 @@ public class SuperpositionServerPacketHandler {
         }
 
         double dist = player.position().distanceToSqr(pos.getCenter());
-        if (dist > 64) {
+        if (dist > 24) {
             return;
         }
 

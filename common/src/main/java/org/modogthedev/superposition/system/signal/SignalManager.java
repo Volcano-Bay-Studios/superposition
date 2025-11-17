@@ -58,7 +58,7 @@ public class SignalManager {
     public static void postSignalsToAntenna(Antenna antenna) {
         antenna.signals.clear();
         for (Signal signal : transmittedSignals.get(antenna.level).values()) {
-            AntennaManager.postSignalToAntenna(signal, antenna);
+            AntennaManager.submitSignalToAntenna(signal, antenna);
         }
     }
 

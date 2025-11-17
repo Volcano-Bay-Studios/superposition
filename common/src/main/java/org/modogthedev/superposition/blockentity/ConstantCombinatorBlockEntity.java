@@ -26,7 +26,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
     @Override
     public void tick() {
         if (outputSignal == null) {
-            outputSignal = SignalHelper.getEmptySignal(getLevel(),getBlockPos());
+            outputSignal = SignalHelper.getEmptySignal(getLevel(), getBlockPos());
         }
         if (outputString != null)
             outputSignal.encode(outputString);
@@ -64,6 +64,11 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         super.loadSyncedData(tag);
         if (tag.contains("output")) {
             outputString = tag.getString("output");
+        }
+        if (tag.contains("modifiedPosition")) {
+            int position = tag.getInt("modifiedPosition");
+            String word = tag.getString("changedChar");
+            outputString = (outputString.substring(0, position) + (word) + outputString.substring(Math.min(position, outputString.length())));
         }
     }
 

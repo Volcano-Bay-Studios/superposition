@@ -41,12 +41,12 @@ public class LowPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "Low Pass Filter - " + SuperpositionMth.frequencyToHzReadable(frequency);
+        return "Low Pass Filter - " + SuperpositionMth.formatHz(frequency);
     }
 
     @Override
     public String getTooltip() {
-        return SuperpositionMth.frequencyToHzReadable(frequency);
+        return SuperpositionMth.formatHz(frequency);
     }
 
     @Override

@@ -56,12 +56,12 @@ public class BandPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "Band Pass Filter - " + SuperpositionMth.frequencyToHzReadable(lowFrequency) + " - " + SuperpositionMth.frequencyToHzReadable(Math.abs(158 - highFrequency));
+        return "Band Pass Filter - " + SuperpositionMth.formatHz(lowFrequency) + " - " + SuperpositionMth.formatHz(Math.abs(158 - highFrequency));
     }
 
     @Override
     public String getTooltip() {
-        return SuperpositionMth.frequencyToHzReadable(lowFrequency) + " - " + SuperpositionMth.frequencyToHzReadable(Math.abs(158 - highFrequency));
+        return SuperpositionMth.formatHz(lowFrequency) + " - " + SuperpositionMth.formatHz(Math.abs(158 - highFrequency));
     }
 
     @Override

@@ -114,17 +114,19 @@ public class SuperpositionUITooltipRenderer {
                         editableTooltip.replaceText("");
                     } else if (Screen.isSelectAll(key)) {
                         selected = true;
+                    } else {
+                        return;
                     }
                 }
             }
-            CompoundTag tag = new CompoundTag();
-            tag.putString("output", editableTooltip.getText());
-            updateEditableBlockEntity(editPos, tag);
+            updateEditableBlockEntity(editPos);
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
         }
     }
 
-    private static void updateEditableBlockEntity(BlockPos pos, CompoundTag tag) {
+    private static void updateEditableBlockEntity(BlockPos pos) {
+        CompoundTag tag = new CompoundTag();
+        tag.putString("output", editableTooltip.getText());
         Level level = Minecraft.getInstance().level;
         if (level.getBlockEntity(editPos) instanceof SyncedBlockEntity syncedBlockEntity) {
             syncedBlockEntity.loadSyncedData(tag);
@@ -140,12 +142,18 @@ public class SuperpositionUITooltipRenderer {
             } else {
                 editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, editableTooltip.getText().length())));
             }
-            cursorPos++;
-            cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
-            flash = 0;
             CompoundTag tag = new CompoundTag();
-            tag.putString("output", editableTooltip.getText());
-            updateEditableBlockEntity(editPos, tag);
+            tag.putInt("modifiedPosition",cursorPos);
+            tag.putString("changedChar", String.valueOf(key));
+            tag.putInt("stringLength",editableTooltip.getText().length());
+            Level level = Minecraft.getInstance().level;
+            if (level.getBlockEntity(editPos) instanceof SyncedBlockEntity syncedBlockEntity) {
+                syncedBlockEntity.loadSyncedData(tag);
+            }
+            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
+            cursorPos++;
+            cursorPos = Mth.clamp(cursorPos, -1, editableTooltip.getText().length());
+            flash = -1;
         }
     }
 
@@ -155,6 +163,8 @@ public class SuperpositionUITooltipRenderer {
             editingEditable = false;
             editPos = null;
             selected = false;
+        } else {
+            cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
         }
     }
 

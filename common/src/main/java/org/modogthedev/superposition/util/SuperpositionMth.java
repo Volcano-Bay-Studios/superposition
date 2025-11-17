@@ -46,7 +46,7 @@ public class SuperpositionMth {
      * @param frequency
      * @return String in hertz
      */
-    public static String frequencyToHzReadable(float frequency) {
+    public static String formatHz(float frequency) {
         if (frequency >= 1000000000) {
             return Math.round(frequency / 100000000) + "GHz";
         } else if (frequency >= 10000) {
@@ -59,13 +59,24 @@ public class SuperpositionMth {
 
     /**
      * Returns the frequency of an antenna
-     * See <a href="https://www.ahsystems.com/EMC-formulas-equations/frequency-wavelength-calculator.php">...</a>
+     * <a href="https://www.ahsystems.com/EMC-formulas-equations/frequency-wavelength-calculator.php"> See </a>
      *
      * @param size how many blocks the antenna is
      * @return The antenna frequency in Hz
      */
     public static int antennaSizeToHz(int size) {
         return (int) ((14989622) / (size / 2f));
+    }
+
+    /**
+     * Returns the frequency of an antenna
+     * <a href="https://www.ahsystems.com/EMC-formulas-equations/frequency-wavelength-calculator.php"> See </a>
+     *
+     * @param frequency The frequency to convert
+     * @return The antenna size, rounded as an integer
+     */
+    public static int hzToAntennaSize(float frequency) {
+        return Math.round(29979244 / frequency);
     }
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {

@@ -20,11 +20,9 @@ public class Signal {
     private float amplitude;
     private float frequency;
     private float sourceFrequency;
-    private float modulation;
     private boolean emitting = true;
     private int lifetime = 0;
     private BlockPos sourceAntennaPos;
-    private int sourceAntennaSize = 0;
     private EncodedData<?> encodedData = null;
     private float distance = 0;
     @Deprecated
@@ -34,10 +32,6 @@ public class Signal {
     private float minDist = 0;
 
     public boolean tick() {
-//        for (float i = 0; i < 361; i += .1f) {
-//            this.level.addParticle(ParticleTypes.WAX_ON, pos.x + (Math.sin(i)*maxDist), pos.y, pos.z+ (Math.cos(i)*maxDist), 0, Math.random()-0.5, 0);
-//            this.level.addParticle(ParticleTypes.WAX_OFF, pos.x + (Math.sin(i)*minDist), pos.y, pos.z+ (Math.cos(i)*minDist), 0, Math.random()-0.5, 0);
-//        }
         lifetime++;
         float maxRange = amplitude * 5000;
         minDist = 0;
@@ -59,10 +53,10 @@ public class Signal {
         this.frequency = frequency;
         this.amplitude = amplitude;
         this.sourceFrequency = sourceFrequency;
-        setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()), 0);
+        setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()));
     }
 
-    public Signal(Level level,UUID uuid, FriendlyByteBuf buf) {
+    public Signal(Level level, UUID uuid, FriendlyByteBuf buf) {
         this.pos = new Vector3d();
         this.load(uuid, buf);
     }
@@ -78,11 +72,9 @@ public class Signal {
         this.amplitude = buf.readFloat();
         this.frequency = buf.readFloat();
         this.sourceFrequency = buf.readFloat();
-        this.modulation = buf.readFloat();
         this.emitting = buf.readBoolean();
         this.lifetime = buf.readVarInt();
         this.sourceAntennaPos = buf.readBlockPos();
-        this.sourceAntennaSize = buf.readVarInt();
         int ordinal = buf.readVarInt();
         if (ordinal > 0) {
             this.encodedData = EncodedData.Type.values()[ordinal - 1].getCodec().decode(buf);
@@ -97,11 +89,9 @@ public class Signal {
         buf.writeFloat(this.amplitude);
         buf.writeFloat(this.frequency);
         buf.writeFloat(this.sourceFrequency);
-        buf.writeFloat(this.modulation);
         buf.writeBoolean(this.emitting);
         buf.writeVarInt(this.lifetime);
         buf.writeBlockPos(this.sourceAntennaPos);
-        buf.writeVarInt(sourceAntennaSize);
         if (this.encodedData != null) {
             EncodedData.Type type = this.encodedData.type();
             buf.writeVarInt(type.ordinal() + 1);
@@ -112,18 +102,16 @@ public class Signal {
     }
 
     public void copy(Signal signal) {
-            this.level = signal.level;
-            this.uuid = signal.uuid;
-            this.modulation = signal.modulation;
-            this.emitting = signal.emitting;
-            this.lifetime = signal.lifetime;
-            this.frequency = signal.frequency;
-            this.amplitude = signal.amplitude;
-            this.pos.set(signal.pos);
-            this.sourceFrequency = signal.sourceFrequency;
-            this.sourceAntennaPos = signal.sourceAntennaPos;
-            this.sourceAntennaSize = signal.sourceAntennaSize;
-            this.encodedData = signal.encodedData;
+        this.level = signal.level;
+        this.uuid = signal.uuid;
+        this.emitting = signal.emitting;
+        this.lifetime = signal.lifetime;
+        this.frequency = signal.frequency;
+        this.amplitude = signal.amplitude;
+        this.pos.set(signal.pos);
+        this.sourceFrequency = signal.sourceFrequency;
+        this.sourceAntennaPos = signal.sourceAntennaPos;
+        this.encodedData = signal.encodedData;
     }
 
     public void encode(boolean bool) {
@@ -161,7 +149,7 @@ public class Signal {
         }
     }
 
-    public void modulate(float amplitude) {
+    public void addAmplitude(float amplitude) {
         this.amplitude += amplitude;
     }
 
@@ -204,10 +192,6 @@ public class Signal {
         return this.sourceAntennaPos;
     }
 
-    public int getSourceAntennaSize() {
-        return this.sourceAntennaSize;
-    }
-
     @Nullable
     public EncodedData<?> getEncodedData() {
         return this.encodedData;
@@ -237,25 +221,20 @@ public class Signal {
         this.sourceFrequency = sourceFrequency;
     }
 
-    public void setModulation(float modulation) {
-        this.modulation = modulation;
-    }
-
     public void setEmitting(boolean emitting) {
         this.emitting = emitting;
     }
 
-    public void setDistance(float distance) {
+    public void addTraversalDistance(float distance) {
         this.distance = distance;
     }
 
-    public float getDistance() {
+    public float getTraversalDistance() {
         return distance;
     }
 
-    public void setSourceAntenna(BlockPos sourceAntennaPos, int sourceAntennaSize) {
+    public void setSourceAntenna(BlockPos sourceAntennaPos) {
         this.sourceAntennaPos = sourceAntennaPos;
-        this.sourceAntennaSize = sourceAntennaSize;
     }
 
     @Override

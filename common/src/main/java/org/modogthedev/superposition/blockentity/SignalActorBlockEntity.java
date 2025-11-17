@@ -222,6 +222,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
 
     /**
      * Returns the list of signals inside the block. It should be deep cloned if you are going to modify it elsewhere.
+     * You should always use {@link SignalActorBlockEntity#getSideSignals(Direction)} if your operation exists in the world.
      *
      * @return the putSignals field
      */
@@ -306,7 +307,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     /**
-     * If you need to put signals into a block entity, call this method.
+     * Puts signals into a block entity.
      *
      * @param nextCall
      * @param signals
@@ -320,7 +321,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     }
 
     /**
-     * This method should not be called on another blockEntity, this method exists as an easy way for block entitys to start signal propagation
+     * This method should not be called on another blockEntity, this method exists as an easy way for block entities to start signal propagation
      *
      * @param nextCall
      * @param list

@@ -42,7 +42,7 @@ public class HighPassFilter extends Filter {
 
     @Override
     public String toString() {
-        return "High Pass Filter - " + SuperpositionMth.frequencyToHzReadable(frequency);
+        return "High Pass Filter - " + SuperpositionMth.formatHz(frequency);
     }
 
     @Override
@@ -72,6 +72,6 @@ public class HighPassFilter extends Filter {
 
     @Override
     public String getTooltip() {
-        return SuperpositionMth.frequencyToHzReadable(frequency);
+        return SuperpositionMth.formatHz(frequency);
     }
 }

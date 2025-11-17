@@ -94,20 +94,20 @@ public class FilterScreen extends WidgetScreen {
         int j = (this.height - imageHeight) / 2;
         if (filterType instanceof LowPassFilter) {
             renderBar(guiGraphics, 167, 10, Math.abs((int) dials.get(0).scrolledAmount), true);
-            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.abs(158 - Math.min(158, dials.get(0).scrolledAmount)) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.formatHz(Math.abs(158 - Math.min(158, dials.get(0).scrolledAmount)) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
 
         }
         if (filterType instanceof HighPassFilter) {
             renderBar(guiGraphics, 9, 10, Math.abs((int) dials.get(0).scrolledAmount), false);
-            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 15, j + 50, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.formatHz(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 15, j + 50, 0xFF56d156, guiGraphics);
         }
         if (filterType instanceof BandPassFilter) {
             dials.get(0).maxScroll = (int) (158 - dials.get(1).scrolledAmount);
             dials.get(1).maxScroll = (int) (158 - dials.get(0).scrolledAmount);
             renderBar(guiGraphics, 9, 10, Math.abs((int) dials.get(0).scrolledAmount), false);
             renderBar(guiGraphics, 167, 10, Math.abs((int) dials.get(1).scrolledAmount), true);
-            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
-            drawFrequencyText(SuperpositionMth.frequencyToHzReadable(Math.abs(158 - Math.min(158, dials.get(1).scrolledAmount)) * 100000), i + 15, j + 82, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.formatHz(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
+            drawFrequencyText(SuperpositionMth.formatHz(Math.abs(158 - Math.min(158, dials.get(1).scrolledAmount)) * 100000), i + 15, j + 82, 0xFF56d156, guiGraphics);
 
         }
     }

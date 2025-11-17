@@ -29,6 +29,7 @@ import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
+import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClientState;
 import org.modogthedev.superposition.system.cable.CableClipResult;
@@ -414,8 +415,8 @@ public class CableRenderer {
             Vec3 pos1 = Vec3.atCenterOf(blockHitResult.getBlockPos());
             if (level.getBlockEntity(BlockPos.containing(pos1)) instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
                 matrixStack.matrixPush();
-                if (antennaActorBlockEntity.antenna != null) {
-                    for (BlockPos pos : antennaActorBlockEntity.antenna.antennaParts) {
+                if (antennaActorBlockEntity.antenna instanceof PhysicalAntenna physicalAntenna) {
+                    for (BlockPos pos : physicalAntenna.antennaParts) {
                         DebugRenderer.renderFilledBox(matrixStack.toPoseStack(), bufferSource, pos, -0.2f, 0.5f, 0.9f, 0.5f, 0.5f);
                     }
                 }

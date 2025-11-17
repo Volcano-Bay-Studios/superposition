@@ -68,20 +68,6 @@ public class ClientSignalManager {
                     signals.add(signal);
                 }
             }
-
-            for (int i = 0; i < count; i++) { //TODO: SYNCHRONISATION
-//                if (computerBlockEntity.periphrealSignal != null) {
-//                    computerBlockEntity.periphrealSignal.load(id, buf);
-//                } else {
-//                }
-            }
-        }
-    }
-
-    public static void postSignalsToAntenna(Antenna antenna) {
-        ifAbsent(antenna.level);
-        for (Signal signal : clientSignals.get(antenna.level).values()) {
-            AntennaManager.postSignalToAntenna(signal, antenna);
         }
     }
 

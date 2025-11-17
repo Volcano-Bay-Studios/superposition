@@ -72,13 +72,8 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
         if (signal != null) {
-            signal.modulate(Math.max(0, amplification - throttle + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneAmplification / 15))));
-            if (lastAmplitude != signal.getAmplitude()) {
-                level.updateNeighbourForOutputSignal(this.getBlockPos(), this.getBlockState().getBlock());
-            }
-            if (updateTooltip) {
-                amplitude = signal.getAmplitude();
-            }
+            signal.addAmplitude(Math.max(0, amplification - throttle + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneAmplification / 15))));
+            amplitude += signal.getAmplitude();
         }
         return signal;
     }
@@ -105,6 +100,9 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
             this.setTooltip(tooltip);
+            for (Signal signal : putSignals) {
+                amplitude += signal.getAmplitude();
+            }
             if (amplitude > 0) {
                 ticks++;
                 if (ticks > ticksToChange - 1) {
@@ -141,7 +139,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         }
         throttle = (temp - 26f) * 10f;
         amplitude -= throttle;
-        amplitude = Math.max(amplitude,0);
+        amplitude = Math.max(amplitude, 0);
 
         if (updateNext) {
             level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
@@ -150,8 +148,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         if (lastAmplitude != amplitude) {
             updateNext = true;
         }
-
-
         lastAmplitude = amplitude;
         amplitude = 0;
         super.tick();
@@ -173,7 +169,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         center = center.add(new Vec3(facing.getNormal().getX(), facing.getNormal().getY(), facing.getNormal().getZ()).scale(0.4f));
         light.setPosition(center.x, center.y, center.z);
         light.setColor(0xc76528);
-        light.setBrightness((float) Math.clamp((temp-26.1f)/4f,0,3));
+        light.setBrightness((float) Math.clamp((temp - 26.1f) / 4f, 0, 3));
         light.setRadius(2f);
     }
 

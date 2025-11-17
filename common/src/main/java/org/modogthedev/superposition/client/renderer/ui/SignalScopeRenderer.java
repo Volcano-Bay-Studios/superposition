@@ -124,7 +124,7 @@ public class SignalScopeRenderer {
         guiGraphics.fill(RenderType.guiOverlay(), (int) (start), (int) ((screenHeight / 3) + (screenHeight / 2)) - 8, (int) (start) + 2, (int) ((screenHeight / 3) + (screenHeight / 2)) + 10, new Color(128, 242, 130, 255).getRGB());
         guiGraphics.fill(RenderType.guiOverlay(), (int) (end), (int) ((screenHeight / 3) + (screenHeight / 2)) - 8, (int) (end) + 2, (int) ((screenHeight / 3) + (screenHeight / 2)) + 10, new Color(128, 242, 130, 255).getRGB());
 
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, "FREQUENCY: " + SuperpositionMth.frequencyToHzReadable((position - selectorWidth) * 100000) + " - " + SuperpositionMth.frequencyToHzReadable((position + selectorWidth) * 100000), (int) (screenWidth / 2), (int) ((screenHeight / 3) + (screenHeight / 2)) - 35, new Color(78, 208, 114, 255).getRGB());
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, "FREQUENCY: " + SuperpositionMth.formatHz((position - selectorWidth) * 100000) + " - " + SuperpositionMth.formatHz((position + selectorWidth) * 100000), (int) (screenWidth / 2), (int) ((screenHeight / 3) + (screenHeight / 2)) - 35, new Color(78, 208, 114, 255).getRGB());
 
         //  Render inputs
         guiGraphics.blit(SCROLL, 4, 14, 0, 0, 12, 16, 12, 16);

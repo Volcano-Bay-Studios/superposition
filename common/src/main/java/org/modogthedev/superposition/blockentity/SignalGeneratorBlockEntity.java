@@ -65,7 +65,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
         if (this.level.isClientSide()) {
             List<Component> tooltip = new ArrayList<>();
             tooltip.add(Component.literal("Signal Generator Status:"));
-            tooltip.add(Component.literal("Frequency - " + SuperpositionMth.frequencyToHzReadable(frequency * 100000)));
+            tooltip.add(Component.literal("Frequency - " + SuperpositionMth.formatHz(frequency * 100000)));
 
             float speed = SuperpositionMth.getFromRange(150, 0, 3, .1f, frequency);
             if (frequency <= 0 || frequency > 150) {

@@ -9,6 +9,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
+import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.BlockHelper;
 import org.modogthedev.superposition.util.LongRaycast;
@@ -42,10 +43,10 @@ public class AntennaManager {
         }
     }
 
-    public static void postSignalToAntenna(Signal signal, Antenna antenna) {
+    public static void submitSignalToAntenna(Signal signal, Antenna antenna) {
         BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
 
-        if (!antenna.reading) {
+        if (!antenna.receiver) {
             return;
         }
         float bonusFrequency = 0;
@@ -54,17 +55,17 @@ public class AntennaManager {
             bonusFrequency = antennaActorBlockEntity.getBounusFrequency();
         }
 
-        float dist = (float) Vec3.atLowerCornerOf(antenna.antennaActor).distanceTo(Vec3.atLowerCornerOf(pos));
-        float antennaFrequency = SuperpositionMth.antennaSizeToHz(antenna.antennaParts.size()) + bonusFrequency;
+        float dist = (float) antenna.getPosition().distanceTo(Vec3.atLowerCornerOf(pos));
+        float antennaFrequency = antenna.getFrequency() + bonusFrequency;
 
         if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
             Signal signal1 = new Signal(signal);
 
             signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
-            signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(antenna.antennaParts.size(), Math.max(1, signal.getSourceAntennaSize())))));
-            Vec3 to = antenna.antennaActor.getCenter().add(antenna.relativeCenter.x, antenna.relativeCenter.y, antenna.relativeCenter.z);
+            signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(SuperpositionMth.hzToAntennaSize(antennaFrequency), Math.max(1, SuperpositionMth.hzToAntennaSize(signal.getFrequency()))))));
+            Vec3 to = antenna.antennaActor.getCenter().add(antenna.getPosition().x, antenna.getPosition().y, antenna.getPosition().z);
             float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(to.x, to.y, to.z));
-            signal1.setDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
+            signal1.addTraversalDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
             // TODO: Synchronize the state of the signal when its received.
             signal1.mulAmplitude(Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0));
 
@@ -126,20 +127,22 @@ public class AntennaManager {
                     return;
                 }
                 Antenna ourAntenna = antennas.get(level).get(ordinal);
-                ourAntenna.antennaParts = parts;
-                ourAntenna.updateDimensions();
-                antennas.get(level).set(ordinal, ourAntenna);
-                if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
-                    antennaActorBlockEntity.setAntenna(ourAntenna);
-                    antennaActorBlockEntity.update();
+                if (ourAntenna instanceof PhysicalAntenna physicalAntenna) {
+                    physicalAntenna.antennaParts = parts;
+                    physicalAntenna.updateDimensions();
+                    antennas.get(level).set(ordinal, ourAntenna);
+                    if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
+                        antennaActorBlockEntity.setAntenna(ourAntenna);
+                        antennaActorBlockEntity.update();
+                    }
                 }
             } else {
                 List<BlockPos> parts = new ArrayList<>(thisPart.parts());
                 if (parts.size() < 2) {
                     return;
                 }
-                Antenna newAntenna = new Antenna(parts, thisPart.base(), level);
-                newAntenna.reading = (level.getBlockState(thisPart.base()).getBlock().equals(SuperpositionBlocks.RECEIVER.get()));
+                PhysicalAntenna newAntenna = new PhysicalAntenna(parts, thisPart.base(), level);
+                newAntenna.receiver = (level.getBlockState(thisPart.base()).getBlock().equals(SuperpositionBlocks.RECEIVER.get()));
                 newAntenna.updateDimensions();
                 antennas.get(level).add(newAntenna);
                 BlockEntity blockEntity = level.getBlockEntity(newAntenna.antennaActor);
