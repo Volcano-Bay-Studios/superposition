@@ -17,6 +17,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.antenna.Antenna;
+import org.modogthedev.superposition.system.antenna.AntennaElement;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.system.cable.Cable;
@@ -51,6 +52,9 @@ public class DebugRenderer {
         }
         for (Antenna antenna : AntennaManager.getAntennaList(level)) {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getPosition(), 0.5f, 0.5f, 0.9f, 0.5f);
+            for (AntennaElement antennaElement : antenna.getAntennaElements()) {
+                drawPosBox((PoseStack) matrixStack, vertexConsumer, antennaElement.getPosition(), 0.25f, 0.5f, 0.9f, 0.5f);
+            }
         }
         for (Cable cable : CableManager.getLevelCables(level)) {
             boolean isSleeping = cable.isSleeping();

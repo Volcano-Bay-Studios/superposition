@@ -9,19 +9,29 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Signal {
 
     public static final int SPEED = 64;
-
+    /**
+     * This UUID is for keeping track of the signal itself.
+     */
     private UUID uuid;
+    /**
+     * This UUID is for tracking multiple signals that are identical other than that they are broadcast from different antenna elements
+     */
+    private UUID broadcastUuid;
     private final Vector3d pos;
     private float amplitude;
     private float frequency;
+    @Deprecated
     private float sourceFrequency;
     private boolean emitting = true;
     private int lifetime = 0;
+    @Deprecated
     private BlockPos sourceAntennaPos;
     private EncodedData<?> encodedData = null;
     private float distance = 0;
@@ -48,6 +58,7 @@ public class Signal {
 
     public Signal(Vector3dc pos, Level level, float frequency, float amplitude, float sourceFrequency) {
         this.uuid = UUID.randomUUID();
+        this.broadcastUuid = UUID.randomUUID();
         this.pos = new Vector3d(pos);
         this.level = level;
         this.frequency = frequency;
@@ -68,6 +79,7 @@ public class Signal {
 
     public void load(UUID id, FriendlyByteBuf buf) {
         this.uuid = id;
+        this.broadcastUuid = buf.readUUID();
         this.pos.set(buf.readFloat(), buf.readFloat(), buf.readFloat());
         this.amplitude = buf.readFloat();
         this.frequency = buf.readFloat();
@@ -83,6 +95,7 @@ public class Signal {
 
     public void write(FriendlyByteBuf buf) {
         buf.writeUUID(this.uuid);
+        buf.writeUUID(this.broadcastUuid);
         buf.writeFloat((float) this.pos.x);
         buf.writeFloat((float) this.pos.y);
         buf.writeFloat((float) this.pos.z);
@@ -104,6 +117,7 @@ public class Signal {
     public void copy(Signal signal) {
         this.level = signal.level;
         this.uuid = signal.uuid;
+        this.broadcastUuid = signal.broadcastUuid;
         this.emitting = signal.emitting;
         this.lifetime = signal.lifetime;
         this.frequency = signal.frequency;
@@ -161,11 +175,22 @@ public class Signal {
         return this.uuid;
     }
 
+    public UUID getBroadcastUuid() {
+        return broadcastUuid;
+    }
+
     /**
      * Resets the UUID of a signal if it already exists and is closing
      */
     public void changeUUID() {
-        uuid = UUID.randomUUID();
+        this.uuid = UUID.randomUUID();
+    }
+
+    /**
+     * Resets the Broadcast UUID of a signal if it already exists and is closing
+     */
+    public void changeBroadcastUUID() {
+        this.broadcastUuid = UUID.randomUUID();
     }
 
     public Vector3d getPos() {
@@ -239,12 +264,26 @@ public class Signal {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Signal signal) {
-            if (getEncodedData() != null && getEncodedData().equals(signal.getEncodedData())) {
-                return true;
-            }
+        if (obj == this) {
+            return true;
         }
-        return super.equals(obj);
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        if (obj instanceof Signal signal) {
+            return getEncodedData() != null && getEncodedData().equals(signal.getEncodedData());
+        }
+        return false;
+    }
+
+    /**
+     * Wraps this signal into a new list.
+     * @return A new list containing this signal.
+     */
+    public List<Signal> wrap() {
+        ArrayList<Signal> signals = new ArrayList<>();
+        signals.add(this);
+        return signals;
     }
 
     @Override

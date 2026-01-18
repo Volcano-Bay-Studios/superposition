@@ -9,6 +9,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
+import java.util.List;
+
 public class SuperpositionMth {
     public static float getFromRange(float OldMax, float OldMin, float NewMax, float NewMin, float OldValue) {
         float OldRange = (OldMax - OldMin);
@@ -36,6 +38,11 @@ public class SuperpositionMth {
         return new Vector3d(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f);
     }
 
+    /**
+     * This converts amplifier values into dB, this is a magic number function and has no real reason for the numbers to be defined the way they are
+     * @param value
+     * @return
+     */
     public static float mapAmplitude(float value) {
         return Mth.map(value, 0, 153, 3, 10);
     }
@@ -64,7 +71,7 @@ public class SuperpositionMth {
      * @param size how many blocks the antenna is
      * @return The antenna frequency in Hz
      */
-    public static int antennaSizeToHz(int size) {
+    public static int antennaSizeToHz(float size) {
         return (int) ((14989622) / (size / 2f));
     }
 
@@ -77,6 +84,15 @@ public class SuperpositionMth {
      */
     public static int hzToAntennaSize(float frequency) {
         return Math.round(29979244 / frequency);
+    }
+
+    public static Vector3d center(List<BlockPos> positions) {
+        final Vector3d center = new Vector3d();
+        for (BlockPos position : positions) {
+            Vec3 center1 = position.getCenter();
+            center.add(center1.x, center1.y, center1.z);
+        }
+        return center.div(positions.size());
     }
 
     public static VoxelShape rotateShape(Direction from, Direction to, VoxelShape shape) {

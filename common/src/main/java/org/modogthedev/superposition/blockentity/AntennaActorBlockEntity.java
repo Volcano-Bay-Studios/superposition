@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
-import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
 public class AntennaActorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
@@ -18,18 +17,6 @@ public class AntennaActorBlockEntity extends SignalActorBlockEntity implements T
     }
 
     public String classifyAntenna() {
-        if (antenna instanceof PhysicalAntenna physicalAntenna) {
-            if (physicalAntenna.relativeCenter.x == 0 && physicalAntenna.relativeCenter.z == 0) {
-                if (physicalAntenna.size.x == 0 && physicalAntenna.size.z == 0)
-                    return "Monopole";
-                else if (physicalAntenna.size.x != 0 && physicalAntenna.size.z != 0)
-                    return "Yagi";
-            }
-            if (physicalAntenna.size.x != 0 && physicalAntenna.size.z != 0)
-                return "Log Periodic";
-            if ((physicalAntenna.avg.x != 0 && physicalAntenna.avg.z == 0) || (physicalAntenna.avg.z != 0 && physicalAntenna.avg.x == 0))
-                return "Dipole";
-        }
         return "Unknown";
     }
 

@@ -25,13 +25,8 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
 //        System.out.println(SignalManager.transmittedSignals.get(level).size());
         BlockPos sidedPos = this.getSwappedPos();
         tooltip.add(Component.literal("Transmitter Status:"));
-        float frequency = 0;
-        if (antenna != null) {
-            frequency = antenna.getFrequency();
-        }
         if (antenna != null && level.isClientSide) {
-            tooltip.add(Component.literal("Antenna Classification - " + this.classifyAntenna()));
-            tooltip.add(Component.literal("Antenna Frequency - " + SuperpositionMth.formatHz(frequency)));
+            antenna.updateTooltip(tooltip);
         }
         boolean noSignal = false;
         if (antenna != null) {
@@ -42,7 +37,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     signalForBroadcast.setEmitting(true);
                     signalForBroadcast.level = level;
                     signalForBroadcast.setSourceAntenna(this.getBlockPos());
-                    signalForBroadcast.mulAmplitude(1 / Math.max(1, Math.abs((signalForBroadcast.getFrequency() - frequency) / 100000)));
+                    antenna.updateResonantAmplitude(signalForBroadcast);
                     if (signalForBroadcast.getAmplitude() > 0.05f) {
                         SignalManager.updateSignal(signalForBroadcast);
                         signal = signalForBroadcast;

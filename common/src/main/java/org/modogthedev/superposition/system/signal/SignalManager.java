@@ -75,8 +75,9 @@ public class SignalManager {
         ifAbsent(signal.level);
         if (transmittedSignals.get(signal.level).containsKey(signal.getUuid())) {
             if (!transmittedSignals.get(signal.level).get(signal.getUuid()).isEmitting()) {
-                transmittedSignals.get(signal.level).get(signal.getUuid()).changeUUID();
-                Signal signal1 = transmittedSignals.get(signal.level).get(signal.getUuid());
+                Signal oldSignal = transmittedSignals.get(signal.level).get(signal.getUuid());
+                oldSignal.changeUUID();
+                Signal signal1 = oldSignal;
                 transmittedSignals.get(signal.level).put(signal1.getUuid(), signal1);
                 transmittedSignals.get(signal.level).put(signal.getUuid(), new Signal(signal));
             } else {

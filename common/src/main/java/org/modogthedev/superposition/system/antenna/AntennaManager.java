@@ -46,23 +46,17 @@ public class AntennaManager {
     public static void submitSignalToAntenna(Signal signal, Antenna antenna) {
         BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
 
-        if (!antenna.receiver) {
+        if (!antenna.isReceiving) {
             return;
-        }
-        float bonusFrequency = 0;
-        BlockEntity blockEntity = signal.level.getBlockEntity(antenna.antennaActor);
-        if (blockEntity instanceof AntennaActorBlockEntity antennaActorBlockEntity) {
-            bonusFrequency = antennaActorBlockEntity.getBounusFrequency();
         }
 
         float dist = (float) antenna.getPosition().distanceTo(Vec3.atLowerCornerOf(pos));
-        float antennaFrequency = antenna.getFrequency() + bonusFrequency;
 
         if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
             Signal signal1 = new Signal(signal);
 
             signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
-            signal1.mulAmplitude(1.0F / Math.max(1, 1f / (SuperpositionMth.resonanceAlgorithm(SuperpositionMth.hzToAntennaSize(antennaFrequency), Math.max(1, SuperpositionMth.hzToAntennaSize(signal.getFrequency()))))));
+            antenna.updateResonantAmplitude(signal1);
             Vec3 to = antenna.antennaActor.getCenter().add(antenna.getPosition().x, antenna.getPosition().y, antenna.getPosition().z);
             float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(to.x, to.y, to.z));
             signal1.addTraversalDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
@@ -142,7 +136,7 @@ public class AntennaManager {
                     return;
                 }
                 PhysicalAntenna newAntenna = new PhysicalAntenna(parts, thisPart.base(), level);
-                newAntenna.receiver = (level.getBlockState(thisPart.base()).getBlock().equals(SuperpositionBlocks.RECEIVER.get()));
+                newAntenna.isReceiving = (level.getBlockState(thisPart.base()).getBlock().equals(SuperpositionBlocks.RECEIVER.get()));
                 newAntenna.updateDimensions();
                 antennas.get(level).add(newAntenna);
                 BlockEntity blockEntity = level.getBlockEntity(newAntenna.antennaActor);

@@ -33,7 +33,6 @@ public class SuperpositionClientPacketHandler {
         Level level = ctx.level();
         if (level == null) {
             Superposition.LOGGER.warn("Server sent inscriber screen for unknown level");
-            return;
         }
 
         ScreenManager.openInscriber(new Card(packet.tag().getCompound("card")),packet.pos());
