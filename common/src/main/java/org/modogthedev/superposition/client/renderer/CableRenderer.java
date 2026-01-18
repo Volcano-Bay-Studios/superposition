@@ -99,26 +99,6 @@ public class CableRenderer {
         List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
         List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
 
-//        if (cable.getPoints().getFirst().getAnchor() != null) {
-//            RopeNode point = cable.getPoints().getFirst();
-//            Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
-//            splinePoints.addFirst(pos);
-//            prevSplinePoints.addFirst(pos);
-//        } else {
-//            splinePoints.addFirst(cable.getPoints().getFirst().getPosition());
-//            prevSplinePoints.addFirst(cable.getPoints().getFirst().getPrevRenderPosition());
-//        }
-
-//        if (cable.getPoints().getLast().getAnchor() != null) {
-//            RopeNode point = cable.getPoints().getLast();
-//            Vec3 pos = point.getAnchor().getAnchorBlock().getCenter().relative(point.getAnchor().getDirection(), 0.51f);
-//            splinePoints.add(pos);
-//            prevSplinePoints.add(pos);
-//        } else {
-//            splinePoints.add(cable.getPoints().getLast().getPosition());
-//            prevSplinePoints.add(cable.getPoints().getLast().getPrevRenderPosition());
-//        }
-
         int color = 0xFF000000 | cable.getColor().getRGB();
         float constantRadius = SuperpositionConstants.cableWidth / 2.0f;
         float v = 0;

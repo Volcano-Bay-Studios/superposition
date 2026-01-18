@@ -61,7 +61,7 @@ public class ClientSignalManager {
                 }
             }
             if (signals.size() < count) {
-                for (int i = 0; i < count; i++) {
+                for (int i = signals.size(); i < count; i++) {
                     UUID id = buf.readUUID();
                     Signal signal = new Signal(level,id, buf);
                     signal.level = level;

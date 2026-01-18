@@ -63,7 +63,7 @@ public class Superposition {
     }
 
     public static void clientTick(Level level) {
-        VeilBloomRenderer.enable();
+        VeilBloomRenderer.tryEnable();
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
         CablePassthroughManager.tick(level);

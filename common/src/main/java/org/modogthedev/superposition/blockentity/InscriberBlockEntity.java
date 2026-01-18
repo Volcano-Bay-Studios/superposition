@@ -79,7 +79,10 @@ public class InscriberBlockEntity extends SignalActorBlockEntity implements Tick
 
     @Override
     public List<Signal> getSignals() {
-        if (card != null && outputSignal != null) {
+        if (outputSignal == null) {
+            outputSignal = new Signal(SuperpositionMth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
+        }
+        if (card != null) {
             outputSignal.encode(card.save(new CompoundTag()));
         }
         return SignalHelper.listOf(outputSignal);

@@ -5,9 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Clearable;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -59,6 +57,11 @@ public class InscriberBlock extends SignalActorTickingBlock implements EntityBlo
         } else {
             return direction == level.getBlockState(pos).getValue(FACING).getCounterClockWise();
         }
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override

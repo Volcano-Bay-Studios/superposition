@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,7 +89,7 @@ public class RopeNode {
             velocity = velocity.scale(0.9f);
         }
 
-        position = prevPosition.add(velocity);
+        position = SableCompat.tryTransform(level,prevPosition.add(velocity));
     }
 
     public Vec3 getRenderPosition(float partialTicks) {
@@ -148,6 +149,7 @@ public class RopeNode {
 
     public void setAnchor(Direction direction, BlockPos pos) {
         this.anchor = new AnchorConstraint(
+                simulation,
                 direction, pos, this,
                 () -> simulation.getNode(simulation.getNodes().indexOf(this) - 1),
                 () -> simulation.getNode(simulation.getNodes().indexOf(this) + 1),

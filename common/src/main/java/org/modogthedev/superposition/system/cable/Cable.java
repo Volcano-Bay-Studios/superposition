@@ -45,7 +45,7 @@ public class Cable {
 
     public Cable(UUID id, Vec3 starAnchor, Vec3 endAnchor, int points, Level level, Color color, boolean emitsLight) {
         this.id = id;
-        this.ropeSimulation = new RopeSimulation(this.radius, false);
+        this.ropeSimulation = new RopeSimulation(level, this.radius, false);
         this.ropeSimulation.createRope(points, starAnchor, endAnchor);
         this.level = level;
         this.color = color;
@@ -95,12 +95,23 @@ public class Cable {
                 start = this.level.getBlockEntity(startPos);
                 if (start instanceof SignalActorBlockEntity startSignalActor) {
                     List<Signal> signalsFromBlock = startSignalActor.getSideSignals(firstNode.getAnchor().getDirection());
-                    if (signalsFromBlock != null) {
+                    if (signalsFromBlock != null) { // TODO: remove this
+                        for (Signal signal : signalsFromBlock) {
+                            if (signal == null) {
+                                throw new NullPointerException(start + " is returning null signals.");
+                            }
+                        }
                         signalList.addAll(signalsFromBlock);
                     }
                 } else {
                     List<Signal> signalsFromBlock = CablePassthroughManager.getSignalsFromBlock(this.level, startPos);
+
                     if (signalsFromBlock != null) {
+                        for (Signal signal : signalsFromBlock) {
+                            if (signal == null) {
+                                throw new NullPointerException(startPos + " is holding null signals.");
+                            }
+                        }
                         signalList.addAll(signalsFromBlock);
                     }
                 }
@@ -245,7 +256,7 @@ public class Cable {
         boolean emitsLight = (flags & 1) != 0;
         boolean sleeping = (flags & 2) != 0;
         int size = buf.readVarInt();
-        RopeSimulation ropeSimulation = new RopeSimulation(SuperpositionConstants.cableRadius, sleeping);
+        RopeSimulation ropeSimulation = new RopeSimulation(level, SuperpositionConstants.cableRadius, sleeping);
         for (int i = 0; i < size; i++) {
             RopeNode newPoint = new RopeNode(buf.readVec3());
             ropeSimulation.addNode(newPoint);

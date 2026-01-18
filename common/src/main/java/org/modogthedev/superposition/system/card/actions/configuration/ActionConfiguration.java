@@ -34,7 +34,9 @@ public class ActionConfiguration implements Cloneable {
 
     public ActionConfiguration copy() {
         try {
-            return (ActionConfiguration) clone();
+            ActionConfiguration clone = (ActionConfiguration) clone();
+            clone.selfReference = getSelfReference();
+            return clone;
         } catch (CloneNotSupportedException e) {
             return null;
         }

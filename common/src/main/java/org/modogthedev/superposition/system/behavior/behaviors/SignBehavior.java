@@ -24,19 +24,19 @@ public class SignBehavior extends Behavior implements ScanBehavior, ManipulateBe
     @Override
     public void scan(CompoundTag tag, AnalyserBlockEntity analyserBlockEntity, Level level, BlockPos pos, BlockState state) {
         String text = "";
-            BlockEntity blockEntity1 = level.getBlockEntity(pos);
-            if (blockEntity1 instanceof SignBlockEntity signBlockEntity) {
-                for (Component component : signBlockEntity.getFrontText().getMessages(true)) {
-                    if (!component.getString().isEmpty())
-                        text = text.concat((text.isEmpty() ? "" : " ") + component.getString());
-                }
-                for (Component component : signBlockEntity.getBackText().getMessages(true)) {
-                    if (!component.getString().isEmpty())
-                        text = text.concat((text.isEmpty() ? "" : " ") + component.getString());
-                }
+        BlockEntity blockEntity1 = level.getBlockEntity(pos);
+        if (blockEntity1 instanceof SignBlockEntity signBlockEntity) {
+            for (Component component : signBlockEntity.getFrontText().getMessages(true)) {
+                if (!component.getString().isEmpty())
+                    text = text.concat((text.isEmpty() ? "" : " ") + component.getString());
             }
+            for (Component component : signBlockEntity.getBackText().getMessages(true)) {
+                if (!component.getString().isEmpty())
+                    text = text.concat((text.isEmpty() ? "" : " ") + component.getString());
+            }
+        }
         if (!text.isEmpty())
-            tag.putString(getSelfReference().getPath(),text);
+            tag.putString(getSelfReference().getPath(), text);
     }
 
     @Override
@@ -44,9 +44,11 @@ public class SignBehavior extends Behavior implements ScanBehavior, ManipulateBe
         if (signal != null && signal.getEncodedData() != null) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof SignBlockEntity signBlockEntity) {
-                String string = DataHelper.getStringKey(signal, "line");
-                if (string != null) {
-                    signBlockEntity.setText(new SignText().setMessage(0, Component.literal(string)), true);
+                for (int i = 0; i < 5; i++) {
+                    String string = DataHelper.getStringKey(signal, "line" + i);
+                    if (string != null) {
+                        signBlockEntity.setText(new SignText().setMessage(i, Component.literal(string)), true);
+                    }
                 }
             }
         }

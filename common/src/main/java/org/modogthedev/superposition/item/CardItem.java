@@ -103,11 +103,8 @@ public class CardItem extends Item {
                 boolean creative = context.getPlayer().getAbilities().instabuild;
                 if (cardHolder.getCard() == null) {
                     cardHolder.setCard(card);
-                    context.getItemInHand().shrink(1);
-                    if (!creative)
-                        return InteractionResult.CONSUME;
-                    else
-                        return InteractionResult.SUCCESS;
+                    context.getItemInHand().setCount(0);
+                    return InteractionResult.SUCCESS;
                 }
             }
         }

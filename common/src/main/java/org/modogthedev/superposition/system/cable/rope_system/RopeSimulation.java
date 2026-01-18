@@ -10,13 +10,15 @@ public class RopeSimulation {
 
     float connectionWidth;
 
+    Level level;
     List<RopeNode> nodes = new ArrayList<>();
     List<RopeConstraint> baseConstraints = new ArrayList<>();
     List<RopeConstraint> constraints = new ArrayList<>();
 
     int sleepTime = 0;
 
-    public RopeSimulation(float connectionWidth, boolean sleeping) {
+    public RopeSimulation(Level level, float connectionWidth, boolean sleeping) {
+        this.level = level;
         this.connectionWidth = connectionWidth;
         this.sleepTime = sleeping ? 21 : 0;
     }
@@ -254,4 +256,7 @@ public class RopeSimulation {
         return sleepTime > 20;
     }
 
+    public Level getLevel() {
+        return level;
+    }
 }
