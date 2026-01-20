@@ -44,7 +44,7 @@ public class CableItem extends Item {
         for (Cable cable : CableManager.getLevelCables(level)) {
             if (cable.hasPlayerHolding(player.getId())) {
                 if (!player.isShiftKeyDown()) {
-                    CableManager.playerExtendsCable(player, SuperpositionConstants.cableSpawnAmount);
+                    CableManager.playerExtendsCable(player, SuperpositionConstants.cableExtendAmount);
                 } else {
                     CableManager.playerShrinksCable(player);
                 }

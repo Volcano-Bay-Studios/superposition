@@ -266,7 +266,7 @@ public class CableManager {
         }
     }
 
-    public static void playerExtendsCable(Player player, int amount) {
+    public static boolean playerExtendsCable(Player player, int amount) {
         for (Cable cable : getLevelCables(player.level())) {
             int id = player.getId();
             if (cable.hasPlayerHolding(id)) {
@@ -276,21 +276,23 @@ public class CableManager {
                     cable.addPointAtIndex(index, new RopeNode(pos));
                 }
                 cable.addPlayerHoldingPoint(id, Math.min(cable.getPoints().size() - 1, index + amount));
+                return true;
             }
         }
+        return false;
     }
 
-    public static void playerShrinksCable(Player player) {
+    public static boolean playerShrinksCable(Player player) {
         Map<UUID, Cable> cables = getCables(player.level());
         if (cables == null) {
-            return;
+            return false;
         }
 
         for (Map.Entry<UUID, Cable> entry : cables.entrySet()) {
             Cable cable = entry.getValue();
             if (cable.getPoints().size() < 4) {
                 removeCable(player.level(), entry.getKey());
-                return;
+                return true;
             }
 
             int id = player.getId();
@@ -299,8 +301,10 @@ public class CableManager {
                 cable.stopPlayerDrag(id);
                 cable.getPoints().remove(index);
                 cable.addPlayerHoldingPoint(id, index == 0 ? 0 : (index - 1));
+                return true;
             }
         }
+        return false;
     }
 
     public static void addCable(Cable cable, Level level) {

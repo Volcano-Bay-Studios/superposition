@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.system.antenna.type;
 
-import com.jcraft.jorbis.Block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -156,16 +155,19 @@ public class PhysicalAntenna extends Antenna {
                     if (antennaPart.getY() == startPos.getY() && antennaPart.getZ() == startPos.getZ()) {
                         matching.add(antennaPart);
                     }
+                    break;
                 }
                 case Y: {
                     if (antennaPart.getX() == startPos.getX() && antennaPart.getZ() == startPos.getZ()) {
                         matching.add(antennaPart);
                     }
+                    break;
                 }
                 case Z: {
                     if (antennaPart.getX() == startPos.getX() && antennaPart.getY() == startPos.getY()) {
                         matching.add(antennaPart);
                     }
+                    break;
                 }
             }
         }

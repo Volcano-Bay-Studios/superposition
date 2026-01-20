@@ -56,16 +56,13 @@ public class AntennaManager {
             Signal signal1 = new Signal(signal);
 
             signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
-            antenna.updateResonantAmplitude(signal1);
             Vec3 to = antenna.antennaActor.getCenter().add(antenna.getPosition().x, antenna.getPosition().y, antenna.getPosition().z);
             float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(to.x, to.y, to.z));
             signal1.addTraversalDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
-            // TODO: Synchronize the state of the signal when its received.
+            // TODO: Do all of this inside the antenna.
             signal1.mulAmplitude(Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0));
 
-            if (signal1.getAmplitude() > 0.5f) {
-                antenna.signals.add(signal1);
-            }
+                antenna.receiveSignal(signal1);
         }
     }
 

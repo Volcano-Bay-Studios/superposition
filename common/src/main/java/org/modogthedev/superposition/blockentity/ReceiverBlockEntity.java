@@ -9,7 +9,6 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;

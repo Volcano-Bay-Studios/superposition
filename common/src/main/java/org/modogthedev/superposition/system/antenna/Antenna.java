@@ -5,7 +5,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 
 import java.util.*;
 
@@ -39,7 +38,7 @@ public class Antenna {
 
         for (UUID uuid : signalsSentThisTick.keySet()) {
             List<Signal> thisSignalList = signalsSentThisTick.getOrDefault(uuid,new ArrayList<>());
-            List<Signal> oldSignalList = signalsSentLastTick.getOrDefault(uuid, new  ArrayList<>());
+            List<Signal> oldSignalList = signalsSentLastTick.getOrDefault(uuid, new ArrayList<>());
             try {
                 if (!oldSignalList.getFirst().equals(thisSignalList.getFirst())) {
                     for (Signal signal : oldSignalList) {
@@ -72,7 +71,7 @@ public class Antenna {
     }
 
     public void receiveSignal(Signal signal) {
-
+        signals.add(signal);
     }
 
     public boolean isPos(BlockPos pos) {
@@ -97,5 +96,13 @@ public class Antenna {
 
     public void updateResonantAmplitude(Signal signal) {
 
+    }
+
+    public void stopBroadcasting() {
+        for (List<Signal> signals : signalsSentLastTick.values()) {
+            for (Signal signal : signals) {
+                signal.stop();
+            }
+        }
     }
 }

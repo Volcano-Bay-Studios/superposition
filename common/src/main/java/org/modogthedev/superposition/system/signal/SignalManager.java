@@ -1,14 +1,11 @@
 package org.modogthedev.superposition.system.signal;
 
 import foundry.veil.api.network.VeilPacketManager;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
@@ -23,14 +20,8 @@ public class SignalManager {
         AntennaManager.clearSignals(level);
 
         Iterator<Signal> iterator = transmittedSignals.get(level).values().iterator();
-        BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
         while (iterator.hasNext()) {
             Signal signal = iterator.next();
-            blockPos.set(signal.getSourceAntennaPos());
-            BlockState baseState = level.getBlockState(blockPos);
-            if (!baseState.is(SuperpositionBlocks.TRANSMITTER.get())) {
-                stopSignal(signal);
-            }
             if (signal.tick()) {
                 iterator.remove();
             }

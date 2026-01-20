@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.system.signal;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -31,8 +30,6 @@ public class Signal {
     private float sourceFrequency;
     private boolean emitting = true;
     private int lifetime = 0;
-    @Deprecated
-    private BlockPos sourceAntennaPos;
     private EncodedData<?> encodedData = null;
     private float distance = 0;
     @Deprecated
@@ -64,7 +61,6 @@ public class Signal {
         this.frequency = frequency;
         this.amplitude = amplitude;
         this.sourceFrequency = sourceFrequency;
-        setSourceAntenna(new BlockPos((int) pos.x(), (int) pos.y(), (int) pos.z()));
     }
 
     public Signal(Level level, UUID uuid, FriendlyByteBuf buf) {
@@ -86,7 +82,6 @@ public class Signal {
         this.sourceFrequency = buf.readFloat();
         this.emitting = buf.readBoolean();
         this.lifetime = buf.readVarInt();
-        this.sourceAntennaPos = buf.readBlockPos();
         int ordinal = buf.readVarInt();
         if (ordinal > 0) {
             this.encodedData = EncodedData.Type.values()[ordinal - 1].getCodec().decode(buf);
@@ -104,7 +99,6 @@ public class Signal {
         buf.writeFloat(this.sourceFrequency);
         buf.writeBoolean(this.emitting);
         buf.writeVarInt(this.lifetime);
-        buf.writeBlockPos(this.sourceAntennaPos);
         if (this.encodedData != null) {
             EncodedData.Type type = this.encodedData.type();
             buf.writeVarInt(type.ordinal() + 1);
@@ -124,7 +118,6 @@ public class Signal {
         this.amplitude = signal.amplitude;
         this.pos.set(signal.pos);
         this.sourceFrequency = signal.sourceFrequency;
-        this.sourceAntennaPos = signal.sourceAntennaPos;
         this.encodedData = signal.encodedData;
     }
 
@@ -213,10 +206,6 @@ public class Signal {
         return this.emitting;
     }
 
-    public BlockPos getSourceAntennaPos() {
-        return this.sourceAntennaPos;
-    }
-
     @Nullable
     public EncodedData<?> getEncodedData() {
         return this.encodedData;
@@ -256,10 +245,6 @@ public class Signal {
 
     public float getTraversalDistance() {
         return distance;
-    }
-
-    public void setSourceAntenna(BlockPos sourceAntennaPos) {
-        this.sourceAntennaPos = sourceAntennaPos;
     }
 
     @Override
