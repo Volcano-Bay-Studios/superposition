@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.client.renderer.block;
+ package org.modogthedev.superposition.client.renderer.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -89,16 +89,21 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
         Float[] signals = new Float[size];
         Arrays.fill(signals, 1f);
-        for (Signal signal : be.signals) {
+        for (Signal signal : be.getSignals()) {
             if (signal != null) {
                 float frequency = Mth.map(signal.getFrequency() / 100000, 0, 158, 0, 256);
                 int slot = Mth.clamp(Math.round(frequency), 2, 254);
-                float normalValue = Mth.map(signal.getAmplitude(), 0, 40, 1, 2);
-                signals[slot - 2] = normalValue / 1.6f;
-                signals[slot - 1] = normalValue / 1.2f;
-                signals[slot] = normalValue;
-                signals[slot + 1] = normalValue / 1.2f;
-                signals[slot + 2] = normalValue / 1.6f;
+                float normalValue = Mth.map(signal.getAmplitude(), 0, 40, 0, 1);
+                signals[slot - 2] += normalValue / 8f + signals[slot];
+                signals[slot - 1] += normalValue / 4f + signals[slot-1];
+                signals[slot] += normalValue + signals[slot];
+                signals[slot + 1] += normalValue / 4f + signals[slot + 1];
+                signals[slot + 2] += normalValue / 8f + signals[slot + 2];
+                signals[slot - 2] /= 2;
+                signals[slot - 1] /= 2;
+                signals[slot] /= 2;
+                signals[slot + 1] /= 2;
+                signals[slot + 2] /= 2;
             }
         }
         for (int i = 0; i < size; i++) {
@@ -111,6 +116,8 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
             }
             y += (float) (Math.random() / 64) * transformDown;
             yinverse = -y + .42f + (.05f * transformDown);
+            y = Math.min(y,0.55f);
+            yinverse = Math.max(yinverse, -0.55f);
 
             buffer
                     .addVertex(m, x + part, 0.5001f, yinverse)

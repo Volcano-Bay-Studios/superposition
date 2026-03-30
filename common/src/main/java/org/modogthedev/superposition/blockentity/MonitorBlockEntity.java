@@ -12,10 +12,7 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class MonitorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     public MonitorBlockEntity(BlockPos pos, BlockState state) {
@@ -23,7 +20,6 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
     }
 
     private BlockPos linkedPos = null;
-    public Signal[] signals = new Signal[12];
     public float highestValue = 0;
     public float lowestValue = 0;
     public List<String> text = new ArrayList<>();
@@ -39,14 +35,21 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
         for (Signal signal : getSignals()) {
             EncodedData<?> encodedData = signal.getEncodedData();
             if (encodedData != null) {
-                text.add(encodedData.stringValue());
+                EncodedData.Type type = encodedData.type();
+                if (type != EncodedData.Type.STRING && type != EncodedData.Type.COMPOUND_TAG) {
+                    text.add(encodedData.stringValue());
+                } else {
+                    text.add('"' + encodedData.stringValue() + '"');
+                }
                 stateData = true;
             }
         }
         if (!text.isEmpty()) {
             StringBuilder whole = new StringBuilder();
-            for (String string : text) {
-                whole.append(" ").append(string);
+            Iterator<String> iterator = text.iterator();
+            while (iterator.hasNext()) {
+                String next = iterator.next();
+                whole.append(next).append(iterator.hasNext() ? ", " : "");
             }
             String[] strings = (WordUtils.wrap(whole.toString(), 14, "\n", true)).split("\n");
             text = new ArrayList<>(Arrays.asList(strings));
@@ -80,7 +83,6 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
                     amplitudeSorted.remove(amplitudeSorted.getLast());
                     frequencySorted.remove(frequencySorted.getLast());
                 }
-                signals = frequencySorted.toArray(new Signal[12]);
             }
         }
         super.tick();

@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         if (antenna == null) {
             return new ArrayList<>();
         }
-        antenna.signals.clear();
         if (level.isClientSide)
             return putSignals;
         return antenna.signals;

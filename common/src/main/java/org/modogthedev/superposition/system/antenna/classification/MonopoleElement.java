@@ -1,9 +1,7 @@
 package org.modogthedev.superposition.system.antenna.classification;
 
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.system.antenna.AntennaElement;
-import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class MonopoleElement extends AntennaElement {
@@ -16,6 +14,11 @@ public class MonopoleElement extends AntennaElement {
     @Override
     public String getClassificationName() {
         return "Monopole";
+    }
+
+    @Override
+    public double getQValue() {
+        return 6;
     }
 
     @Override

@@ -5,7 +5,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
@@ -48,6 +47,8 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                         broadcastSignal.level = level;
                     }
                     antenna.sendSignals(signals);
+                } else {
+                    antenna.sendSignals(List.of());
                 }
             }
         }

@@ -8,7 +8,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
 import org.modogthedev.superposition.system.antenna.Antenna;
-import org.modogthedev.superposition.system.antenna.AntennaManager;
 
 import java.util.*;
 
@@ -49,7 +48,7 @@ public class SignalManager {
         antenna.signals.clear();
         for (Signal signal : transmittedSignals.get(antenna.level).values()) {
             if (antenna.isReceiving) {
-                AntennaManager.submitSignalToAntenna(signal, antenna);
+                antenna.receiveSignal(signal);
             }
         }
     }
@@ -65,7 +64,7 @@ public class SignalManager {
             return;
         }
         ifAbsent(signal.level);
-       if (transmittedSignals.get(signal.level).containsKey(signal.getUuid())) {
+        if (transmittedSignals.get(signal.level).containsKey(signal.getUuid())) {
             if (!transmittedSignals.get(signal.level).get(signal.getUuid()).equals(signal)) {
                 Signal oldSignal = transmittedSignals.get(signal.level).get(signal.getUuid());
                 oldSignal.changeUUID();

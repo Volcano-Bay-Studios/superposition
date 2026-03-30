@@ -54,7 +54,7 @@ public class Signal {
                 return true;
             }
         }
-        maxDist = lifetime * SPEED;
+        maxDist = Math.min(maxRange,lifetime * SPEED);
         return false;
     }
 
@@ -163,6 +163,7 @@ public class Signal {
         if (this.emitting) {
             this.endTime = this.lifetime;
             this.emitting = false;
+            changeBroadcastUUID();
         }
     }
 
@@ -250,7 +251,7 @@ public class Signal {
     }
 
     public void addTraversalDistance(float distance) {
-        this.distance = distance;
+        this.distance += distance;
     }
 
     public float getTraversalDistance() {
@@ -269,12 +270,12 @@ public class Signal {
             EncodedData<?> signalEncodedData = getEncodedData();
             EncodedData<?> otherSignalEncodedData = signal.getEncodedData();
             if (signalEncodedData != null && otherSignalEncodedData != null) {
-                if (signalEncodedData.equals(otherSignalEncodedData)) {
+                if (!signalEncodedData.equals(otherSignalEncodedData)) {
                     return false;
                 }
             }
             float amplitudeDifference = Math.abs(getAmplitude() - signal.getAmplitude());
-            return (getFrequency() == signal.getFrequency()) && amplitudeDifference < 1;
+            return (getFrequency() == signal.getFrequency()) && amplitudeDifference < 0.1;
         }
         return false;
     }

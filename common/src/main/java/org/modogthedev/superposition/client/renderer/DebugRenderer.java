@@ -51,7 +51,7 @@ public class DebugRenderer {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, signal.getPos().add(0, 1, 0, POS), 0.3f, 0.5f, 0.5f, 0.9f);
         }
         for (Antenna antenna : AntennaManager.getAntennaList(level)) {
-            drawPosBox((PoseStack) matrixStack, vertexConsumer, antenna.getPosition(), 0.5f, 0.5f, 0.9f, 0.5f);
+            drawPosBox((PoseStack) matrixStack, vertexConsumer, new Vec3(antenna.getPosition().x,antenna.getPosition().y,antenna.getPosition().z), 0.5f, 0.5f, 0.9f, 0.5f);
             for (AntennaElement antennaElement : antenna.getAntennaElements()) {
                 drawPosBox((PoseStack) matrixStack, vertexConsumer, antennaElement.getPosition(), 0.25f, 0.5f, 0.9f, 0.5f);
             }

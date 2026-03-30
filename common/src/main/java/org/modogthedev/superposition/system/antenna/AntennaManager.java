@@ -2,20 +2,14 @@ package org.modogthedev.superposition.system.antenna;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
-import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.BlockHelper;
-import org.modogthedev.superposition.util.LongRaycast;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +23,7 @@ public class AntennaManager {
         List<Antenna> levelAntennas = antennas.get(level);
         if (levelAntennas != null) {
             for (Antenna antenna : levelAntennas) {
+                antenna.signals.clear();
                 SignalManager.postSignalsToAntenna(antenna);
             }
         }
@@ -52,25 +47,6 @@ public class AntennaManager {
         }
         for (Antenna antenna : levelAntennas) {
             antenna.signals.clear();
-        }
-    }
-
-    public static void submitSignalToAntenna(Signal signal, Antenna antenna) {
-        BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
-
-        float dist = (float) antenna.getPosition().distanceTo(Vec3.atLowerCornerOf(pos));
-
-        if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
-            Signal signal1 = new Signal(signal);
-
-            signal1.mulAmplitude(1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
-            Vec3 to = antenna.antennaActor.getCenter().add(antenna.getPosition().x, antenna.getPosition().y, antenna.getPosition().z);
-            float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(to.x, to.y, to.z));
-            signal1.addTraversalDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
-            // TODO: Do all of this inside the antenna.
-            signal1.mulAmplitude(Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0));
-
-                antenna.receiveSignal(signal1);
         }
     }
 

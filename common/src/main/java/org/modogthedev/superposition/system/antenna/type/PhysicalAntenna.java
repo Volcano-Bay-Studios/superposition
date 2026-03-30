@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaElement;
@@ -96,7 +95,7 @@ public class PhysicalAntenna extends Antenna {
         this.getRelativeCenter(this.relativeCenter);
         this.getAvg(this.avg);
         this.calculateSize();
-        setPosition(new Vec3(antennaActor.getX(), antennaActor.getY() + highSize.y(), antennaActor.getZ()));
+        setPosition(new Vector3d(antennaActor.getX(), antennaActor.getY() + highSize.y(), antennaActor.getZ()));
         classifyAntenna();
     }
 
