@@ -17,7 +17,6 @@ public class SignalManager {
 
     public static void tick(ServerLevel level) {
         ifAbsent(level);
-        AntennaManager.clearSignals(level);
 
         Iterator<Signal> iterator = transmittedSignals.get(level).values().iterator();
         while (iterator.hasNext()) {
@@ -49,7 +48,9 @@ public class SignalManager {
     public static void postSignalsToAntenna(Antenna antenna) {
         antenna.signals.clear();
         for (Signal signal : transmittedSignals.get(antenna.level).values()) {
-            AntennaManager.submitSignalToAntenna(signal, antenna);
+            if (antenna.isReceiving) {
+                AntennaManager.submitSignalToAntenna(signal, antenna);
+            }
         }
     }
 
@@ -64,29 +65,28 @@ public class SignalManager {
             return;
         }
         ifAbsent(signal.level);
-        if (transmittedSignals.get(signal.level).containsKey(signal.getUuid())) {
-            if (!transmittedSignals.get(signal.level).get(signal.getUuid()).isEmitting()) {
+       if (transmittedSignals.get(signal.level).containsKey(signal.getUuid())) {
+            if (!transmittedSignals.get(signal.level).get(signal.getUuid()).equals(signal)) {
                 Signal oldSignal = transmittedSignals.get(signal.level).get(signal.getUuid());
                 oldSignal.changeUUID();
-                Signal signal1 = oldSignal;
-                transmittedSignals.get(signal.level).put(signal1.getUuid(), signal1);
-                transmittedSignals.get(signal.level).put(signal.getUuid(), new Signal(signal));
+                oldSignal.stop();
+                transmittedSignals.get(signal.level).put(oldSignal.getUuid(), oldSignal);
+                transmittedSignals.get(signal.level).put(signal.getUuid(), signal);
+                signal.markUpdate();
             } else {
                 transmittedSignals.get(signal.level).get(signal.getUuid()).copy(signal);
             }
         } else {
-            transmittedSignals.get(signal.level).put(signal.getUuid(), new Signal(signal));
+            signal.markUpdate();
+            transmittedSignals.get(signal.level).put(signal.getUuid(), signal);
         }
     }
 
-    public static void stopSignal(Signal signal) {
-        if (signal != null) {
-            if (signal.level.isClientSide) {
-                ClientSignalManager.stopSignal(signal);
-            } else if (transmittedSignals.get(signal.level).containsKey(signal.getUuid()) && transmittedSignals.get(signal.level).get(signal.getUuid()).isEmitting()) {
-                transmittedSignals.get(signal.level).get(signal.getUuid()).stop();
+    public static void markSignalUpdate(Signal broadcastSignal) {
+        for (Signal value : transmittedSignals.get(broadcastSignal.level).values()) {
+            if (value.getBroadcastUuid().equals(broadcastSignal.getBroadcastUuid())) {
+                value.markUpdate();
             }
         }
     }
-
 }

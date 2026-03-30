@@ -80,10 +80,10 @@ public class SuperpositionMth {
      * <a href="https://www.ahsystems.com/EMC-formulas-equations/frequency-wavelength-calculator.php"> See </a>
      *
      * @param frequency The frequency to convert
-     * @return The antenna size, rounded as an integer
+     * @return The antenna size, in meters
      */
-    public static int hzToAntennaSize(float frequency) {
-        return Math.round(29979244 / frequency);
+    public static float hzToAntennaSize(float frequency) {
+        return (29979244 / frequency);
     }
 
     public static Vector3d center(List<BlockPos> positions) {
@@ -120,6 +120,20 @@ public class SuperpositionMth {
             return 0;
         }
         return (float) n1 / n2;
+    }
+
+    /**
+     * This method returns a value
+     * @param antennaSize a
+     * @param signalWavelength x
+     * @return A multiplier for the amplitude of the signal
+     */
+    public static double calculateAntennaAmplitude(float antennaSize, float signalWavelength) {
+        return ((Math.cos(Math.PI*2*
+                Math.log10(signalWavelength/antennaSize)
+                /Math.log10(2))
+                /Math.max(0.25f,signalWavelength))
+                +1/Math.max(0.25f,signalWavelength));
     }
 
     public static int gcdByEuclidsAlgorithm(int n1, int n2) {

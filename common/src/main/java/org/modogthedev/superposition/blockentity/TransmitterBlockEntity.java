@@ -13,8 +13,6 @@ import java.util.List;
 
 public class TransmitterBlockEntity extends AntennaActorBlockEntity {
 
-    private Signal signal;
-
     public TransmitterBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.TRANSMITTER.get(), pos, state);
     }
@@ -22,48 +20,40 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
     @Override
     public void tick() {
         List<Component> tooltip = new ArrayList<>();
-//        System.out.println(SignalManager.transmittedSignals.get(level).size());
         BlockPos sidedPos = this.getSwappedPos();
         tooltip.add(Component.literal("Transmitter Status:"));
         if (antenna != null && level.isClientSide) {
             antenna.updateTooltip(tooltip);
         }
         boolean noSignal = false;
+        boolean antennaExists = false;
+        boolean isPowered = false;
         if (antenna != null) {
-            Signal signalForBroadcast = getSignal();
-            if (signalForBroadcast != null) {
-                if (level.hasNeighborSignal(this.getBlockPos())) { //TODO: borken
-                    signalForBroadcast.getPos().set(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5);
-                    signalForBroadcast.setEmitting(true);
-                    signalForBroadcast.level = level;
-                    if (signalForBroadcast.getAmplitude() > 0.05f) {
-                        SignalManager.updateSignal(signalForBroadcast);
-                        signal = signalForBroadcast;
-                        if (level.isClientSide) {
-                            tooltip.add(Component.literal("Broadcast Frequency - " + SuperpositionMth.formatHz(signalForBroadcast.getFrequency())));
-                        }
-                    } else {
-                        this.stopTransmission();
+            antennaExists = true;
+            List<Signal> signals = getSignals();
+            noSignal = signals.isEmpty();
+            if (level.isClientSide) {
+                if (!signals.isEmpty()) {
+                    tooltip.add(Component.literal(signals.size() == 1 ? "Signal: " : "Signals: "));
+                    for (Signal broadcastSignal : signals) {
+                        tooltip.add(Component.literal(SuperpositionMth.formatHz(broadcastSignal.getFrequency())));
                     }
-                } else if (signal != null) {
-                    this.stopTransmission();
+                } else {
+                    tooltip.add(Component.literal("No Signals"));
                 }
             } else {
-                if (signal != null) {
-                    this.stopTransmission();
+                if (level.hasNeighborSignal(this.getBlockPos())) { //TODO: borken
+                    isPowered = true;
+                    for (Signal broadcastSignal : signals) {
+                        broadcastSignal.level = level;
+                    }
+                    antenna.sendSignals(signals);
                 }
-                noSignal = true;
             }
-        } else if (signal != null) {
-            this.stopTransmission();
         }
-        tooltip.add(Component.literal("Signal - " + ((signal != null) ? "BROADCASTING" : (noSignal ? "NO SIGNAL" : "OFFLINE"))));
+
+        tooltip.add(Component.literal("Status - " + ((antennaExists) ? (noSignal ? "NO SIGNAL" : ( isPowered ? "BROADCASTING" : "DISABLED")) : "NO ANTENNA")));
         this.setTooltip(tooltip);
         super.tick();
-    }
-
-    public void stopTransmission() {
-        SignalManager.stopSignal(signal);
-        signal = null;
     }
 }

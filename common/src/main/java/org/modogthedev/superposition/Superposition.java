@@ -56,6 +56,7 @@ public class Superposition {
 
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
+        AntennaManager.tickAntennas(level);
         CableSavedData.get(level);
         CableManager.tick(level);
         CablePassthroughManager.tick(level);

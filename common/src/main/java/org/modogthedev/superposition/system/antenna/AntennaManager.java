@@ -1,6 +1,7 @@
 package org.modogthedev.superposition.system.antenna;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -11,6 +12,7 @@ import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.util.BlockHelper;
 import org.modogthedev.superposition.util.LongRaycast;
 import org.modogthedev.superposition.util.SuperpositionMth;
@@ -22,7 +24,16 @@ import java.util.List;
 public class AntennaManager {
     public static HashMap<Level, List<Antenna>> antennas = new HashMap<>();
 
-    //    public static List<Antenna> antennas = new ArrayList<>();
+    public static void tickAntennas(ServerLevel level) {
+        clearSignals(level);
+        List<Antenna> levelAntennas = antennas.get(level);
+        if (levelAntennas != null) {
+            for (Antenna antenna : levelAntennas) {
+                SignalManager.postSignalsToAntenna(antenna);
+            }
+        }
+    }
+
     private static void ifAbsent(Level level) {
         if (!antennas.containsKey(level)) {
             antennas.put(level, new ArrayList<>());
@@ -35,20 +46,17 @@ public class AntennaManager {
     }
 
     public static void clearSignals(Level level) {
-        if (antennas.get(level) == null) {
+        List<Antenna> levelAntennas = antennas.get(level);
+        if (levelAntennas == null) {
             return;
         }
-        for (Antenna antenna : antennas.get(level)) {
+        for (Antenna antenna : levelAntennas) {
             antenna.signals.clear();
         }
     }
 
     public static void submitSignalToAntenna(Signal signal, Antenna antenna) {
         BlockPos pos = SuperpositionMth.blockPosFromVec3(signal.getPos());
-
-        if (!antenna.isReceiving) {
-            return;
-        }
 
         float dist = (float) antenna.getPosition().distanceTo(Vec3.atLowerCornerOf(pos));
 

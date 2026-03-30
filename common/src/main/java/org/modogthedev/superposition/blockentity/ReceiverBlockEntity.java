@@ -36,9 +36,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         antenna.signals.clear();
         if (level.isClientSide)
             return putSignals;
-        else
-            SignalManager.postSignalsToAntenna(antenna);
-
         return antenna.signals;
     }
 

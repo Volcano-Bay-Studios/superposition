@@ -87,7 +87,7 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             return null;
         }
         this.updateSignal();
-        return connectedSignal;
+        return new Signal(connectedSignal);
     }
 
     @Override

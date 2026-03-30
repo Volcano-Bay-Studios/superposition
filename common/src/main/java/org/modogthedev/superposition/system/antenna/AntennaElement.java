@@ -2,10 +2,12 @@ package org.modogthedev.superposition.system.antenna;
 
 import org.joml.Vector3d;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.SignalManager;
+import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class AntennaElement {
     protected Vector3d position;
-    protected Vector3d antennaPositionOffset;
+    protected Vector3d antennaPositionOffset = new Vector3d();
     public AntennaElement(Vector3d position) {
         this.position = position;
     }
@@ -20,10 +22,15 @@ public class AntennaElement {
 
     public Signal sendSignal(Signal signal) {
         Signal returnSignal = new Signal(signal);
+        returnSignal.changeUUID();
         returnSignal.getPos().set(position).add(antennaPositionOffset);
         returnSignal.setEmitting(true);
+        double multiplier = SuperpositionMth.calculateAntennaAmplitude(SuperpositionMth.hzToAntennaSize(getAntennaFrequency()),SuperpositionMth.hzToAntennaSize(returnSignal.getFrequency()));
+        returnSignal.mulAmplitude((float) multiplier);
 
-
+        if (returnSignal.getAmplitude() > 0.5f) {
+            SignalManager.updateSignal(returnSignal);
+        }
         return returnSignal;
     }
 

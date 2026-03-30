@@ -37,8 +37,13 @@ public class Signal {
     private int endTime = 0;
     private float maxDist = 0;
     private float minDist = 0;
+    private boolean updatedLastTick = true;
 
     public boolean tick() {
+        if (!updatedLastTick) {
+            stop();
+        }
+        updatedLastTick = false;
         lifetime++;
         float maxRange = amplitude * 5000;
         minDist = 0;
@@ -51,6 +56,10 @@ public class Signal {
         }
         maxDist = lifetime * SPEED;
         return false;
+    }
+
+    public void markUpdate() {
+        updatedLastTick = true;
     }
 
     public Signal(Vector3dc pos, Level level, float frequency, float amplitude, float sourceFrequency) {
@@ -119,6 +128,7 @@ public class Signal {
         this.pos.set(signal.pos);
         this.sourceFrequency = signal.sourceFrequency;
         this.encodedData = signal.encodedData;
+        markUpdate();
     }
 
     public void encode(boolean bool) {
@@ -256,7 +266,15 @@ public class Signal {
             return false;
         }
         if (obj instanceof Signal signal) {
-            return getEncodedData() != null && getEncodedData().equals(signal.getEncodedData());
+            EncodedData<?> signalEncodedData = getEncodedData();
+            EncodedData<?> otherSignalEncodedData = signal.getEncodedData();
+            if (signalEncodedData != null && otherSignalEncodedData != null) {
+                if (signalEncodedData.equals(otherSignalEncodedData)) {
+                    return false;
+                }
+            }
+            float amplitudeDifference = Math.abs(getAmplitude() - signal.getAmplitude());
+            return (getFrequency() == signal.getFrequency()) && amplitudeDifference < 1;
         }
         return false;
     }
