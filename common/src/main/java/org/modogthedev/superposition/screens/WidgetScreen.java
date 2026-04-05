@@ -50,7 +50,6 @@ public class WidgetScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         SuperpositionUITooltipRenderer.renderOverlay(pGuiGraphics, pPartialTick);
         setPositions();
         for (Dial dial : dials) {

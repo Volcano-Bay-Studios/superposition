@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
-import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
 
 import java.util.*;
@@ -50,7 +49,7 @@ public class ClientSignalManager {
         BlockPos pos = buf.readBlockPos();
         if (level.getBlockEntity(pos) instanceof SignalActorBlockEntity signalActorBlockEntity) {
             int count = buf.readVarInt();
-            List<Signal> signals = signalActorBlockEntity.getSignals();
+            List<Signal> signals = new ArrayList<>(signalActorBlockEntity.getSignals());
             for (int i = 0; i < Math.min(count,signals.size()); i++) {
                 UUID id = buf.readUUID();
                 signals.get(i).load(id,buf);
@@ -68,6 +67,7 @@ public class ClientSignalManager {
                     signals.add(signal);
                 }
             }
+            signalActorBlockEntity.updatePutSignals(signals);
         }
     }
 

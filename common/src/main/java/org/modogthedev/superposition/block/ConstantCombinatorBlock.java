@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.bridge.CommonRedstone;
@@ -62,7 +61,7 @@ public class ConstantCombinatorBlock extends SignalActorTickingBlock implements 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.isClientSide)
-            SuperpositionUITooltipRenderer.editingEditable = true;
+            SuperpositionUITooltipRenderer.edit(pos,level);
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }

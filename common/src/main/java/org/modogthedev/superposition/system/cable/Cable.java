@@ -24,6 +24,7 @@ import org.modogthedev.superposition.system.world.RedstoneWorld;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -230,6 +231,7 @@ public class Cable {
     }
 
     public void toBytes(FriendlyByteBuf buf) {
+        buf.writeInt(1); // Data format version, can be used in the future if data format changes
         buf.writeInt(this.color.getRGB());
         buf.writeByte((this.emitsLight ? 1 : 0) | (this.ropeSimulation.isSleeping() ? 2 : 0));
         buf.writeVarInt(this.ropeSimulation.getNodeCount());
@@ -241,6 +243,11 @@ public class Cable {
             if (constraint != null) {
                 buf.writeEnum(constraint.getDirection());
                 buf.writeBlockPos(constraint.getAnchorBlock());
+                buf.writeBoolean(constraint.getPort() != null);
+                if (constraint.getPort() != null) {
+                    buf.writeInt(constraint.getPort().length());
+                    buf.writeCharSequence(constraint.getPort(), StandardCharsets.UTF_8);
+                }
             }
         }
         buf.writeVarInt(this.playerHoldingPointMap.size());
@@ -251,6 +258,7 @@ public class Cable {
     }
 
     public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level, boolean isCreating) {
+        int version = buf.readInt();
         Color color1 = new Color(buf.readInt());
         byte flags = buf.readByte();
         boolean emitsLight = (flags & 1) != 0;
@@ -263,6 +271,11 @@ public class Cable {
             newPoint.setPrevPosition(buf.readVec3());
             if (buf.readBoolean()) {
                 newPoint.setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
+                if (buf.readBoolean()) {
+                    AnchorConstraint anchor = newPoint.getAnchor();
+                    assert anchor != null : "Rope anchor is null after it was just set";
+                    anchor.setPort((String) buf.readCharSequence(buf.readInt(),StandardCharsets.UTF_8));
+                }
             }
         }
         Cable cable = new Cable(id, ropeSimulation, level, color1, emitsLight);

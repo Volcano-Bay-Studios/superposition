@@ -146,14 +146,22 @@ public class SuperpositionUITooltipRenderer {
             tag.putInt("modifiedPosition",cursorPos);
             tag.putString("changedChar", String.valueOf(key));
             tag.putInt("stringLength",editableTooltip.getText().length());
-            Level level = Minecraft.getInstance().level;
-            if (level.getBlockEntity(editPos) instanceof SyncedBlockEntity syncedBlockEntity) {
-                syncedBlockEntity.loadSyncedData(tag);
-            }
             VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
             cursorPos++;
             cursorPos = Mth.clamp(cursorPos, -1, editableTooltip.getText().length());
             flash = -1;
+        }
+    }
+
+    public static void edit(BlockPos pos, Level level) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof EditableTooltip editableTooltip1) {
+            editableTooltip = editableTooltip1;
+            editingEditable = true;
+            if (editPos != null)
+                editPos.set(pos);
+            else
+                editPos = new BlockPos.MutableBlockPos().set(pos);
         }
     }
 
@@ -193,18 +201,16 @@ public class SuperpositionUITooltipRenderer {
             }
         }
         editableTooltip = null;
+        BlockPos focusedPos = null;
         if (result instanceof BlockHitResult blockHitResult) {
             pos = Vec3.atCenterOf(blockHitResult.getBlockPos());
             BlockEntity blockEntity = mc.level.getBlockEntity(BlockPos.containing(pos));
             if (blockEntity instanceof SPTooltipable tooltippable1) {
                 tooltippable = tooltippable1;
             }
-            if (blockEntity instanceof EditableTooltip editableTooltip1) {
-                editableTooltip = editableTooltip1;
-                if (editPos != null)
-                    editPos.set(BlockPos.containing(pos));
-                else
-                    editPos = new BlockPos.MutableBlockPos().set(BlockPos.containing(pos));
+            if (blockEntity instanceof EditableTooltip tooltip) {
+                editableTooltip = tooltip;
+                focusedPos = BlockPos.containing(pos);
             }
         }
         if (tooltippable == null && mc.screen instanceof WidgetScreen widgetScreen) {
@@ -296,6 +302,9 @@ public class SuperpositionUITooltipRenderer {
             tooltipY = (int) tooltipPosition.y;
         }
         tooltippable.drawExtra();
+        if (focusedPos != null && !focusedPos.equals(editPos)) {
+            editableTooltip = null;
+        }
         if (editableTooltip != null && editingEditable && flash < 40) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
             int xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));

@@ -10,15 +10,18 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
 import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
+import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import oshi.util.tuples.Pair;
 
@@ -133,7 +136,7 @@ public class CableManager {
                         RopeNode playerPoint = pointIndexPair.getA();
 
                         if (playerPoint.getLastHoldGoalPos() != null) {
-                            double stretch = playerPoint.calculateOverstretch()/Mth.map(cable.getPoints().size(),3,100,1,2.5f);
+                            double stretch = playerPoint.calculateOverstretch() / Mth.map(cable.getPoints().size(), 3, 100, 1, 2.5f);
                             if (level.isClientSide) {
                                 CableRenderer.stretch = (float) Math.clamp(stretch * 5f, 0, 1);
                             }
@@ -192,6 +195,16 @@ public class CableManager {
         Pair<Cable, RopeNode> rayCast = cableClipResult.rayCastForClosest(getPlayerHoldCablePos(player), .7f, true);
         if (rayCast != null) {
             Cable cable = rayCast.getA();
+            if (rayCast.getB().getAnchor() != null) {
+                if (level.getBlockEntity(rayCast.getB().getAnchor().getAnchorBlock()) instanceof SignalActorBlockEntity signalActorBlockEntity) {
+                    if (player.isShiftKeyDown()) {
+                        ScreenManager.openPort(rayCast.getB().getAnchor().getAnchorBlock());
+                        return InteractionResult.sidedSuccess(level.isClientSide());
+                    } else {
+                        signalActorBlockEntity.getPortConfig().remove(cable);
+                    }
+                }
+            }
             cable.addPlayerHoldingPoint(id, cable.getPointIndex(rayCast.getB()));
             VeilPacketManager.server().sendPacket(new PlayerGrabCableC2SPacket(cable.getId()));
             return InteractionResult.sidedSuccess(level.isClientSide());
@@ -212,7 +225,7 @@ public class CableManager {
         if (result.getType() == HitResult.Type.BLOCK) {
             holdGoalPos = result.getLocation();
         }
-        float length = (float) Math.min(5,player.getEyePosition().distanceTo(holdGoalPos));
+        float length = (float) Math.min(5, player.getEyePosition().distanceTo(holdGoalPos));
         holdGoalPos = player.getEyePosition().add(holdGoalPos.subtract(player.getEyePosition()).normalize().scale(length)); // Verifies the end result is the correct length
         return holdGoalPos;
     }
@@ -244,6 +257,16 @@ public class CableManager {
         addCable(newCable, level);
     }
 
+    public static void playerConnectCable(Cable cable, int index, Player player, BlockPos pos) {
+        BlockEntity blockEntity = player.level().getBlockEntity(pos);
+        if (blockEntity instanceof SignalActorBlockEntity signalActorBlock && (index == 0 || index == cable.getPoints().size() - 1)) {
+            if (player.level().isClientSide) {
+                signalActorBlock.getPortConfig().getScreenCables().add(new PortConfig.ScreenCable(cable, index == 0));
+                ScreenManager.openPort(pos);
+            }
+        }
+    }
+
     public static void playerFinishDraggingCable(Player player, BlockPos pos, Direction face) {
         for (Cable cable : getLevelCables(player.level())) {
             int id = player.getId();
@@ -255,6 +278,7 @@ public class CableManager {
                 RopeNode anchorPoint = pointIndexPair.getA();
                 if (face != null) {
                     anchorPoint.setAnchor(face, pos);
+                    playerConnectCable(cable, pointIndexPair.getB(), player, pos);
                 } else {
                     anchorPoint.removeAnchor();
                 }

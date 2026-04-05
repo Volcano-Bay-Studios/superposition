@@ -12,6 +12,7 @@ public class AnchorConstraint implements RopeConstraint {
     Direction direction;
     BlockPos anchorBlock;
     RopeSimulation simulation;
+    String port = null;
 
     RopeNode node;
     Supplier<RopeNode> adjacentPrev, adjacentNext;
@@ -47,6 +48,14 @@ public class AnchorConstraint implements RopeConstraint {
 
     public BlockPos getAnchorBlock() {
         return anchorBlock;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 
     @Override

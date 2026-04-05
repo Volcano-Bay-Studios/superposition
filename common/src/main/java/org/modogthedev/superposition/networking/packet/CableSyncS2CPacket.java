@@ -15,7 +15,7 @@ public class CableSyncS2CPacket implements CustomPacketPayload {
     public static final StreamCodec<FriendlyByteBuf, CableSyncS2CPacket> CODEC = StreamCodec.of((buffer, value) -> value.toBytes(buffer), CableSyncS2CPacket::new);
 
     private final UUID id;
-    private final Cable cable;
+    private Cable cable;
     private final boolean remove;
 
     public CableSyncS2CPacket(UUID id) {
@@ -33,7 +33,11 @@ public class CableSyncS2CPacket implements CustomPacketPayload {
     private CableSyncS2CPacket(FriendlyByteBuf buf) {
         this.id = buf.readUUID();
         this.remove = buf.readBoolean();
-        this.cable = this.remove ? null : Cable.fromBytes(this.id, buf, null, false);
+        try {
+            this.cable = this.remove ? null : Cable.fromBytes(this.id, buf, null, false);
+        } catch (Exception ignored) {
+            cable = null;
+        }
     }
 
     private void toBytes(FriendlyByteBuf buf) {

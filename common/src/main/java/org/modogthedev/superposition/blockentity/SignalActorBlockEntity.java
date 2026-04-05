@@ -26,6 +26,7 @@ import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
+import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.*;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
+public abstract class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
 
     @Unique
     private List<Component> veil$tooltip = new ArrayList<>();
@@ -50,6 +51,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     private boolean signalsDirty = false;
     private final List<String> configurationTooltipString = new ArrayList<>();
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
+    private PortConfig portConfig;
     int signalsReceived = 0;
 
     Object lastCall;
@@ -138,15 +140,27 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        portConfig.save(tag);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        portConfig.load(tag,getLevel());
     }
 
     public SignalActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
+        PortConfig.Builder builder = buildPorts(new PortConfig.Builder());
+        portConfig = builder.build();
+    }
+
+    public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
+        return builder.addInputPort("in").addOutputPort("out");
+    }
+
+    public PortConfig getPortConfig() {
+        return portConfig;
     }
 
     private Direction getClockWise(Direction direction) {
@@ -502,7 +516,7 @@ public class SignalActorBlockEntity extends SyncedBlockEntity implements Tickabl
             SignalHelper.updateSignalList(lastSignals, putSignals);
             lastSignals.addAll(putSignals);
             if (signalsDirty) {
-                VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(putSignals, getBlockPos()));
+                VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(getSignals(), getBlockPos()));
             }
             signalsDirty = false;
         }

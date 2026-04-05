@@ -6,6 +6,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.EditableTooltip;
@@ -53,6 +54,9 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
+        if (level != null && level.isClientSide && getBlockPos().equals(SuperpositionUITooltipRenderer.editPos)) {
+            return;
+        }
         if (tag.contains("output")) {
             outputString = tag.getString("output");
         }
@@ -87,8 +91,14 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
 
     @Override
     public Signal modulateSignal(Signal signal, boolean updateTooltip) {
+        if (level != null && level.isClientSide && getBlockPos().equals(SuperpositionUITooltipRenderer.editPos)) {
+            return null;
+        }
         if (signal.getEncodedData() != null) {
-            outputString = signal.getEncodedData().stringValue();
+            if (!outputString.equals(signal.getEncodedData().stringValue())) {
+                outputString = signal.getEncodedData().stringValue();
+                markDirty();
+            }
         }
         return signal;
     }

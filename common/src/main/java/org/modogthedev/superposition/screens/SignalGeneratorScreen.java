@@ -26,6 +26,8 @@ import org.modogthedev.superposition.blockentity.SignalGeneratorBlockEntity;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.sound.ClientAudioManager;
 
+import java.awt.*;
+
 public class SignalGeneratorScreen extends WidgetScreen {
     private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/signal_generator_background.png");
     private static final ResourceLocation PIXEL = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/pixel.png");
@@ -49,8 +51,8 @@ public class SignalGeneratorScreen extends WidgetScreen {
         freeSpin = true;
         this.pos = pos;
         ticks = 0;
-        this.addDial(-25, 0);
-        this.addDial(25, 0);
+        this.addDial(-48, 1);
+        this.addDial(-10, 1);
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof SignalGeneratorBlockEntity generatorBlockEntity) {
@@ -76,7 +78,6 @@ public class SignalGeneratorScreen extends WidgetScreen {
         } else {
             pMaxY += 3;
         }
-        // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -91,21 +92,22 @@ public class SignalGeneratorScreen extends WidgetScreen {
     }
 
     public void renderSine(GuiGraphics pGuiGraphics) {
-        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui()); // In ryan we trust
-        int startPos = (this.width - 158) / 2;
-        int j = (this.height - imageHeight) / 2;
+        this.lineConsumer = pGuiGraphics.bufferSource().getBuffer(RenderType.gui());
+        int startPos = (this.width - 152) / 2;
+        int j = (this.height - imageHeight) / 2 + 7;
         int width = this.width;
         float resolution = 0.5f;
-        for (float i = 0; i < 158; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80)) * 25);
-            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80)) * 25);
-            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
+        for (float i = 0; i < 149; i += resolution) {
+            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 150)) * 25);
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 150)) * 25);
+            Color color = new Color(0.12f, 0.9f, 0.25f, (float) Math.min(1,Math.pow(60/(Math.abs(74-i)),5)));
+            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, color.getRGB());
         }
         this.flush(pGuiGraphics);
         if (frequency < .72f || frequency > 150) {
-            pGuiGraphics.blit(WARN_ON, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
+            pGuiGraphics.blit(WARN_ON, width / 2 + 30, height / 2 - 10, 0, 0, 14, 14, 14, 14);
         } else {
-            pGuiGraphics.blit(WARN_OFF, width / 2 - 81, height / 2 - 20, 0, 0, 14, 14, 14, 14);
+            pGuiGraphics.blit(WARN_OFF, width / 2 + 30, height / 2 - 10, 0, 0, 14, 14, 14, 14);
         }
     }
 
@@ -115,11 +117,11 @@ public class SignalGeneratorScreen extends WidgetScreen {
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if ((double) width / 2 + 72 > pMouseX - 10 && (double) width / 2 + 72 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
+        if ((double) width / 2 + 62 > pMouseX - 15 && (double) width / 2 + 62 < pMouseX && (double) height / 2 - 15 > pMouseY - 24 && (double) height / 2 - 15 < pMouseY) {
             this.playSwitchSound(Minecraft.getInstance().getSoundManager(), mute);
             mute = !mute;
         }
-        if ((double) width / 2 + 58 > pMouseX - 10 && (double) width / 2 + 60 < pMouseX && (double) height / 2 - 20 > pMouseY - 24 && (double) height / 2 - 20 < pMouseY) {
+        if ((double) width / 2 + 48 > pMouseX - 10 && (double) width / 2 + 50 < pMouseX && (double) height / 2 - 15 > pMouseY - 24 && (double) height / 2 - 15 < pMouseY) {
             this.playSwitchSound(Minecraft.getInstance().getSoundManager(), swap);
             swap = !swap;
             this.updateBlock();
@@ -141,6 +143,7 @@ public class SignalGeneratorScreen extends WidgetScreen {
 
     @Override
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderBackground(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         this.calculateWavelength();
         int i = (this.width - imageWidth) / 2;
         int j = (this.height - imageHeight) / 2;
@@ -148,16 +151,16 @@ public class SignalGeneratorScreen extends WidgetScreen {
         this.renderSine(pGuiGraphics);
 //        frequency = 5;
         if (mute) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 62, height / 2 - 15, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 62, height / 2 - 15, 0, 0, 10, 24, 10, 24);
         }
         if (swap) {
-            pGuiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_ON, width / 2 + 48, height / 2 - 15, 0, 0, 10, 24, 10, 24);
 
         } else {
-            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 - 20, 0, 0, 10, 24, 10, 24);
+            pGuiGraphics.blit(SWITCH_OFF, width / 2 + 48, height / 2 - 15, 0, 0, 10, 24, 10, 24);
         }
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }

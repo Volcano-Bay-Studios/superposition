@@ -11,7 +11,7 @@ public class ScreenManager {
     private static AmplifierScreen amplifierScreen;
     private static FilterScreen filterScreen;
     private static InscriberScreen inscriberScreen;
-
+    private static PortScreen portScreen;
     public static void openSignalGenerator(BlockPos pos) {
         signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pos);
         SuperpositionClient.setScreen(signalGeneratorScreen);
@@ -32,5 +32,14 @@ public class ScreenManager {
     public static void openInscriber(Card card, BlockPos pos) {
         inscriberScreen = new InscriberScreen(card, pos);
         SuperpositionClient.setScreen(inscriberScreen);
+    }
+
+
+    public static void openPort(BlockPos pos) {
+        if (!PortScreen.shouldOpen(pos)) {
+            return;
+        }
+        portScreen = new PortScreen(pos);
+        SuperpositionClient.setScreen(portScreen);
     }
 }
