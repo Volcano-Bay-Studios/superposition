@@ -20,6 +20,7 @@ public class SuperpositionMessages {
         INSTANCE.registerServerbound(FilterItemModificationC2SPacket.TYPE, FilterItemModificationC2SPacket.CODEC, SuperpositionServerPacketHandler::handleFilterItemModification);
         INSTANCE.registerServerbound(PlayerDropCableC2SPacket.TYPE, PlayerDropCableC2SPacket.CODEC, SuperpositionServerPacketHandler::handleDropCable);
         INSTANCE.registerServerbound(PlayerGrabCableC2SPacket.TYPE, PlayerGrabCableC2SPacket.CODEC, SuperpositionServerPacketHandler::handleGrabCable);
+        INSTANCE.registerServerbound(PlayerPlugCableC2SPacket.TYPE, PlayerPlugCableC2SPacket.CODEC, SuperpositionServerPacketHandler::handlePlugCable);
     }
 
 //    public static void registerClient() {

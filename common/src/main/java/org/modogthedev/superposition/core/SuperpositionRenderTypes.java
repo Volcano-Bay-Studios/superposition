@@ -74,6 +74,13 @@ public class SuperpositionRenderTypes extends RenderType {
                 .setOverlayState(OVERLAY)
                 .createCompositeState(true));
 
+    private static final CompositeRenderType SCREEN_CABLE = create(Superposition.MODID+":screen_cable", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.QUADS, 786432, RenderType.CompositeState.builder()
+            .setShaderState(VeilRenderBridge.shaderState(Superposition.id("screen_cable")))
+            .setTextureState(new RenderStateShard.TextureStateShard(Superposition.id("textures/misc/screen_cable.png"), false, false))
+            .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+            .setDepthTestState(LEQUAL_DEPTH_TEST)
+            .createCompositeState(false));
+
 //    private static final Function<ResourceLocation, RenderType> BLOCK_POLYGON_OFFSET = texture -> {
 //
 //        return ;
@@ -112,6 +119,9 @@ public class SuperpositionRenderTypes extends RenderType {
         return POSITION_COLOR_POLYGON_OFFSET;
     }
 
+    public static RenderType screenCable() {
+        return SCREEN_CABLE;
+    }
 
 //    public static RenderType blockPolygonOffset(ResourceLocation location) {
 //        return BLOCK_POLYGON_OFFSET.apply(location);

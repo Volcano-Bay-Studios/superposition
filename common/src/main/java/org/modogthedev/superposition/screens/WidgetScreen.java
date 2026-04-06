@@ -181,7 +181,7 @@ public class WidgetScreen extends Screen {
     }
 
     public Vec2 getTooltipPosition(int w, int h) {
-        return new Vec2(w / 2f, (h / 5f) * 3f);
+        return new Vec2(w / 2f, (h / 4f) * 3f);
     }
 
     @Nullable

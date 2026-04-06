@@ -15,6 +15,7 @@ import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
 import oshi.util.tuples.Pair;
@@ -90,4 +91,22 @@ public class SuperpositionServerPacketHandler {
         Vec3 pos = points.getFirst().getPosition();
         VeilPacketManager.around(player, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(new CableSyncS2CPacket(cable));
     }
+
+    public static void handlePlugCable(PlayerPlugCableC2SPacket packet, ServerPacketContext ctx) {
+        Cable cable = CableManager.getCable(ctx.level(), packet.id());
+        if (cable != null) {
+            if (packet.isOut()) {
+                AnchorConstraint anchor = cable.getPoints().getFirst().getAnchor();
+                if (anchor != null) {
+                    anchor.setPort(packet.port());
+                }
+            } else {
+                AnchorConstraint anchor = cable.getPoints().getLast().getAnchor();
+                if (anchor != null) {
+                    anchor.setPort(packet.port());
+                }
+            }
+        }
+    }
 }
+

@@ -200,8 +200,6 @@ public class CableManager {
                     if (player.isShiftKeyDown()) {
                         ScreenManager.openPort(rayCast.getB().getAnchor().getAnchorBlock());
                         return InteractionResult.sidedSuccess(level.isClientSide());
-                    } else {
-                        signalActorBlockEntity.getPortConfig().remove(cable);
                     }
                 }
             }
@@ -261,7 +259,6 @@ public class CableManager {
         BlockEntity blockEntity = player.level().getBlockEntity(pos);
         if (blockEntity instanceof SignalActorBlockEntity signalActorBlock && (index == 0 || index == cable.getPoints().size() - 1)) {
             if (player.level().isClientSide) {
-                signalActorBlock.getPortConfig().getScreenCables().add(new PortConfig.ScreenCable(cable, index == 0));
                 ScreenManager.openPort(pos);
             }
         }

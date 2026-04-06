@@ -300,17 +300,19 @@ public class Cable {
         this.ropeSimulation.resizeRope(cable.getPointsCount());
         List<RopeNode> targetPoints = cable.getPoints();
         for (int i = 0; i < this.ropeSimulation.getNodeCount(); i++) {
+            RopeNode node = this.ropeSimulation.getNode(i);
             if (this.playerHoldingPointMap.size() != cable.playerHoldingPointMap.size()) {
-                this.ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition());
+                node.setPosition(targetPoints.get(i).getPosition());
 //                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
             } else {
 //                ropeSimulation.getNode(i).setPrevPosition(ropeSimulation.getNode(i).getPosition());
-                this.ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(this.ropeSimulation.getNode(i).getPrevPosition(), 0.8f));
-                this.ropeSimulation.getNode(i).setPosition(targetPoints.get(i).getPosition().lerp(this.ropeSimulation.getNode(i).getPosition(), 0.8f));
+                node.setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(node.getPrevPosition(), 0.8f));
+                node.setPosition(targetPoints.get(i).getPosition().lerp(node.getPosition(), 0.8f));
             }
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
             if (newAnchor != null) {
-                this.ropeSimulation.getNode(i).setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
+                node.setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
+                node.getAnchor().setPort(newAnchor.getPort());
             } else {
                 getPoints().get(i).removeAnchor();
             }

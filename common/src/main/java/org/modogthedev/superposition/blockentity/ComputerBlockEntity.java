@@ -14,6 +14,7 @@ import org.modogthedev.superposition.block.ComputerBlock;
 import org.modogthedev.superposition.blockentity.util.CardHolder;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.card.ExecutableAction;
 import org.modogthedev.superposition.system.card.Node;
@@ -49,6 +50,37 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
 
     public static float getRedstoneOffset(Level level, BlockPos pos) {
         return level.getSignal(pos, level.getBlockState(pos).getValue(AmplifierBlock.FACING).getOpposite());
+    }
+
+    @Override
+    public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
+        builder.addBothPort("a");
+        builder.addBothPort("b");
+        builder.addBothPort("c");
+        builder.addBothPort("d");
+        builder.addBothPort("e");
+        builder.addBothPort("f");
+        builder.addBothPort("g");
+        builder.addBothPort("h");
+        builder.addBothPort("i");
+        builder.addBothPort("j");
+        builder.addBothPort("k");
+        builder.addBothPort("l");
+        builder.addBothPort("m");
+        builder.addBothPort("n");
+        builder.addBothPort("o");
+        builder.addBothPort("p");
+        builder.addBothPort("q");
+        builder.addBothPort("r");
+        builder.addBothPort("s");
+        builder.addBothPort("t");
+        builder.addBothPort("u");
+        builder.addBothPort("v");
+        builder.addBothPort("w");
+        builder.addBothPort("x");
+        builder.addBothPort("y");
+        builder.addBothPort("z");
+        return builder;
     }
 
     public Card getCard() {
