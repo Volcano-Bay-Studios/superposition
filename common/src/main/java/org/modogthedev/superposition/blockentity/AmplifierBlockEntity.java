@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -70,12 +71,13 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
+    public @Nullable Signal manipulateSignal(Signal signal) {
         if (signal != null) {
             signal.addAmplitude(Math.max(0, amplification - throttle + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneAmplification / 15))));
             amplitude += signal.getAmplitude();
         }
         return signal;
+
     }
 
     public float getColdness(BlockPos pos) {
@@ -100,7 +102,7 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
             this.setTooltip(tooltip);
-            for (Signal signal : putSignals) {
+            for (Signal signal : getInputSignals()) {
                 amplitude += signal.getAmplitude();
             }
             if (amplitude > 0) {

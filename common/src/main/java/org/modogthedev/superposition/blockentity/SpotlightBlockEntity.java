@@ -8,12 +8,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
-import org.modogthedev.superposition.system.cable.CablePassthroughManager;
+import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.TickableBlockEntity;
@@ -31,36 +31,37 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
     private float iris = 30f;
 
     @Override
+    public @Nullable Signal manipulateSignal(Signal signal) {
+        if (signal != null && signal.getEncodedData() != null) {
+            color = signal.getEncodedData().intValue();
+            if (signal.getEncodedData().compoundTagData() != null) {
+                if (signal.getEncodedData().compoundTagData().contains("iris", 3)) {
+                    iris = signal.getEncodedData().compoundTagData().getInt("iris");
+                    iris = Mth.clamp(iris, 3f, 30f);
+                }
+                if (signal.getEncodedData().compoundTagData().contains("color", 3)) {
+                    color = signal.getEncodedData().compoundTagData().getInt("color");
+                }
+            }
+        }
+        return super.manipulateSignal(signal);
+    }
+
+    @Override
+    public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
+        return super.buildPorts(builder);
+    }
+
+    @Override
+    public String outPortName() {
+        return "passthrough";
+    }
+
+    @Override
     public void tick() {
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
-        Signal signal = getSignal();
-        if (signal == null) {
-            Direction direction = getBlockState().getValue(SignalActorTickingBlock.FACING);
-            BlockEntity blockEntity = level.getBlockEntity(getBlockPos().relative(direction.getOpposite(),1));
-            List<Signal> signals = new ArrayList<>();
-            if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-                signals = signalActorBlockEntity.getSideSignals(direction);
-            }
-            if (signals.isEmpty()) {
-                signals = CablePassthroughManager.getSignalsFromBlock(this.level, getBlockPos().relative(direction.getOpposite(),1));
-            }
-            if (signals != null && !signals.isEmpty()) {
-                updatePutSignals(signals);
-            }
-        }
-        if (signal != null && signal.getEncodedData() != null) {
-            color = signal.getEncodedData().intValue();
-        }
-        if (signal != null && signal.getEncodedData() != null && signal.getEncodedData().compoundTagData() != null) {
-            if (signal.getEncodedData().compoundTagData().contains("iris", 3)) {
-                iris = signal.getEncodedData().compoundTagData().getInt("iris");
-                iris = Mth.clamp(iris, 3f, 30f);
-            }
-            if (signal.getEncodedData().compoundTagData().contains("color", 3)) {
-                color = signal.getEncodedData().compoundTagData().getInt("color");
-            }
-        }
+
         super.tick();
     }
 
@@ -96,12 +97,6 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-
-        return super.modulateSignal(signal, updateTooltip);
-    }
-
-    @Override
     public boolean lightEnabled() {
         return true;
     }
@@ -119,14 +114,14 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
         Vec3 relative = new Vec3(relativePos.getX(), relativePos.getY(), relativePos.getZ()).normalize().scale(0.99f);
         Vec3 center = this.getBlockPos().getCenter();
         if (facing == Direction.UP || facing == Direction.DOWN) {
-            center = center.add(relative.scale(-3.5/16f));
+            center = center.add(relative.scale(-3.5 / 16f));
         } else {
             center = center.add(relative.scale(0.51f)).subtract(0, 1 / 16f, 0);
         }
         light.getPosition().set(center.x, center.y, center.z);
         light.setSize(5 / 16f, 5 / 16f);
         light.setColor(color);
-        light.setDistance(30f * Mth.map(iris,5,30,3,1));
+        light.setDistance(30f * Mth.map(iris, 5, 30, 3, 1));
         light.setAngle(iris / 100f);
         Color color1 = new Color(color);
         float brightness = (color1.getRed() / 255f) + (color1.getGreen() / 255f) + (color1.getBlue() / 255f);

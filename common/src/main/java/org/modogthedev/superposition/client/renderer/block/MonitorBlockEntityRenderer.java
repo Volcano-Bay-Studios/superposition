@@ -89,7 +89,7 @@ public class MonitorBlockEntityRenderer implements BlockEntityRenderer<MonitorBl
 
         Float[] signals = new Float[size];
         Arrays.fill(signals, 1f);
-        for (Signal signal : be.getSignals()) {
+        for (Signal signal : be.getInputSignals()) {
             if (signal != null) {
                 float frequency = Mth.map(signal.getFrequency() / 100000, 0, 158, 0, 256);
                 int slot = Mth.clamp(Math.round(frequency), 2, 254);

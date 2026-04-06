@@ -120,7 +120,7 @@ public class FilterScreen extends WidgetScreen {
         if (blockEntity instanceof FilterBlockEntity filterBlockEntity) {
             signals = filterBlockEntity.getUnmodulated();
         } else if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signals = signalActorBlockEntity.getSignals();
+            signals = signalActorBlockEntity.getInputSignals();
         }
         float highestValue = 0;
         float lowestValue = 0;

@@ -29,7 +29,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
         boolean isPowered = false;
         if (antenna != null) {
             antennaExists = true;
-            List<Signal> signals = getSignals();
+            List<Signal> signals = getInputSignals();
             noSignal = signals.isEmpty();
             if (level.isClientSide) {
                 if (!signals.isEmpty()) {

@@ -9,8 +9,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.SignalList;
 
-import java.util.Collection;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /**
  * This packet will be used in the future to synchronize some block signals that may behave differently on the server. Currently, it is used to synchronise peripheral signals in computers.
@@ -21,15 +23,20 @@ public class BlockSignalSyncS2CPacket implements CustomPacketPayload {
     public static final StreamCodec<ByteBuf, BlockSignalSyncS2CPacket> CODEC = ByteBufCodecs.BYTE_ARRAY.map(BlockSignalSyncS2CPacket::new, BlockSignalSyncS2CPacket::getData);
     private final byte[] data;
 
-    public BlockSignalSyncS2CPacket(Collection<Signal> signals, BlockPos pos) {
+    public BlockSignalSyncS2CPacket(Map<String, SignalList> signals, BlockPos pos) {
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeBlockPos(pos);
         buf.writeVarInt(signals.size());
-        for (Signal signal : signals) {
-            if (signal != null && signal.getUuid() != null) {
-                signal.write(buf);
+        signals.forEach((string, signalList) -> {
+            buf.writeInt(string.length());
+            buf.writeCharSequence(string, StandardCharsets.UTF_8);
+            buf.writeInt(signalList.size());
+            for (Signal signal : signalList.getSignals()) {
+                if (signal != null && signal.getUuid() != null) {
+                    signal.write(buf);
+                }
             }
-        }
+        });
         this.data = new byte[buf.writerIndex()];
         buf.readBytes(this.data);
     }

@@ -29,10 +29,10 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
     public void tick() {
         List<Component> tooltip = new ArrayList<>();
         setTooltip(tooltip);
-        List<Signal> frequencySorted = getSignals();
+        List<Signal> frequencySorted = new ArrayList<>(getInputSignals());
         text = new ArrayList<>();
         boolean stateData = false;
-        for (Signal signal : getSignals()) {
+        for (Signal signal : getInputSignals()) {
             EncodedData<?> encodedData = signal.getEncodedData();
             if (encodedData != null) {
                 EncodedData.Type type = encodedData.type();
@@ -67,23 +67,7 @@ public class MonitorBlockEntity extends SignalActorBlockEntity implements Tickab
         }
 
         if (level.isClientSide) {
-            if (frequencySorted.isEmpty() && linkedPos != null && getLevel().getBlockEntity(linkedPos) instanceof SignalActorBlockEntity signalActorBlockEntity)
-                frequencySorted = signalActorBlockEntity.getSignals();
-            if (frequencySorted != null) {
-                frequencySorted.sort(Comparator.comparingDouble(Signal::getFrequency));
-                List<Signal> amplitudeSorted = new ArrayList<>(frequencySorted);
-                amplitudeSorted.sort(Comparator.comparingDouble(Signal::getAmplitude));
-                if (!amplitudeSorted.isEmpty()) {
-                    highestValue = amplitudeSorted.getLast().getAmplitude();
-                    lowestValue = amplitudeSorted.getFirst().getAmplitude();
-                    if (amplitudeSorted.size() == 1)
-                        lowestValue = lowestValue / 2;
-                }
-                while (amplitudeSorted.size() > 12) {
-                    amplitudeSorted.remove(amplitudeSorted.getLast());
-                    frequencySorted.remove(frequencySorted.getLast());
-                }
-            }
+
         }
         super.tick();
     }

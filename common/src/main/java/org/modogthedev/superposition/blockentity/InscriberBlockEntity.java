@@ -1,7 +1,6 @@
 package org.modogthedev.superposition.blockentity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -11,7 +10,6 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SignalHelper;
 import org.modogthedev.superposition.util.SuperpositionMth;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
@@ -68,31 +66,26 @@ public class InscriberBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public boolean specialAddSignals(List<Signal> signals, Direction face) {
-        for (Signal signal : signals) {
+    public String outPortName() {
+        return "program";
+    }
+
+    @Override
+    public void tick() {
+        List<Signal> inputSignals = getInputSignals();
+        if (!inputSignals.isEmpty()) {
+            Signal signal = inputSignals.getLast();
             if (signal != null && signal.getEncodedData() != null) {
                 card.load(signal.getEncodedData().compoundTagData());
             }
         }
-        return true;
-    }
-
-    @Override
-    public List<Signal> getSignals() {
         if (outputSignal == null) {
             outputSignal = new Signal(SuperpositionMth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
         }
         if (card != null) {
             outputSignal.encode(card.save(new CompoundTag()));
         }
-        return SignalHelper.listOf(outputSignal);
-    }
-
-    @Override
-    public void tick() {
-        if (outputSignal == null) {
-            outputSignal = new Signal(SuperpositionMth.convertVec(getBlockPos()), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
-        }
+        singleSignalOut(outputSignal);
         if (level.isClientSide) {
             resetTooltip();
             addTooltip(Component.literal("Inscriber Status:"));

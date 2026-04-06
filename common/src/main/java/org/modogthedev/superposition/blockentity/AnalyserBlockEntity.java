@@ -14,7 +14,6 @@ import org.modogthedev.superposition.system.behavior.Behavior;
 import org.modogthedev.superposition.system.behavior.types.ScanBehavior;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
-import org.modogthedev.superposition.util.SignalHelper;
 
 import java.util.List;
 
@@ -45,6 +44,7 @@ public class AnalyserBlockEntity extends PeripheralBlockEntity {
             }
         }
         signal.encode(tag);
+        putPortSignals(outPortName(), List.of(signal));
         super.tick();
     }
 
@@ -66,11 +66,6 @@ public class AnalyserBlockEntity extends PeripheralBlockEntity {
         startDistance = 1 + (SuperpositionConstants.analyserRange * rangeRatio);
         endDistance = SuperpositionConstants.analyserRange + (SuperpositionConstants.analyserRange * rangeRatio);
         distance = endDistance;
-    }
-
-    @Override
-    public List<Signal> getSignals() {
-        return SignalHelper.listOf(signal);
     }
 
     public Direction getFacing() {

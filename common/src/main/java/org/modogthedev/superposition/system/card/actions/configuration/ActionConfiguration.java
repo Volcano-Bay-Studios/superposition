@@ -28,8 +28,15 @@ public class ActionConfiguration implements Cloneable {
         guiGraphics.drawString(Minecraft.getInstance().font, title, 0, 0, topBorder);
     }
 
-    public void mouse(int button, double x, double y) {
+    public boolean mouse(int button, double x, double y) {
+        return false;
+    }
 
+    public boolean charTyped(char codePoint, int modifiers) {
+        return false;
+    }
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return false;
     }
 
     public ActionConfiguration copy() {
@@ -45,6 +52,8 @@ public class ActionConfiguration implements Cloneable {
     public int getHeight() {
         return 50;
     }
+
+    public void tick(int animation) {}
 
     public CompoundTag save(CompoundTag tag) {
         if (selfReference != null) {

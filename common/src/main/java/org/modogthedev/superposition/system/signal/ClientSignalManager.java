@@ -5,7 +5,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
+import org.modogthedev.superposition.util.SignalList;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ClientSignalManager {
@@ -26,7 +28,7 @@ public class ClientSignalManager {
         clientSignals.get(level).values().removeAll(signalsForRemoval);
     }
 
-    public static void processTag(Level level, FriendlyByteBuf buf) {
+    public static void processSignal(Level level, FriendlyByteBuf buf) {
         ifAbsent(level);
         Map<UUID, Signal> signalMap = clientSignals.get(level);
         Set<UUID> removed = new HashSet<>(signalMap.keySet());
@@ -44,30 +46,22 @@ public class ClientSignalManager {
         signalMap.keySet().removeAll(removed);
     }
 
-    public static void processBlockBoundTag(Level level, FriendlyByteBuf buf) {
+    public static void processBlockBoundSignal(Level level, FriendlyByteBuf buf) {
         ifAbsent(level);
         BlockPos pos = buf.readBlockPos();
         if (level.getBlockEntity(pos) instanceof SignalActorBlockEntity signalActorBlockEntity) {
             int count = buf.readVarInt();
-            List<Signal> signals = new ArrayList<>(signalActorBlockEntity.getSignals());
-            for (int i = 0; i < Math.min(count,signals.size()); i++) {
-                UUID id = buf.readUUID();
-                signals.get(i).load(id,buf);
-            }
-            if (signals.size() > count) {
-                for (int i = signals.size(); i > count; i--) {
-                    signals.remove(i-1);
+            for (int i = 0; i < count; i++) {
+                String port = (String) buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8);
+                SignalList signalList = signalActorBlockEntity.getSignalList(port);
+                List<Signal> signals = new ArrayList<>();
+                int size = buf.readInt();
+                for (int j = 0; j < size; j++) {
+                    signals.add(new Signal(level, buf.readUUID(), buf));
                 }
+                signalList.addAll(signals);
+                signalList.flush();
             }
-            if (signals.size() < count) {
-                for (int i = signals.size(); i < count; i++) {
-                    UUID id = buf.readUUID();
-                    Signal signal = new Signal(level,id, buf);
-                    signal.level = level;
-                    signals.add(signal);
-                }
-            }
-            signalActorBlockEntity.updatePutSignals(signals);
         }
     }
 

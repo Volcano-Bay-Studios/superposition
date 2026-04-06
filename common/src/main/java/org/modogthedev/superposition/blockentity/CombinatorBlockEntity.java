@@ -5,19 +5,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
+import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.MathFunction;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 public class CombinatorBlockEntity extends SignalActorBlockEntity {
     public CombinatorBlockEntity(BlockPos pos, BlockState state) {
@@ -26,80 +25,12 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
 
     private Types type = Types.ARITHMETIC;
     private Modes mode = Modes.ADD;
-    private final List<Signal> rightSignals = new ArrayList<>();
-    private int rightSignalsReceived = 0;
     private Signal outputSignal;
 
-    public void updateRightSignals(List<Signal> signals) {
-        if (rightSignals.size() == signals.size()) {
-            for (int i = 0; i < signals.size(); i++) {
-                rightSignals.get(i).copy(signals.get(i));
-            }
-        } else if (rightSignals.size() > signals.size()) {
-            ListIterator<Signal> iterator = rightSignals.listIterator();
-            while (iterator.hasNext()) {
-                int i = iterator.nextIndex();
-                Signal signal = iterator.next();
-                if (i >= signals.size()) {
-                    iterator.remove();
-                    continue;
-                }
-                signal.copy(signals.get(i));
-            }
-        } else {
-            for (int i = 0; i < signals.size(); i++) {
-                Signal signal = signals.get(i);
-                if (i >= rightSignals.size()) {
-                    rightSignals.add(new Signal(signal));
-                    continue;
-                }
-                rightSignals.get(i).copy(signal);
-            }
-        }
-        modulateSignals(rightSignals, true);
-    }
-
     @Override
-    public void addSignals(Object lastCall, List<Signal> signals, Direction face) {
-        if (lastCall == this.lastCall) {
-            return;
-        }
-        this.lastCall = lastCall;
-        this.modulateSignals(signals, true);
-        BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.addSignals(lastCall, new ArrayList<>(signals), face);
-        }
-        if (face == getInvertedSwappedSide()) {
-            if (signalsReceived == 0) {
-                this.updatePutSignals(signals);
-            } else {
-                for (Signal signal : signals) {
-                    putSignals.add(new Signal(signal));
-                }
-                signalsReceived++;
-            }
-        } else if (face == getSwappedSide()) {
-            if (rightSignalsReceived == 0) {
-                this.updateRightSignals(signals);
-            } else {
-                for (Signal signal : signals) {
-                    rightSignals.add(new Signal(signal));
-                }
-                rightSignalsReceived++;
-            }
-        }
+    public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
+        return builder.addInputPort("a").addInputPort("b").addOutputPort(outPortName());
     }
-
-    @Override
-    public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
-        if (face == getSwappedSide()) {
-            updateRightSignals(signals);
-        } else {
-            updatePutSignals(signals);
-        }
-    }
-
 
     @Override
     public void tick() {
@@ -108,63 +39,47 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
         }
         resetTooltip();
         addTooltip("Combinator Status:");
-        if (!putSignals.isEmpty()) {
-            if (putSignals.size() == 1) {
-                addTooltip("Left - " + (putSignals.getFirst().getEncodedData() != null ? putSignals.getFirst().getEncodedData().stringValue() : "null"));
+        List<Signal> signalsA = getPortSignals("a");
+        if (!signalsA.isEmpty()) {
+            if (signalsA.size() == 1) {
+                EncodedData<?> signalA = signalsA.getFirst().getEncodedData();
+                addTooltip("A - " + (signalA != null ? signalA.stringValue() : "null"));
             } else {
-                addTooltip("Left - " + putSignals.size() + " signals");
+                addTooltip("A - " + signalsA.size() + " signals");
             }
         }
-        if (!rightSignals.isEmpty()) {
-            if (rightSignals.size() == 1) {
-                addTooltip("Right - " + (rightSignals.getFirst().getEncodedData() != null ? rightSignals.getFirst().getEncodedData().stringValue() : "null"));
+        List<Signal> signalsB = getPortSignals("b");
+        if (!signalsB.isEmpty()) {
+            if (signalsB.size() == 1) {
+                EncodedData<?> signalB = signalsB.getFirst().getEncodedData();
+                addTooltip("Right - " + (signalB != null ? signalB.stringValue() : "null"));
             } else {
-                addTooltip("Right - " + rightSignals.size() + " signals");
+                addTooltip("Right - " + signalsB.size() + " signals");
             }
         }
         if (outputSignal.getEncodedData() != null)
             addTooltip("Output - " + outputSignal.getEncodedData().stringValue());
         float value = 0;
         if (mode != null) {
-            float[] floats = new float[putSignals.size() + rightSignals.size()];
-            List<Signal> signals = new ArrayList<>(putSignals);
-            signals.addAll(rightSignals);
-            for (int i = 0; i < signals.size(); i++) {
-                if (signals.get(i).getEncodedData() != null) {
-                    floats[i] = signals.get(i).getEncodedData().floatValue();
-                } else {
-                    floats[i] = 0;
+            int size = Math.min(signalsA.size(), signalsB.size());
+            float[] floats = new float[size * 2];
+            for (int i = 0; i < size; i++) {
+                floats[i * 2] = signalsA.get(i).getEncodedData().floatValue();
+                floats[i * 2 + 1] = signalsB.get(i).getEncodedData().floatValue();
+            }
+            if (size == 0) {
+                if (!signalsA.isEmpty()) {
+                    value += signalsA.getLast().getEncodedData().floatValue();
+                } else if (!signalsB.isEmpty()) {
+                    value += signalsB.getLast().getEncodedData().floatValue();
                 }
             }
-            value = mode.evaluate(floats);
+            value += mode.evaluate(floats);
         }
         outputSignal.encode(value);
 
-        if (rightSignalsReceived == 0) {
-            rightSignals.clear();
-        }
-        rightSignalsReceived = 0;
-        BlockEntity blockEntity = level.getBlockEntity(getBlockPos().above());
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.putSignalFace(outputSignal, Direction.UP);
-        }
+        singleSignalOut(outputSignal);
         super.tick();
-    }
-
-    @Override
-    public Signal getSideSignal(Direction face) {
-        if (face == Direction.UP) {
-            return outputSignal;
-        }
-        return super.getSideSignal(face);
-    }
-
-    @Override
-    public List<Signal> getSideSignals(Direction face) {
-        if (face == Direction.UP && outputSignal != null) {
-            return List.of(outputSignal);
-        }
-        return super.getSideSignals(face);
     }
 
     @Override
@@ -322,13 +237,13 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity {
             }
             return value;
         }, Types.TRIGONOMETRIC, "ATAN"),
-        SQR((floats) -> {
+        POW((floats) -> {
             float value = 0;
-            for (float f : floats) {
-                value += (float) Math.toDegrees(Math.atan(Math.toRadians(f)));
+            for (int i = 0; i < floats.length; i += 2) {
+                value += (float) Math.pow(floats[0], floats[1]);
             }
             return value;
-        }, Types.SCIENTIFIC, "^2"),
+        }, Types.SCIENTIFIC, "POW"),
         ROOT((floats) -> {
             float value = 0;
             for (float f : floats) {

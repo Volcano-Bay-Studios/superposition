@@ -27,13 +27,12 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         super.loadAdditional(tag, registries);
     }
 
-    @Override
     public List<Signal> getSignals() {
         if (antenna == null) {
             return new ArrayList<>();
         }
         if (level.isClientSide)
-            return putSignals;
+            return getOutputSignals();
         return antenna.signals;
     }
 
@@ -53,16 +52,12 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
                 antenna.updateTooltip(tooltip);
                 float bonusFrequency = getBounusFrequency();
             } else {
-                updatePutSignals(signals);
+                signalsOut(signals);
             }
             int currentSize = signals.size();
             tooltip.add(Component.literal("Signal - " + (signals.isEmpty() ? "NONE" : "OK")));
             if (currentSize != lastSize || (antennaBrokenLastTick != (antenna == null))) {
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
-            }
-            if (!signals.isEmpty()) {
-                ourCall = new Object();
-                putSignalList(ourCall, signals);
             }
             lastSize = currentSize;
         } else {
@@ -71,12 +66,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         antennaBrokenLastTick = (antenna == null);
         this.setTooltip(tooltip);
         super.tick();
-    }
-
-    @Override
-    public void putSignalList(Object nextCall, List<Signal> list) {
-        if (nextCall == ourCall)
-            super.putSignalList(nextCall, list);
     }
 
     @Override

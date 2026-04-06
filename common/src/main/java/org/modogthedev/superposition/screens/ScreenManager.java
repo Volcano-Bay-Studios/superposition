@@ -3,6 +3,7 @@ package org.modogthedev.superposition.screens;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import org.modogthedev.superposition.SuperpositionClient;
+import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.filter.Filter;
 
@@ -41,5 +42,12 @@ public class ScreenManager {
         }
         portScreen = new PortScreen(pos);
         SuperpositionClient.setScreen(portScreen);
+    }
+
+
+    public static void addCable(Cable cable){
+        if (portScreen != null) {
+            portScreen.tryAdd(cable);
+        }
     }
 }

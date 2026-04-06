@@ -21,7 +21,7 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         resetTooltip();
         addTooltip("Manipulator Status:");
         addTooltip("Manipulating " + level.getBlockState(getFrontPos()).getBlock().getName().getString() + "...");
-        Signal signal = getSignal();
+        Signal signal = getInputSignals().getLast() ;
 
         for (ManipulateBehavior behavior : SuperpositionBehaviors.manipulateBehaviors) {
             behavior.manipulate(signal,getLevel(),getBlockPos());

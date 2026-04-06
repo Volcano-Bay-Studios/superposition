@@ -16,11 +16,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
@@ -31,11 +32,9 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.*;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
-public abstract class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable {
+public abstract class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable, PortBehavior {
 
     @Unique
     private List<Component> veil$tooltip = new ArrayList<>();
@@ -56,8 +55,8 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
 
     Object lastCall;
     private Object lastCallList;
-    protected final List<Signal> lastSignals = new ArrayList<>();
-    protected final List<Signal> putSignals = new ArrayList<>();
+
+    protected Map<String, SignalList> putSignals = new HashMap<>();
     LightRenderHandle<?> light;
 
     public List<Component> getTooltip() {
@@ -149,14 +148,15 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
 
     public SignalActorBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
-        PortConfig.Builder builder = buildPorts(new PortConfig.Builder());
+        PortConfig.Builder builder = buildPorts(PortConfig.create());
         portConfig = builder.build();
     }
 
     public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
-        return builder.addInputPort("in").addOutputPort("out");
+        return builder.addInputPort(inPortName()).addOutputPort(outPortName());
     }
 
+    @Override
     public PortConfig getPortConfig() {
         return portConfig;
     }
@@ -216,177 +216,57 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         return sidedPos2;
     }
 
-    public void postSignal(Signal signal) {
-
+    @ApiStatus.Internal
+    public SignalList getSignalList(String port) {
+        return putSignals.computeIfAbsent(port, string -> new SignalList());
     }
+
+    @Override
+    public @Unmodifiable List<Signal> getPortSignals(String port) {
+        if (!portConfig.getPorts().containsKey(port)) {
+            return List.of();
+        }
+        return getSignalList(port).getSignals();
+    }
+
+    @Override
+    public boolean putPortSignals(String port, List<Signal> signals) {
+        if (port == null || !portConfig.getPorts().containsKey(port)) {
+            return false;
+        }
+        return getSignalList(port).addAll(signals);
+    }
+
+
 
     public void markDirty() {
         signalsDirty = true;
     }
 
-    public Signal getSignal() {
-        return SignalHelper.randomSignal(getSignals());
-    }
 
-    public Signal getSideSignal(Direction face) {
-        return getSignal();
+    /**
+     * This is called for all the signals that exist in the "in" port.
+     * This only happens if the block has an "in" port.
+     * @param signalList The signals that come from the "in" port
+     * @return The signals that will go to the "out" port. This only happens if the block has an "out" port. Return null to cancel this signal returning to out.
+     */
+    public List<Signal> manipulateSignals(List<Signal> signalList) {
+        List<Signal> outList = new ArrayList<>();
+        for (Signal inSignal : signalList) {
+            Signal outSignal = manipulateSignal(inSignal);
+            if (outSignal != null) {
+                outList.add(outSignal);
+            }
+        }
+        return outList;
     }
 
     /**
-     * Returns the list of signals inside the block. It should be deep cloned if you are going to modify it elsewhere.
-     * You should always use {@link SignalActorBlockEntity#getSideSignals(Direction)} if your operation exists in the world.
-     *
-     * @return the putSignals field
+     * This is called for each of the signals that exist in the "in" port.
+     * This only happens if the block has an "in" port.
+     * @return The signal that will go to the "out" port. This only happens if the block has an "out" port. Return null to cancel this signal returning to out.
      */
-    public List<Signal> getSignals() {
-        return putSignals;
-    }
-
-    public List<Signal> getSideSignals(Direction face) {
-        return getSignals();
-    }
-
-    /**
-     * If you want special behavior when signals are inserted on difference faces, override this method and return true. You must also clear signals each tick if you use this, or use an update signals method. This method does not catch signals that are inserted without a face.
-     *
-     * @param signals The signals that were inserted
-     * @param face    The face they were added too
-     * @return This tells the method that called it not to continue its default behavior
-     */
-    public boolean specialAddSignals(List<Signal> signals, Direction face) {
-        return false;
-    }
-
-    public void addSignals(Object lastCall, List<Signal> signals, Direction face) {
-        if (lastCall == this.lastCall) {
-            return;
-        }
-        this.lastCall = lastCall;
-        if (specialAddSignals(signals, face)) {
-            return;
-        }
-        List<Signal> signals1 = new ArrayList<>();
-        for (Signal signal : signals) {
-            if (signal != null) {
-                signals1.add(new Signal(signal));
-            }
-        }
-        this.modulateSignals(signals1, true);
-        BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.addSignals(lastCall, new ArrayList<>(signals1), face);
-        }
-        if (signalsReceived == 0) {
-            this.updatePutSignals(signals1);
-        } else {
-            for (Signal signal : signals1) {
-                if (signal != null) {
-                    putSignals.add(new Signal(signal));
-                }
-            }
-            signalsReceived++;
-        }
-    }
-
-    public void updatePutSignals(List<Signal> signals) {
-        signalsReceived++;
-        if (putSignals.size() == signals.size()) {
-            for (int i = 0; i < signals.size(); i++) {
-                putSignals.get(i).copy(signals.get(i));
-            }
-        } else if (putSignals.size() > signals.size()) {
-            ListIterator<Signal> iterator = putSignals.listIterator();
-            while (iterator.hasNext()) {
-                int i = iterator.nextIndex();
-                Signal signal = iterator.next();
-                if (i >= signals.size()) {
-                    iterator.remove();
-                    continue;
-                }
-                signal.copy(signals.get(i));
-            }
-        } else {
-            for (int i = 0; i < signals.size(); i++) {
-                Signal signal = signals.get(i);
-                if (i >= putSignals.size()) {
-                    putSignals.add(new Signal(signal));
-                    continue;
-                }
-                putSignals.get(i).copy(signal);
-            }
-        }
-        modulateSignals(putSignals, true);
-    }
-
-    /**
-     * Puts signals into a block entity.
-     *
-     * @param nextCall
-     * @param signals
-     * @param face
-     */
-    public void putSignalsFace(Object nextCall, List<Signal> signals, Direction face) {
-        if (specialAddSignals(signals, face)) {
-            return;
-        }
-        putSignalList(nextCall, signals);
-    }
-
-    /**
-     * This method should not be called on another blockEntity, this method exists as an easy way for block entities to start signal propagation
-     *
-     * @param nextCall
-     * @param list
-     */
-    protected void putSignalList(Object nextCall, List<Signal> list) {
-        if ((lastCallList != null && lastCallList.equals(nextCall)) || level == null) {
-            return;
-        }
-        this.updatePutSignals(list);
-        BlockPos sidedPos = this.getSwappedPos();
-        BlockEntity blockEntity = level.getBlockEntity(sidedPos);
-        if (!level.getBlockState(sidedPos).is(Blocks.AIR) && blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            BlockPos invertedSwappedPos = signalActorBlockEntity.getInvertedSwappedPos();
-            if (invertedSwappedPos != null && invertedSwappedPos.equals(this.getBlockPos())) {
-                list = signalActorBlockEntity.modulateSignals(list, true);
-                lastCallList = nextCall;
-                signalActorBlockEntity.putSignalsFace(nextCall, list, getInvertedSwappedSide());
-            }
-        }
-    }
-
-    /**
-     * This method has no special behavior. All it does is call { @link {@link #putSignalsFace(Object, List, Direction)}} but encapsulates the provided signal into a list
-     *
-     * @param signal Signal to be encapsulated into a list
-     * @param face   The face it should be inserted into
-     */
-    public void putSignalFace(Signal signal, Direction face) {
-        putSignalsFace(new Object(), SignalHelper.listOf(signal), face);
-    }
-
-    /**
-     * This method has no special behavior. It calls { @link {@link #putSignalList(Object, List)}} but encapsulates the provided signal into a list, it does this to start signal propagation of a signal
-     *
-     * @param signal Signal to be encapsulated into a list
-     */
-    public void putSignal(Signal signal) {
-        putSignalList(new Object(), SignalHelper.listOf(signal));
-    }
-
-
-    public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
-        List<Signal> safeList = new ArrayList<>();
-        for (Signal signal : signalList) {
-            Signal signal1 = modulateSignal(signal, updateTooltip);
-            if (signal1 != null) {
-                safeList.add(signal1);
-            }
-        }
-        return safeList;
-    }
-
-    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
+    public @Nullable Signal manipulateSignal(Signal signal) {
         return signal;
     }
 
@@ -417,7 +297,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
             this.addTooltip("");
         }
         this.addTooltip("Configuration: ");
-        this.addConfigTooltip("Signal Direction - " + (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES) ? "Right" : "Left"), () -> {
+        this.addConfigTooltip("Out Direction - " + (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES) ? "Right" : "Left"), () -> {
             CompoundTag tag = new CompoundTag();
             tag.putBoolean("swap", !SignalActorBlockEntity.this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES));
             VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, SignalActorBlockEntity.this.getBlockPos()));
@@ -493,34 +373,62 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 this.checkEvents();
                 this.finaliseConfigTooltips();
             }
+            processPorts();
         }
         if (getLevel() != null && !getLevel().isClientSide) {
-            if (signalsReceived == 0) {
-                putSignals.clear();
-                markDirty();
-            }
-            if (lastSignals.size() != putSignals.size()) {
-                markDirty();
-            } else {
-                for (int i = 0; i < putSignals.size(); i++) {
-                    if (!putSignals.get(i).equals(lastSignals.get(i))) {
-                        markDirty();
-                        break;
-                    }
+            for (SignalList value : putSignals.values()) {
+                boolean change = value.flush();
+                if (change) {
+                    markDirty();
                 }
             }
 
-            lastSignals.clear();
-            SignalHelper.updateSignalList(lastSignals, putSignals);
-            lastSignals.addAll(putSignals);
+//            if (getInputSignals().isEmpty() && !getOutputSignals().isEmpty())
+
+            boolean dirty = processPorts();
+            if (dirty) {
+                markDirty();
+            }
+
+            if (level.getBlockEntity(getSwappedPos()) instanceof PortBehavior portBehavior && Objects.equals(outPortName(), "out")) {
+                if (portBehavior.getPortConfig().getPorts().containsKey(portBehavior.inPortName())) {
+                    portBehavior.putPortSignals(portBehavior.inPortName(),getPortSignals(outPortName()));
+                }
+            }
+
             if (signalsDirty) {
-                VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(getSignals(), getBlockPos()));
+                VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(putSignals, getBlockPos()));
             }
             signalsDirty = false;
         }
         signalsReceived = 0;
     }
 
+    public boolean processPorts() {
+        if (portConfig.getPorts().containsKey(inPortName())) {
+            List<Signal> manipulatedSignals = getPortSignals(inPortName());
+            if (portConfig.getPorts().containsKey(outPortName())) {
+                return putPortSignals(outPortName(), manipulateSignals(manipulatedSignals));
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Fetches signals from the input port
+     * @return The signals in the input port
+     */
+    public List<Signal> getInputSignals() {
+        return getPortSignals(inPortName());
+    }
+
+    /**
+     * Fetches signals from the output port
+     * @return The signals in the output port
+     */
+    public List<Signal> getOutputSignals() {
+        return getPortSignals(outPortName());
+    }
 
     public boolean lightEnabled() {
         return false;

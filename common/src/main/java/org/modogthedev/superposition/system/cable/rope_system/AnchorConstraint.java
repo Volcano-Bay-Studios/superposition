@@ -3,6 +3,7 @@ package org.modogthedev.superposition.system.cable.rope_system;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 
 import java.util.function.Supplier;
@@ -50,7 +51,7 @@ public class AnchorConstraint implements RopeConstraint {
         return anchorBlock;
     }
 
-    public String getPort() {
+    public @Nullable String getPort() {
         return port;
     }
 

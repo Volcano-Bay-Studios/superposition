@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +19,7 @@ import org.joml.Vector2f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
+import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.networking.packet.PlayerPlugCableC2SPacket;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
@@ -54,6 +56,22 @@ public class PortScreen extends Screen {
         }
     }
 
+    public void tryAdd(Cable cable) {
+        for (PortConfig.ScreenCable screenCable : screenCables) {
+            if (screenCable.getCable().getId().equals(cable.getId())) {
+                return;
+            }
+        }
+        AnchorConstraint anchor = cable.getPoints().getFirst().getAnchor();
+        if (anchor != null && anchor.getAnchorBlock().equals(pos)) {
+            screenCables.addFirst(new PortConfig.ScreenCable(cable, true));
+        }
+        anchor = cable.getPoints().getLast().getAnchor();
+        if (anchor != null && anchor.getAnchorBlock().equals(pos)) {
+            screenCables.addFirst(new PortConfig.ScreenCable(cable, false));
+        }
+    }
+
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
@@ -70,7 +88,7 @@ public class PortScreen extends Screen {
         }
 
         PortConfig portConfig = signalActor.getPortConfig();
-        Collection<PortConfig.Port> values = portConfig.getAll().values();
+        Collection<PortConfig.Port> values = portConfig.getPorts().values();
         int i = (this.width - 176) / 2;
         int j = (int) ((float) (this.height - values.size() * 32 - 16) / 2 + scroll);
         blit(guiGraphics, i, j, 0, 11, 0, 1);
@@ -135,7 +153,11 @@ public class PortScreen extends Screen {
                 focusPosition.set(mouseX, mouseY);
             }
             if (screenCable.getFocusPosition().x == 0 && screenCable.getFocusPosition().y == 0) {
-                screenCable.getFocusPosition().set(focusPosition);
+                if (screenCable.getBind() != null) {
+                    screenCable.getFocusPosition().set(focusPosition);
+                } else {
+                    screenCable.getFocusPosition().set(startPosition);
+                }
             }
             focusPosition = screenCable.getFocusPosition().lerp(focusPosition,0.15f);
             k = 0;
@@ -149,14 +171,16 @@ public class PortScreen extends Screen {
 
                 k++;
             }
+            boolean bound = portConfig.getPorts().containsKey(screenCable.getBind());
             if (cableShader != null) {
                 cableShader.getOrCreateUniform("BoxMin").setVector(startPosition.x/this.width, startPosition.y/this.height);
-                cableShader.getOrCreateUniform("BoxMax").setVector(focusPosition.x/this.width, focusPosition.y/this.height);
+//                    cableShader.getOrCreateUniform("BoxMax").setVector(focusPosition.x/this.width, focusPosition.y/this.height);
+                    cableShader.getOrCreateUniform("BoxMax").setVector((focusPosition.x - (screenCable.isOut() ? 6 : -6))/this.width, focusPosition.y/this.height);
             }
             int rgb = screenCable.getCable().getColor().getRGB();
-            fill(guiGraphics,SuperpositionRenderTypes.screenCable(), (int) startPosition.x, (int) startPosition.y, (int) focusPosition.x, (int) focusPosition.y, 1 + n * 2, rgb, screenCable.getBind() != null);
+            fill(guiGraphics,SuperpositionRenderTypes.screenCable(), (int) startPosition.x, (int) startPosition.y, (int) focusPosition.x, (int) focusPosition.y, 1 + n * 2, rgb, bound);
             guiGraphics.fill((int) (startPosition.x - 10), (int) (startPosition.y - 10 + k), (int) (startPosition.x + 10), (int) (startPosition.y + 10 + k),2, rgb);
-            if (screenCable.getBind() == null) {
+            if (!bound) {
                 if (screenCable.isOut()) {
                     guiGraphics.innerBlit(CABLE_PLUG, (int) focusPosition.x - 16, (int) focusPosition.x, (int) focusPosition.y - 7, (int) focusPosition.y + 9, 2 + n * 2, 1, 0, 0, 1);
                 } else {
@@ -190,8 +214,8 @@ public class PortScreen extends Screen {
         minY += 10;
         maxY -= 10;
         if (wrap) {
-            minX += 10;
-            maxX -= 10;
+            minX += 6;
+            maxX -= 6;
         }
 
         VertexConsumer vertexconsumer = guiGraphics.bufferSource().getBuffer(renderType);
@@ -218,6 +242,9 @@ public class PortScreen extends Screen {
 
         for (PortConfig.ScreenCable screenCable : screenCables) {
             if (mouse.distance(screenCable.getFocusPosition()) < 10) {
+                if (screenCable.getBind() != null) {
+                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SCROLL.get(), 1.5F));
+                }
                 focusedCable = screenCable;
                 screenCable.bind(null);
                 VeilPacketManager.server().sendPacket(new PlayerPlugCableC2SPacket(focusedCable.getCable().getId(),null,focusedCable.isOut()));
@@ -233,7 +260,7 @@ public class PortScreen extends Screen {
             return false;
         }
         PortConfig portConfig = signalActor.getPortConfig();
-        Collection<PortConfig.Port> values = portConfig.getAll().values();
+        Collection<PortConfig.Port> values = portConfig.getPorts().values();
         int i = (this.width - 176) / 2;
         int j = (int) ((float) (this.height - values.size() * 32 - 16) / 2 + scroll);
         j += 16;
@@ -261,7 +288,9 @@ public class PortScreen extends Screen {
             }
             if (mouseY > y && mouseY < y + 32 && mouseX > x && mouseX < x + 32) {
                 focusedCable.bind(port.getName());
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SCROLL.get(), 1.0F));
                 VeilPacketManager.server().sendPacket(new PlayerPlugCableC2SPacket(focusedCable.getCable().getId(),port.getName(),focusedCable.isOut()));
+                break;
             }
             k++;
         }

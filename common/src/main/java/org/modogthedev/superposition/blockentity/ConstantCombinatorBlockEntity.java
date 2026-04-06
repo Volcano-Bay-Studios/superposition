@@ -4,8 +4,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -13,7 +14,6 @@ import org.modogthedev.superposition.util.EditableTooltip;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SignalHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implements EditableTooltip {
@@ -31,10 +31,6 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         }
         if (outputString != null)
             outputSignal.encode(outputString);
-        BlockEntity blockEntity = level.getBlockEntity(getSwappedPos());
-        if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signalActorBlockEntity.putSignalsFace(new Object(), List.of(new Signal(outputSignal)), getInvertedSwappedSide());
-        }
 
         resetTooltip();
         addTooltip("Constant Combinator Status:");
@@ -76,21 +72,17 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         }
     }
 
+
     @Override
-    public List<Signal> getSignals() {
-        if (outputSignal != null) {
-            return SignalHelper.listOf(outputSignal);
+    public @Unmodifiable List<Signal> getPortSignals(String port) {
+        if (outPortName().equals(port) && outputSignal != null) {
+            return List.of(outputSignal);
         }
-        return new ArrayList<>();
+        return super.getPortSignals(port);
     }
 
     @Override
-    public List<Signal> getSideSignals(Direction face) {
-        return getSignals();
-    }
-
-    @Override
-    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
+    public @Nullable Signal manipulateSignal(Signal signal) {
         if (level != null && level.isClientSide && getBlockPos().equals(SuperpositionUITooltipRenderer.editPos)) {
             return null;
         }
@@ -102,7 +94,6 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         }
         return signal;
     }
-
 
     public Direction getFacing() {
         return getBlockState().getValue(SignalActorTickingBlock.FACING);

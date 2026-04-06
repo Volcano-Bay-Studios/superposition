@@ -51,12 +51,13 @@ public class CombinatorConfiguration extends ActionConfiguration {
 
 
     @Override
-    public void mouse(int button, double x, double y) {
+    public boolean mouse(int button, double x, double y) {
         if (x > 86) {
             ordinal = step(1);
         } else {
             ordinal = step(-1);
         }
+        return true;
     }
 
     public int step(int amount) {

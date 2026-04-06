@@ -6,13 +6,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionFilters;
 import org.modogthedev.superposition.system.filter.Filter;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FilterBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
@@ -25,29 +25,18 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
     }
 
     @Override
-    public Signal modulateSignal(Signal signal, boolean updateTooltip) {
-        if (!passSignal(signal)) {
-            return null;
+    public @Nullable Signal manipulateSignal(Signal signal) {
+        if (passSignal(signal)) {
+            return signal;
         }
-        return signal;
+        return null;
     }
 
     public Filter getFilter() {
         return type;
     }
 
-    @Override
-    public List<Signal> modulateSignals(List<Signal> signalList, boolean updateTooltip) {
-        if (level.isClientSide && updateTooltip)
-            unmodulated = signalList;
-        List<Signal> finalSignals = new ArrayList<>();
-        for (Signal signal : signalList) {
-            if (passSignal(signal)) {
-                finalSignals.add(signal);
-            }
-        }
-        return finalSignals;
-    }
+
 
     public boolean passSignal(Signal signal) {
         if (type != null)

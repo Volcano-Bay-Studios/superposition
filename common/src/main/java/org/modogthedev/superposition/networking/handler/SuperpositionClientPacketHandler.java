@@ -26,7 +26,7 @@ public class SuperpositionClientPacketHandler {
             return;
         }
 
-        ClientSignalManager.processTag(level, packet.getBuf());
+        ClientSignalManager.processSignal(level, packet.getBuf());
     }
 
     public static void handleInscriberScreen(InscriberScreenS2CPacket packet, ClientPacketContext ctx) {
@@ -45,7 +45,7 @@ public class SuperpositionClientPacketHandler {
             return;
         }
 
-        ClientSignalManager.processBlockBoundTag(level, packet.getBuf());
+        ClientSignalManager.processBlockBoundSignal(level, packet.getBuf());
     }
 
     public static void handleCableSync(CableSyncS2CPacket packet, ClientPacketContext ctx) {

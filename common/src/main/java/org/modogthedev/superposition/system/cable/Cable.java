@@ -95,7 +95,7 @@ public class Cable {
             if (this.level.isLoaded(startPos)) {
                 start = this.level.getBlockEntity(startPos);
                 if (start instanceof SignalActorBlockEntity startSignalActor) {
-                    List<Signal> signalsFromBlock = startSignalActor.getSideSignals(firstNode.getAnchor().getDirection());
+                    List<Signal> signalsFromBlock = startSignalActor.getPortSignals(firstNode.getAnchor().getPort());
                     if (signalsFromBlock != null) { // TODO: remove this
                         for (Signal signal : signalsFromBlock) {
                             if (signal == null) {
@@ -147,8 +147,8 @@ public class Cable {
                 BlockEntity end = this.level.getBlockEntity(endPos);
 
                 if (end instanceof SignalActorBlockEntity endSignalActor) {
-                    if (!signalList.isEmpty() && start != endSignalActor) {
-                        endSignalActor.addSignals(new Object(), signalList, lastNode.getAnchor().getDirection());
+                    if (!signalList.isEmpty()) {
+                        endSignalActor.putPortSignals(lastNode.getAnchor().getPort(),signalList);
                     }
                 } else {
                     if (!signalList.isEmpty()) {

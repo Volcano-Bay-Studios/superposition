@@ -245,6 +245,7 @@ public class CableManager {
 
     private static void playerStartCable(BlockPos pos, Direction face, Level level, Player player, Color color, boolean emitsLight) {
         if (player.level().isClientSide()) {
+            ScreenManager.openPort(pos);
             return;
         }
 
@@ -330,6 +331,7 @@ public class CableManager {
 
     public static void addCable(Cable cable, Level level) {
         Cable old = getCablesMap(level).computeIfAbsent(level.dimension(), unused -> new HashMap<>()).put(cable.getId(), cable);
+        ScreenManager.addCable(cable);
         if (old != null) {
             CableClientState clientState = old.getClientState();
             if (clientState != null) {

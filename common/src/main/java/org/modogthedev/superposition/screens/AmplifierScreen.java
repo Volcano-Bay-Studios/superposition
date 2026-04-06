@@ -25,6 +25,7 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.AmplifierBlockEntity;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.SignalHelper;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 public class AmplifierScreen extends WidgetScreen {
@@ -204,7 +205,7 @@ public class AmplifierScreen extends WidgetScreen {
 
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof AmplifierBlockEntity signalActorBlockEntity) {
-            Signal blockSignal = signalActorBlockEntity.getSignal();
+            Signal blockSignal = SignalHelper.randomSignal(signalActorBlockEntity.getInputSignals());
             if (blockSignal != null) {
                 this.frequency = blockSignal.getSourceFrequency(); //TODO Explode if signal to high
                 this.readAmplitude = signalActorBlockEntity.lastAmplitude;

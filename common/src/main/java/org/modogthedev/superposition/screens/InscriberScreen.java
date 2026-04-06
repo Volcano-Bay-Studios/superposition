@@ -73,6 +73,11 @@ public class InscriberScreen extends Screen {
         if (animation >= 40) {
             animation = 0;
         }
+        if (inspectingNode != null) {
+            for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
+                configuration.tick(animation);
+            }
+        }
         super.tick();
     }
 
@@ -133,7 +138,7 @@ public class InscriberScreen extends Screen {
         SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, -2, -2, screenWidth + 2, 0, panelTopBorder, panelTopBorder);
         SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, -2, screenHeight, screenWidth + 2, screenHeight + 2, panelBottomBorder, panelBottomBorder);
         boolean hoveringTitle = (adjustedMouse.x > 0 && adjustedMouse.x < screenWidth && adjustedMouse.y < 0 && adjustedMouse.y > -30) || titleFocused;
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font,card.title + (titleFocused && animation < 20 ? "|" : ""),screenWidth/2,-15,hoveringTitle ? highlight : topBorder);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, card.title + (titleFocused && animation < 20 ? "|" : ""), screenWidth / 2, -15, hoveringTitle ? highlight : topBorder);
 
         dragNode(guiGraphics, mouseX, mouseY);
 
@@ -358,7 +363,7 @@ public class InscriberScreen extends Screen {
                 }
             }
         }
-        selectedNode.getPosition().set(Mth.clamp(selectedNode.getPosition().x,0,screenWidth), Mth.clamp(selectedNode.getPosition().y,0,screenHeight));
+        selectedNode.getPosition().set(Mth.clamp(selectedNode.getPosition().x, 0, screenWidth), Mth.clamp(selectedNode.getPosition().y, 0, screenHeight));
     }
 
     private void drawConnection(GuiGraphics guiGraphics, float x1, float y1, float x2, float y2, int snapMode, float width, int color1, int color2) {
@@ -498,8 +503,9 @@ public class InscriberScreen extends Screen {
                 int y = 40;
                 for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
                     if (mouseY > y && mouseY < y + configuration.getHeight()) {
-                        configuration.mouse(button,(int) (mouseX - (width - 186)),mouseY-y);
-                        return true;
+                        if (configuration.mouse(button, (int) (mouseX - (width - 186)), mouseY - y)) {
+                            return true;
+                        }
                     }
                     y += configuration.getHeight();
                 }
@@ -639,12 +645,20 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (inspectingNode != null) {
+            for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
+                boolean type = configuration.keyPressed(keyCode,scanCode,modifiers);
+                if (type) {
+                    return true;
+                }
+            }
+        }
         if (keyCode == 261 || keyCode == 259) {
             if (inspectingNode != null) {
                 card.getNodes().remove(inspectingNode);
                 inspectingNode = null;
-            } else if (titleFocused){
-                card.title = card.title.substring(0,Math.max(0,card.title.length()-1));
+            } else if (titleFocused) {
+                card.title = card.title.substring(0, Math.max(0, card.title.length() - 1));
             }
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -652,6 +666,14 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
+        if (inspectingNode != null) {
+            for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
+                boolean type = configuration.charTyped(codePoint, modifiers);
+                if (type) {
+                    return true;
+                }
+            }
+        }
         if (titleFocused) {
             card.title = card.title.concat(String.valueOf(codePoint));
             return true;
@@ -672,7 +694,7 @@ public class InscriberScreen extends Screen {
 
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.put("card",card.save(new CompoundTag()));
+        tag.put("card", card.save(new CompoundTag()));
         VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, blockPos));
     }
 }

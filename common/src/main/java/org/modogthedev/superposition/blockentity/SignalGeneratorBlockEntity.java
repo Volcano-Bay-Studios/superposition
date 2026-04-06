@@ -58,9 +58,13 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
 
     @Override
     public void tick() {
-        Signal signal = this.getSignal();
+        Signal signal = null;
+        if (frequency >= 0 && frequency < 150) {
+            this.updateSignal();
+            signal = new Signal(connectedSignal);
+        }
         if (signal != null) {
-            this.putSignal(signal);
+            this.singleSignalOut(signal);
         }
         if (this.level.isClientSide()) {
             List<Component> tooltip = new ArrayList<>();
@@ -79,24 +83,6 @@ public class SignalGeneratorBlockEntity extends SignalActorBlockEntity implement
             this.setTooltip(tooltip);
         }
         super.tick();
-    }
-
-    @Override
-    public Signal getSignal() {
-        if (frequency <= 0 || frequency > 150) {
-            return null;
-        }
-        this.updateSignal();
-        return new Signal(connectedSignal);
-    }
-
-    @Override
-    public List<Signal> getSignals() {
-        List<Signal> signals = new ArrayList<>();
-        if (getSignal() != null) {
-            signals.add(getSignal());
-        }
-        return signals;
     }
 
     public float getFrequency() {

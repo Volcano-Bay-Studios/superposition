@@ -1,33 +1,27 @@
 package org.modogthedev.superposition.system.cable;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class PortConfig {
-    private List<Port> inputs = new ArrayList<>();
-    private List<Port> outputs = new ArrayList<>();
-    private HashMap<String, Port> all = new HashMap<>();
+    private HashMap<String, Port> ports = new HashMap<>();
 
-    public List<Port> getInputs() {
-        return inputs;
-    }
-
-    public List<Port> getOutputs() {
-        return outputs;
-    }
-
-    public HashMap<String, Port> getAll() {
-        return all;
+    public HashMap<String, Port> getPorts() {
+        return ports;
     }
 
     public static Builder create() {
-        return new Builder();
+        return new Builder(new PortConfig());
     }
 
+    public Builder rebuild() {
+        ports.clear();
+
+        return new Builder(this);
+    }
     public enum IO {
         IN,
         OUT,
@@ -53,28 +47,40 @@ public class PortConfig {
     }
 
     public static class Builder {
-        private final PortConfig config = new PortConfig();
+        private final PortConfig config;
+
+        public Builder(PortConfig config) {
+            this.config = config;
+        }
 
         public Builder addInputPort(String name) {
             Port port = new Port(name, IO.IN);
-            config.inputs.add(port);
-            config.all.put(name, port);
+            config.ports.put(name, port);
             return this;
         }
 
         public Builder addOutputPort(String name) {
             Port port = new Port(name, IO.OUT);
-            config.outputs.add(port);
-            config.all.put(name, port);
+            config.ports.put(name, port);
             return this;
         }
 
         public Builder addBothPort(String name) {
             Port port = new Port(name, IO.BOTH);
-            config.inputs.add(port);
-            config.outputs.add(port);
-            config.all.put(name, port);
+            config.ports.put(name, port);
             return this;
+        }
+
+        public boolean hasPort(String name) {
+            return config.ports.containsKey(name);
+        }
+
+        public @Nullable Port getExisting(String name) {
+            return config.ports.get(name);
+        }
+
+        public void removeExisting(String name) {
+            config.ports.remove(name);
         }
 
         public PortConfig build() {

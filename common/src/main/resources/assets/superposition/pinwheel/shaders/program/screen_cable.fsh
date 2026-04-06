@@ -57,12 +57,12 @@ void main() {
         lastP = currentP;
     }
 
-    if (smoothstep(8.0, 6.5, minDist) > 0.5) {
+    if (smoothstep(7.0, 5.5, minDist) > 0.5) {
         float distFromEnd = segmentLengthSum - finalArcPos;
-        float u = distFromEnd / 13;
-        float v = (minDist / 8.0) * 0.5 + 0.5;
+        float u = distFromEnd / 10;
+        float v = (minDist / 7.0) * 0.5 + 0.5;
 
-        vec4 texColor = texture(Sampler0, vec2(u, v));
+        vec4 texColor = texture(Sampler0, vec2(u, v)) * vec4(vec3(min(1,(distFromEnd+5)/10)),1.0);
         fragColor = texColor * vertexColor;
     } else {
         discard;

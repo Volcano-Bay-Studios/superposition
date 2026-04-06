@@ -12,7 +12,7 @@ import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.actions.*;
 import org.modogthedev.superposition.system.card.actions.configuration.ActionConfiguration;
-import org.modogthedev.superposition.system.card.actions.configuration.DirectionConfiguration;
+import org.modogthedev.superposition.system.card.actions.configuration.PortConfiguration;
 import org.modogthedev.superposition.system.card.actions.configuration.EnumConfiguration;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class SuperpositionActions {
     public static final ResourceKey<Registry<ActionConfiguration>> ACTION_CONFIGURATION_KEY = ResourceKey.createRegistryKey(Superposition.id("action_configurations"));
     public static final RegistrationProvider<ActionConfiguration> ACTION_CONFIGURATIONS = RegistrationProvider.get(ACTION_CONFIGURATION_KEY, Superposition.MODID);
 
-    public static final RegistryObject<ActionConfiguration> DIRECTION_CONFIGURATION = ACTION_CONFIGURATIONS.register("direction", () -> new DirectionConfiguration(Component.literal("Direction")));
+    public static final RegistryObject<ActionConfiguration> DIRECTION_CONFIGURATION = ACTION_CONFIGURATIONS.register("port", () -> new PortConfiguration(Component.literal("Port")));
     public static final RegistryObject<ActionConfiguration> COMBINATOR_CONFIGURATION = ACTION_CONFIGURATIONS.register("combinator", () -> new EnumConfiguration(Component.literal("Combinator"), CombinatorBlockEntity.Modes.values()));
 
 
