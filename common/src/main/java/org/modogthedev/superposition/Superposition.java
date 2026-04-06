@@ -48,9 +48,8 @@ public class Superposition {
 
     public static void preTick(Level level) {
         if (level.isClientSide) {
-            RedstoneWorld.clientTick(level);
+//            RedstoneWorld.clientTick(level);
         } else {
-            RedstoneWorld.tick(level);
         }
     }
 
@@ -59,6 +58,7 @@ public class Superposition {
         AntennaManager.tickAntennas(level);
         CableSavedData.get(level);
         CableManager.tick(level);
+        RedstoneWorld.tick(level);
         CablePassthroughManager.tick(level);
         CarabinerManager.tick(level);
     }

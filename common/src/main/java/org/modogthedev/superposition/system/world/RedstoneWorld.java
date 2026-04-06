@@ -1,11 +1,10 @@
 package org.modogthedev.superposition.system.world;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class RedstoneWorld { // Forgive me for this class is a sin. There is probably a better way to do this.
     private static final HashMap<Level, HashMap<BlockPos, Integer>> oldMap = new HashMap<>();
@@ -14,6 +13,10 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
 
     private static HashMap<BlockPos, Integer> getMap(Level level) {
         return level.isClientSide ? clientRedstoneMap.computeIfAbsent(level, (key) -> new HashMap<>()) : redstoneMap.computeIfAbsent(level, (key) -> new HashMap<>());
+    }
+
+    private static HashMap<BlockPos, Integer> getOldMap(Level level) {
+        return level.isClientSide ? clientRedstoneMap.computeIfAbsent(level, (key) -> new HashMap<>()) : oldMap.computeIfAbsent(level, (key) -> new HashMap<>());
     }
 
     public static void tick(Level level) {
@@ -32,13 +35,13 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
             }
             old.remove(pos);
         }
-        for (BlockPos pos : old.keySet()) {
+        List<BlockPos> removal = new ArrayList<>(old.keySet());
+        old.clear();
+        old.putAll(redstone);
+        for (BlockPos pos : removal) {
             level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
             level.updateNeighborsAt(pos.above(), level.getBlockState(pos.above()).getBlock());
         }
-
-        old.clear();
-        old.putAll(redstone);
         redstone.clear();
     }
 
@@ -47,15 +50,22 @@ public class RedstoneWorld { // Forgive me for this class is a sin. There is pro
     }
 
     public static void setPower(Level level, BlockPos pos, int power) {
-        getMap(level).put(pos, power);
+        getMap(level).put(pos, Mth.clamp(power,0,15));
     }
 
     public static int getPower(Level level, BlockPos pos) {
         Integer i = getValueIfKeyEquals(getMap(level), (pos));
+        Integer j = getValueIfKeyEquals(getOldMap(level), pos);
+        int k = 0;
         if (i != null) {
-            return i;
+            k = i;
         }
-        return 0;
+        if (j != null) {
+            if (j > k) {
+                k = j;
+            }
+        }
+        return k;
     }
 
     public static int getOldPower(Level level, BlockPos pos) {
