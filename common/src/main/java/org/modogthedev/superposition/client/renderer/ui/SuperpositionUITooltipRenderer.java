@@ -143,9 +143,7 @@ public class SuperpositionUITooltipRenderer {
                 editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, editableTooltip.getText().length())));
             }
             CompoundTag tag = new CompoundTag();
-            tag.putInt("modifiedPosition",cursorPos);
-            tag.putString("changedChar", String.valueOf(key));
-            tag.putInt("stringLength",editableTooltip.getText().length());
+            tag.putString("output",editableTooltip.getText());
             VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
             cursorPos++;
             cursorPos = Mth.clamp(cursorPos, -1, editableTooltip.getText().length());

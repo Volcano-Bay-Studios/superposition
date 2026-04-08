@@ -5,16 +5,24 @@ import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.BiModifyAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class RetriveCard extends Action implements BiModifyAction {
+public class SubstringAction extends Action implements BiModifyAction {
 
-    public RetriveCard(ResourceLocation action, Information info) {
+    public SubstringAction(ResourceLocation action, Information info) {
         super(action, info);
     }
 
     @Override
     public Signal modify(Signal signal, Signal periphrealSignal) {
         if (periphrealSignal != null && signal.getEncodedData() != null && periphrealSignal.getEncodedData() != null) {
-            signal.setEncodedData(signal.getEncodedData().getTagKey(periphrealSignal.getEncodedData().stringValue()));
+            String s = signal.getEncodedData().stringValue();
+            int cutPosition = periphrealSignal.getEncodedData().intValue();
+            if (s != null) {
+                if (cutPosition >= 0) {
+                    signal.encode(s.substring(0, Math.max(0, s.length() - cutPosition)));
+                } else {
+                    signal.encode(s.substring(-cutPosition));
+                }
+            }
         }
         return signal;
     }

@@ -12,20 +12,43 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.behavior.Behavior;
 import org.modogthedev.superposition.system.behavior.types.ScanBehavior;
+import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AnalyserBlockEntity extends PeripheralBlockEntity {
     public float distance = 0;
     public int startDistance = 0;
     public int endDistance = 0;
     private Signal signal;
+    private String path = "";
 
     public AnalyserBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.ANALYSER.get(), pos, state);
         signal = new Signal(new Vector3d(), getLevel(), 1f, 1f, 1f);
+    }
+
+    @Override
+    public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
+        return super.buildPorts(builder).addInputPort("narrowPath");
+    }
+
+    @Override
+    public boolean putPortSignals(String port, List<Signal> signals) {
+        if (Objects.equals(port, "narrowPath")) {
+            Signal signal = signals.getLast();
+            if (signal != null && signal.getEncodedData() != null) {
+                String path = signal.getEncodedData().stringValue();
+                this.path = path;
+            }
+
+            return true;
+        }
+        return super.putPortSignals(port, signals);
     }
 
     @Override
@@ -44,7 +67,17 @@ public class AnalyserBlockEntity extends PeripheralBlockEntity {
             }
         }
         signal.encode(tag);
+        String[] split = path.split("/");
+        for (String pathTarget : split) {
+            try {
+                EncodedData<?> data = signal.getEncodedData().getTagKey(pathTarget);
+                if (!Objects.equals(data.stringValue(), "null")) {
+                    signal.setEncodedData(data);
+                }
+            } catch (Exception ignored) {}
+        }
         putPortSignals(outPortName(), List.of(signal));
+        path = "";
         super.tick();
     }
 

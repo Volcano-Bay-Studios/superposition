@@ -61,6 +61,11 @@ public class SuperpositionActions {
             Component.literal("Duplicates a signal list into two copies"),
             Action.Type.MODIFY
     )));
+    public static final RegistryObject<Action> NARROW = registerAction("narrow", () -> new NarrowAction(Superposition.id("narrow"), new Action.Information(
+            Component.literal("Narrow"),
+            Component.literal("Takes a list of signals and returns only the first one"),
+            Action.Type.MODIFY
+    )));
     public static final RegistryObject<Action> OPTIONAL = registerAction("optional", () -> new OptionalAction(Superposition.id("optional"), new Action.Information(
             Component.literal("Optional"),
             Component.literal("Returns the first signal if, and only if, the second signals boolean value is true"),
@@ -71,7 +76,7 @@ public class SuperpositionActions {
             Component.literal("Retrieves the amplitude of the signal"),
             Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> FREQUENCY = registerAction("frequency", () -> new FrequencyCard(Superposition.id("frequency"), new Action.Information(
+    public static final RegistryObject<Action> FREQUENCY = registerAction("frequency", () -> new FrequencyAction(Superposition.id("frequency"), new Action.Information(
             Component.literal("Frequency"),
             Component.literal("Retrieves the frequency of the signal"),
             Action.Type.MODIFY
@@ -86,7 +91,7 @@ public class SuperpositionActions {
             Component.literal("Merges tags together"),
             Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> RETRIEVE = registerAction("retrieve", () -> new RetriveCard(Superposition.id("retrieve"), new Action.Information(
+    public static final RegistryObject<Action> RETRIEVE = registerAction("retrieve", () -> new RetriveAction(Superposition.id("retrieve"), new Action.Information(
             Component.literal("Retrieve"),
             Component.literal("Retrieve the contents of a tag using the second signal as a tag"),
             Action.Type.MODIFY
@@ -101,7 +106,7 @@ public class SuperpositionActions {
             Component.literal("Returns the program stored inside the computer"),
             Action.Type.OUTPUT
     )));
-    public static final RegistryObject<Action> SUBSTRING = registerAction("substring", () -> new SubstringCard(Superposition.id("substring"), new Action.Information(
+    public static final RegistryObject<Action> SUBSTRING = registerAction("substring", () -> new SubstringAction(Superposition.id("substring"), new Action.Information(
             Component.literal("Substring"),
             Component.literal("Cuts a string at the the number encoded the second signal, if the second signal is negative it will cut from the front instead"),
             Action.Type.MODIFY

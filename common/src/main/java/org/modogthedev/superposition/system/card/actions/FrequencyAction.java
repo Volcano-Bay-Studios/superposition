@@ -5,9 +5,9 @@ import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.MonoModifyAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class FrequencyCard extends Action implements MonoModifyAction {
+public class FrequencyAction extends Action implements MonoModifyAction {
 
-    public FrequencyCard(ResourceLocation action, Information info) {
+    public FrequencyAction(ResourceLocation action, Information info) {
         super(action, info);
     }
 

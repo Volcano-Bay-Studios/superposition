@@ -188,6 +188,7 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 if (card != null) {
                     card.load(tag);
                     rebuild(card);
+                    markDirty();
                 }
                 return true;
             }

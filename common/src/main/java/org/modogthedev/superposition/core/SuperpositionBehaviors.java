@@ -27,6 +27,7 @@ public class SuperpositionBehaviors {
     public static final RegistryObject<Behavior> DISTANCE = registerBehavior("distance", (resourceLocation -> () -> new DistanceBehavior(resourceLocation)));
     public static final RegistryObject<Behavior> REDSTONE = registerBehavior("redstone", (resourceLocation -> () -> new RedstoneBehavior(resourceLocation)));
     public static final RegistryObject<Behavior> SIGN = registerBehavior("sign", (resourceLocation -> () -> new SignBehavior(resourceLocation)));
+    public static final RegistryObject<Behavior> FURNACE = registerBehavior("furnace", (resourceLocation -> () -> new FurnaceBehavior(resourceLocation)));
 
     public static RegistryObject<Behavior> registerBehavior(String name, Function<ResourceLocation, Supplier<Behavior>> resourceLocationFunction) {
         behaviors.add(resourceLocationFunction.apply(Superposition.id(name)).get());
