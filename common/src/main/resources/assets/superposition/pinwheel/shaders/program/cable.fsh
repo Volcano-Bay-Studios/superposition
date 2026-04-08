@@ -20,8 +20,6 @@ in vec3 normal;
 out vec4 fragColor;
 
 void main() {
-    // #veil:albedo
     vec4 color = texture(Sampler0, texCoord0) * vertexColor * ColorModulator;
     fragColor = linear_fog(color * vec4(lightmapColor, 1.0), vertexDistance, FogStart, FogEnd, FogColor);
 }
-

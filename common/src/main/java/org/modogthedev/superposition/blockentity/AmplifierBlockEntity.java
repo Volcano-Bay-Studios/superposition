@@ -27,7 +27,6 @@ import java.util.List;
 public class AmplifierBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
 
     public float amplification;
-    public float redstoneAmplification;
     public float temp = 26.1f;
     public float amplitude;
     public float throttle = 0f;
@@ -46,7 +45,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
         this.amplification = tag.getFloat("amplification");
-        this.redstoneAmplification = tag.getFloat("redstoneAmplification");
 
         level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
 //        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
@@ -59,7 +57,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putFloat("amplification", amplification);
-        tag.putFloat("redstoneAmplification", redstoneAmplification);
         super.saveAdditional(tag, registries);
     }
 
@@ -67,13 +64,12 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         this.amplification = tag.getFloat("amplification");
-        this.redstoneAmplification = tag.getFloat("redstoneAmplification");
     }
 
     @Override
     public @Nullable Signal manipulateSignal(Signal signal) {
         if (signal != null) {
-            signal.addAmplitude(Math.max(0, amplification - throttle + (getRedstoneOffset(level, this.getBlockPos()) * (this.redstoneAmplification / 15))));
+            signal.addAmplitude(Math.max(0, amplification - throttle));
             amplitude += signal.getAmplitude();
         }
         return signal;
@@ -102,9 +98,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
         if (level.isClientSide) {
             List<Component> tooltip = new ArrayList<>();
             this.setTooltip(tooltip);
-            for (Signal signal : getInputSignals()) {
-                amplitude += signal.getAmplitude();
-            }
             if (amplitude > 0) {
                 ticks++;
                 if (ticks > ticksToChange - 1) {

@@ -28,6 +28,8 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalHelper;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
+import java.awt.*;
+
 public class AmplifierScreen extends WidgetScreen {
     private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/amplifier_screen.png");
     private static final ResourceLocation SWITCH_ON = ResourceLocation.fromNamespaceAndPath(Superposition.MODID, "textures/screen/switch_on.png");
@@ -49,14 +51,12 @@ public class AmplifierScreen extends WidgetScreen {
         super(pTitle);
         AmplifierScreen.pos = pos;
         ticks = 0;
-        addDial(-72, 0, 76);
-        addDial(-50, 0, 76);
-        assert Minecraft.getInstance().level != null : "Level was null in Amplifier Screen";
+        addDial(-67, -3, 68);
+        assert Minecraft.getInstance().level != null : "Level was null in AmplifierScreen";
         BlockState state = Minecraft.getInstance().level.getBlockState(pos);
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof AmplifierBlockEntity generatorBlockEntity) {
-            dials.get(0).scrolledAmount = generatorBlockEntity.redstoneAmplification;
-            dials.get(1).scrolledAmount = generatorBlockEntity.amplification;
+            dials.getFirst().scrolledAmount = generatorBlockEntity.amplification;
         }
         swap = state.getValue(SignalGeneratorBlock.SWAP_SIDES);
     }
@@ -66,40 +66,23 @@ public class AmplifierScreen extends WidgetScreen {
     }
 
     public void renderSine(GuiGraphics pGuiGraphics) {
-        int startPos = (this.width - 70) / 2;
+        int startPos = (this.width - 115) / 2;
         int j = (this.height - imageHeight) / 2;
         float resolution = 0.5f;
-        for (float i = 0; i < 61; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80))) * (5 + ((readAmplitude) / 5) + signalAmplitude);
-            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80))) * (5 + ((readAmplitude) / 5) + signalAmplitude);
+        for (float i = 0; i < 131; i += resolution) {
+            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80))) * (signalAmplitude / 5);
+            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80))) * (signalAmplitude / 5);
+            Color color = new Color(0.12f, 0.9f, 0.25f, (float) Math.min(1,Math.pow(60/(Math.abs(65-i)),5)));
             calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition, -35, 42);
             nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition, -35, 42);
-            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
-        }
-    }
-
-    public void renderSine2(GuiGraphics pGuiGraphics) {
-        int startPos = (this.width + 68) / 2;
-        int j = (this.height - imageHeight) / 2;
-        float resolution = 0.5f;
-        for (float i = 0; i < 45; i += resolution) {
-            float calculatedPosition = (float) (Math.sin((i + ticks) * (frequency / 80))) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude);
-            float nextCalculatedPosition = (float) (Math.sin(((i + resolution) + ticks) * (frequency / 80))) * (5 + ((readAmplitude - amplitude) / 5) + signalAmplitude);
-            calculatedPosition = net.minecraft.util.Mth.clamp(calculatedPosition, -35, 42);
-            nextCalculatedPosition = net.minecraft.util.Mth.clamp(nextCalculatedPosition, -35, 42);
-            this.fill(pGuiGraphics, (i + (startPos)), (j + 45 + calculatedPosition), (i + (startPos)) + 1, (j + 45 + nextCalculatedPosition) + 1, 0xFF56d156);
+            this.fill(pGuiGraphics, (i + (startPos)), (j + 52 + calculatedPosition), (i + (startPos)) + 1, (j + 52 + nextCalculatedPosition) + 1, color.getRGB());
         }
     }
 
     public void renderBars(GuiGraphics guiGraphics) {
-        int width = this.width; // Redundant call?
-        int barHeight = Math.min(76, Math.abs((int) dials.get(0).scrolledAmount));
-        int barHeight2 = Math.min(76, Math.abs((int) dials.get(1).scrolledAmount));
-        fillExact(guiGraphics, width / 2f - 79, height / 2f - 25 - barHeight, width / 2f - 65, height / 2f - 25, 0xFF56d156);
-        fillExact(guiGraphics, width / 2f - 57, height / 2f - 25 - barHeight2, width / 2f - 43, height / 2f - 25, 0xFF56d156);
-        modRate = barHeight;
-        assert Minecraft.getInstance().level != null : "Tried accessing screen from server";
-        amplitude = barHeight2 + (AmplifierBlockEntity.getRedstoneOffset(Minecraft.getInstance().level, pos) * ((float) barHeight / 15));
+        int barHeight2 = Math.min(68, Math.abs((int) dials.get(0).scrolledAmount));
+        Color color = new Color(0.12f, 0.9f, 0.25f, 1f);
+        fillExact(guiGraphics, width / 2f - 79, height / 2f - 24 - barHeight2, width / 2f - 67, height / 2f - 24, color.getRGB());
     }
 
     public void fill(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
@@ -110,7 +93,6 @@ public class AmplifierScreen extends WidgetScreen {
         } else {
             pMaxY += 3;
         }
-        // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -125,7 +107,6 @@ public class AmplifierScreen extends WidgetScreen {
     }
 
     public void fillExact(GuiGraphics graphics, float pMinX, float pMinY, float pMaxX, float pMaxY, int pColor) {
-        // In ryan we trust
         float f3 = (float) FastColor.ARGB32.alpha(pColor) / 255.0F;
         float f = (float) FastColor.ARGB32.red(pColor) / 255.0F;
         float f1 = (float) FastColor.ARGB32.green(pColor) / 255.0F;
@@ -174,7 +155,6 @@ public class AmplifierScreen extends WidgetScreen {
         guiGraphics.blit(BACKGROUND, i, j, 0, 0, imageWidth, imageHeight);
 //        frequency = 5;
         renderSine(guiGraphics);
-        renderSine2(guiGraphics);
         renderBars(guiGraphics);
 
         if (mute) {
@@ -201,22 +181,19 @@ public class AmplifierScreen extends WidgetScreen {
 //            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SuperpositionSounds.SINE.get(), pitch)); TODO: use new thing
         }
         ticks++;
-        assert Minecraft.getInstance().level != null : "Tried to access screen from server!";
+        assert Minecraft.getInstance().level != null : "Tried to access screen with no level!";
 
         BlockEntity blockEntity = Minecraft.getInstance().level.getBlockEntity(pos);
         if (blockEntity instanceof AmplifierBlockEntity signalActorBlockEntity) {
-            Signal blockSignal = SignalHelper.randomSignal(signalActorBlockEntity.getInputSignals());
+            Signal blockSignal = SignalHelper.randomSignal(signalActorBlockEntity.getOutputSignals());
             if (blockSignal != null) {
                 this.frequency = blockSignal.getSourceFrequency(); //TODO Explode if signal to high
-                this.readAmplitude = signalActorBlockEntity.lastAmplitude;
-//                this.signalAmplitude = blockSignal.amplitude;
+                this.signalAmplitude = blockSignal.getAmplitude();
             } else {
                 frequency = 0;
-                readAmplitude = 0;
             }
         } else {
             this.frequency = 0;
-            readAmplitude = 0;
         }
     }
 
@@ -234,8 +211,7 @@ public class AmplifierScreen extends WidgetScreen {
 
     public void updateBlock() {
         CompoundTag tag = new CompoundTag();
-        tag.putFloat("amplification", Math.min(76, Math.abs((int) dials.get(1).scrolledAmount)));
-        tag.putFloat("redstoneAmplification", Math.min(76, Math.abs((int) dials.get(0).scrolledAmount)));
+        tag.putFloat("amplification", Math.min(76, Math.abs((int) dials.get(0).scrolledAmount)));
         tag.putBoolean("swap", swap);
         VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, pos));
     }

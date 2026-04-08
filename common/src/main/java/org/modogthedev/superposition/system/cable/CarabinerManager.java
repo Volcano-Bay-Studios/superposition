@@ -14,6 +14,7 @@ public class CarabinerManager {
 
     private static final Map<UUID, RopeNode> PLAYER_POINT_MAP = new HashMap<>();
     private static float slide = 0f;
+    private static float velocity = 0f;
 
     public static void tick(Level level) {
         for (Map.Entry<UUID, RopeNode> entry : PLAYER_POINT_MAP.entrySet()) {
@@ -32,6 +33,7 @@ public class CarabinerManager {
         for (Map.Entry<UUID, RopeNode> entry : PLAYER_POINT_MAP.entrySet()) {
             Player player = level.getPlayerByUUID(entry.getKey());
             if (player != null) {
+                velocity = velocity * 0.95f;
                 RopeNode point = entry.getValue();
                 RopeNode nextPoint = entry.getValue().getNext();
                 Vec3 pos = point.getPosition();
@@ -41,18 +43,20 @@ public class CarabinerManager {
                 } else {
                     cableVector = point.getLast().getPosition().subtract(point.getPosition()).normalize();
                 }
-                if (slide > 0) {
+                if (slide > 0.01) {
                     if (nextPoint != null) {
                         pos = pos.lerp(nextPoint.getPosition(), slide);
                     } else {
                         slide = 0;
+                        velocity = 0;
                     }
                 }
-                if (slide < 0 && point.getLast() != null) {
+                if (slide < -0.01) {
                     if (point.getLast() != null) {
                         pos = pos.lerp(point.getLast().getPosition(), -slide);
                     } else {
                         slide = 0;
+                        velocity = 0;
                     }
                 }
                 if (slide > 1) {
@@ -63,23 +67,31 @@ public class CarabinerManager {
                     PLAYER_POINT_MAP.put(entry.getKey(), point.getLast());
                     slide = 0;
                 }
-                float moveAmount = (float) player.getViewVector(0).dot(cableVector) / 5f;
+                Vec3 forward = player.calculateViewVector(player.getViewXRot(0), player.getViewYRot(0));
+                Vec3 left = player.calculateViewVector(player.getViewXRot(0), player.getViewYRot(0) - 90);
+                Vec3 back = player.calculateViewVector(player.getViewXRot(0), player.getViewYRot(0) + 180);
+                Vec3 right = player.calculateViewVector(player.getViewXRot(0), player.getViewYRot(0) + 90);
+                Vec3 view = new Vec3(0,0,0);
+                velocity += (float) (cableVector.y/-10f);
                 if (Minecraft.getInstance().options.keyUp.isDown()) {
-                    slide += moveAmount;
+                    view = view.add(forward);
                 }
                 if (Minecraft.getInstance().options.keyLeft.isDown()) {
-                    slide -= 0.1f - moveAmount;
+                    view = view.add(left);
                 }
                 if (Minecraft.getInstance().options.keyDown.isDown()) {
-                    slide -= moveAmount;
+                    view = view.add(back);
                 }
                 if (Minecraft.getInstance().options.keyRight.isDown()) {
-                    slide += 0.1f - moveAmount;
+                    view = view.add(right);
                 }
+                velocity += (float) view.normalize().dot(cableVector) / 20f;
+                slide += velocity;
 
                 player.setDeltaMovement(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(1)).subtract(0f, 0.2f, 0f).subtract(pos).scale(-0.5f));
                 if (player.isShiftKeyDown()) {
                     removePlayer(player.getUUID());
+                    velocity = 0;
                 }
             }
         }

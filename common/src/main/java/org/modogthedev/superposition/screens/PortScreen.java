@@ -84,7 +84,7 @@ public class PortScreen extends Screen {
 
         ShaderProgram cableShader = VeilRenderSystem.renderer().getShaderManager().getShader(Superposition.id("screen_cable"));
         if (cableShader != null) {
-            cableShader.getOrCreateUniform("Screen").setVector(this.width, this.height);
+            cableShader.getUniform("Screen").setVector(this.width, this.height);
         }
 
         PortConfig portConfig = signalActor.getPortConfig();
@@ -173,9 +173,9 @@ public class PortScreen extends Screen {
             }
             boolean bound = portConfig.getPorts().containsKey(screenCable.getBind());
             if (cableShader != null) {
-                cableShader.getOrCreateUniform("BoxMin").setVector(startPosition.x/this.width, startPosition.y/this.height);
+                cableShader.getUniform("BoxMin").setVector(startPosition.x/this.width, startPosition.y/this.height);
 //                    cableShader.getOrCreateUniform("BoxMax").setVector(focusPosition.x/this.width, focusPosition.y/this.height);
-                    cableShader.getOrCreateUniform("BoxMax").setVector((focusPosition.x - (screenCable.isOut() ? 6 : -6))/this.width, focusPosition.y/this.height);
+                    cableShader.getUniform("BoxMax").setVector((focusPosition.x - (screenCable.isOut() ? 6 : -6))/this.width, focusPosition.y/this.height);
             }
             int rgb = screenCable.getCable().getColor().getRGB();
             fill(guiGraphics,SuperpositionRenderTypes.screenCable(), (int) startPosition.x, (int) startPosition.y, (int) focusPosition.x, (int) focusPosition.y, 1 + n * 2, rgb, bound);
