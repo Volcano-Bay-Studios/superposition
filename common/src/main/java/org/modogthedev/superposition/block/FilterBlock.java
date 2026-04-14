@@ -3,6 +3,7 @@ package org.modogthedev.superposition.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -80,6 +81,9 @@ public class FilterBlock extends SignalActorTickingBlock implements EntityBlock,
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (!player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
+            return InteractionResult.PASS;
+        }
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof FilterBlockEntity filterBlockEntity) {
             if (filterBlockEntity.getFilter() != null) {

@@ -23,9 +23,9 @@ public class FurnaceBehavior extends Behavior implements ScanBehavior {
         if (blockEntity1 instanceof AbstractFurnaceBlockEntity furnaceBlockEntity) {
             FurnaceBehaviorAccessor furnace = (FurnaceBehaviorAccessor) furnaceBlockEntity;
             CompoundTag tag = new CompoundTag();
-            tag.putInt("litTime",furnace.litTime());
-            tag.putInt("litDuration",furnace.litDuration());
-            tag.putInt("cookingProgress",furnace.cookingProgress());
+            tag.putInt("litTime",furnace.getLitTime());
+            tag.putInt("litDuration",furnace.getLitDuration());
+            tag.putInt("cookingProgress",furnace.getCookingProgress());
 
             outputTag.put(getPath(),tag);
         }

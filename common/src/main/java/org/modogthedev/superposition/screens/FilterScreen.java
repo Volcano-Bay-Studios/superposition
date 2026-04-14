@@ -51,26 +51,26 @@ public class FilterScreen extends WidgetScreen {
         this.filterType = filter;
         this.pos = pos;
         if (filter instanceof LowPassFilter) {
-            addDial(-67, 14, 158);
+            addDial(-64, 17, 158);
             imageWidth = 176;
             imageHeight = 74;
             imageOffset = 108;
-            barOffset = 10;
+            barOffset = 14;
         }
         if (filter instanceof HighPassFilter) {
-            addDial(68, 15, 158);
+            addDial(62, 17, 158);
             imageWidth = 176;
             imageHeight = 74;
             imageOffset = 182;
-            barOffset = 10;
+            barOffset = 14;
         }
         if (filter instanceof BandPassFilter) {
-            addDial(-67, -1, 158);
-            addDial(68, 30, 158);
+            addDial(-64, 2, 158);
+            addDial(62, 30, 158);
             imageWidth = 176;
             imageHeight = 106;
             imageOffset = 0;
-            barOffset = 10;
+            barOffset = 14;
         }
         filter.updateDials(dials);
     }
@@ -108,7 +108,6 @@ public class FilterScreen extends WidgetScreen {
             renderBar(guiGraphics, 167, 10, Math.abs((int) dials.get(1).scrolledAmount), true);
             drawFrequencyText(SuperpositionMth.formatHz(Math.max(0, dials.get(0).scrolledAmount) * 100000), i + 45, j + 50, 0xFF56d156, guiGraphics);
             drawFrequencyText(SuperpositionMth.formatHz(Math.abs(158 - Math.min(158, dials.get(1).scrolledAmount)) * 100000), i + 15, j + 82, 0xFF56d156, guiGraphics);
-
         }
     }
 
@@ -118,9 +117,12 @@ public class FilterScreen extends WidgetScreen {
         BlockEntity blockEntity = mc.level.getBlockEntity(pos);
         List<Signal> signals = null;
         if (blockEntity instanceof FilterBlockEntity filterBlockEntity) {
-            signals = filterBlockEntity.getUnmodulated();
+            List<Signal> unmodulated = filterBlockEntity.getUnmodulated();
+            if (unmodulated != null) {
+                signals = new ArrayList<>(unmodulated);
+            }
         } else if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
-            signals = signalActorBlockEntity.getInputSignals();
+            signals = new ArrayList<>(signalActorBlockEntity.getOutputSignals());
         }
         float highestValue = 0;
         float lowestValue = 0;

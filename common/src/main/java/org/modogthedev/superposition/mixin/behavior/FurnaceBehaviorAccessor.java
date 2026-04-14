@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public interface FurnaceBehaviorAccessor {
     @Accessor
-    int litTime();
+    int getLitTime();
     @Accessor
-    int litDuration();
+    int getLitDuration();
     @Accessor
-    int cookingProgress();
+    int getCookingProgress();
 }

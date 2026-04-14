@@ -14,6 +14,7 @@ import org.joml.Matrix4f;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.blockentity.FilterBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 
 import java.awt.*;
@@ -32,8 +33,13 @@ public class FilterBlockEntityRenderer implements BlockEntityRenderer<FilterBloc
             return;
 
         if (renderType == null) {
-                renderType = SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/amplifier_block_screen.png"));
+            if (SuperpositionConstants.bloomEnabled) {
+                renderType = SuperpositionRenderTypes.bloomBlockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png"));
+            } else {
+                renderType = SuperpositionRenderTypes.blockPolygonOffset(Superposition.id("textures/screen/filter_block_screen.png"));
+            }
         }
+
         VertexConsumer buffer = bufferSource.getBuffer(renderType);
 
         float min = getMinPlaneExtent(be);
