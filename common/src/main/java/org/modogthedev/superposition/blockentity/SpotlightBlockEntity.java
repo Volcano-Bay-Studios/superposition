@@ -11,6 +11,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
@@ -110,9 +111,8 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
     public void configureAreaLight(AreaLightData light) {
         super.configureAreaLight(light);
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
-        BlockPos relativePos = BlockPos.containing(0, 0, 0).relative(facing, 1);
-        Vec3 relative = new Vec3(relativePos.getX(), relativePos.getY(), relativePos.getZ()).normalize().scale(0.99f);
-        Vec3 center = this.getBlockPos().getCenter();
+        Vec3 relative = SableCompat.transformNormal(level,getBlockPos().getCenter(), Vec3.atLowerCornerOf(facing.getNormal()));
+        Vec3 center = new Vec3(lightPosition.x,lightPosition.y,lightPosition.z);
         if (facing == Direction.UP || facing == Direction.DOWN) {
             center = center.add(relative.scale(-3.5 / 16f));
         } else {

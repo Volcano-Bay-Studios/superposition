@@ -78,14 +78,14 @@ public class CableManager {
         if (CableRenderer.detachDelta > 0) {
             CableRenderer.detachDelta = CableRenderer.detachDelta - 0.2f;
         }
-//        CableRenderer.stretch = 0;
+        CableRenderer.stretch = 0;
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
             for (Cable cable : cables.values()) {
-                cable.preSimulate();
+//                cable.preSimulate();
             }
             applyPlayerStretch(level);
-            dragPlayers(level);
+//            dragPlayers(level);
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
             }
@@ -249,7 +249,7 @@ public class CableManager {
             return;
         }
 
-        Vec3 anchorPosition = Cable.getAnchoredPoint(pos, face);
+        Vec3 anchorPosition = Cable.getAnchoredPoint(level,pos, face);
         Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, getPlayerHoldCablePos(player), SuperpositionConstants.cableSpawnAmount, level, color, emitsLight);
         newCable.getPoints().getFirst().setAnchor(face, pos);
         newCable.setPlayerHolding(player);

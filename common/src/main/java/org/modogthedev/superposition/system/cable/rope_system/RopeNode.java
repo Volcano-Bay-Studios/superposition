@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class RopeNode {
     Vec3 tempPosition;
 
     Vec3 lastHoldGoalPos;
+
+    CableSnapshotInterpolator interpolator = new CableSnapshotInterpolator(new Vector3d());
 
     @Nullable
     AnchorConstraint anchor = null;
@@ -73,10 +76,12 @@ public class RopeNode {
         if ((velocity.x != 0 || velocity.y != 0 || velocity.z != 0)) {
             Vec3 velocityVertical = new Vec3(0, velocity.y, 0);
             velocityVertical = Entity.collideBoundingBox(null, velocityVertical, collisionBox, level, List.of());
+            velocityVertical = SableCompat.tryTransform(level,velocityVertical);
 
             collisionBox = collisionBox.move(velocityVertical);
             Vec3 velocityHorizontal = new Vec3(velocity.x, 0, velocity.z);
             velocityHorizontal = Entity.collideBoundingBox(null, velocityHorizontal, collisionBox, level, List.of());
+            velocityHorizontal = SableCompat.tryTransform(level,velocityHorizontal);
 
             velocity = new Vec3(velocityHorizontal.x, velocityVertical.y, velocityHorizontal.z);
         }
@@ -165,6 +170,7 @@ public class RopeNode {
 
     public void setPrevPosition(Vec3 prevPosition) {
         this.prevPosition = prevPosition;
+        this.prevRenderPosition = prevPosition;
     }
 
     public void setTempPosition(Vec3 tempPosition) {

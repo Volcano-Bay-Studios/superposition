@@ -29,6 +29,15 @@ dependencies {
 //    modRuntimeOnly "maven.modrinth:worldedit:7.3.8"
     modRuntimeOnly "mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}"
 
+    implementation ("dev.ryanhcode.sable:sable-fabric-${minecraft_version}:${sable_version}") {
+        exclude group: "foundry.veil"
+        transitive = false
+    }
+
+    api(include("dev.ryanhcode.sable-companion:sable-companion-fabric-${project.minecraft_version}:${project.sable_companion_version}")) {
+        exclude group: "foundry.veil"
+    }
+
 //    implementation("net.createmod.ponder:Ponder-Fabric-${minecraft_version}:${ponder_version}")
 }
 

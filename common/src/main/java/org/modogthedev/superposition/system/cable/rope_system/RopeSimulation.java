@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.cable.rope_system;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class RopeSimulation {
     int sleepTime = 0;
 
     public RopeSimulation(Level level, float connectionWidth, boolean sleeping) {
+        assert level != null : "Rope level was null!";
         this.level = level;
         this.connectionWidth = connectionWidth;
         this.sleepTime = sleeping ? 21 : 0;
@@ -79,52 +81,59 @@ public class RopeSimulation {
 
     public void simulate(Level level) {
         float gravity = 0.25f * -9.8f / 40f;
-        for (RopeNode node : nodes) {
-            Vec3 velocity = Vec3.ZERO;
-            if (!node.isFixed()) {
-                velocity = node.getPosition().subtract(node.prevPosition);
-
-                velocity = velocity.add(0, gravity, 0);
-
-                float scaleFactor = 0.9f * (velocity.length() > -gravity ? 1.0f : 0.1f);
-                velocity = new Vec3(velocity.x * scaleFactor, velocity.y, velocity.z * scaleFactor);
+        if (level.isClientSide) {
+            for (RopeNode node : nodes) {
+                node.prevPosition = node.position;
+                node.prevRenderPosition = node.position;
             }
-            node.prevPosition = node.position;
-            node.position = node.position.add(velocity);
-        }
+        } else {
+            for (RopeNode node : nodes) {
+                Vec3 velocity = Vec3.ZERO;
+                if (!node.isFixed()) {
+                    velocity = node.getPosition().subtract(node.prevPosition);
 
-        List<RopeConstraint> constraints = collectAllConstraints();
-        for (int i = 0; i < constraints.size(); i++) {
-            constraints.get(i).applyConstraint();
-        }
-        for (int i = constraints.size() - 1; i >= 0; i--) {
-            constraints.get(i).applyConstraint();
-        }
+                    velocity = velocity.add(0, gravity, 0);
 
-        for (RopeNode node : nodes) {
-            node.resolveWorldCollisions(level);
-        }
+                    float scaleFactor = 0.9f * (velocity.length() > -gravity ? 1.0f : 0.1f);
+                    velocity = new Vec3(velocity.x * scaleFactor, velocity.y, velocity.z * scaleFactor);
+                }
+                node.prevPosition = node.position;
+                node.position = node.position.add(velocity);
+            }
 
-        for (int i = 0; i < 10; i++) {
-            processLength(true);
+            List<RopeConstraint> constraints = collectAllConstraints();
+            for (int i = 0; i < constraints.size(); i++) {
+                constraints.get(i).applyConstraint();
+            }
+            for (int i = constraints.size() - 1; i >= 0; i--) {
+                constraints.get(i).applyConstraint();
+            }
+
             for (RopeNode node : nodes) {
                 node.resolveWorldCollisions(level);
             }
 
-            processLength(false);
+            for (int i = 0; i < 10; i++) {
+                processLength(true);
+                for (RopeNode node : nodes) {
+                    node.resolveWorldCollisions(level);
+                }
+
+                processLength(false);
+                for (RopeNode node : nodes) {
+                    node.resolveWorldCollisions(level);
+                }
+
+            }
+
             for (RopeNode node : nodes) {
                 node.resolveWorldCollisions(level);
             }
 
-        }
-
-        for (RopeNode node : nodes) {
-            node.resolveWorldCollisions(level);
-        }
-
-        for (RopeNode node : nodes) {
-            if (node.prevPosition.distanceTo(node.position) < 0.0025f) {
-                node.position = node.prevPosition;
+            for (RopeNode node : nodes) {
+                if (node.prevPosition.distanceTo(node.position) < 0.0025f) {
+                    node.position = node.prevPosition;
+                }
             }
         }
 
@@ -134,8 +143,12 @@ public class RopeSimulation {
             if (movedLastTick.lengthSqr() > 1e-9) {
                 shouldSleep = false;
                 break;
+            } else if (node.getAnchor() != null && SableCompat.isSublevel(level, Vec3.atLowerCornerOf(node.getAnchor().getAnchorBlock()))){
+                shouldSleep = false;
+                break;
             }
         }
+
 
         if (shouldSleep) {
             sleepTime++;

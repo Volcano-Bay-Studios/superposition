@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.phys.Vec3;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.system.cable.Cable;
@@ -33,7 +34,7 @@ public class SuperpositionServerPacketHandler {
             return;
         }
 
-        double dist = player.position().distanceToSqr(pos.getCenter());
+        double dist = player.position().distanceToSqr(SableCompat.tryTransform(level,packet.pos().getCenter()));
         if (dist > 24) {
             return;
         }

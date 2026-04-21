@@ -32,14 +32,16 @@ public class AnchorConstraint implements RopeConstraint {
 
     @Override
     public void applyConstraint() {
-        node.position = SableCompat.tryTransform(simulation.getLevel(), anchorBlock.getCenter().add(Vec3.atLowerCornerOf(direction.getNormal()).scale(0.5f + 1 / 16f)));
+        Vec3 center = SableCompat.tryTransform(simulation.getLevel(),anchorBlock.getCenter());
+        Vec3 normal = SableCompat.transformNormal(simulation.getLevel(), anchorBlock.getCenter() ,Vec3.atLowerCornerOf(getDirection().getNormal())).scale(0.5f + 1 / 16f);
+        node.position =  center.add(normal);
         RopeNode prevNode = adjacentPrev.get();
         if (prevNode != null) {
-            prevNode.position = BendConstraint.resolveAnchorBend(anchorBlock.getCenter(), node.position, prevNode.position, width);
+            prevNode.position = BendConstraint.resolveAnchorBend(center, node.position, prevNode.position, width);
         }
         RopeNode nextNode = adjacentNext.get();
         if (nextNode != null) {
-            nextNode.position = BendConstraint.resolveAnchorBend(anchorBlock.getCenter(), node.position, nextNode.position, width);
+            nextNode.position = BendConstraint.resolveAnchorBend(center, node.position, nextNode.position, width);
         }
     }
 

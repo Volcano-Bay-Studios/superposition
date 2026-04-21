@@ -22,7 +22,10 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
@@ -51,6 +54,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     private final List<String> configurationTooltipString = new ArrayList<>();
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
     private PortConfig portConfig;
+    protected Vector3d lightPosition = null;
     int signalsReceived = 0;
 
     Object lastCall;
@@ -138,6 +142,11 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (lightPosition != null) {
+            tag.putDouble("lightX", lightPosition.x);
+            tag.putDouble("lightY", lightPosition.y);
+            tag.putDouble("lightZ", lightPosition.z);
+        }
         super.saveAdditional(tag, registries);
     }
 
@@ -283,6 +292,8 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         super.loadSyncedData(tag);
         if (tag.contains("swap"))
             this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
+        if (tag.contains("lightX")) {
+        }
     }
 
     public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {
@@ -351,6 +362,13 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         if (this.level != null && this.level.isClientSide) {
             if (this.lightEnabled() && light == null && !isRemoved()) {
                 this.createLight();
+                if (SableCompat.isSublevel(level,getBlockPos().getCenter())) {
+                    Vec3 pos = SableCompat.tryTransform(level, getBlockPos().getCenter());
+                    lightPosition = new Vector3d(pos.x,pos.y,pos.z);
+                } else {
+                    Vec3 center = getBlockPos().getCenter();
+                    lightPosition = new Vector3d(center.x,center.y,center.z);
+                }
                 if (light.getLightData() instanceof AreaLightData areaLight) {
                     this.configureAreaLight(areaLight);
                 }
@@ -360,6 +378,13 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 light.markDirty();
             }
             if (lightEnabled() && shouldUpdateLight() && light != null && !isRemoved()) {
+                if (SableCompat.isSublevel(level,getBlockPos().getCenter())) {
+                    Vec3 pos = SableCompat.tryTransform(level, getBlockPos().getCenter());
+                    lightPosition = new Vector3d(pos.x,pos.y,pos.z);
+                } else {
+                    Vec3 center = getBlockPos().getCenter();
+                    lightPosition = new Vector3d(center.x,center.y,center.z);
+                }
                 if (light.getLightData() instanceof AreaLightData areaLight) {
                     this.configureAreaLight(areaLight);
                 }
@@ -435,7 +460,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     }
 
     public boolean shouldUpdateLight() {
-        return false;
+        return SableCompat.isSublevel(level,getBlockPos().getCenter());
     }
 
     public LightData prepareLight() {
@@ -447,10 +472,15 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     }
 
     public void configureAreaLight(AreaLightData light) {
-        Vec3 center = this.getBlockPos().getCenter();
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
-        light.getPosition().set(center.x, center.y, center.z);
-        light.getOrientation().set(facing.getRotation().rotateX((float) (Math.PI / 2f)).rotateY((float) Math.PI));
+        light.getPosition().set(lightPosition.x, lightPosition.y, lightPosition.z);
+        Quaternionf rotation = facing.getRotation();
+        Quaternionf poseRotation = SableCompat.getRotation(level, getBlockPos().getCenter());
+        if (poseRotation != null) {
+            rotation = poseRotation.mul(rotation);
+        }
+        light.getOrientation().set(rotation.mul(new Quaternionf().fromAxisAngleDeg(1,0,0,-90)).conjugate());
+        light.setOcclusionEnabled(true);
     }
 
     public void configurePointLight(PointLightData light) {

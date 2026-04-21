@@ -50,6 +50,25 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven {
+        name = "RyanHCode Maven"
+        url = "https://maven.ryanhcode.dev/releases"
+    }
+    maven {
+        url = "http://maven.ryanhcode.dev/private"
+        allowInsecureProtocol = true
+
+        credentials {
+            credentials {
+                username = ryanhcodeMavenUser
+                password = ryanhcodeMavenToken
+            }
+
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
     repositories {
         maven {
             url "https://maven.squiddev.cc"

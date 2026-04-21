@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
@@ -237,7 +238,7 @@ public class Cable {
         buf.writeVarInt(this.ropeSimulation.getNodeCount());
         for (RopeNode point : this.ropeSimulation.getNodes()) {
             buf.writeVec3(point.getPosition());
-            buf.writeVec3(point.getPrevPosition());
+//            buf.writeVec3(point.getPrevPosition());
             AnchorConstraint constraint = point.getAnchor();
             buf.writeBoolean(constraint != null);
             if (constraint != null) {
@@ -268,7 +269,7 @@ public class Cable {
         for (int i = 0; i < size; i++) {
             RopeNode newPoint = new RopeNode(buf.readVec3());
             ropeSimulation.addNode(newPoint);
-            newPoint.setPrevPosition(buf.readVec3());
+//            newPoint.setPrevPosition(buf.readVec3());
             if (buf.readBoolean()) {
                 newPoint.setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
                 if (buf.readBoolean()) {
@@ -306,7 +307,7 @@ public class Cable {
 //                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
             } else {
 //                ropeSimulation.getNode(i).setPrevPosition(ropeSimulation.getNode(i).getPosition());
-                node.setPrevPosition(targetPoints.get(i).getPrevPosition().lerp(node.getPrevPosition(), 0.8f));
+                node.setPrevPosition(node.getPosition());
                 node.setPosition(targetPoints.get(i).getPosition().lerp(node.getPosition(), 0.8f));
             }
             AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
@@ -415,8 +416,9 @@ public class Cable {
         this.stretchGrace = stretchGrace;
     }
 
-    public static Vec3 getAnchoredPoint(BlockPos pos, Direction face) {
-        return pos.getCenter().add(pos.getCenter().subtract(pos.relative(face).getCenter()).scale(-0.45));
+    public static Vec3 getAnchoredPoint(Level level,BlockPos pos, Direction face) {
+        Vec3 center = SableCompat.tryTransform(level, pos.getCenter());
+        return center.add(center.subtract(pos.relative(face).getCenter()).scale(-0.45));
     }
 
     public boolean isSleeping() {

@@ -28,6 +28,16 @@ dependencies {
     implementation "mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}"
 
     implementation("net.createmod.ponder:Ponder-Common-${minecraft_version}:${ponder_version}")
+
+
+    implementation ("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
+        exclude group: "foundry.veil"
+        transitive = false
+    }
+
+    api("dev.ryanhcode.sable-companion:sable-companion-common-${project.minecraft_version}:${project.sable_companion_version}") {
+        exclude group: "foundry.veil"
+    }
 }
 
 

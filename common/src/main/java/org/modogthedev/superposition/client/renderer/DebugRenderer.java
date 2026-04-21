@@ -19,7 +19,6 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaElement;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
-import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
