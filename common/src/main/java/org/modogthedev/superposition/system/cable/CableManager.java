@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -19,23 +20,29 @@ import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
+import org.modogthedev.superposition.networking.packet.InterpolationStateS2CPacket;
 import org.modogthedev.superposition.networking.packet.PlayerDropCableC2SPacket;
 import org.modogthedev.superposition.networking.packet.PlayerGrabCableC2SPacket;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import oshi.util.tuples.Pair;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class CableManager {
-    private static final int grabTimer = 0;
-    private static final Map<ResourceKey<Level>, Map<UUID, Cable>> cables = new HashMap<>();
-    private static final Map<ResourceKey<Level>, Map<UUID, Cable>> clientCables = new HashMap<>();
-
-    public static Map<ResourceKey<Level>, Map<UUID, Cable>> getCablesMap(Level level) {
-        return level.isClientSide() ? clientCables : cables;
-    }
+    private static final Map<ResourceKey<Level>, CableManager> cableManagers = new HashMap<>();
+    private final int grabTimer = 0;
+    private final Map<UUID, Cable> cables = new HashMap<>();
+    private final Logger log = LoggerFactory.getLogger(CableManager.class);
+    private long lastSendMs;
+    private int msSinceLastSend;
+    private int interpolationTick;
+    private List<ServerPlayer> syncPlayers = new ArrayList<>();
+    private final List<ServerPlayer> lastPlayers = new ArrayList<>();
 
     public static @Nullable Cable getCable(Level level, UUID id) {
         Map<UUID, Cable> map = getCables(level);
@@ -47,21 +54,38 @@ public class CableManager {
     }
 
     public static @Nullable Map<UUID, Cable> getCables(Level level) {
-        return level.isClientSide() ? clientCables.get(level.dimension()) : cables.get(level.dimension());
+        return cableManagers.computeIfAbsent(level.dimension(),(levelResourceKey -> new CableManager())).cables;
+    }
+
+    public static CableManager getManager(Level level) {
+        return cableManagers.computeIfAbsent(level.dimension(),(levelResourceKey -> new CableManager()));
     }
 
     private static void syncCable(ServerLevel level, Cable cable) {
         CableSyncS2CPacket packet = new CableSyncS2CPacket(cable);
         Vec3 pos = cable.getPoints().getFirst().getPosition();
         VeilPacketManager.around(null, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(packet);
+        for (ServerPlayer player : level.players()) {
+            if (player.position().distanceToSqr(pos.x,pos.y,pos.z) < cable.getPoints().size() + 100) {
+                getManager(level).syncPlayers.add(player);
+            }
+        }
     }
 
     public static void tick(ServerLevel level) {
         Map<UUID, Cable> cables = getCables(level);
+
+        final long ms = System.currentTimeMillis();
+        CableManager cableManager = getManager(level);
+        if (cableManager.lastSendMs == -1) {
+            cableManager.msSinceLastSend = (int) (1000.0 / level.getServer().tickRateManager().tickrate());
+        } else {
+            cableManager.msSinceLastSend = (int) (ms - cableManager.lastSendMs);
+        }
+        cableManager.lastSendMs = ms;
+
+
         if (cables != null) {
-            for (Cable cable : cables.values()) {
-                cable.preSimulate();
-            }
             applyPlayerStretch(level);
             dragPlayers(level);
             for (Cable cable : cables.values()) {
@@ -72,6 +96,28 @@ public class CableManager {
                 syncCable(level, cable);
             }
         }
+
+        List<ServerPlayer> last = cableManager.lastPlayers;
+
+        Iterator<ServerPlayer> iterator = last.iterator();
+        List<ServerPlayer> syncPlayers = cableManager.syncPlayers;
+        while (iterator.hasNext()) {
+            ServerPlayer syncPlayer = iterator.next();
+            if (syncPlayers.contains(syncPlayer)) {
+                VeilPacketManager.player(syncPlayer).sendPacket(new InterpolationStateS2CPacket(cableManager.msSinceLastSend, cableManager.interpolationTick,false));
+            } else {
+                VeilPacketManager.player(syncPlayer).sendPacket(new InterpolationStateS2CPacket(cableManager.msSinceLastSend, cableManager.interpolationTick,true));
+                iterator.remove();
+            }
+        }
+        last.clear();
+        last.addAll(syncPlayers);
+        syncPlayers.clear();
+        cableManager.interpolationTick++;
+    }
+
+    public static int getInterpolationTick(Level level) {
+        return getManager(level).interpolationTick;
     }
 
     public static void clientTick(Level level) {
@@ -330,7 +376,7 @@ public class CableManager {
     }
 
     public static void addCable(Cable cable, Level level) {
-        Cable old = getCablesMap(level).computeIfAbsent(level.dimension(), unused -> new HashMap<>()).put(cable.getId(), cable);
+        Cable old = getManager(level).cables.put(cable.getId(), cable);
         ScreenManager.addCable(cable);
         if (old != null) {
             CableClientState clientState = old.getClientState();
@@ -362,18 +408,18 @@ public class CableManager {
     }
 
     public static void wipeResidualData() {
-        cables.clear();
+        cableManagers.clear();
     }
 
     public static void wipeClientData() {
-        for (Map<UUID, Cable> map : clientCables.values()) {
-            for (Cable value : map.values()) {
+        for (CableManager manager : cableManagers.values()) {
+            for (Cable value : manager.cables.values()) {
                 CableClientState clientState = value.getClientState();
                 if (clientState != null) {
                     clientState.free();
                 }
             }
         }
-        clientCables.clear();
+        cableManagers.clear();
     }
 }

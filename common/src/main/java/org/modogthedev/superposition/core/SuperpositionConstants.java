@@ -10,5 +10,5 @@ public class SuperpositionConstants {
     public static final int analyserRange = 16;
     public static final float periphrealFrequency = 42f;
     public static final boolean bloomEnabled = true;
-
+    public static final float interpolationDelay = 1.5f;
 }

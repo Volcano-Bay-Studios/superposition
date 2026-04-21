@@ -32,7 +32,7 @@ public class CableSavedData extends SavedData {
             int i = 0;
             for (UUID uuid : cableHashMap.keySet()) {
                 FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-                cableHashMap.get(uuid).toBytes(buf);
+                cableHashMap.get(uuid).write(buf);
                 tag.putUUID("uuid_" + i, uuid);
                 byte[] bytes = new byte[buf.writerIndex()];
                 buf.readBytes(bytes);
@@ -51,7 +51,7 @@ public class CableSavedData extends SavedData {
         for (int i = 0; i < size; i++) {
             UUID uuid = tag.getUUID("uuid_" + i);
             try {
-                Cable cable = Cable.fromBytes(uuid, new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))), level, true);
+                Cable cable = Cable.readNew(uuid, new FriendlyByteBuf(Unpooled.wrappedBuffer(tag.getByteArray(String.valueOf(i)))), level, true);
                 CableManager.addCable(cable, level);
             } catch (Exception ignored) {}
         }

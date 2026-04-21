@@ -1,7 +1,9 @@
 package org.modogthedev.superposition.system.cable.rope_system;
 
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +20,12 @@ public class RopeNode {
 
     RopeSimulation simulation;
 
-    Vec3 prevPosition;
-    Vec3 prevRenderPosition;
+    Vec3 renderPosition;
     Vec3 position;
-    Vec3 tempPosition;
-
+    Vec3 prevPosition;
     Vec3 lastHoldGoalPos;
 
-    CableSnapshotInterpolator interpolator = new CableSnapshotInterpolator(new Vector3d());
+    CableSnapshotInterpolator interpolator;
 
     @Nullable
     AnchorConstraint anchor = null;
@@ -34,7 +35,8 @@ public class RopeNode {
     public RopeNode(Vec3 position) {
         this.position = position;
         this.prevPosition = position;
-        this.prevRenderPosition = position;
+        this.renderPosition = position;
+        this.interpolator = new CableSnapshotInterpolator(new Vector3d());
     }
 
     public boolean isFixed() {
@@ -97,54 +99,42 @@ public class RopeNode {
         position = SableCompat.tryTransform(level,prevPosition.add(velocity));
     }
 
-    public Vec3 getRenderPosition(float partialTicks) {
-        if (simulation.isSleeping()) {
-            return position;
+    public void read(FriendlyByteBuf buf, int gameTick) {
+        setPosition(buf.readVec3());
+        interpolator.receiveSnapshot(gameTick, JOMLConversion.toJOML(position));
+        if (buf.readBoolean()) {
+            setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
+            if (buf.readBoolean()) {
+                AnchorConstraint anchor = getAnchor();
+                assert anchor != null : "Rope anchor is null after it was just set";
+                anchor.setPort((String) buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8));
+            }
         }
-        return prevRenderPosition.lerp(position, partialTicks);
     }
 
-    public Vec3 getTempPosition() {
-        return tempPosition;
+    public RopeNode(FriendlyByteBuf buf) {
+        setPosition(buf.readVec3());
+        if (buf.readBoolean()) {
+            setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
+            if (buf.readBoolean()) {
+                AnchorConstraint anchor = getAnchor();
+                assert anchor != null : "Rope anchor is null after it was just set";
+                anchor.setPort((String) buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8));
+            }
+        }
+        this.interpolator = new CableSnapshotInterpolator(new Vector3d());
     }
 
-    public Vec3 getPrevRenderPosition() {
-        return prevRenderPosition;
+    public Vec3 getRenderPosition(float partialTicks) {
+        return prevPosition.lerp(renderPosition, partialTicks);
     }
 
     public void setPosition(Vec3 position) {
         this.position = position;
     }
 
-    public List<Vec3> getNextPositions() {
-        return nextPositions;
-    }
-
-    public void setNextPositions(List<Vec3> nextPositions) {
-        this.nextPositions = nextPositions;
-    }
-
     public void addNextPosition(Vec3 nextPosition) {
-//        if (!isFixed()) this.position = nextPosition;
         this.nextPositions.add(nextPosition);
-    }
-
-    public void applyNextPositions() {
-        if (nextPositions.isEmpty() || isFixed()) {
-            return;
-        }
-
-        Vec3 move = this.position;
-        int count = 1;
-        for (Vec3 pos : nextPositions) {
-            move = move.add(pos);
-            count++;
-        }
-
-        if (count != 0) {
-            this.position = move.scale(1f / count);
-        }
-        setNextPositions(new ArrayList<>());
     }
 
     @Nullable
@@ -170,11 +160,6 @@ public class RopeNode {
 
     public void setPrevPosition(Vec3 prevPosition) {
         this.prevPosition = prevPosition;
-        this.prevRenderPosition = prevPosition;
-    }
-
-    public void setTempPosition(Vec3 tempPosition) {
-        this.tempPosition = tempPosition;
     }
 
     public Vec3 getPrevPosition() {
@@ -183,10 +168,6 @@ public class RopeNode {
 
     public float calculateOverstretch() {
         return simulation.calculateOverstretch(this);
-    }
-
-    public void preSimulate() {
-        prevRenderPosition = position;
     }
 
     public Vec3 getPosition() {
@@ -200,5 +181,4 @@ public class RopeNode {
     public Vec3 getLastHoldGoalPos() {
         return lastHoldGoalPos;
     }
-
 }

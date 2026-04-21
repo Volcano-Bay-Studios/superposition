@@ -1,8 +1,11 @@
 package org.modogthedev.superposition.system.cable.rope_system;
 
+import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3dc;
 import org.modogthedev.superposition.compat.sable.SableCompat;
+import org.modogthedev.superposition.system.cable.SuperpositionClientInterpolationState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +86,10 @@ public class RopeSimulation {
         float gravity = 0.25f * -9.8f / 40f;
         if (level.isClientSide) {
             for (RopeNode node : nodes) {
-                node.prevPosition = node.position;
-                node.prevRenderPosition = node.position;
+                node.interpolator.tick(SuperpositionClientInterpolationState.INSTANCE.getTickPointer());
+                Vector3dc interpolatedPose = node.interpolator.getInterpolatedPose();
+                node.prevPosition = node.renderPosition;
+                node.renderPosition = JOMLConversion.toMojang(interpolatedPose);
             }
         } else {
             for (RopeNode node : nodes) {
@@ -177,12 +182,6 @@ public class RopeSimulation {
                 if (!nextNode.isFixed())
                     nextNode.position = nextNode.position.add(node.position.subtract(nextNode.position).normalize().scale(change));
             }
-        }
-    }
-
-    public void updatePrevRenderPos() {
-        for (RopeNode node : nodes) {
-            node.prevRenderPosition = node.position;
         }
     }
 

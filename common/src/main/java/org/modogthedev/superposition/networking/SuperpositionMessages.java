@@ -15,6 +15,7 @@ public class SuperpositionMessages {
         INSTANCE.registerClientbound(InscriberScreenS2CPacket.TYPE, InscriberScreenS2CPacket.CODEC, SuperpositionClientPacketHandler::handleInscriberScreen);
         INSTANCE.registerClientbound(SignalSyncS2CPacket.TYPE, SignalSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleSignalSync);
         INSTANCE.registerClientbound(CableSyncS2CPacket.TYPE, CableSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleCableSync);
+        INSTANCE.registerClientbound(InterpolationStateS2CPacket.TYPE, InterpolationStateS2CPacket.CODEC, SuperpositionClientPacketHandler::handleInterpolationState);
 
         INSTANCE.registerServerbound(BlockEntityModificationC2SPacket.TYPE, BlockEntityModificationC2SPacket.CODEC, SuperpositionServerPacketHandler::handleBlockEntityModification);
         INSTANCE.registerServerbound(FilterItemModificationC2SPacket.TYPE, FilterItemModificationC2SPacket.CODEC, SuperpositionServerPacketHandler::handleFilterItemModification);

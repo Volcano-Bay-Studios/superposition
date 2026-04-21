@@ -69,24 +69,20 @@ public class CableRenderer {
         Vector3dc origin = clientState.getOrigin();
 
         CABLE_POINTS.clear();
-        PREV_CABLE_POINTS.clear();
         RopeNode firstPoint = cable.getPoints().getFirst();
         Vec3 firstPos = firstPoint.getPosition();
         CABLE_POINTS.add(firstPos);
-        PREV_CABLE_POINTS.add(firstPos);
         if (cable.getPoints().getFirst().getAnchor() != null) {
             RopeNode point = cable.getPoints().getFirst();
             Vec3 normal = SableCompat.transformNormal((Level) level, point.getAnchor().getAnchorBlock().getCenter() ,Vec3.atLowerCornerOf(point.getAnchor().getDirection().getNormal())).scale(-0.2f);
             Vec3 pos = SableCompat.tryTransform((Level) level, point.getAnchor().getAnchorBlock().getCenter()).add(normal);
 
             CABLE_POINTS.add(pos);
-            PREV_CABLE_POINTS.add(pos);
         }
 
         for (RopeNode point : cable.getPoints()) {
-            Vec3 pos = point.getPosition();
+            Vec3 pos = point.getRenderPosition(partialTicks);
             CABLE_POINTS.add(pos);
-            PREV_CABLE_POINTS.add(point.getPrevRenderPosition());
         }
 
         if (cable.getPoints().getLast().getAnchor() != null) {
@@ -95,41 +91,36 @@ public class CableRenderer {
             Vec3 pos = SableCompat.tryTransform((Level) level, point.getAnchor().getAnchorBlock().getCenter()).add(normal);
 
             CABLE_POINTS.add(pos);
-            PREV_CABLE_POINTS.add(pos);
         }
         RopeNode lastPoint = cable.getPoints().getLast();
         Vec3 lastPos = lastPoint.getPosition();
         CABLE_POINTS.add(lastPos);
-        PREV_CABLE_POINTS.add(lastPos);
         List<Vec3> splinePoints = CatmulRomSpline.generateSpline(CABLE_POINTS, SuperpositionConstants.cableSegments);
-        List<Vec3> prevSplinePoints = CatmulRomSpline.generateSpline(PREV_CABLE_POINTS, SuperpositionConstants.cableSegments);
 
         int color = 0xFF000000 | cable.getColor().getRGB();
         float constantRadius = SuperpositionConstants.cableWidth / 2.0f;
         float v = 0;
         float nextV;
 
-        renderCableStart(vertexConsumer, level, origin, color, prevSplinePoints.getFirst(), splinePoints.getFirst(), prevSplinePoints.get(1), splinePoints.get(1), partialTicks);
+        renderCableStart(vertexConsumer, level, origin, color, splinePoints.getFirst(), splinePoints.get(1), partialTicks);
 
         for (int i = 0; i < splinePoints.size() - 1; i++) {
             float delta = (float) i / (splinePoints.size() - 1);
             float nextDelta = (float) (i + 1) / (splinePoints.size() - 1);
             float cableRadius = constantRadius - (0.001f * delta);
             float nextCableRadius = constantRadius - (0.001f * nextDelta);
-            Vec3 prevPoint = prevSplinePoints.get(i);
             Vec3 point = splinePoints.get(i);
-            Vec3 prevNextPoint = prevSplinePoints.get(i + 1);
             Vec3 nextPoint = splinePoints.get(i + 1);
 
-            double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
-            double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
-            double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
-            double nextX = Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x);
-            double nextY = Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y);
-            double nextZ = Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z);
+            double x = point.x;
+            double y = point.y;
+            double z = point.z;
+            double nextX = nextPoint.x;
+            double nextY = nextPoint.y;
+            double nextZ = nextPoint.z;
 
             if (i < splinePoints.size() - 2) {
-                calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, prevSplinePoints.get(i + 2), splinePoints.get(i + 2), partialTicks);
+                calculateOrientation(NEXT_ORIENTATION, nextX, nextY, nextZ, splinePoints.get(i + 2), partialTicks);
             } else {
                 NEXT_ORIENTATION.set(ORIENTATION);
             }
@@ -206,7 +197,7 @@ public class CableRenderer {
             ORIENTATION.set(NEXT_ORIENTATION);
             v = nextV;
         }
-        renderCableEnd(vertexConsumer, level, origin, color, prevSplinePoints.getLast(), splinePoints.getLast(), prevSplinePoints.get(prevSplinePoints.size() - 2), splinePoints.get(splinePoints.size() - 2), partialTicks);
+        renderCableEnd(vertexConsumer, level, origin, color, splinePoints.getLast(), splinePoints.get(splinePoints.size() - 2), partialTicks);
     }
 
     public static void renderCables(Matrix4fc projectionMatrix, Matrix4fc frustumMatrix, DeltaTracker deltaTracker, Camera camera) {
@@ -242,14 +233,14 @@ public class CableRenderer {
         renderType.clearRenderState();
     }
 
-    private static void renderCableStart(VertexConsumer vertexConsumer, BlockAndTintGetter level, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+    private static void renderCableStart(VertexConsumer vertexConsumer, BlockAndTintGetter level, Vector3dc cameraPos, int color, Vec3 point, Vec3 nextPoint, float partialTicks) {
         float cableRadius = (SuperpositionConstants.cableWidth / 2.0f);
-        double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
-        double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
-        double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
+        double x = point.x;
+        double y = point.y;
+        double z = point.z;
 
         // TODO attach to block face
-        calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
+        calculateOrientation(ORIENTATION, x, y, z, nextPoint, partialTicks);
 
         // Draw first face
         int startLight = LevelRenderer.getLightColor(level, LIGHT_POS.set(x, y, z));
@@ -267,14 +258,14 @@ public class CableRenderer {
         vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
     }
 
-    private static void renderCableEnd(VertexConsumer vertexConsumer, BlockAndTintGetter level, Vector3dc cameraPos, int color, Vec3 prevPoint, Vec3 point, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
+    private static void renderCableEnd(VertexConsumer vertexConsumer, BlockAndTintGetter level, Vector3dc cameraPos, int color, Vec3 point, Vec3 prevNextPoint, float partialTicks) {
         float cableRadius = (SuperpositionConstants.cableWidth / 2.0f) - 0.001f;
-        double x = Mth.lerp(partialTicks, prevPoint.x, point.x);
-        double y = Mth.lerp(partialTicks, prevPoint.y, point.y);
-        double z = Mth.lerp(partialTicks, prevPoint.z, point.z);
+        double x = point.x;
+        double y = point.y;
+        double z = point.z;
 
         // TODO attach to block face
-        calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, nextPoint, partialTicks);
+        calculateOrientation(ORIENTATION, x, y, z, prevNextPoint, partialTicks);
         ORIENTATION.rotateAxis((float) Math.PI, 0, 1, 0);
 
         // Draw first face
@@ -293,10 +284,10 @@ public class CableRenderer {
         vertexConsumer.addVertex((float) (x - cameraPos.x() + POS.x), (float) (y - cameraPos.y() + POS.y), (float) (z - cameraPos.z() + POS.z)).setColor(255, 255, 255, 255).setUv(1.0F, 0.5F).setLight(startLight).setNormal(NORMAL.x, NORMAL.y, NORMAL.z);
     }
 
-    private static void calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 prevNextPoint, Vec3 nextPoint, float partialTicks) {
-        double dx = (Mth.lerp(partialTicks, prevNextPoint.x, nextPoint.x) - x);
-        double dy = (Mth.lerp(partialTicks, prevNextPoint.y, nextPoint.y) - y);
-        double dz = (Mth.lerp(partialTicks, prevNextPoint.z, nextPoint.z) - z);
+    private static void calculateOrientation(Quaternionf store, double x, double y, double z, Vec3 nextPoint, float partialTicks) {
+        double dx = (nextPoint.x - x);
+        double dy = (nextPoint.y - y);
+        double dz = (nextPoint.z - z);
         float factor = 0;//(float) Mth.smoothstep(1.0-Mth.clamp(8*Math.sqrt(dx * dx + dz * dz), 0.0, 1.0));
         store.identity().rotateAxis((float) Math.atan2(dx, dz), 0, 1, 0).rotateAxis((float) (Math.acos(dy / Math.sqrt(dx * dx + dy * dy + dz * dz)) - Math.PI / 2.0), 1, 0, 0).slerp(dy < 0 ? POSITIVE_Y : NEGATIVE_Y, factor);
     }

@@ -3,18 +3,15 @@ package org.modogthedev.superposition.networking.handler;
 import foundry.veil.api.network.handler.ClientPacketContext;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
-import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
-import org.modogthedev.superposition.networking.packet.InscriberScreenS2CPacket;
-import org.modogthedev.superposition.networking.packet.SignalSyncS2CPacket;
+import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.system.cable.SuperpositionClientInterpolationState;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 public class SuperpositionClientPacketHandler {
@@ -35,7 +32,7 @@ public class SuperpositionClientPacketHandler {
             Superposition.LOGGER.warn("Server sent inscriber screen for unknown level");
         }
 
-        ScreenManager.openInscriber(new Card(packet.tag().getCompound("card")),packet.pos());
+        ScreenManager.openInscriber(new Card(packet.tag().getCompound("card")), packet.pos());
     }
 
     public static void handleBlockSignalSync(BlockSignalSyncS2CPacket packet, ClientPacketContext ctx) {
@@ -60,18 +57,23 @@ public class SuperpositionClientPacketHandler {
             CableManager.removeCable(level, id);
             return;
         }
-
-        Cable cable = Objects.requireNonNull(packet.getCable());
-        cable.setLevel(level);
         Map<UUID, Cable> cables = CableManager.getCables(level);
+
         if (cables != null) {
-            Cable old = cables.get(id);
-            if (old != null) {
-                old.updateFromCable(cable, false);
+            Cable cable = cables.get(id);
+            if (cable != null) {
+                cable.read(id,packet.getBuffer(),level);
                 return;
             }
         }
+        Cable cable = Cable.readNew(id,packet.getBuffer(),level,false);
 
         CableManager.addCable(cable, level);
+    }
+
+    public static void handleInterpolationState(InterpolationStateS2CPacket packet, ClientPacketContext ctx) {
+        Level level = ctx.level();
+        SuperpositionClientInterpolationState.INSTANCE.receiveInfo(packet.msSinceLast(), packet.gameTick(), packet.stopped());
+
     }
 }

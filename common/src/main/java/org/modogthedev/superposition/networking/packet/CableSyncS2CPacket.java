@@ -15,37 +15,38 @@ public class CableSyncS2CPacket implements CustomPacketPayload {
     public static final StreamCodec<FriendlyByteBuf, CableSyncS2CPacket> CODEC = StreamCodec.of((buffer, value) -> value.toBytes(buffer), CableSyncS2CPacket::new);
 
     private final UUID id;
-    private Cable cable;
     private final boolean remove;
+    private final FriendlyByteBuf buffer;
+
+    private Cable cable;
 
     public CableSyncS2CPacket(UUID id) {
         this.id = id;
-        this.cable = null;
         this.remove = true;
+        this.buffer = null;
     }
 
     public CableSyncS2CPacket(Cable cable) {
         this.id = cable.getId();
-        this.cable = cable;
         this.remove = false;
+        this.buffer = null;
+        this.cable = cable;
     }
 
     private CableSyncS2CPacket(FriendlyByteBuf buf) {
         this.id = buf.readUUID();
         this.remove = buf.readBoolean();
-        try {
-            this.cable = this.remove ? null : Cable.fromBytes(this.id, buf, null, false);
-        } catch (Exception ignored) {
-            cable = null;
-        }
+        this.buffer = buf;
     }
 
     private void toBytes(FriendlyByteBuf buf) {
         buf.writeUUID(this.id);
         buf.writeBoolean(this.remove);
-        if (!this.remove) {
-            this.cable.toBytes(buf);
-        }
+        cable.write(buf);
+    }
+
+    public FriendlyByteBuf getBuffer() {
+        return buffer;
     }
 
     public UUID getId() {
@@ -54,10 +55,6 @@ public class CableSyncS2CPacket implements CustomPacketPayload {
 
     public boolean isRemove() {
         return this.remove;
-    }
-
-    public @Nullable Cable getCable() {
-        return this.cable;
     }
 
     @Override

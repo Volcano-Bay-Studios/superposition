@@ -84,10 +84,6 @@ public class CableSnapshotInterpolator {
         this.stopped = false;
     }
 
-    public void setFirstPoses(final Vector3dc positionb, final Vector3dc poseB) {
-        this.runningSnapshot.set(poseB);
-    }
-
     public Vector3dc getInterpolatedPose() {
         return this.runningSnapshot;
     }
@@ -101,13 +97,11 @@ public class CableSnapshotInterpolator {
      * Ticks the snapshot interpolator
      */
     public void tick(final double backTick) {
-        // Remove old snapshots
         final int bufferStartTime = (int) (backTick - 6);
         while (!this.buffer.isEmpty() && this.buffer.getFirst().gameTick < bufferStartTime) {
             this.buffer.removeFirst();
         }
 
-        // If we have no snapshots, we can't interpolate
         if (this.buffer.isEmpty()) {
             return;
         }

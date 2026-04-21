@@ -38,7 +38,7 @@ public class Cable {
     public float radius = SuperpositionConstants.cableRadius;
     private final RopeSimulation ropeSimulation;
     private Color color;
-    private final boolean emitsLight;
+    private boolean emitsLight;
     private float brightness;
     private int stretchGrace = 0;
 
@@ -231,11 +231,12 @@ public class Cable {
         return this.ropeSimulation.getNodes();
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(1); // Data format version, can be used in the future if data format changes
+        buf.writeInt(CableManager.getInterpolationTick(level));
         buf.writeInt(this.color.getRGB());
         buf.writeByte((this.emitsLight ? 1 : 0) | (this.ropeSimulation.isSleeping() ? 2 : 0));
-        buf.writeVarInt(this.ropeSimulation.getNodeCount());
+        buf.writeInt(this.ropeSimulation.getNodeCount());
         for (RopeNode point : this.ropeSimulation.getNodes()) {
             buf.writeVec3(point.getPosition());
 //            buf.writeVec3(point.getPrevPosition());
@@ -251,15 +252,43 @@ public class Cable {
                 }
             }
         }
-        buf.writeVarInt(this.playerHoldingPointMap.size());
+        buf.writeInt(this.playerHoldingPointMap.size());
         for (Int2IntMap.Entry entry : this.playerHoldingPointMap.int2IntEntrySet()) {
-            buf.writeVarInt(entry.getIntKey());
-            buf.writeVarInt(entry.getIntValue());
+            buf.writeInt(entry.getIntKey());
+            buf.writeInt(entry.getIntValue());
         }
     }
 
-    public static Cable fromBytes(UUID id, FriendlyByteBuf buf, Level level, boolean isCreating) {
+    public void read(UUID id, FriendlyByteBuf buf, Level level) {
         int version = buf.readInt();
+        int gameTick = buf.readInt();
+        this.color = new Color(buf.readInt());
+        byte flags = buf.readByte();
+        this.emitsLight = (flags & 1) != 0;
+        int size = buf.readVarInt();
+        int currentPoints = ropeSimulation.getNodes().size();
+        for (int i = 0; i < size; i++) {
+            if (i < currentPoints) {
+                RopeNode node = ropeSimulation.getNodes().get(i);
+                node.read(buf, gameTick);
+            } else {
+                RopeNode newPoint = new RopeNode(buf);
+                ropeSimulation.addNode(newPoint);
+            }
+        }
+        while (ropeSimulation.getNodes().size() > size) {
+            ropeSimulation.getNodes().removeLast();
+        }
+        int playerHoldingMapSize = buf.readVarInt();
+        playerHoldingPointMap.clear();
+        for (int i = 0; i < playerHoldingMapSize; i++) {
+            addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
+        }
+    }
+
+    public static Cable readNew(UUID id, FriendlyByteBuf buf, Level level, boolean isCreating) {
+        int version = buf.readInt();
+        int gameTick = buf.readInt();
         Color color1 = new Color(buf.readInt());
         byte flags = buf.readByte();
         boolean emitsLight = (flags & 1) != 0;
@@ -267,17 +296,8 @@ public class Cable {
         int size = buf.readVarInt();
         RopeSimulation ropeSimulation = new RopeSimulation(level, SuperpositionConstants.cableRadius, sleeping);
         for (int i = 0; i < size; i++) {
-            RopeNode newPoint = new RopeNode(buf.readVec3());
+            RopeNode newPoint = new RopeNode(buf);
             ropeSimulation.addNode(newPoint);
-//            newPoint.setPrevPosition(buf.readVec3());
-            if (buf.readBoolean()) {
-                newPoint.setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
-                if (buf.readBoolean()) {
-                    AnchorConstraint anchor = newPoint.getAnchor();
-                    assert anchor != null : "Rope anchor is null after it was just set";
-                    anchor.setPort((String) buf.readCharSequence(buf.readInt(),StandardCharsets.UTF_8));
-                }
-            }
         }
         Cable cable = new Cable(id, ropeSimulation, level, color1, emitsLight);
         int playerHoldingMapSize = buf.readVarInt();
@@ -423,11 +443,5 @@ public class Cable {
 
     public boolean isSleeping() {
         return this.ropeSimulation.isSleeping();
-    }
-
-    public void preSimulate() {
-        for (RopeNode node : this.getPoints()) {
-            node.preSimulate();
-        }
     }
 }
