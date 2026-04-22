@@ -2,6 +2,7 @@ package org.modogthedev.superposition.compat.sable;
 
 import dev.ryanhcode.sable.companion.SableCompanion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -31,5 +32,12 @@ public class SableCompat {
             return SuperpositionSableHelper.getRotation(level,pos);
         }
         return null;
+    }
+
+    public static Vec3 tryCollide(Level level, Vec3 vel, Vec3 pos) {
+        if (CompatabilityHandler.Mod.SABLE.isLoaded) {
+            return SuperpositionSableHelper.collide(level,vel, pos);
+        }
+        return pos;
     }
 }

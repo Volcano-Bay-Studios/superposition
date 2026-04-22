@@ -85,6 +85,7 @@ public class RopeNode {
             velocityHorizontal = SableCompat.tryTransform(level,velocityHorizontal);
 
             velocity = new Vec3(velocityHorizontal.x, velocityVertical.y, velocityHorizontal.z);
+
         }
 
         if (initialYVelocity < velocity.y && velocity.y <= 0) {
@@ -96,6 +97,7 @@ public class RopeNode {
         }
 
         position = SableCompat.tryTransform(level,prevPosition.add(velocity));
+        position = SableCompat.tryCollide(level,velocity,position);
     }
 
     public void read(FriendlyByteBuf buf, int gameTick) {
