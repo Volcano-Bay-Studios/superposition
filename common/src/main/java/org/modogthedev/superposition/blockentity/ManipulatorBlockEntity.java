@@ -8,6 +8,8 @@ import org.modogthedev.superposition.system.behavior.types.ManipulateBehavior;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
+import java.util.List;
+
 public class ManipulatorBlockEntity extends PeripheralBlockEntity {
 
     public ManipulatorBlockEntity(BlockPos pos, BlockState state) {
@@ -21,10 +23,13 @@ public class ManipulatorBlockEntity extends PeripheralBlockEntity {
         resetTooltip();
         addTooltip("Manipulator Status:");
         addTooltip("Manipulating " + level.getBlockState(getFrontPos()).getBlock().getName().getString() + "...");
-        Signal signal = getInputSignals().getLast() ;
+        List<Signal> inputSignals = getInputSignals();
+        if (!inputSignals.isEmpty()) {
+            Signal signal = inputSignals.getLast();
 
-        for (ManipulateBehavior behavior : SuperpositionBehaviors.manipulateBehaviors) {
-            behavior.manipulate(signal,getLevel(),getBlockPos());
+            for (ManipulateBehavior behavior : SuperpositionBehaviors.manipulateBehaviors) {
+                behavior.manipulate(signal, getLevel(), getBlockPos());
+            }
         }
 //        if (card != null) {
 //            Signal signal = SignalHelper.randomSignal(putSignals);
