@@ -1,13 +1,10 @@
 package org.modogthedev.superposition.system.cable;
 
-import dev.ryanhcode.sable.companion.math.Pose3dc;
-import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.ApiStatus;
 import org.modogthedev.superposition.core.SuperpositionConstants;
-import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 
 import java.util.function.Consumer;
 
@@ -15,7 +12,6 @@ import java.util.function.Consumer;
  * TODO: there's too large of a window that we're okay with being within for latency / delay.
  */
 public class SuperpositionClientInterpolationState {
-    public static final SuperpositionClientInterpolationState INSTANCE = new SuperpositionClientInterpolationState();
     public static final boolean RENDER_INTERPOLATION_BOUNDS = false;
 
     private final Minecraft minecraft = Minecraft.getInstance();

@@ -3,7 +3,6 @@ package org.modogthedev.superposition.system.cable;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -18,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.networking.packet.CableSyncS2CPacket;
 import org.modogthedev.superposition.networking.packet.InterpolationStateS2CPacket;
@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.List;
 
 public class CableManager {
-    private static final Map<ResourceKey<Level>, CableManager> cableManagers = new HashMap<>();
+    private static final Map<Level, CableManager> cableManagers = new HashMap<>();
     private final int grabTimer = 0;
     private final Map<UUID, Cable> cables = new HashMap<>();
     private final Logger log = LoggerFactory.getLogger(CableManager.class);
@@ -43,6 +43,7 @@ public class CableManager {
     private int interpolationTick;
     private List<ServerPlayer> syncPlayers = new ArrayList<>();
     private final List<ServerPlayer> lastPlayers = new ArrayList<>();
+    private SuperpositionClientInterpolationState interpolationState = null;
 
     public static @Nullable Cable getCable(Level level, UUID id) {
         Map<UUID, Cable> map = getCables(level);
@@ -54,11 +55,11 @@ public class CableManager {
     }
 
     public static @Nullable Map<UUID, Cable> getCables(Level level) {
-        return cableManagers.computeIfAbsent(level.dimension(),(levelResourceKey -> new CableManager())).cables;
+        return cableManagers.computeIfAbsent(level,(levelResourceKey -> new CableManager())).cables;
     }
 
     public static CableManager getManager(Level level) {
-        return cableManagers.computeIfAbsent(level.dimension(),(levelResourceKey -> new CableManager()));
+        return cableManagers.computeIfAbsent(level,(levelResourceKey -> new CableManager()));
     }
 
     private static void syncCable(ServerLevel level, Cable cable) {
@@ -70,6 +71,13 @@ public class CableManager {
                 getManager(level).syncPlayers.add(player);
             }
         }
+    }
+
+    public SuperpositionClientInterpolationState getInterpolationState() {
+        if (interpolationState == null) {
+            interpolationState = new SuperpositionClientInterpolationState();
+        }
+        return interpolationState;
     }
 
     public static void tick(ServerLevel level) {
@@ -88,6 +96,9 @@ public class CableManager {
         if (cables != null) {
             applyPlayerStretch(level);
             dragPlayers(level);
+
+            cables.values().removeIf(cable -> cable.getPoints().size() < 2);
+
             for (Cable cable : cables.values()) {
                 cable.updatePhysics();
             }
@@ -127,9 +138,6 @@ public class CableManager {
         CableRenderer.stretch = 0;
         Map<UUID, Cable> cables = getCables(level);
         if (cables != null) {
-            for (Cable cable : cables.values()) {
-//                cable.preSimulate();
-            }
             applyPlayerStretch(level);
 //            dragPlayers(level);
             for (Cable cable : cables.values()) {
@@ -268,6 +276,7 @@ public class CableManager {
         BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(), holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
         if (result.getType() == HitResult.Type.BLOCK) {
             holdGoalPos = result.getLocation();
+            holdGoalPos = SableCompat.tryTransform(player.level(),holdGoalPos);
         }
         float length = (float) Math.min(5, player.getEyePosition().distanceTo(holdGoalPos));
         holdGoalPos = player.getEyePosition().add(holdGoalPos.subtract(player.getEyePosition()).normalize().scale(length)); // Verifies the end result is the correct length
@@ -285,6 +294,7 @@ public class CableManager {
         BlockHitResult result = player.level().clip(new ClipContext(player.getEyePosition(), holdGoalPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
         if (result.getType() == HitResult.Type.BLOCK) {
             holdGoalPos = result.getLocation();
+            holdGoalPos = SableCompat.tryTransform(player.level(),holdGoalPos);
         }
         return holdGoalPos;
     }

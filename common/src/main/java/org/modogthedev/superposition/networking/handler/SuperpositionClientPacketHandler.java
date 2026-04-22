@@ -7,7 +7,6 @@ import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
-import org.modogthedev.superposition.system.cable.SuperpositionClientInterpolationState;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 
@@ -73,7 +72,6 @@ public class SuperpositionClientPacketHandler {
 
     public static void handleInterpolationState(InterpolationStateS2CPacket packet, ClientPacketContext ctx) {
         Level level = ctx.level();
-        SuperpositionClientInterpolationState.INSTANCE.receiveInfo(packet.msSinceLast(), packet.gameTick(), packet.stopped());
-
+        CableManager.getManager(level).getInterpolationState().receiveInfo(packet.msSinceLast(), packet.gameTick(), packet.stopped());
     }
 }

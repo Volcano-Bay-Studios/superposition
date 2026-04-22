@@ -2,10 +2,11 @@ package org.modogthedev.superposition.system.cable.rope_system;
 
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3dc;
 import org.modogthedev.superposition.compat.sable.SableCompat;
-import org.modogthedev.superposition.system.cable.SuperpositionClientInterpolationState;
+import org.modogthedev.superposition.system.cable.CableManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public class RopeSimulation {
         float gravity = 0.25f * -9.8f / 40f;
         if (level.isClientSide) {
             for (RopeNode node : nodes) {
-                node.interpolator.tick(SuperpositionClientInterpolationState.INSTANCE.getTickPointer());
+                node.interpolator.tick(CableManager.getManager(level).getInterpolationState().getTickPointer());
                 Vector3dc interpolatedPose = node.interpolator.getInterpolatedPose();
                 node.prevPosition = node.renderPosition;
                 node.renderPosition = JOMLConversion.toMojang(interpolatedPose);
@@ -104,6 +105,16 @@ public class RopeSimulation {
                 }
                 node.prevPosition = node.position;
                 node.position = node.position.add(velocity);
+            }
+
+            for (RopeNode node : nodes) {
+                AnchorConstraint anchor = node.getAnchor();
+                if (anchor != null) {
+                    BlockState blockState = level.getBlockState(anchor.getAnchorBlock());
+                    if (blockState.isAir()) {
+                        node.removeAnchor();
+                    }
+                }
             }
 
             List<RopeConstraint> constraints = collectAllConstraints();
@@ -266,6 +277,10 @@ public class RopeSimulation {
 
     public boolean isSleeping() {
         return sleepTime > 20;
+    }
+
+    public void forceSleep() {
+        sleepTime = 21;
     }
 
     public Level getLevel() {

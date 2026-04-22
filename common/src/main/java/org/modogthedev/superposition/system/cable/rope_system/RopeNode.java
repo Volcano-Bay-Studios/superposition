@@ -9,7 +9,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +35,7 @@ public class RopeNode {
         this.position = position;
         this.prevPosition = position;
         this.renderPosition = position;
-        this.interpolator = new CableSnapshotInterpolator(new Vector3d());
+        this.interpolator = new CableSnapshotInterpolator(JOMLConversion.toJOML(position));
     }
 
     public boolean isFixed() {
@@ -61,7 +60,7 @@ public class RopeNode {
 
     public void resolveWorldCollisions(Level level) {
         if (position.distanceToSqr(prevPosition) > 100) {
-            position = prevPosition.add(position.subtract(prevPosition).normalize().scale(10f));
+            position = prevPosition.add(position.subtract(prevPosition).normalize().scale(4f));
         }
 
         if (isFixed() || !level.isLoaded(BlockPos.containing(getPosition()))) {
@@ -109,10 +108,13 @@ public class RopeNode {
                 assert anchor != null : "Rope anchor is null after it was just set";
                 anchor.setPort((String) buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8));
             }
+        } else {
+            removeAnchor();
         }
     }
 
-    public RopeNode(FriendlyByteBuf buf) {
+    public RopeNode(FriendlyByteBuf buf, RopeSimulation simulation) {
+        this.simulation = simulation;
         setPosition(buf.readVec3());
         if (buf.readBoolean()) {
             setAnchor(buf.readEnum(Direction.class), buf.readBlockPos());
@@ -122,7 +124,9 @@ public class RopeNode {
                 anchor.setPort((String) buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8));
             }
         }
-        this.interpolator = new CableSnapshotInterpolator(new Vector3d());
+        this.prevPosition = position;
+        this.renderPosition = position;
+        this.interpolator = new CableSnapshotInterpolator(JOMLConversion.toJOML(position));
     }
 
     public Vec3 getRenderPosition(float partialTicks) {

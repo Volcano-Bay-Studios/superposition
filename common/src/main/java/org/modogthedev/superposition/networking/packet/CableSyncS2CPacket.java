@@ -1,9 +1,11 @@
 package org.modogthedev.superposition.networking.packet;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.cable.Cable;
 
@@ -12,8 +14,8 @@ import java.util.UUID;
 public class CableSyncS2CPacket implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<CableSyncS2CPacket> TYPE = new CustomPacketPayload.Type<>(Superposition.id("cable_sync"));
-    public static final StreamCodec<FriendlyByteBuf, CableSyncS2CPacket> CODEC = StreamCodec.of((buffer, value) -> value.toBytes(buffer), CableSyncS2CPacket::new);
-
+    public static final StreamCodec<ByteBuf, CableSyncS2CPacket> CODEC =
+            ByteBufCodecs.BYTE_ARRAY.map(CableSyncS2CPacket::new, CableSyncS2CPacket::toBytes);
     private final UUID id;
     private final boolean remove;
     private final FriendlyByteBuf buffer;
@@ -33,16 +35,23 @@ public class CableSyncS2CPacket implements CustomPacketPayload {
         this.cable = cable;
     }
 
-    private CableSyncS2CPacket(FriendlyByteBuf buf) {
+    private CableSyncS2CPacket(byte[] data) {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(data));
         this.id = buf.readUUID();
         this.remove = buf.readBoolean();
         this.buffer = buf;
     }
 
-    private void toBytes(FriendlyByteBuf buf) {
+    private byte[] toBytes() {
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeUUID(this.id);
         buf.writeBoolean(this.remove);
-        cable.write(buf);
+        if (cable != null) {
+            cable.write(buf);
+        }
+        byte[] data = new byte[buf.writerIndex()];
+        buf.readBytes(data);
+        return data;
     }
 
     public FriendlyByteBuf getBuffer() {

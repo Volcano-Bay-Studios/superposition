@@ -69,8 +69,8 @@ public class Cable {
         if (!this.playerHoldingPointMap.isEmpty()) {
             this.ropeSimulation.invalidateSleepTime();
         }
-        this.freeStuckPoints();
-        if (!this.isSleeping()) {
+//        this.freeStuckPoints();
+        if (!this.isSleeping() || level.isClientSide) {
             this.ropeSimulation.simulate(this.level);
         }
         this.sendSignal();
@@ -236,10 +236,9 @@ public class Cable {
         buf.writeInt(CableManager.getInterpolationTick(level));
         buf.writeInt(this.color.getRGB());
         buf.writeByte((this.emitsLight ? 1 : 0) | (this.ropeSimulation.isSleeping() ? 2 : 0));
-        buf.writeInt(this.ropeSimulation.getNodeCount());
+        buf.writeVarInt(this.ropeSimulation.getNodeCount());
         for (RopeNode point : this.ropeSimulation.getNodes()) {
             buf.writeVec3(point.getPosition());
-//            buf.writeVec3(point.getPrevPosition());
             AnchorConstraint constraint = point.getAnchor();
             buf.writeBoolean(constraint != null);
             if (constraint != null) {
@@ -252,10 +251,10 @@ public class Cable {
                 }
             }
         }
-        buf.writeInt(this.playerHoldingPointMap.size());
+        buf.writeVarInt(this.playerHoldingPointMap.size());
         for (Int2IntMap.Entry entry : this.playerHoldingPointMap.int2IntEntrySet()) {
-            buf.writeInt(entry.getIntKey());
-            buf.writeInt(entry.getIntValue());
+            buf.writeVarInt(entry.getIntKey());
+            buf.writeVarInt(entry.getIntValue());
         }
     }
 
@@ -265,6 +264,9 @@ public class Cable {
         this.color = new Color(buf.readInt());
         byte flags = buf.readByte();
         this.emitsLight = (flags & 1) != 0;
+        if ((flags & 2) != 0) {
+            ropeSimulation.forceSleep();
+        }
         int size = buf.readVarInt();
         int currentPoints = ropeSimulation.getNodes().size();
         for (int i = 0; i < size; i++) {
@@ -272,7 +274,7 @@ public class Cable {
                 RopeNode node = ropeSimulation.getNodes().get(i);
                 node.read(buf, gameTick);
             } else {
-                RopeNode newPoint = new RopeNode(buf);
+                RopeNode newPoint = new RopeNode(buf, ropeSimulation);
                 ropeSimulation.addNode(newPoint);
             }
         }
@@ -284,6 +286,7 @@ public class Cable {
         for (int i = 0; i < playerHoldingMapSize; i++) {
             addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
         }
+        this.level = level;
     }
 
     public static Cable readNew(UUID id, FriendlyByteBuf buf, Level level, boolean isCreating) {
@@ -296,7 +299,7 @@ public class Cable {
         int size = buf.readVarInt();
         RopeSimulation ropeSimulation = new RopeSimulation(level, SuperpositionConstants.cableRadius, sleeping);
         for (int i = 0; i < size; i++) {
-            RopeNode newPoint = new RopeNode(buf);
+            RopeNode newPoint = new RopeNode(buf, ropeSimulation);
             ropeSimulation.addNode(newPoint);
         }
         Cable cable = new Cable(id, ropeSimulation, level, color1, emitsLight);
@@ -308,42 +311,11 @@ public class Cable {
             ropeSimulation.recalculateBaseRopeConstraints();
         }
         return cable;
+//        return null;
     }
 
     public Int2IntMap getPlayerHoldingPointMap() {
         return this.playerHoldingPointMap;
-    }
-
-    public void updateFromCable(Cable cable, boolean isHard) {
-        boolean clientDirty = !this.color.equals(cable.color);
-        this.color = cable.color;
-        this.ropeSimulation.removeAllConstraints();
-        this.ropeSimulation.resizeRope(cable.getPointsCount());
-        List<RopeNode> targetPoints = cable.getPoints();
-        for (int i = 0; i < this.ropeSimulation.getNodeCount(); i++) {
-            RopeNode node = this.ropeSimulation.getNode(i);
-            if (this.playerHoldingPointMap.size() != cable.playerHoldingPointMap.size()) {
-                node.setPosition(targetPoints.get(i).getPosition());
-//                ropeSimulation.getNode(i).setPrevPosition(targetPoints.get(i).getPrevPosition());
-            } else {
-//                ropeSimulation.getNode(i).setPrevPosition(ropeSimulation.getNode(i).getPosition());
-                node.setPrevPosition(node.getPosition());
-                node.setPosition(targetPoints.get(i).getPosition().lerp(node.getPosition(), 0.8f));
-            }
-            AnchorConstraint newAnchor = targetPoints.get(i).getAnchor();
-            if (newAnchor != null) {
-                node.setAnchor(newAnchor.getDirection(), newAnchor.getAnchorBlock());
-                node.getAnchor().setPort(newAnchor.getPort());
-            } else {
-                getPoints().get(i).removeAnchor();
-            }
-        }
-        this.level = cable.level;
-        this.ropeSimulation.recalculateBaseRopeConstraints();
-        this.playerHoldingPointMap = new Int2IntArrayMap(cable.playerHoldingPointMap);
-        if (clientDirty) {
-            this.clientDirty = true;
-        }
     }
 
     public float calculateLength() {

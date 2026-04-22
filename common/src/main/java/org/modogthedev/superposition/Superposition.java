@@ -15,7 +15,6 @@ import org.modogthedev.superposition.system.antenna.AntennaManager;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.CablePassthroughManager;
 import org.modogthedev.superposition.system.cable.CarabinerManager;
-import org.modogthedev.superposition.system.cable.SuperpositionClientInterpolationState;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.sound.ClientAudioManager;
@@ -65,7 +64,7 @@ public class Superposition {
     }
 
     public static void clientTick(Level level) {
-        SuperpositionClientInterpolationState.INSTANCE.tick();
+        CableManager.getManager(level).getInterpolationState().tick();
         VeilBloomRenderer.tryEnable();
         ClientSignalManager.tick(level);
         CableManager.clientTick(level);
