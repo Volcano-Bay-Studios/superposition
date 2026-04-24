@@ -30,8 +30,6 @@ public class SuperpositionActions {
     public static final RegistrationProvider<ActionConfiguration> ACTION_CONFIGURATIONS = RegistrationProvider.get(ACTION_CONFIGURATION_KEY, Superposition.MODID);
 
     public static final RegistryObject<ActionConfiguration> DIRECTION_CONFIGURATION = ACTION_CONFIGURATIONS.register("port", () -> new PortConfiguration(Component.literal("Port")));
-    public static final RegistryObject<ActionConfiguration> COMBINATOR_CONFIGURATION = ACTION_CONFIGURATIONS.register("combinator", () -> new EnumConfiguration(Component.literal("Combinator"), CombinatorBlockEntity.Modes.values()));
-
 
     public static final ResourceKey<Registry<Action>> ACTION_KEY = ResourceKey.createRegistryKey(Superposition.id("action"));
     public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ACTION_KEY, Superposition.MODID);

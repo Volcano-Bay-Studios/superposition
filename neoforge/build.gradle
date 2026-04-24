@@ -11,6 +11,7 @@ dependencies {
         exclude group: "foundry.veil"
     })
 
+
     compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-core-api:${project.cc_version}")
     compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge-api:${project.cc_version}")
     runtimeOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge:${project.cc_version}")
@@ -29,7 +30,8 @@ dependencies {
     //modRuntimeOnly("curse.maven:worldedit-225608:4586218")
     //modRuntimeOnly("mezz.jei:jei-${rootProject.property("minecraft_version")}-forge:${rootProject.property("jei_version")}")
 
-//    implementation("net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:${ponder_version}")
+//    jarJar(implementation("net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:${ponder_version}"));
+    jarJar(api(additionalRuntimeClasspath("com.ezylang:EvalEx:${project.evalex_version}")))
 }
 
 neoForge {

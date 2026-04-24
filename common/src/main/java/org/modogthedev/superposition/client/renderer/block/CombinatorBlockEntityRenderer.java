@@ -35,8 +35,9 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
         ms.mulPose(be.getBlockState().getValue(SignalGeneratorBlock.FACING).getRotation());
 
         String text = "";
-        if (be.getMode() != null)
-            text = be.getMode().getDisplayText();
+        if (be.getExpressionString() != null) {
+            text = be.getExpressionString();
+        }
         if (Objects.equals(text, "x")) {
             ms.translate(0, 0, -.02);
         }

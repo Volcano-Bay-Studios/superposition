@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.system.signal.data;
 
+import com.ezylang.evalex.Expression;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompoundTag;
@@ -57,6 +58,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         @Override
         public Type type() {
             return Type.BOOL;
+        }
+
+        @Override
+        public void asExpressionVariable(String param, Expression expression) {
+            expression.with(param, this.value);
         }
 
         @Override
@@ -280,6 +286,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         }
 
         @Override
+        public void asExpressionVariable(String param, Expression expression) {
+            expression.with(param,this.value);
+        }
+
+        @Override
         public boolean equals(Object obj) {
             if (obj == this) {
                 return true;
@@ -324,6 +335,11 @@ public sealed interface EncodedData<T> extends Cloneable {
         @Override
         public boolean booleanValue() {
             return !this.value.getAsString().isBlank();
+        }
+
+        @Override
+        public void asExpressionVariable(String param, Expression expression) {
+            expression.with(param,stringValue());
         }
 
         @Override
@@ -406,11 +422,17 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public int intValue() {
+            try {
+                return ByteBuffer.wrap(value).getInt();
+            } catch (Exception ignored) {}
             return 0;
         }
 
         @Override
         public Number numberValue() {
+            try {
+                return ByteBuffer.wrap(value).getInt();
+            } catch (Exception ignored) {}
             return 0;
         }
 
@@ -488,6 +510,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
     byte[] byteArrayValue();
 
+
     /**
      * Dumps the data into the given tag with the given key
      *
@@ -543,6 +566,10 @@ public sealed interface EncodedData<T> extends Cloneable {
 
     default double doubleValue() {
         return this.numberValue().doubleValue();
+    }
+
+    default void asExpressionVariable(String param, Expression expression) {
+        expression.with(param,floatValue());
     }
 
     String stringValue();

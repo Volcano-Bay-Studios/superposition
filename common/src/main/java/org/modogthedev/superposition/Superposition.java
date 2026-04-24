@@ -1,5 +1,6 @@
 package org.modogthedev.superposition;
 
+import com.ezylang.evalex.config.ExpressionConfiguration;
 import com.mojang.logging.LogUtils;
 import foundry.veil.api.client.color.Color;
 import foundry.veil.impl.client.render.pipeline.VeilBloomRenderer;
@@ -29,6 +30,9 @@ public class Superposition {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final HashMap<String, Integer> SUPERPOSITION_THEME = new HashMap<>();
     public static boolean DEBUG = false;
+    public static ExpressionConfiguration configuration = ExpressionConfiguration.builder()
+            .lenientMode(true)
+            .build();
 
     public static void init() {
         LOGGER.info("Superposition is initializing.");

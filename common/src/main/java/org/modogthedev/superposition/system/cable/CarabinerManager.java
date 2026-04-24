@@ -21,6 +21,10 @@ public class CarabinerManager {
             Player player = level.getPlayerByUUID(entry.getKey());
             if (player != null) {
                 RopeNode point = entry.getValue();
+                if (player.getEyePosition().distanceTo(point.getPosition()) > 15) {
+                    removePlayer(player.getUUID());
+                    continue;
+                }
                 player.setDeltaMovement(player.getEyePosition().add(player.getEyePosition().add(player.getForward().subtract(player.getEyePosition())).scale(1)).subtract(0f, 0.2f, 0f).subtract(point.getPosition()).scale(-0.5f));
                 if (player.isShiftKeyDown()) {
                     removePlayer(player.getUUID());

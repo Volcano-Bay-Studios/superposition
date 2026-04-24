@@ -12,6 +12,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
+
     modImplementation(include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}"))
     modCompileOnly "mezz.jei:jei-${project.minecraft_version}-fabric-api:${project.jei_version}"
 //    modImplementation(include("com.jamieswhiteshirt:reach-entity-attributes:2.5.0"))
@@ -38,7 +39,9 @@ dependencies {
         exclude group: "foundry.veil"
     }
 
-//    implementation("net.createmod.ponder:Ponder-Fabric-${minecraft_version}:${ponder_version}")
+    api("com.ezylang:EvalEx:3.6.1")
+    include(api("com.ezylang:EvalEx:${project.evalex_version}"))
+//    include(implementation("net.createmod.ponder:Ponder-Fabric-${minecraft_version}:${ponder_version}"))
 }
 
 loom {
