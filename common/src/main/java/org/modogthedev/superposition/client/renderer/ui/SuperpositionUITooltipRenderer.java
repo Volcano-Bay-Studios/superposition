@@ -10,6 +10,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -27,6 +28,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.modogthedev.superposition.Superposition;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.screens.WidgetScreen;
 import org.modogthedev.superposition.util.EditableTooltip;
@@ -143,7 +145,7 @@ public class SuperpositionUITooltipRenderer {
                 editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, editableTooltip.getText().length())));
             }
             CompoundTag tag = new CompoundTag();
-            tag.putString("output",editableTooltip.getText());
+            tag.putString("output", editableTooltip.getText());
             VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
             cursorPos++;
             cursorPos = Mth.clamp(cursorPos, -1, editableTooltip.getText().length());
@@ -227,8 +229,8 @@ public class SuperpositionUITooltipRenderer {
         hoverTicks++;
         lastHoveredPos = pos;
         List<Component> tooltip = new ArrayList<>(tooltippable.getTooltip());
-        if (editableTooltip != null) {
-            tooltip.add(Component.literal(editableTooltip.prefix() + editableTooltip.getText()));
+        if (editableTooltip != null && !tooltip.isEmpty()) {
+            tooltip.add(1, Component.literal(editableTooltip.prefix() + '"' + editableTooltip.getText() + '"'));
         }
 
         if (tooltip.isEmpty()) {
@@ -261,6 +263,7 @@ public class SuperpositionUITooltipRenderer {
         int background = Superposition.SUPERPOSITION_THEME.get("background");
         int borderTop = Superposition.SUPERPOSITION_THEME.get("topBorder");
         int borderBottom = Superposition.SUPERPOSITION_THEME.get("bottomBorder");
+        RenderSystem.setShaderColor(1f, 1f, 1f, fade);
 //        background = resetAlpha(background).multiply(1,1,1,.7f);
 //        borderBottom = resetAlpha(borderBottom);
 //        borderTop = resetAlpha(borderTop);
@@ -276,11 +279,12 @@ public class SuperpositionUITooltipRenderer {
 
         if (tooltippable.getWorldspace()) {
             currentPos = currentPos == null ? pos : currentPos;
-            Vec3 playerPos = mc.gameRenderer.getMainCamera().getPosition();
+            ClientLevel level = Minecraft.getInstance().level;
             Vec3i playerPosInt = new Vec3i((int) Math.round(result.getLocation().x), (int) result.getLocation().y, (int) Math.round(result.getLocation().z + 1));
             Vec3i cornerInt = new Vec3i((int) pos.x, (int) pos.y, (int) pos.z);
             Vec3i diff = playerPosInt.subtract(cornerInt);
             desiredPos = pos.add(Math.round(Mth.clamp(diff.getX(), -1, 1) * 0.5f) - 0.5f, 0.5, Math.round(Mth.clamp(diff.getZ(), -1, 1) * 0.5f) - 0.5f);
+            desiredPos = SableCompat.tryTransform(level,desiredPos);
             if (hoverTicks == 1) {
                 currentPos = desiredPos.add(0, -0.15f, 0);
             }
@@ -316,7 +320,7 @@ public class SuperpositionUITooltipRenderer {
         if (editableTooltip != null && editingEditable) {
             String focusText = "[PRESS ESC TO UNFOCUS]";
             RenderSystem.setShaderColor(.5f, 1, .5f, 1f);
-            graphics.drawString(Minecraft.getInstance().font, focusText, (tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8) - tooltipTextWidth / 2, tooltipY + tooltipHeight / 2 + 10, 0xFFFFFF);
+            graphics.drawString(Minecraft.getInstance().font, focusText, (tooltipX + tooltipTextWidth / 2 - Minecraft.getInstance().font.width(focusText) / 2 + 8) - tooltipTextWidth / 2, tooltipY + tooltipHeight, 0xFFFFFF);
             RenderSystem.setShaderColor(1, 1, 1, 1);
         }
         flash++;

@@ -26,7 +26,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
         }
         boolean noSignal = false;
         boolean antennaExists = false;
-        boolean isPowered = false;
+        boolean isPowered = level.hasNeighborSignal(this.getBlockPos());
         if (antenna != null) {
             antennaExists = true;
             List<Signal> signals = getInputSignals();
@@ -41,8 +41,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
                     tooltip.add(Component.literal("No Signals"));
                 }
             } else {
-                if (level.hasNeighborSignal(this.getBlockPos())) { //TODO: borken
-                    isPowered = true;
+                if (isPowered) {
                     for (Signal broadcastSignal : signals) {
                         broadcastSignal.level = level;
                     }

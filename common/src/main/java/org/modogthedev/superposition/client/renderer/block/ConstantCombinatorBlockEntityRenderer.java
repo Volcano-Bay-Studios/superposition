@@ -37,7 +37,7 @@ public class ConstantCombinatorBlockEntityRenderer implements BlockEntityRendere
 
         String text = be.getOutputString().substring(0, Math.min(3, be.getOutputString().length()));
         if (be.getOutputString().length() > 3)
-            text = text + "-";
+            text = text + "...";
 
         if (!text.equals("")) {
             ms.pushPose();

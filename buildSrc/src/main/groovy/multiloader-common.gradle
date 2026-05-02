@@ -69,6 +69,7 @@ repositories {
             }
         }
     }
+    maven { url = 'https://maven.maxhenkel.de/repository/public' }
     repositories {
         maven {
             url "https://maven.squiddev.cc"
@@ -160,7 +161,8 @@ processResources {
             'java_version'                 : java_version,
             'veil_version'                 : veil_version,
             'evalex_version'               : evalex_version,
-            'jei_version'                  : jei_version
+            'jei_version'                  : jei_version,
+            'voicechat_version'            : voicechat_version
     ]
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', '*.mixins.json']) {

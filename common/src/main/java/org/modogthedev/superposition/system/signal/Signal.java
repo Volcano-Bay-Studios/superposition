@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.system.signal;
 
+import dev.ryanhcode.sable.ActiveSableCompanion;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -31,7 +32,7 @@ public class Signal {
     private boolean emitting = true;
     private int lifetime = 0;
     private EncodedData<?> encodedData = null;
-    private float distance = 0;
+    private float timeTraversed = 0;
     @Deprecated
     public Level level;
     private int endTime = 0;
@@ -198,7 +199,11 @@ public class Signal {
     }
 
     public Vector3d getPos() {
-        return this.pos;
+        return ActiveSableCompanion.INSTANCE.projectOutOfSubLevel(level,this.pos, new Vector3d());
+    }
+
+    public void setPos(Vector3d newPos) {
+        this.pos.set(newPos);
     }
 
     public float getAmplitude() {
@@ -251,11 +256,11 @@ public class Signal {
     }
 
     public void addTraversalDistance(float distance) {
-        this.distance += distance;
+        this.timeTraversed += distance / SPEED;
     }
 
     public float getTraversalDistance() {
-        return distance;
+        return timeTraversed;
     }
 
     @Override

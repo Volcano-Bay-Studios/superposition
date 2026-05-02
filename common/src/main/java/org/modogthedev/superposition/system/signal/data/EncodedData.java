@@ -287,7 +287,15 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void asExpressionVariable(String param, Expression expression) {
-            expression.with(param,this.value);
+            try {
+                float number = Float.parseFloat(this.value);
+                if (Float.toString(number).equals(this.value) || Integer.toString((int) number).equals(this.value)) {
+                    expression.with(param, number);
+                    return;
+                }
+            } catch (Exception ignored) {
+            }
+            expression.with(param, this.value);
         }
 
         @Override
@@ -339,7 +347,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public void asExpressionVariable(String param, Expression expression) {
-            expression.with(param,stringValue());
+            expression.with(param, stringValue());
         }
 
         @Override
@@ -424,7 +432,8 @@ public sealed interface EncodedData<T> extends Cloneable {
         public int intValue() {
             try {
                 return ByteBuffer.wrap(value).getInt();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             return 0;
         }
 
@@ -432,7 +441,8 @@ public sealed interface EncodedData<T> extends Cloneable {
         public Number numberValue() {
             try {
                 return ByteBuffer.wrap(value).getInt();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             return 0;
         }
 
@@ -569,7 +579,7 @@ public sealed interface EncodedData<T> extends Cloneable {
     }
 
     default void asExpressionVariable(String param, Expression expression) {
-        expression.with(param,floatValue());
+        expression.with(param, floatValue());
     }
 
     String stringValue();

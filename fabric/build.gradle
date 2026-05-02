@@ -12,6 +12,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
+//    modImplementation( "maven.modrinth:simple-voice-chat:api-${project.voicechat_version}:fabric-stub")
+//    modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_version}"
 
     modImplementation(include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}"))
     modCompileOnly "mezz.jei:jei-${project.minecraft_version}-fabric-api:${project.jei_version}"

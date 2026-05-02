@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
@@ -72,12 +71,12 @@ public class Antenna {
     public void receiveSignal(final Signal signal) {
         for (AntennaElement antennaElement : antennaElements) {
             double amplitude = signal.getAmplitude();
-            float dist = (float) antennaElement.getPosition().distance(signal.getPos());
+            Vector3d to = antennaElement.getPosition(signal.level);
+            float dist = (float) to.distance(signal.getPos());
 
             if (dist < signal.getMaxDist() && dist > signal.getMinDist()) {
 
                 amplitude *= (1.0F / Math.max(1, dist / (1000000000 / signal.getFrequency())));
-                Vec3 to = antennaActor.getCenter().add(antennaElement.getPosition().x, antennaElement.getPosition().y, antennaElement.getPosition().z);
                 float penetration = LongRaycast.getPenetration(signal.level, signal.getPos(), new Vector3d(to.x, to.y, to.z));
                 amplitude *= (Mth.map(penetration, 0, signal.getFrequency() / 200000, 1, 0));
                 amplitude *= antennaElement.getAmplitudeScalar(signal);

@@ -2,7 +2,6 @@ package org.modogthedev.superposition.compat.sable;
 
 import dev.ryanhcode.sable.companion.SableCompanion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -12,6 +11,20 @@ public class SableCompat {
     public static Vec3 tryTransform(Level level, Vec3 pos) {
         if (CompatabilityHandler.Mod.SABLE.isLoaded) {
             return SuperpositionSableHelper.transformPosition(level,pos);
+        }
+        return pos;
+    }
+
+    public static Vec3 tryTransform(Level level, Vec3 sourcePos, Vec3 pos) {
+        if (CompatabilityHandler.Mod.SABLE.isLoaded) {
+            return SuperpositionSableHelper.transformPosition(level,sourcePos, pos);
+        }
+        return pos;
+    }
+
+    public static Vec3 tryTransformPositionInverse(Level level, Vec3 sourcePos, Vec3 pos) {
+        if (CompatabilityHandler.Mod.SABLE.isLoaded) {
+            return SuperpositionSableHelper.transformPositionInverse(level,sourcePos, pos);
         }
         return pos;
     }

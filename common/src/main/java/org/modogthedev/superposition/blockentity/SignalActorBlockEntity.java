@@ -292,8 +292,6 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         super.loadSyncedData(tag);
         if (tag.contains("swap"))
             this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
-        if (tag.contains("lightX")) {
-        }
     }
 
     public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {
@@ -398,7 +396,6 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 this.checkEvents();
                 this.finaliseConfigTooltips();
             }
-            processPorts();
         }
         if (getLevel() != null && !getLevel().isClientSide) {
             for (SignalList value : putSignals.values()) {
@@ -423,6 +420,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
 
             if (signalsDirty) {
                 VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(putSignals, getBlockPos()));
+                sendData();
             }
             signalsDirty = false;
         }

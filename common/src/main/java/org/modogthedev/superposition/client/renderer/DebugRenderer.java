@@ -52,7 +52,7 @@ public class DebugRenderer {
         for (Antenna antenna : AntennaManager.getAntennaList(level)) {
             drawPosBox((PoseStack) matrixStack, vertexConsumer, new Vec3(antenna.getPosition().x,antenna.getPosition().y,antenna.getPosition().z), 0.5f, 0.5f, 0.9f, 0.5f);
             for (AntennaElement antennaElement : antenna.getAntennaElements()) {
-                drawPosBox((PoseStack) matrixStack, vertexConsumer, antennaElement.getPosition(), 0.25f, 0.5f, 0.9f, 0.5f);
+                drawPosBox((PoseStack) matrixStack, vertexConsumer, antennaElement.getPosition(level), 0.25f, 0.5f, 0.9f, 0.5f);
             }
         }
         for (Cable cable : CableManager.getLevelCables(level)) {

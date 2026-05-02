@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionConstants;
@@ -47,64 +48,94 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity implements Edi
         if (!signalsA.isEmpty()) {
             if (signalsA.size() == 1) {
                 EncodedData<?> signalA = signalsA.getFirst().getEncodedData();
-                addTooltip("A - " + (signalA != null ? signalA.stringValue() : "null"));
+                addTooltip("A = " + (signalA != null ? signalA.stringValue() : "null"));
             } else {
-                addTooltip("A - " + signalsA.size() + " signals");
+                StringBuilder format = new StringBuilder("[");
+                for (int i = 0; i < signalsA.size(); i++) {
+                    EncodedData<?> encodedData = signalsA.get(i).getEncodedData();
+                    if (encodedData != null) {
+                        format.append('"').append(encodedData.stringValue()).append('"');
+                        if (i < signalsA.size() - 1) {
+                            format.append(", ");
+                        }
+                    }
+                }
+                format.append("]");
+                addTooltip("A = " + format);
             }
         }
         List<Signal> signalsB = getPortSignals("b");
         if (!signalsB.isEmpty()) {
             if (signalsB.size() == 1) {
                 EncodedData<?> signalB = signalsB.getFirst().getEncodedData();
-                addTooltip("Right - " + (signalB != null ? signalB.stringValue() : "null"));
+                addTooltip("B = " + (signalB != null ? signalB.stringValue() : "null"));
             } else {
-                addTooltip("Right - " + signalsB.size() + " signals");
-            }
-        }
-        float value;
-        if (!Objects.equals(expressionString, lastString)) {
-            expression = new Expression(expressionString);
-            lastString = expressionString;
-        }
-        try {
-            Expression expressionToEval = expression.copy();
-            if (!signalsA.isEmpty()) {
-                EncodedData<?> encodedData = signalsA.getFirst().getEncodedData();
-                if (encodedData != null) {
-                    encodedData.asExpressionVariable("a", expressionToEval);
-                }
-                for (int i = 0; i < signalsA.size(); i++) {
-                    EncodedData<?> thisData = signalsA.get(i).getEncodedData();
-                    if (thisData != null) {
-                        thisData.asExpressionVariable("a"+i,expressionToEval);
-                    }
-                }
-            }
-            if (!signalsB.isEmpty()) {
-                EncodedData<?> encodedData = signalsB.getFirst().getEncodedData();
-                if (encodedData != null) {
-                    encodedData.asExpressionVariable("b", expressionToEval);
-                }
-
+                StringBuilder format = new StringBuilder("[");
                 for (int i = 0; i < signalsB.size(); i++) {
-                    EncodedData<?> thisData = signalsB.get(i).getEncodedData();
-                    if (thisData != null) {
-                        thisData.asExpressionVariable("b"+i,expressionToEval);
+                    EncodedData<?> encodedData = signalsB.get(i).getEncodedData();
+                    if (encodedData != null) {
+                        format.append('"').append(encodedData.stringValue()).append('"');
+                        if (i < signalsB.size() - 1) {
+                            format.append(", ");
+                        }
                     }
                 }
+                format.append("]");
+                addTooltip("B = " + format);
+            }
+        }
+        if (!level.isClientSide) {
+            float value;
+            if (!Objects.equals(expressionString, lastString)) {
+                expression = new Expression(expressionString, Superposition.configuration);
+                lastString = expressionString;
+            }
+            try {
+                Expression expressionToEval = expression.copy();
+                if (!signalsA.isEmpty()) {
+                    EncodedData<?> encodedData = signalsA.getFirst().getEncodedData();
+                    if (encodedData != null) {
+                        encodedData.asExpressionVariable("a", expressionToEval);
+                    }
+                    for (int i = 0; i < signalsA.size(); i++) {
+                        EncodedData<?> thisData = signalsA.get(i).getEncodedData();
+                        if (thisData != null) {
+                            thisData.asExpressionVariable("a" + i, expressionToEval);
+                        }
+                    }
+                }
+                if (!signalsB.isEmpty()) {
+                    EncodedData<?> encodedData = signalsB.getFirst().getEncodedData();
+                    if (encodedData != null) {
+                        encodedData.asExpressionVariable("b", expressionToEval);
+                    }
+
+                    for (int i = 0; i < signalsB.size(); i++) {
+                        EncodedData<?> thisData = signalsB.get(i).getEncodedData();
+                        if (thisData != null) {
+                            thisData.asExpressionVariable("b" + i, expressionToEval);
+                        }
+                    }
+                }
+
+                EvaluationValue evaluation = expressionToEval.evaluate();
+                value = Float.parseFloat(evaluation.getStringValue());
+            } catch (Exception ignored) {
+                value = 0;
             }
 
-            EvaluationValue evaluation = expressionToEval.evaluate();
-            value = evaluation.getNumberValue().floatValue();
-        } catch (Exception ignored) {
-            value = 0;
+            outputSignal.encode(value);
+            markDirty();
+            singleSignalOut(outputSignal);
         }
 
-        outputSignal.encode(value);
-
-        if (outputSignal.getEncodedData() != null)
-            addTooltip("Output - " + outputSignal.getEncodedData().stringValue());
-        singleSignalOut(outputSignal);
+        List<Signal> outputSignals = getOutputSignals();
+        if (!outputSignals.isEmpty()) {
+            EncodedData<?> encodedData = outputSignals.getFirst().getEncodedData();
+            if (encodedData != null) {
+                addTooltip("Evaluation = " + encodedData.stringValue());
+            }
+        }
         super.tick();
     }
 
@@ -161,5 +192,10 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity implements Edi
     @Override
     public void replaceText(String string) {
         this.expressionString = string;
+    }
+
+    @Override
+    public String prefix() {
+        return "Expression - ";
     }
 }

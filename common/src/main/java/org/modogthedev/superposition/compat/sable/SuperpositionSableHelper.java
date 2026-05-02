@@ -7,9 +7,6 @@ import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -39,6 +36,39 @@ public class SuperpositionSableHelper {
             return pose.transformNormal(normal);
         }
         return normal;
+    }
+
+
+    public static Vec3 transformPosition(Level level, Vec3 source, Vec3 pos) {
+        SubLevel sublevel = Sable.HELPER.getContaining(level, source);
+        Pose3dc pose = null;
+        if (sublevel != null) {
+            if (sublevel instanceof ClientSubLevel clientSubLevel) {
+                pose = clientSubLevel.renderPose();
+            } else {
+                pose = sublevel.logicalPose();
+            }
+        }
+        if (pose != null) {
+            return pose.transformPosition(pos);
+        }
+        return pos;
+    }
+
+    public static Vec3 transformPositionInverse(Level level, Vec3 source, Vec3 pos) {
+        SubLevel sublevel = Sable.HELPER.getContaining(level, source);
+        Pose3dc pose = null;
+        if (sublevel != null) {
+            if (sublevel instanceof ClientSubLevel clientSubLevel) {
+                pose = clientSubLevel.renderPose();
+            } else {
+                pose = sublevel.logicalPose();
+            }
+        }
+        if (pose != null) {
+            return pose.transformPositionInverse(pos);
+        }
+        return pos;
     }
 
     public static Quaternionf getRotation(Level level, Vec3 pos) {

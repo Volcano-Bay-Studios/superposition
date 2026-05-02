@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.block.AmplifierBlock;
-import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -45,9 +44,6 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
         this.amplification = tag.getFloat("amplification");
-
-        level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
-//        getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap"));
     }
 
     public static float getRedstoneOffset(Level level, BlockPos pos) {
@@ -57,6 +53,9 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putFloat("amplification", amplification);
+        tag.putFloat("amplitude", amplitude);
+        tag.putFloat("temp", temp);
+        tag.putFloat("throttle", throttle);
         super.saveAdditional(tag, registries);
     }
 
@@ -64,16 +63,18 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         this.amplification = tag.getFloat("amplification");
+        this.amplitude = tag.getFloat("amplitude");
+        this.temp = tag.getFloat("temp");
+        this.throttle = tag.getFloat("throttle");
     }
 
     @Override
     public @Nullable Signal manipulateSignal(Signal signal) {
         if (signal != null) {
             signal.addAmplitude(Math.max(0, amplification - throttle));
-            amplitude += signal.getAmplitude();
+            amplitude += Math.max(0, amplification - throttle) + (signal.getAmplitude()/25f);
         }
         return signal;
-
     }
 
     public float getColdness(BlockPos pos) {
@@ -119,32 +120,37 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
                 this.addTooltip(Component.literal("No Signal"));
             }
 
-        }
-        float coldness = 0f;
-        for (Direction direction : Direction.values()) {
-            coldness += getColdness(getBlockPos().relative(direction));
-        }
+        } else {
+            float coldness = 0f;
+            for (Direction direction : Direction.values()) {
+                coldness += getColdness(getBlockPos().relative(direction));
+            }
 
-        float tempGoal = (amplitude / 10f) + 26;
-        tempGoal -= coldness;
-        if (tempGoal > temp) {
-            temp += (tempGoal - temp) / 100f;
-        } else if (tempGoal < temp) {
-            temp += (tempGoal - temp) / 500f;
-        }
-        throttle = (temp - 26f) * 10f;
-        amplitude -= throttle;
-        amplitude = Math.max(amplitude, 0);
+            float tempGoal = (amplitude / 10f) + 26;
+            tempGoal -= coldness;
+            if (tempGoal > temp) {
+                temp += (tempGoal - temp) / 20f;
+            } else if (tempGoal < temp) {
+                temp += (tempGoal - temp) / 100f;
+            }
+            if (tempGoal - temp > 0.01f) {
+                markDirty();
+            }
+            throttle = (temp - 26f) * 10f;
+            amplitude -= throttle;
+            amplitude = Math.max(amplitude, 0);
 
-        if (updateNext) {
-            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
-            updateNext = false;
+            if (updateNext) {
+                markDirty();
+                level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+                updateNext = false;
+            }
+            if (lastAmplitude != amplitude) {
+                updateNext = true;
+            }
+            lastAmplitude = amplitude;
+            amplitude = 0;
         }
-        if (lastAmplitude != amplitude) {
-            updateNext = true;
-        }
-        lastAmplitude = amplitude;
-        amplitude = 0;
         super.tick();
     }
 

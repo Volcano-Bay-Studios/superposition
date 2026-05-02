@@ -36,7 +36,10 @@ public class CombinatorBlockEntityRenderer implements BlockEntityRenderer<Combin
 
         String text = "";
         if (be.getExpressionString() != null) {
-            text = be.getExpressionString();
+            text = be.getExpressionString().substring(0, Math.min(4, be.getExpressionString().length()));
+            if (be.getExpressionString().length() > 4)
+                text = text + "...";
+
         }
         if (Objects.equals(text, "x")) {
             ms.translate(0, 0, -.02);
