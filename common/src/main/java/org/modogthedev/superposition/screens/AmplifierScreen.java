@@ -158,16 +158,16 @@ public class AmplifierScreen extends WidgetScreen {
         renderBars(guiGraphics);
 
         if (mute) {
-            guiGraphics.blit(SWITCH_ON, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_ON, width / 2 + 62, height / 2 - 15, 0, 0, 10, 24, 10, 24);
 
         } else {
-            guiGraphics.blit(SWITCH_OFF, width / 2 + 72, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_OFF, width / 2 + 62, height / 2 - 15, 0, 0, 10, 24, 10, 24);
         }
         if (swap) {
-            guiGraphics.blit(SWITCH_ON, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_ON, width / 2 + 48, height / 2 - 15, 0, 0, 10, 24, 10, 24);
 
         } else {
-            guiGraphics.blit(SWITCH_OFF, width / 2 + 58, height / 2 + 12, 0, 0, 10, 24, 10, 24);
+            guiGraphics.blit(SWITCH_OFF, width / 2 + 48, height / 2 - 15, 0, 0, 10, 24, 10, 24);
         }
         super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
         flush(guiGraphics);

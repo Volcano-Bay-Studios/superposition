@@ -306,7 +306,7 @@ public class CableManager {
         }
 
         Vec3 anchorPosition = Cable.getAnchoredPoint(level,pos, face);
-        Cable newCable = new Cable(UUID.randomUUID(), SableCompat.tryTransform(level,anchorPosition), getPlayerHoldCablePos(player), SuperpositionConstants.cableSpawnAmount, level, color, emitsLight);
+        Cable newCable = new Cable(UUID.randomUUID(), anchorPosition, getPlayerHoldCablePos(player), SuperpositionConstants.cableSpawnAmount, level, color, emitsLight);
         newCable.getPoints().getFirst().setAnchor(face, pos);
         newCable.setPlayerHolding(player);
         addCable(newCable, level);

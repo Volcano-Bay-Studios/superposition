@@ -410,7 +410,8 @@ public class Cable {
 
     public static Vec3 getAnchoredPoint(Level level,BlockPos pos, Direction face) {
         Vec3 center = SableCompat.tryTransform(level, pos.getCenter());
-        return center.add(center.subtract(pos.relative(face).getCenter()).scale(-0.45));
+        Vec3 relative = SableCompat.tryTransform(level,pos.relative(face).getCenter());
+        return center.add(center.subtract(relative).scale(-0.45));
     }
 
     public boolean isSleeping() {

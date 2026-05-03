@@ -55,13 +55,13 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
                 signalsOut(signals);
             }
             int currentSize = signals.size();
-            tooltip.add(Component.literal("Signal - " + (signals.isEmpty() ? "NONE" : "OK")));
+            tooltip.add(Component.literal("Status - " + (signals.isEmpty() ? "NO SIGNAL" : "OK")));
             if (currentSize != lastSize || (antennaBrokenLastTick != (antenna == null))) {
                 level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
             }
             lastSize = currentSize;
         } else {
-            tooltip.add(Component.literal("Antenna Classification - ERROR"));
+            tooltip.add(Component.literal("Status - NO ANTENNA"));
         }
         antennaBrokenLastTick = (antenna == null);
         this.setTooltip(tooltip);
