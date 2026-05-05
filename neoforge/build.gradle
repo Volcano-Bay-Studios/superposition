@@ -59,7 +59,7 @@ dependencies {
     compileOnly "mezz.jei:jei-${project.minecraft_version}-neoforge-api:${project.jei_version}"
     runtimeOnly("mezz.jei:jei-${project.minecraft_version}-neoforge:${project.jei_version}")
 
-    implementation ("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
+    implementation("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
         exclude group: "foundry.veil"
         transitive = false
     }
@@ -70,7 +70,7 @@ dependencies {
     //modRuntimeOnly("mezz.jei:jei-${rootProject.property("minecraft_version")}-forge:${rootProject.property("jei_version")}")
     compileOnly("dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:${flywheel_version}")
     jarJar(runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}"))
-    jarJar(implementation("net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:${ponder_version}"))
+    jarJar(api("net.createmod.ponder:ponder-neoforge:$ponder_version+mc$minecraft_version"))
 }
 
 

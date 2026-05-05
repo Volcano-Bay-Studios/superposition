@@ -46,7 +46,7 @@ dependencies {
 
     api("dev.engine-room.flywheel:flywheel-fabric-api-${minecraft_version}:${flywheel_version}")
     include(implementation("dev.engine-room.flywheel:flywheel-fabric-${minecraft_version}:${flywheel_version}"))
-    include(implementation("net.createmod.ponder:Ponder-Fabric-${minecraft_version}:${ponder_version}"))
+    include(implementation("net.createmod.ponder:ponder-fabric:$ponder_version+mc$minecraft_version"))
 }
 
 loom {

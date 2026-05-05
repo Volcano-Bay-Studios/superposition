@@ -32,8 +32,7 @@ dependencies {
     implementation "foundry.veil:veil-common-${project.minecraft_version}:${project.veil_version}"
 
     compileOnly("dev.engine-room.flywheel:flywheel-common-mojmap-api-${minecraft_version}:${flywheel_version}")
-    implementation("net.createmod.ponder:Ponder-Common-${minecraft_version}:${ponder_version}")
-
+    implementation("net.createmod.ponder:ponder-common:$ponder_version+mc$minecraft_version")
 
     implementation ("dev.ryanhcode.sable:sable-neoforge-${minecraft_version}:${sable_version}") {
         exclude group: "foundry.veil"

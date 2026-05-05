@@ -54,21 +54,22 @@ repositories {
         name = "RyanHCode Maven"
         url = "https://maven.ryanhcode.dev/releases"
     }
-    maven {
-        url = "http://maven.ryanhcode.dev/private"
-        allowInsecureProtocol = true
-
-        credentials {
-            credentials {
-                username = ryanhcodeMavenUser
-                password = ryanhcodeMavenToken
-            }
-
-            authentication {
-                basic(BasicAuthentication)
-            }
-        }
-    }
+//    maven {
+//        url = "http://maven.ryanhcode.dev/private"
+//        allowInsecureProtocol = true
+//
+//        credentials {
+//            credentials {
+//                username = ryanhcodeMavenUser
+//                password = ryanhcodeMavenToken
+//            }
+//
+//            authentication {
+//                basic(BasicAuthentication)
+//            }
+//        }
+//    }
+//    Those who snow ^
     maven { url = 'https://maven.maxhenkel.de/repository/public' }
     repositories {
         maven {
