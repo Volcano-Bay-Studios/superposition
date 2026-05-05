@@ -1,6 +1,6 @@
 package org.modogthedev.superposition.system.antenna;
 
-import dev.ryanhcode.sable.ActiveSableCompanion;
+import dev.ryanhcode.sable.companion.SableCompanion;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.system.signal.Signal;
@@ -19,7 +19,7 @@ public abstract class AntennaElement {
     }
 
     public Vector3d getPosition(Level level) {
-        return ActiveSableCompanion.INSTANCE.projectOutOfSubLevel(level, new Vector3d(position).add(antennaPositionOffset));
+        return SableCompanion.INSTANCE.projectOutOfSubLevel(level, new Vector3d(position).add(antennaPositionOffset));
     }
 
     /**

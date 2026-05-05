@@ -6,14 +6,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.blockentity.CombinatorBlockEntity;
 import org.modogthedev.superposition.compat.CompatabilityHandler;
 import org.modogthedev.superposition.screens.utils.ActionSpritesheet;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.actions.*;
 import org.modogthedev.superposition.system.card.actions.configuration.ActionConfiguration;
 import org.modogthedev.superposition.system.card.actions.configuration.PortConfiguration;
-import org.modogthedev.superposition.system.card.actions.configuration.EnumConfiguration;
+import org.modogthedev.superposition.system.card.actions.configuration.StringConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,8 @@ public class SuperpositionActions {
     public static final ResourceKey<Registry<ActionConfiguration>> ACTION_CONFIGURATION_KEY = ResourceKey.createRegistryKey(Superposition.id("action_configurations"));
     public static final RegistrationProvider<ActionConfiguration> ACTION_CONFIGURATIONS = RegistrationProvider.get(ACTION_CONFIGURATION_KEY, Superposition.MODID);
 
-    public static final RegistryObject<ActionConfiguration> DIRECTION_CONFIGURATION = ACTION_CONFIGURATIONS.register("port", () -> new PortConfiguration(Component.literal("Port")));
+    public static final RegistryObject<ActionConfiguration> PORT_CONFIGURATION = ACTION_CONFIGURATIONS.register("port", () -> new PortConfiguration(Component.literal("Port")));
+    public static final RegistryObject<ActionConfiguration> EXPRESSION_CONFIGURATION = ACTION_CONFIGURATIONS.register("expression", () -> new StringConfiguration(Component.literal("Expression")));
 
     public static final ResourceKey<Registry<Action>> ACTION_KEY = ResourceKey.createRegistryKey(Superposition.id("action"));
     public static final RegistrationProvider<Action> ACTION = RegistrationProvider.get(ACTION_KEY, Superposition.MODID);
@@ -107,6 +107,12 @@ public class SuperpositionActions {
     public static final RegistryObject<Action> SUBSTRING = registerAction("substring", () -> new SubstringAction(Superposition.id("substring"), new Action.Information(
             Component.literal("Substring"),
             Component.literal("Cuts a string at the the number encoded the second signal, if the second signal is negative it will cut from the front instead"),
+            Action.Type.MODIFY
+    )));
+
+    public static final RegistryObject<Action> ARITHMETIC = registerAction("arithmetic", () -> new ArithmeticAction(Superposition.id("arithmetic"), new Action.Information(
+            Component.literal("Arithmetic"),
+            Component.literal("Evaluates an expression based on it's inputs. The operation will be completed once for every pair of signals where each list holds one"),
             Action.Type.MODIFY
     )));
 

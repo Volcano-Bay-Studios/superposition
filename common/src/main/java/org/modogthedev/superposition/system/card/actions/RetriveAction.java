@@ -12,10 +12,10 @@ public class RetriveAction extends Action implements BiModifyAction {
     }
 
     @Override
-    public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (periphrealSignal != null && signal.getEncodedData() != null && periphrealSignal.getEncodedData() != null) {
-            signal.setEncodedData(signal.getEncodedData().getTagKey(periphrealSignal.getEncodedData().stringValue()));
+    public Signal modify(Signal firstSignal, Signal secondSignal) {
+        if (secondSignal != null && firstSignal.getEncodedData() != null && secondSignal.getEncodedData() != null) {
+            firstSignal.setEncodedData(firstSignal.getEncodedData().getTagKey(secondSignal.getEncodedData().stringValue()));
         }
-        return signal;
+        return firstSignal;
     }
 }

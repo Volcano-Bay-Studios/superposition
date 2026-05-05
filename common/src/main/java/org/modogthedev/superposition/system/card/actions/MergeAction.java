@@ -14,10 +14,10 @@ public class MergeAction extends Action implements BiModifyAction {
     }
 
     @Override
-    public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (signal != null && signal.getEncodedData() != null && periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
-            signal.encode(signal.getEncodedData().compoundTagData().merge(periphrealSignal.getEncodedData().compoundTagData()));
+    public Signal modify(Signal firstSignal, Signal secondSignal) {
+        if (firstSignal != null && firstSignal.getEncodedData() != null && secondSignal != null && secondSignal.getEncodedData() != null) {
+            firstSignal.encode(firstSignal.getEncodedData().compoundTagData().merge(secondSignal.getEncodedData().compoundTagData()));
         }
-        return signal;
+        return firstSignal;
     }
 }

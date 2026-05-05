@@ -67,7 +67,7 @@ public class CableManager {
         Vec3 pos = cable.getPoints().getFirst().getPosition();
         VeilPacketManager.around(null, level, pos.x, pos.y, pos.z, cable.getPoints().size() + 100).sendPacket(packet);
         for (ServerPlayer player : level.players()) {
-            if (player.position().distanceToSqr(pos.x,pos.y,pos.z) < cable.getPoints().size() + 100) {
+            if (Math.sqrt(player.position().distanceToSqr(pos.x,pos.y,pos.z)) < cable.getPoints().size() + 100) {
                 getManager(level).syncPlayers.add(player);
             }
         }

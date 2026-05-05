@@ -68,6 +68,10 @@ public class SuperpositionBlocks {
             () -> new ConstantCombinatorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistryObject<PanelBlock> PANEL = registerBlock("panel",
+            () -> new PanelBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
     public static final RegistryObject<SpotlightBlock> SPOTLIGHT = registerBlock("spotlight",
             () -> new SpotlightBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()

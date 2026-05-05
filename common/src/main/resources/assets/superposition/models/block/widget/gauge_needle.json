@@ -1,0 +1,24 @@
+{
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "superposition:block/widget/gauge",
+		"particle": "superposition:block/widget/gauge"
+	},
+	"elements": [
+		{
+			"from": [0, 0.01, 0],
+			"to": [1, 0.01, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0.01, 0]},
+			"faces": {
+				"north": {"uv": [0, 0, 0.5, 0], "texture": "#missing"},
+				"east": {"uv": [0, 0, 2, 0], "texture": "#missing"},
+				"south": {"uv": [0, 0, 0.5, 0], "texture": "#missing"},
+				"west": {"uv": [0, 0, 2, 0], "texture": "#missing"},
+				"up": {"uv": [8, 1, 8.5, 3], "texture": "#0"},
+				"down": {"uv": [0, 0, 0.5, 2], "texture": "#missing"}
+			}
+		}
+	]
+}

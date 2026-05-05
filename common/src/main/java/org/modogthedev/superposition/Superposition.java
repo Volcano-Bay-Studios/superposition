@@ -47,6 +47,8 @@ public class Superposition {
         SuperpositionTabs.bootstrap();
         SuperpositionSounds.bootstrap();
         SuperpositionMessages.register();
+        SuperpositionTags.bootstrap();
+        SuperpositionWidgets.bootstrap();
         LOGGER.info("Superposition has been initialized.");
     }
 

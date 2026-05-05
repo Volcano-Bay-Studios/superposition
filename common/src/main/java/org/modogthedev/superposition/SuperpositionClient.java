@@ -3,6 +3,8 @@ package org.modogthedev.superposition;
 import com.mojang.blaze3d.audio.Channel;
 import foundry.veil.api.event.VeilRenderLevelStageEvent;
 import foundry.veil.platform.VeilEventPlatform;
+import net.createmod.catnip.render.CachedBuffers;
+import net.createmod.catnip.render.SuperByteBufferCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.sounds.AudioStream;
@@ -11,6 +13,8 @@ import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.client.renderer.DebugRenderer;
 import org.modogthedev.superposition.client.renderer.block.*;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.core.SuperpositionPartials;
+import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
 import org.modogthedev.superposition.platform.BlockEntityRegistry;
 import org.modogthedev.superposition.system.sound.ClientAudioManager;
 
@@ -18,8 +22,12 @@ public class SuperpositionClient {
 
     public static void init() {
 //        PonderIndex.addPlugin(new SuperpositionPonderPlugin());
+        SuperByteBufferCache.getInstance().registerCompartment(CachedBuffers.PARTIAL);
 
+        SuperpositionPartials.bootstrap();
+        SuperpositionWidgetRenderers.bootstrap();
         ClientAudioManager.setup();
+
         VeilEventPlatform.INSTANCE.onVeilRenderLevelStage((stage, levelRenderer, bufferSource, matrixStack, frustumMatrix, projectionMatrix, partialTicks, deltaTracker, camera, frustum) -> {
             if (stage == VeilRenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES) {
                 CableRenderer.renderCables(projectionMatrix, frustumMatrix, deltaTracker, camera);
@@ -38,6 +46,7 @@ public class SuperpositionClient {
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.COMBINATOR.get(), CombinatorBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.CONSTANT_COMBINATOR.get(), ConstantCombinatorBlockEntityRenderer::new);
         registry.registerBlockEntityRenderer(SuperpositionBlockEntities.SPOTLIGHT.get(), SpotlightBlockEntityRenderer::new);
+        registry.registerBlockEntityRenderer(SuperpositionBlockEntities.PANEL.get(), PanelBlockEntityRenderer::new);
     }
 
     public static void setScreen(Screen screen) {

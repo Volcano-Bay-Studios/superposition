@@ -44,7 +44,9 @@ public class Card { //TODO: make this work!
                 node.load(tag1);
                 nodes.add(node);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            return  null;
+        }
         return tag;
     }
 

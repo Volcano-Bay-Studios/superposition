@@ -499,8 +499,13 @@ public class InscriberScreen extends Screen {
             titleFocused = false;
         }
         if (inspectingNode != null) {
+            Action action = inspectingNode.getAction();
             if (mouseX > width - 200) {
                 int y = 40;
+                for (FormattedCharSequence formattedcharsequence : font.split(action.getInfo().description(), 140)) {
+                    y += 9;
+                }
+                y += 10;
                 for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
                     if (mouseY > y && mouseY < y + configuration.getHeight()) {
                         if (configuration.mouse(button, (int) (mouseX - (width - 186)), mouseY - y)) {

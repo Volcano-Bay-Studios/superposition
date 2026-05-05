@@ -18,4 +18,7 @@ public class SuperpositionTags {
     public static final TagKey<Block> COLD = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("superposition", "cold"));
     public static final TagKey<Block> VERY_COLD = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("superposition", "very_cold"));
 
+    public static void bootstrap(){
+
+    }
 }

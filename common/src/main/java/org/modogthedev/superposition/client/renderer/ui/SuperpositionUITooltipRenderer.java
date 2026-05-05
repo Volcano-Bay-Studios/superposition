@@ -309,11 +309,11 @@ public class SuperpositionUITooltipRenderer {
         }
         if (editableTooltip != null && editingEditable && flash < 40) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
-            int xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + editableTooltip.getText().substring(0, cursorPos)) + 12)));
+            int xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + '"' + editableTooltip.getText().substring(0, cursorPos)) + 12)));
             graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset + 1, tooltipY + (int) textYOffset + 10, -3092272);
             if (selected) {
-                xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix()) + 12)));
-                int xOffset2 = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix())) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
+                xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + '"') + 12)));
+                int xOffset2 = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + '"')) + (Minecraft.getInstance().font.width(editableTooltip.getText()) + 12)));
                 graphics.fill(xOffset, tooltipY + (int) textYOffset, xOffset2, tooltipY + (int) textYOffset + 10, -3092272);
             }
         }

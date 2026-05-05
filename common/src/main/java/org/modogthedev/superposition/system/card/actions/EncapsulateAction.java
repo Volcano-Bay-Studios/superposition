@@ -15,18 +15,18 @@ public class EncapsulateAction extends Action implements BiModifyAction {
     }
 
     @Override
-    public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (signal.getEncodedData() != null) {
+    public Signal modify(Signal firstSignal, Signal secondSignal) {
+        if (firstSignal.getEncodedData() != null) {
             CompoundTag tag = new CompoundTag();
             String key = "0";
-            if (periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
-                key = periphrealSignal.getEncodedData().stringValue();
+            if (secondSignal != null && secondSignal.getEncodedData() != null) {
+                key = secondSignal.getEncodedData().stringValue();
             }
-            tag.putString(key, signal.getEncodedData().stringValue());
-            signal.encode(tag);
+            tag.putString(key, firstSignal.getEncodedData().stringValue());
+            firstSignal.encode(tag);
         } else {
-            signal.encode(new CompoundTag());
+            firstSignal.encode(new CompoundTag());
         }
-        return signal;
+        return firstSignal;
     }
 }

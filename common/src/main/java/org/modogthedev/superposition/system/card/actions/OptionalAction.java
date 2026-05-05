@@ -12,10 +12,10 @@ public class OptionalAction extends Action implements BiModifyAction {
     }
 
     @Override
-    public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (signal != null && periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
-            if (periphrealSignal.getEncodedData().booleanValue()) {
-                return signal;
+    public Signal modify(Signal firstSignal, Signal secondSignal) {
+        if (firstSignal != null && secondSignal != null && secondSignal.getEncodedData() != null) {
+            if (secondSignal.getEncodedData().booleanValue()) {
+                return firstSignal;
             }
         }
         return null;

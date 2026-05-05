@@ -20,7 +20,7 @@ public class OutputAction extends Action implements ComputerAction {
 
     @Override
     protected void setupConfigurations() {
-        getConfigurations().add(SuperpositionActions.DIRECTION_CONFIGURATION.get().copy());
+        getConfigurations().add(SuperpositionActions.PORT_CONFIGURATION.get().copy());
     }
 
     @Override

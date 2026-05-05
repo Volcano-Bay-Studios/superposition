@@ -57,6 +57,9 @@ public class SuperpositionBlockEntities {
             registerBlockEntity("combinator",
                     () -> BlockEntityType.Builder.of(CombinatorBlockEntity::new, SuperpositionBlocks.COMBINATOR.get()));
 
+    public static final RegistryObject<BlockEntityType<PanelBlockEntity>> PANEL =
+            registerBlockEntity("panel",
+                    () -> BlockEntityType.Builder.of(PanelBlockEntity::new, SuperpositionBlocks.PANEL.get()));
     public static final RegistryObject<BlockEntityType<SpotlightBlockEntity>> SPOTLIGHT =
             registerBlockEntity("spotlight",
                     () -> BlockEntityType.Builder.of(SpotlightBlockEntity::new, SuperpositionBlocks.SPOTLIGHT.get()));

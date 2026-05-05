@@ -14,10 +14,10 @@ public class EncodeAction extends Action implements BiModifyAction {
     }
 
     @Override
-    public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (signal != null && periphrealSignal != null && periphrealSignal.getEncodedData() != null) {
-            signal.setEncodedData(periphrealSignal.getEncodedData());
+    public Signal modify(Signal firstSignal, Signal secondSignal) {
+        if (firstSignal != null && secondSignal != null && secondSignal.getEncodedData() != null) {
+            firstSignal.setEncodedData(secondSignal.getEncodedData());
         }
-        return signal;
+        return firstSignal;
     }
 }

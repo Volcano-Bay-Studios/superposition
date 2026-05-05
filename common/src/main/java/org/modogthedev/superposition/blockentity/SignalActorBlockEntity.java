@@ -418,6 +418,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 }
             }
 
+            // TOOD: Players loading blocks should have their data sent to them
             if (signalsDirty) {
                 VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(putSignals, getBlockPos()));
                 sendData();

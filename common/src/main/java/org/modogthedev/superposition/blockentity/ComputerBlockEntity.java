@@ -186,9 +186,13 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
             if (signal != null && signal.getEncodedData() != null && signal.getEncodedData().compoundTagData() != null) {
                 CompoundTag tag = signal.getEncodedData().compoundTagData();
                 if (card != null) {
-                    card.load(tag);
-                    rebuild(card);
-                    markDirty();
+                    Card newCard = new Card();
+                    CompoundTag load = newCard.load(signal.getEncodedData().compoundTagData());
+                    if (load != null) {
+                        card = newCard;
+                        rebuild(card);
+                        markDirty();
+                    }
                 }
                 return true;
             }

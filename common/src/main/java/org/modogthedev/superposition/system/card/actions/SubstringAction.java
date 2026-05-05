@@ -12,18 +12,18 @@ public class SubstringAction extends Action implements BiModifyAction {
     }
 
     @Override
-    public Signal modify(Signal signal, Signal periphrealSignal) {
-        if (periphrealSignal != null && signal.getEncodedData() != null && periphrealSignal.getEncodedData() != null) {
-            String s = signal.getEncodedData().stringValue();
-            int cutPosition = periphrealSignal.getEncodedData().intValue();
+    public Signal modify(Signal firstSignal, Signal secondSignal) {
+        if (secondSignal != null && firstSignal.getEncodedData() != null && secondSignal.getEncodedData() != null) {
+            String s = firstSignal.getEncodedData().stringValue();
+            int cutPosition = secondSignal.getEncodedData().intValue();
             if (s != null) {
                 if (cutPosition >= 0) {
-                    signal.encode(s.substring(0, Math.max(0, s.length() - cutPosition)));
+                    firstSignal.encode(s.substring(0, Math.max(0, s.length() - cutPosition)));
                 } else {
-                    signal.encode(s.substring(-cutPosition));
+                    firstSignal.encode(s.substring(-cutPosition));
                 }
             }
         }
-        return signal;
+        return firstSignal;
     }
 }

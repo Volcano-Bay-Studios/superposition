@@ -251,6 +251,9 @@ public class PortScreen extends Screen {
                 return true;
             }
         }
+        if (focusedCable != null) {
+            return true;
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

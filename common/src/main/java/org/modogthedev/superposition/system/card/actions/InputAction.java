@@ -18,7 +18,7 @@ public class InputAction extends Action implements ExecutableAction {
 
     @Override
     protected void setupConfigurations() {
-        getConfigurations().add(SuperpositionActions.DIRECTION_CONFIGURATION.get().copy());
+        getConfigurations().add(SuperpositionActions.PORT_CONFIGURATION.get().copy());
     }
 
 

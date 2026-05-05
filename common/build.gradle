@@ -31,6 +31,7 @@ dependencies {
     implementation("com.ezylang:EvalEx:${project.evalex_version}")
     implementation "foundry.veil:veil-common-${project.minecraft_version}:${project.veil_version}"
 
+    compileOnly("dev.engine-room.flywheel:flywheel-common-mojmap-api-${minecraft_version}:${flywheel_version}")
     implementation("net.createmod.ponder:Ponder-Common-${minecraft_version}:${ponder_version}")
 
 

@@ -75,8 +75,12 @@ public class InscriberBlockEntity extends SignalActorBlockEntity implements Tick
         List<Signal> inputSignals = getInputSignals();
         if (!inputSignals.isEmpty()) {
             Signal signal = inputSignals.getLast();
-            if (signal != null && signal.getEncodedData() != null) {
-                card.load(signal.getEncodedData().compoundTagData());
+            if (signal != null && signal.getEncodedData() != null && card != null) {
+                Card newCard = new Card();
+                CompoundTag load = newCard.load(signal.getEncodedData().compoundTagData());
+                if (load != null) {
+                    card = newCard;
+                }
             }
         }
         if (outputSignal == null) {

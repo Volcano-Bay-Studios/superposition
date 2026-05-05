@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface BiModifyAction extends ExecutableAction {
-    Signal modify(Signal signal, Signal periphrealSignal);
+    Signal modify(Signal firstSignal, Signal secondSignal);
 
     @Override
     default List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {
