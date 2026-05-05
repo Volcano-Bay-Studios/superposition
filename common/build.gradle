@@ -19,10 +19,8 @@ neoForge {
 dependencies {
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
-    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-
-
-    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.0'
+    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.0'
 
     implementation "mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}"
     implementation("cc.tweaked:cc-tweaked-${project.minecraft_version}-common-api:${project.cc_version}")

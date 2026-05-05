@@ -8,7 +8,8 @@
     "BlockBehaviorMixin",
     "PlayerMixin",
     "ServerGameModeMixin",
-    "SignalGetterMixin"
+    "SignalGetterMixin",
+    "VoxelShapeMixin"
   ],
   "client": [
     "GuiMixin",
@@ -16,6 +17,7 @@
     "MouseHandelerMixin",
     "MultiPlayerGameModeMixin",
     "client.ItemRendererMixin",
+    "client.LevelRendererMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
     "client.PlayerItemInHandLayerMixin",

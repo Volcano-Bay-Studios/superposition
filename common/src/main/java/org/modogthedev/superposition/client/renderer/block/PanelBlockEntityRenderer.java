@@ -36,7 +36,6 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         if (isInvalid(be))
             return;
         BlockState state = be.getBlockState();
-        ps.pushPose();
         Direction dir = state.getValue(FACING);
         BlockState leftState = be.getLevel().getBlockState(be.getBlockPos().relative(dir.getClockWise()));
         BlockState rightState = be.getLevel().getBlockState(be.getBlockPos().relative(dir.getCounterClockWise()));
@@ -45,6 +44,7 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
 
         MatrixStack ms = (MatrixStack) ps;
 
+        ms.matrixPush();
         ms.translate(0.5f,0,0.5f);
         ms.rotate(Math.atan2(-dir.getStepX(),-dir.getStepZ()),0,1,0);
         ms.translate(-0.5f,0,-0.5f);
@@ -63,12 +63,10 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                 .light(light)
                 .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
         ms.matrixPop();
+        ms.matrixPop();
 
-        boolean shift = be.getFrontHeight() < be.getBackHeight();
-        ms.translate(0,10/16f,shift ? 1 : 0);
-        ms.rotate(be.getAngle(),1,0,0);
-        ms.translate(0,-10/16f,shift ? -1 : 0);
-        ms.translate(0,(shift ? be.getBackHeight() : be.getFrontHeight())/16f,0);
+        ms.matrixPush();
+        ms.toPoseStack().mulPose(be.getPanelMatrix());
 
         PartialModel panelSurface = SuperpositionPartials.PANEL_SURFACE;
         if (hasLeft && hasRight) {
@@ -78,6 +76,7 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         } else if (hasRight) {
             panelSurface = SuperpositionPartials.PANEL_SURFACE_RIGHT;
         }
+        
         CachedBuffers.partial(panelSurface,state)
                 .light(light)
                 .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
@@ -94,9 +93,9 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                 ms.matrixPop();
             }
         }
+        ms.matrixPop();
 
 
-        ps.popPose();
     }
 
     @Nullable

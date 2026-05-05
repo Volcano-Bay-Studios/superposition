@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.blockentity;
 
+import foundry.veil.api.client.render.MatrixStack;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -8,18 +9,24 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Matrix4f;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
+import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.widget.Widget;
+import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PanelBlockEntity extends SignalActorBlockEntity {
+import static org.modogthedev.superposition.util.SignalActorTickingBlock.FACING;
+
+public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicShapedBlockEntity {
     private final List<Widget> widgets = new ArrayList<>();
 
     private float frontHeight;
@@ -35,7 +42,6 @@ public class PanelBlockEntity extends SignalActorBlockEntity {
         resetTooltip();
         super.tick();
     }
-
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -135,6 +141,32 @@ public class PanelBlockEntity extends SignalActorBlockEntity {
             }
         }
         updateAngle();
+    }
+
+    public Matrix4f getPanelMatrix() {
+        Direction dir = getBlockState().getValue(FACING);
+        Matrix4f ms = new Matrix4f();
+        float scale = 0.01f;
+        ms.scale(1 + scale);
+        ms.translate(-scale/2f,-scale/2f,-scale/2f);
+
+        ms.translate(0.5f,0,0.5f);
+        ms.rotate((float) Math.atan2(-dir.getStepX(),-dir.getStepZ()),0,1,0);
+        ms.translate(-0.5f,0,-0.5f);
+
+        boolean shift = getFrontHeight() < getBackHeight();
+
+        ms.translate(0,10/16f,shift ? 1 : 0);
+        ms.rotate(getAngle(),1,0,0);
+        ms.translate(0,-10/16f,shift ? -1 : 0);
+        ms.translate(0,(shift ? getBackHeight() : getFrontHeight())/16f,0);
+
+        return ms;
+    }
+
+    @Override
+    public List<DynamicShape> getShapes() {
+        return List.of(new DynamicShape(getPanelMatrix(), Block.box(0,7,0,16,9,16)));
     }
 
     public void updateAngle() {

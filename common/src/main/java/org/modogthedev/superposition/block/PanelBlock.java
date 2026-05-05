@@ -38,12 +38,13 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-        if (blockEntity instanceof PanelBlockEntity panelBlockEntity) {
-
-        }
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Block.box(0,0,0,16,6,16);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return getShape(pState,pLevel,pPos,pContext);
     }
 
     @Override
