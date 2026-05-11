@@ -21,8 +21,9 @@ public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
         super.render(widget, state, pPartialTick, ps, bufferSource, light, pPackedOverlay);
         MatrixStack ms = (MatrixStack) ps;
         ms.matrixPush();
-        ms.translate(1/16f,1/128f,1/16f);
-        ms.rotate(Math.toRadians(widget.getRenderPosition(pPartialTick) * 90f),0,1,0);
+        ms.translate(1.5/16f,0/16f,1.5/16f);
+        ms.rotate(Math.toRadians(widget.getRenderNeedlePosition(pPartialTick) * 90f),0,1,0);
+        ms.translate(-0.5/16f,0/16f,-0.5/16f);
 
         PartialModel gaugeNeedle = getModel("gauge_needle");
         partial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light);

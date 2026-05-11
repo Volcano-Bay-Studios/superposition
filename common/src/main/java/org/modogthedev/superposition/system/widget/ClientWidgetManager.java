@@ -13,7 +13,7 @@ public class ClientWidgetManager {
         if (hitResult instanceof BlockHitResult blockHitResult) {
             BlockEntity blockEntity = level.getBlockEntity(blockHitResult.getBlockPos());
             if (blockEntity instanceof PanelBlockEntity panel) {
-                panel.cameraHover(blockHitResult.getLocation().toVector3f());
+                panel.hoverCamera(blockHitResult.getLocation().toVector3f());
             }
         }
     }

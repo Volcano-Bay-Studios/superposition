@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.block.SignalGeneratorBlock;
+import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.item.ScrewdriverItem;
@@ -35,7 +37,10 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.*;
 import org.spongepowered.asm.mixin.Unique;
 
+import java.security.Provider;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class SignalActorBlockEntity extends SyncedBlockEntity implements TickableBlockEntity, SPTooltipable, PortBehavior {
 
@@ -53,6 +58,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     private boolean signalsDirty = false;
     private final List<String> configurationTooltipString = new ArrayList<>();
     private final List<ConfigurationTooltip> configurationTooltipExecutable = new ArrayList<>();
+    private final List<ConfigurationTooltip.Editable> configurationTooltipEditable = new ArrayList<>();
     private PortConfig portConfig;
     protected Vector3d lightPosition = null;
     int signalsReceived = 0;
@@ -63,7 +69,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     protected Map<String, SignalList> putSignals = new HashMap<>();
     LightRenderHandle<?> light;
 
-    public List<Component> getTooltip() {
+    public List<Component> getTooltip(Player player) {
         return this.veil$tooltip;
     }
 
@@ -247,7 +253,6 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     }
 
 
-
     public void markDirty() {
         signalsDirty = true;
     }
@@ -290,8 +295,16 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     @Override
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
-        if (tag.contains("swap"))
+        if (tag.contains("swap")) {
             this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(SignalGeneratorBlock.SWAP_SIDES, tag.getBoolean("swap")), 2);
+        }
+
+        for (ConfigurationTooltip.Editable editable : configurationTooltipEditable) {
+            if (tag.contains(editable.getName())) {
+                String string = tag.getString(editable.getName());
+                editable.setEditingText(string);
+            }
+        }
     }
 
     public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {
@@ -299,23 +312,53 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         configurationTooltipExecutable.add(configurationTooltip);
     }
 
-    public void setupConfigTooltips() {
+    public void addEditableConfigTooltip(String name, Supplier<String> read, Consumer<String> set) {
+        configurationTooltipEditable.add(new ConfigurationTooltip.Editable(name) {
+            @Override
+            public String getEditingText() {
+                return read.get();
+            }
+
+            @Override
+            public void setEditingText(String text) {
+                set.accept(text);
+            }
+        });
+    }
+
+    protected boolean allowSwap() {
+        return true;
+    }
+
+    public void setupConfigTooltips(Player player) {
         configurationTooltipString.clear();
         configurationTooltipExecutable.clear();
-        if (!this.getTooltip().isEmpty()) {
+        configurationTooltipEditable.clear();
+        if (!this.getTooltip(player).isEmpty()) {
             this.addTooltip("");
         }
         this.addTooltip("Configuration: ");
-        this.addConfigTooltip("Out Direction - " + (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES) ? "Right" : "Left"), () -> {
-            CompoundTag tag = new CompoundTag();
-            tag.putBoolean("swap", !SignalActorBlockEntity.this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES));
-            VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, SignalActorBlockEntity.this.getBlockPos()));
-        });
+        if (allowSwap()) {
+            this.addConfigTooltip("Out Direction - " + (this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES) ? "Right" : "Left"), () -> {
+                CompoundTag tag = new CompoundTag();
+                tag.putBoolean("swap", !SignalActorBlockEntity.this.getBlockState().getValue(SignalActorTickingBlock.SWAP_SIDES));
+                VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, SignalActorBlockEntity.this.getBlockPos()));
+            });
+        }
     }
 
     private void finaliseConfigTooltips() {
         int i = 0;
         for (String string : configurationTooltipString) {
+            if (i == configSelection) {
+                this.addTooltip(string + " ←");
+            } else {
+                this.addTooltip(string);
+            }
+            i++;
+        }
+        for (ConfigurationTooltip.Editable editable : configurationTooltipEditable) {
+            String string = editable.getName() + " - " + editable.getEditingText();
             if (i == configSelection) {
                 this.addTooltip(string + " ←");
             } else {
@@ -338,20 +381,48 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     }
 
     private void checkEvents() {
+        int configSize = configurationTooltipString.size() + configurationTooltipEditable.size();
         if (stepNext) {
-            if (configurationTooltipString.size() > 1) {
+            if (configSize > 1) {
                 configSelection++;
             } else {
-                configurationTooltipExecutable.get(configSelection).execute();
+                executeTooltip(configSelection);
             }
             stepNext = false;
         }
-        if (configSelection >= configurationTooltipString.size()) {
+        if (configSelection >= configSize) {
             configSelection = 0;
         }
         if (interactNext) {
-            configurationTooltipExecutable.get(configSelection).execute();
+            executeTooltip(configSelection);
             interactNext = false;
+        }
+    }
+
+    public EditableTooltip getCurrentEditableConfiguration() {
+        if (configSelection >= configurationTooltipExecutable.size()) {
+            int editableIndex = configSelection - configurationTooltipExecutable.size();
+            if (editableIndex < configurationTooltipEditable.size()) {
+                return configurationTooltipEditable.get(editableIndex).getEditable(configSelection);
+            }
+        }
+        return null;
+    }
+
+    public void executeTooltip(int index) {
+        if (index < configurationTooltipExecutable.size()) {
+            configurationTooltipExecutable.get(configSelection).execute();
+        } else {
+            int editableIndex = index - configurationTooltipExecutable.size();
+            if (editableIndex < configurationTooltipEditable.size()) {
+                org.modogthedev.superposition.util.EditableTooltip editableTooltip = configurationTooltipEditable.get(editableIndex).getEditable(index);
+
+                if (level.isClientSide) {
+                    SuperpositionUITooltipRenderer.editableTooltip = editableTooltip;
+                    SuperpositionUITooltipRenderer.editPos.set(getBlockPos());
+                    SuperpositionUITooltipRenderer.editingEditable = true;
+                }
+            }
         }
     }
 
@@ -360,12 +431,12 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         if (this.level != null && this.level.isClientSide) {
             if (this.lightEnabled() && light == null && !isRemoved()) {
                 this.createLight();
-                if (SableCompat.isSublevel(level,getBlockPos().getCenter())) {
+                if (SableCompat.isSublevel(level, getBlockPos().getCenter())) {
                     Vec3 pos = SableCompat.tryTransform(level, getBlockPos().getCenter());
-                    lightPosition = new Vector3d(pos.x,pos.y,pos.z);
+                    lightPosition = new Vector3d(pos.x, pos.y, pos.z);
                 } else {
                     Vec3 center = getBlockPos().getCenter();
-                    lightPosition = new Vector3d(center.x,center.y,center.z);
+                    lightPosition = new Vector3d(center.x, center.y, center.z);
                 }
                 if (light.getLightData() instanceof AreaLightData areaLight) {
                     this.configureAreaLight(areaLight);
@@ -376,12 +447,12 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 light.markDirty();
             }
             if (lightEnabled() && shouldUpdateLight() && light != null && !isRemoved()) {
-                if (SableCompat.isSublevel(level,getBlockPos().getCenter())) {
+                if (SableCompat.isSublevel(level, getBlockPos().getCenter())) {
                     Vec3 pos = SableCompat.tryTransform(level, getBlockPos().getCenter());
-                    lightPosition = new Vector3d(pos.x,pos.y,pos.z);
+                    lightPosition = new Vector3d(pos.x, pos.y, pos.z);
                 } else {
                     Vec3 center = getBlockPos().getCenter();
-                    lightPosition = new Vector3d(center.x,center.y,center.z);
+                    lightPosition = new Vector3d(center.x, center.y, center.z);
                 }
                 if (light.getLightData() instanceof AreaLightData areaLight) {
                     this.configureAreaLight(areaLight);
@@ -392,12 +463,13 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 light.markDirty();
             }
             if (Minecraft.getInstance().player.getMainHandItem().getItem() instanceof ScrewdriverItem) {
-                this.setupConfigTooltips();
+                this.setupConfigTooltips(Minecraft.getInstance().player);
                 this.checkEvents();
                 this.finaliseConfigTooltips();
             }
         }
         if (getLevel() != null && !getLevel().isClientSide) {
+            setupConfigTooltips(null);
             for (SignalList value : putSignals.values()) {
                 boolean change = value.flush();
                 if (change) {
@@ -414,7 +486,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
 
             if (level.getBlockEntity(getSwappedPos()) instanceof PortBehavior portBehavior && Objects.equals(outPortName(), "out")) {
                 if (portBehavior.getPortConfig().getPorts().containsKey(portBehavior.inPortName())) {
-                    portBehavior.putPortSignals(portBehavior.inPortName(),getPortSignals(outPortName()));
+                    portBehavior.putPortSignals(portBehavior.inPortName(), getPortSignals(outPortName()));
                 }
             }
 
@@ -459,7 +531,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
     }
 
     public boolean shouldUpdateLight() {
-        return SableCompat.isSublevel(level,getBlockPos().getCenter());
+        return SableCompat.isSublevel(level, getBlockPos().getCenter());
     }
 
     public LightData prepareLight() {
@@ -478,7 +550,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         if (poseRotation != null) {
             rotation = poseRotation.mul(rotation);
         }
-        light.getOrientation().set(rotation.mul(new Quaternionf().fromAxisAngleDeg(1,0,0,-90)).conjugate());
+        light.getOrientation().set(rotation.mul(new Quaternionf().fromAxisAngleDeg(1, 0, 0, -90)).conjugate());
         light.setOcclusionEnabled(true);
     }
 

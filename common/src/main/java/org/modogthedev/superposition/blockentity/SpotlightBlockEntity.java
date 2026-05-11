@@ -8,6 +8,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -129,8 +130,8 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public void setupConfigTooltips() {
-        super.setupConfigTooltips();
+    public void setupConfigTooltips(Player player) {
+        super.setupConfigTooltips(player);
         this.addConfigTooltip("Iris - " + iris, () -> {
             CompoundTag tag = new CompoundTag();
             iris -= 5f;

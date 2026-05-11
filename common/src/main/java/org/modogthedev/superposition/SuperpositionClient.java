@@ -11,6 +11,7 @@ import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.SoundEngine;
 import org.modogthedev.superposition.client.renderer.CableRenderer;
 import org.modogthedev.superposition.client.renderer.DebugRenderer;
+import org.modogthedev.superposition.client.renderer.WidgetOverlayRenderer;
 import org.modogthedev.superposition.client.renderer.block.*;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionPartials;
@@ -34,6 +35,7 @@ public class SuperpositionClient {
                 CableRenderer.renderOverlays(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
                 DebugRenderer.renderDebug(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
                 CableRenderer.renderCableHeldPoint(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
+                WidgetOverlayRenderer.renderOverlay(levelRenderer, bufferSource, matrixStack, projectionMatrix, frustumMatrix, partialTicks, deltaTracker, camera);
             }
         });
     }

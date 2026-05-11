@@ -12,4 +12,12 @@ public interface EditableTooltip {
     default String prefix() {
         return "Output - ";
     }
+
+    default int lineOffset() {
+        return -1;
+    }
+
+    default String tagName() {
+        return "output";
+    }
 }

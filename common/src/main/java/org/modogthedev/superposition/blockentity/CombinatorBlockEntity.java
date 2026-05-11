@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
@@ -176,8 +177,8 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity implements Edi
     }
 
     @Override
-    public void setupConfigTooltips() {
-        super.setupConfigTooltips();
+    public void setupConfigTooltips(Player player) {
+        super.setupConfigTooltips(player);
     }
 
     public Direction getFacing() {

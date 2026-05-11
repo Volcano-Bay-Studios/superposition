@@ -3,6 +3,7 @@ package org.modogthedev.superposition.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.signal.Signal;
 
@@ -91,5 +92,33 @@ public class SignalHelper {
 
     public static @NotNull Signal getEmptySignal(Level level, BlockPos pos) {
         return new Signal(SuperpositionMth.convertVec(pos), level, SuperpositionConstants.periphrealFrequency, 1, SuperpositionConstants.periphrealFrequency / 100000);
+    }
+
+
+    public static int getInt(List<Signal> signals) {
+        for (Signal signal : signals) {
+            if (signal.getEncodedData() != null) {
+                return signal.getEncodedData().intValue();
+            }
+        }
+        return 0;
+    }
+
+    public static @Nullable String getString(List<Signal> signals) {
+        for (Signal signal : signals) {
+            if (signal.getEncodedData() != null) {
+                return signal.getEncodedData().stringValue();
+            }
+        }
+        return null;
+    }
+
+    public static float getFloat(List<Signal> signals) {
+        for (Signal signal : signals) {
+            if (signal.getEncodedData() != null) {
+                return signal.getEncodedData().floatValue();
+            }
+        }
+        return 0;
     }
 }

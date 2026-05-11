@@ -24,7 +24,7 @@ public interface BlockGetterMixin {
         DelegateVoxelShape delegate = (DelegateVoxelShape) shape;
         DynamicShapedBlockEntity dynamicShape = delegate.getDynamicShape();
         if (dynamicShape != null) {
-            for (DynamicShapedBlockEntity.DynamicShape dynamicShapeShape : dynamicShape.getShapes()) {
+            for (DynamicShapedBlockEntity.DynamicShape dynamicShapeShape : dynamicShape.getShapes(false)) {
                 Matrix4f mat = dynamicShapeShape.transformation();
                 Matrix4f invMat = new Matrix4f(mat).invert();
 

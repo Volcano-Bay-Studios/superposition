@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -92,8 +93,8 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
     }
 
     @Override
-    public void setupConfigTooltips() {
-        super.setupConfigTooltips();
+    public void setupConfigTooltips(Player player) {
+        super.setupConfigTooltips(player);
         this.addConfigTooltip("Append Data - " + appendData, () -> {
             CompoundTag tag = new CompoundTag();
             appendData = !appendData;

@@ -48,27 +48,35 @@ public class PortConfig {
 
     public static class Builder {
         private final PortConfig config;
+        private String prefix = "";
 
         public Builder(PortConfig config) {
             this.config = config;
         }
 
         public Builder addInputPort(String name) {
+            name = prefix+name;
             Port port = new Port(name, IO.IN);
             config.ports.put(name, port);
             return this;
         }
 
         public Builder addOutputPort(String name) {
+            name = prefix+name;
             Port port = new Port(name, IO.OUT);
             config.ports.put(name, port);
             return this;
         }
 
         public Builder addBothPort(String name) {
+            name = prefix+name;
             Port port = new Port(name, IO.BOTH);
             config.ports.put(name, port);
             return this;
+        }
+
+        public void setPrefix(String prefix) {
+            this.prefix = prefix;
         }
 
         public boolean hasPort(String name) {

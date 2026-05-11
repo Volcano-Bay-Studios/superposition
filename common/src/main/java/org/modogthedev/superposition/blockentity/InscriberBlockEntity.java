@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.blockentity.util.CardHolder;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -53,8 +54,8 @@ public class InscriberBlockEntity extends SignalActorBlockEntity implements Tick
     }
 
     @Override
-    public void setupConfigTooltips() {
-        super.setupConfigTooltips();
+    public void setupConfigTooltips(Player player) {
+        super.setupConfigTooltips(player);
     }
 
     public Card getCard() {

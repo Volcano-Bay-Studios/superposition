@@ -68,7 +68,10 @@ public class SignalList {
             current.removeLast();
             change = true;
         }
-        SignalHelper.updateSignalList(old, current);
+        if (!old.equals(current)) {
+            SignalHelper.updateSignalList(old, current);
+            change = true;
+        }
         writeIndex = 0;
         return change;
     }

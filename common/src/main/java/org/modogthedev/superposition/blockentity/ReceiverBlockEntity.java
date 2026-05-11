@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
@@ -34,12 +35,6 @@ public class ReceiverBlockEntity extends AntennaActorBlockEntity {
         if (level.isClientSide)
             return getOutputSignals();
         return antenna.signals;
-    }
-
-    @Override
-    public List<Component> getTooltip() {
-        AntennaManager.antennaPartUpdate(level, getBlockPos());
-        return super.getTooltip();
     }
 
     @Override

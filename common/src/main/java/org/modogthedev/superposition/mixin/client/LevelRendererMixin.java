@@ -36,7 +36,7 @@ public abstract class LevelRendererMixin {
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof DynamicShapedBlockEntity shapedBlockEntity) {
-            for (DynamicShapedBlockEntity.DynamicShape shape : shapedBlockEntity.getShapes()) {
+            for (DynamicShapedBlockEntity.DynamicShape shape : shapedBlockEntity.getShapes(true)) {
                 poseStack.pushPose();
                 poseStack.translate(pos.getX() - camX, pos.getY() - camY, pos.getZ() - camZ);
                 poseStack.mulPose(shape.transformation());

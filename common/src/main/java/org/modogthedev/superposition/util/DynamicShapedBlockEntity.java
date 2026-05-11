@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DynamicShapedBlockEntity {
 
-    List<DynamicShape> getShapes();
+    List<DynamicShape> getShapes(boolean forRendering);
 
     record DynamicShape(Matrix4f transformation, VoxelShape shape) {}
 }
