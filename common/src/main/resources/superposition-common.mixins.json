@@ -6,6 +6,7 @@
   "refmap": "superposition.refmap.json",
   "mixins": [
     "BlockBehaviorMixin",
+    "BlockGetterMixin",
     "PlayerMixin",
     "ServerGameModeMixin",
     "SignalGetterMixin",

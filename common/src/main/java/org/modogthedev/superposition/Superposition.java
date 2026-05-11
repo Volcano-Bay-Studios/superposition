@@ -19,6 +19,7 @@ import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.sound.ClientAudioManager;
+import org.modogthedev.superposition.system.widget.ClientWidgetManager;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.slf4j.Logger;
 
@@ -70,6 +71,7 @@ public class Superposition {
     }
 
     public static void clientTick(Level level) {
+        ClientWidgetManager.tick(level);
         CableManager.getManager(level).getInterpolationState().tick();
         VeilBloomRenderer.tryEnable();
         ClientSignalManager.tick(level);

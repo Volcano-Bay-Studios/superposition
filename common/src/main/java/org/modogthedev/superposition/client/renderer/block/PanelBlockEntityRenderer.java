@@ -51,14 +51,14 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
 
 
         ms.matrixPush();
-        ms.translate(0, be.getFrontHeight()/16f, 0);
+        ms.translate(0, be.getBackHeight()/16f, 0);
         CachedBuffers.partial(SuperpositionPartials.PANEL_FRONT_LEGS,state)
                 .light(light)
                 .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
         ms.matrixPop();
 
         ms.matrixPush();
-        ms.translate(0,be.getBackHeight()/16f,0);
+        ms.translate(0,be.getFrontHeight()/16f,0);
         CachedBuffers.partial(SuperpositionPartials.PANEL_BACK_LEGS,state)
                 .light(light)
                 .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
@@ -72,9 +72,9 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         if (hasLeft && hasRight) {
             panelSurface = SuperpositionPartials.PANEL_SURFACE_MIDDLE;
         } else if (hasLeft) {
-            panelSurface = SuperpositionPartials.PANEL_SURFACE_LEFT;
-        } else if (hasRight) {
             panelSurface = SuperpositionPartials.PANEL_SURFACE_RIGHT;
+        } else if (hasRight) {
+            panelSurface = SuperpositionPartials.PANEL_SURFACE_LEFT;
         }
         
         CachedBuffers.partial(panelSurface,state)

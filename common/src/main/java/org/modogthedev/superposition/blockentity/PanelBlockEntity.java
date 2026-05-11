@@ -1,6 +1,5 @@
 package org.modogthedev.superposition.blockentity;
 
-import foundry.veil.api.client.render.MatrixStack;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -9,10 +8,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
@@ -35,6 +41,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     public PanelBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.PANEL.get(), pos, state);
+        widgets.add(SuperpositionWidgets.GAUGE.get().makeClone());
     }
 
     @Override
@@ -144,7 +151,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     }
 
     public Matrix4f getPanelMatrix() {
-        Direction dir = getBlockState().getValue(FACING);
+        Direction dir = getBlockState().getValue(FACING).getOpposite();
         Matrix4f ms = new Matrix4f();
         float scale = 0.01f;
         ms.scale(1 + scale);
@@ -166,9 +173,60 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     @Override
     public List<DynamicShape> getShapes() {
-        return List.of(new DynamicShape(getPanelMatrix(), Block.box(0,7,0,16,9,16)));
+        Matrix4f mat = getPanelMatrix();
+        return List.of(new DynamicShape(mat, getShape(getBlockState(),getLevel(),getBlockPos(), mat)));
     }
 
+    public void exploreShapes(BlockGetter level, BlockPos pos, BlockPos offset, List<VoxelShape> shapes, Direction dir, Direction trueRotation) {
+        if (level.getBlockState(pos).is(SuperpositionBlocks.PANEL.get())) {
+            Rotation rotation = Rotation.NONE;
+            switch (trueRotation) {
+                case NORTH -> {
+                    rotation = Rotation.CLOCKWISE_180;
+                    break;
+                }
+                case SOUTH -> {
+                    rotation = Rotation.CLOCKWISE_90;
+                    break;
+                }
+                case WEST -> {
+                    rotation = Rotation.COUNTERCLOCKWISE_90;
+                    break;
+                }
+                case EAST -> {
+                    rotation = Rotation.NONE;
+                    break;
+                }
+            }
+            BlockPos ourOffest = BlockPos.ZERO.relative(trueRotation == Direction.EAST || trueRotation == Direction.NORTH ? Direction.WEST : Direction.EAST,offset.getX()+offset.getY()+offset.getZ());
+            shapes.add(Block.box(0,7,0,16,9,16).move(ourOffest.getX(),ourOffest.getY(),ourOffest.getZ()));
+            BlockPos relative = pos.relative(dir);
+            exploreShapes(level, relative, relative.subtract(pos).offset(offset), shapes, dir, trueRotation);
+        }
+    }
+
+    protected VoxelShape getOurShape() {
+        return Block.box(0, 7, 0, 16, 9, 16);
+    }
+
+    protected VoxelShape getShape(BlockState state,BlockGetter level, BlockPos pos, Matrix4f mat) {
+        VoxelShape ourShape = getOurShape();
+        Direction facing = state.getValue(FACING);
+        Direction dir = facing.getClockWise();
+        BlockPos forward = pos.relative(dir);
+        BlockPos back = pos.relative(dir.getOpposite());
+
+        List<VoxelShape> shapes = new ArrayList<>();
+
+        exploreShapes(level, forward, forward.subtract(pos), shapes, dir, facing);
+        exploreShapes(level, back, back.subtract(pos), shapes, dir.getOpposite(), facing);
+
+        for (VoxelShape shape : shapes) {
+            ourShape = Shapes.join(ourShape,shape, BooleanOp.OR);
+        }
+
+        return ourShape;
+    }
     public void updateAngle() {
         angle = (float) Math.asin((getFrontHeight() - getBackHeight()) / 12);
     }
@@ -187,5 +245,23 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     public List<Widget> getWidgets() {
         return widgets;
+    }
+
+    public Vector2f transformLocal(Vector3f pos) {
+        Matrix4f mat = getPanelMatrix();
+        Matrix4f inv = new Matrix4f(mat).invert();
+
+        BlockPos blockPos = getBlockPos();
+        pos.sub(blockPos.getX(),blockPos.getY(),blockPos.getZ());
+        pos.mulPosition(inv);
+
+        return new Vector2f(pos.x*16f,pos.z*16f);
+    }
+
+
+    public void cameraHover(Vector3f cameraHit) {
+        Vector2f pos = transformLocal(cameraHit);
+
+        widgets.getFirst().getPosition().set((int) pos.x, (int) pos.y);
     }
 }
