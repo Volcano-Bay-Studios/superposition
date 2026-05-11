@@ -77,7 +77,9 @@ public class Widget implements Cloneable {
     }
 
     public void read(CompoundTag tag) {
-        name = tag.getString("name");
+        if (tag.contains("name")) {
+            name = tag.getString("name");
+        }
     }
 
     public void addConfiguration(PanelBlockEntity panel) {

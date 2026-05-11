@@ -17,16 +17,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Unmodifiable;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
-import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
@@ -59,8 +58,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
                 widget.buildPorts(builder);
             }
         }
-
-        return super.buildPorts(builder);
+        return builder;
     }
 
     public void rebuild() {
@@ -97,6 +95,9 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        if (getLevel().isClientSide && SuperpositionUITooltipRenderer.editPos.equals(getBlockPos())) {
+            return;
+        }
         super.loadAdditional(tag, registries);
         widgets.clear();
         ListTag widgetListTag = tag.getList("widgets", 10);
@@ -117,6 +118,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
             backHeight = tag.getFloat("back_height");
         }
         updateAngle();
+        rebuild();
     }
 
     @Override
