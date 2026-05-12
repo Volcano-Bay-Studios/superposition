@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.BuiltInModel;
 import net.minecraft.world.item.ItemStack;
 import org.modogthedev.superposition.client.renderer.ui.SignalScopeRenderer;
 import org.modogthedev.superposition.core.SuperpositionItems;
@@ -23,6 +24,10 @@ public abstract class ItemRendererMixin {
     private BakedModel getModel(ItemModelShaper instance, ItemStack stack, Operation<BakedModel> original) {
         if (stack.is(SuperpositionItems.SIGNAL_SCOPE.get())) {
             return itemModelShaper.getModelManager().getModel(SignalScopeRenderer.SIGNAL_SCOPE_IN_HAND_MODEL);
+        }
+        if (stack.is(SuperpositionItems.WIDGET.get())) {
+            BakedModel model = original.call(instance, stack);
+            return new BuiltInModel(model.getTransforms(),model.getOverrides(),model.getParticleIcon(),false);
         }
         return original.call(instance, stack);
     }

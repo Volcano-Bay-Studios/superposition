@@ -1,24 +1,32 @@
 package org.modogthedev.superposition.client.renderer.block;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
 import foundry.veil.api.client.render.MatrixStack;
 import net.createmod.catnip.render.CachedBuffers;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
 import org.joml.Vector2ic;
+import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
-import org.modogthedev.superposition.core.SuperpositionBlocks;
-import org.modogthedev.superposition.core.SuperpositionPartials;
-import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
+import org.modogthedev.superposition.core.*;
+import org.modogthedev.superposition.item.WidgetItem;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
 
@@ -45,23 +53,23 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         MatrixStack ms = (MatrixStack) ps;
 
         ms.matrixPush();
-        ms.translate(0.5f,0,0.5f);
-        ms.rotate(Math.atan2(-dir.getStepX(),-dir.getStepZ()),0,1,0);
-        ms.translate(-0.5f,0,-0.5f);
+        ms.translate(0.5f, 0, 0.5f);
+        ms.rotate(Math.atan2(-dir.getStepX(), -dir.getStepZ()), 0, 1, 0);
+        ms.translate(-0.5f, 0, -0.5f);
 
 
         ms.matrixPush();
-        ms.translate(0, be.getFrontHeight()/16f, 0);
-        CachedBuffers.partial(SuperpositionPartials.PANEL_FRONT_LEGS,state)
+        ms.translate(0, be.getFrontHeight() / 16f, 0);
+        CachedBuffers.partial(SuperpositionPartials.PANEL_FRONT_LEGS, state)
                 .light(light)
-                .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
+                .renderInto(ms.toPoseStack(), bufferSource.getBuffer(RenderType.solid()));
         ms.matrixPop();
 
         ms.matrixPush();
-        ms.translate(0,be.getBackHeight()/16f,0);
-        CachedBuffers.partial(SuperpositionPartials.PANEL_BACK_LEGS,state)
+        ms.translate(0, be.getBackHeight() / 16f, 0);
+        CachedBuffers.partial(SuperpositionPartials.PANEL_BACK_LEGS, state)
                 .light(light)
-                .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
+                .renderInto(ms.toPoseStack(), bufferSource.getBuffer(RenderType.solid()));
         ms.matrixPop();
         ms.matrixPop();
 
@@ -76,31 +84,59 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         } else if (hasRight) {
             panelSurface = SuperpositionPartials.PANEL_SURFACE_RIGHT;
         }
-        
-        CachedBuffers.partial(panelSurface,state)
+
+        CachedBuffers.partial(panelSurface, state)
                 .light(light)
-                .renderInto(ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()));
+                .renderInto(ms.toPoseStack(), bufferSource.getBuffer(RenderType.solid()));
 
         List<Widget> widgets = be.getWidgets();
-        ms.translate(0,9.001/16f,0);
+        ms.translate(0, 9.001 / 16f, 0);
         for (Widget widget : widgets) {
             WidgetRenderer<Widget> widgetRenderer = getRenderer(widget);
             if (widgetRenderer != null) {
                 ms.matrixPush();
                 Vector2ic position = widget.getPosition();
-                ms.translate(position.x()/16f,0,position.y()/16f);
-                widgetRenderer.render(widget, state,pPartialTick,ms.toPoseStack(),bufferSource,light,pPackedOverlay);
+                ms.translate(position.x() / 16f, 0, position.y() / 16f);
+                widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay);
                 ms.matrixPop();
             }
         }
+
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (mc.hitResult instanceof BlockHitResult blockHitResult && be.equals(player.level().getBlockEntity(blockHitResult.getBlockPos()))) {
+            ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+            if (!itemInHand.is(SuperpositionItems.WIDGET.get())) {
+                itemInHand = player.getItemInHand(InteractionHand.OFF_HAND);
+            }
+            if (itemInHand.is(SuperpositionItems.WIDGET.get())) {
+                ResourceLocation type = WidgetItem.getType(itemInHand);
+                Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(type);
+                if (widget != null) {
+                    WidgetRenderer<Widget> widgetRenderer = getRenderer(widget);
+                    if (widgetRenderer != null) {
+                        ms.matrixPush();
+                        Vector3f pos = new Vector3f(blockHitResult.getLocation().toVector3f());
+                        Vector3f position = be.transformLocal(pos);
+                        Vector2i target = WidgetItem.target;
+                        target.set((int) (position.x * 16), (int) (position.z * 16));
+                        target.set(Mth.clamp(target.x,hasLeft ? -16 : 0,hasRight ? 16 : 32),Mth.clamp(target.y,0,16));
+
+                        ms.translate(target.x() / 16f, 0, target.y() / 16f);
+                        widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay);
+                        RenderSystem.setShaderColor(1f,1f,1f,0.5f);
+                        ms.matrixPop();
+                    }
+                }
+            }
+        }
         ms.matrixPop();
-
-
     }
 
     @Nullable
-    public <T extends Widget> WidgetRenderer<T> getRenderer(T widget) {
+    public static <T extends Widget> WidgetRenderer<T> getRenderer(T widget) {
         ResourceLocation location = widget.getLocation();
+        //noinspection unchecked
         return (WidgetRenderer<T>) SuperpositionWidgetRenderers.WIDGET_RENDERER.asVanillaRegistry().get(location);
     }
 

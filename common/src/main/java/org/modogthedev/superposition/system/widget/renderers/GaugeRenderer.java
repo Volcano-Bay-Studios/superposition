@@ -26,9 +26,9 @@ public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
         ms.translate(-0.5/16f,0/16f,-0.5/16f);
 
         PartialModel gaugeNeedle = getModel("gauge_needle");
-        partial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light);
+        renderPartial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light);
         ms.matrixPop();
         PartialModel gauge = getModel("gauge");
-        partial(gauge,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.translucent()), light);
+        renderPartial(gauge,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.translucent()), light);
     }
 }

@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -11,8 +12,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.SuperpositionClient;
+import org.modogthedev.superposition.client.renderer.item.WidgetItemRenderer;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
+import org.modogthedev.superposition.core.SuperpositionItems;
 
 public class SuperpositionFabricClient implements ClientModInitializer {
 
@@ -27,6 +30,9 @@ public class SuperpositionFabricClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register(SuperpositionUITooltipRenderer::renderOverlay);
 
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register(SuperpositionFabricClient::playerLeaveEvent);
+
+        WidgetItemRenderer widgetItemRenderer = new WidgetItemRenderer();
+        BuiltinItemRendererRegistry.INSTANCE.register(SuperpositionItems.WIDGET.get(), widgetItemRenderer::renderByItem);
 
         this.registerBlockRenderLayers();
     }

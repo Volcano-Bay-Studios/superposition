@@ -279,6 +279,26 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         return Block.box(0, 7, 0, 16, 9, 16);
     }
 
+    protected PanelBlockEntity getNext() {
+        Direction facing = getBlockState().getValue(FACING);
+        Direction dir = facing.getCounterClockWise();
+        BlockPos other = getBlockPos().relative(dir);
+        if (getLevel().getBlockEntity(other) instanceof PanelBlockEntity panel) {
+            return panel;
+        }
+        return null;
+    }
+
+    protected PanelBlockEntity getLast() {
+        Direction facing = getBlockState().getValue(FACING);
+        Direction dir = facing.getClockWise();
+        BlockPos other = getBlockPos().relative(dir);
+        if (getLevel().getBlockEntity(other) instanceof PanelBlockEntity panel) {
+            return panel;
+        }
+        return null;
+    }
+
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, Matrix4f mat) {
         VoxelShape ourShape = getOurShape();
         Direction facing = state.getValue(FACING);
@@ -329,12 +349,34 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         return pos;
     }
 
-    public void hoverCamera(Vector3f cameraHit) {
+    public boolean hoverCamera(Vector3f cameraHit, boolean tryOther) {
         Widget hit = getHit(cameraHit);
         if (hit != null) {
             lastTargeted = hit;
-
+            return true;
+        } else if (tryOther){
+            PanelBlockEntity next = getNext();
+            if (next != null) {
+                if (!next.hoverCamera(cameraHit, false)) {
+                    PanelBlockEntity last = getLast();
+                    if (last != null) {
+                        last.hoverCamera(cameraHit, false);
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
         }
+
+        return false;
+    }
+
+    public void placeWidget(Vector2i placement, Widget widget) {
+        Widget newWidget = widget.makeClone();
+        newWidget.getPosition().set(placement);
+        widgets.add(widget);
     }
 
     public Vector3f getRelativeHitLocation(Vector3f cameraHit, Widget widget) {
