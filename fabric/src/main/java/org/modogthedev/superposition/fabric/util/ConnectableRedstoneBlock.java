@@ -26,10 +26,10 @@ public interface ConnectableRedstoneBlock {
      * @param state     The current state
      * @param level     The level
      * @param pos       The block position in level
-     * @param direction The coming direction of the redstone dust connection (with respect to the block at pos)
+     * @param direction The coming direction of the redstone dust connection (with respect to the block at blockPos)
      * @return True if redstone dust should visually connect on the side passed
      * <p>
-     * If the return value is evaluated based on level and pos (e.g. from BlockEntity), then the implementation of
+     * If the return value is evaluated based on level and blockPos (e.g. from BlockEntity), then the implementation of
      * this block should notify its neighbors to update their shapes when necessary. Consider using
      * {@link BlockState#updateNeighbourShapes(LevelAccessor, BlockPos, int, int)} or
      * {@link BlockState#updateShape(Direction, BlockState, LevelAccessor, BlockPos, BlockPos)}.

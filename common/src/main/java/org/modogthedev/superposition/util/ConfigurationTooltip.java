@@ -17,6 +17,15 @@ public interface ConfigurationTooltip {
         public abstract String getEditingText();
         public abstract void setEditingText(String text);
 
+        public String getTag() {
+            return name;
+        }
+
+
+        public String getStringKey() {
+            return name;
+        }
+
         public EditableTooltip getEditable(int line) {
             return new EditableTooltip() {
                 @Override
@@ -41,7 +50,12 @@ public interface ConfigurationTooltip {
 
                 @Override
                 public String tagName() {
-                    return name;
+                    return getTag();
+                }
+
+                @Override
+                public String stringKey() {
+                    return getStringKey();
                 }
             };
         }

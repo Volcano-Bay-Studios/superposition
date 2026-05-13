@@ -42,6 +42,7 @@
   "item.superposition.magenta_cable" : "Magenta Cable",
   "item.superposition.pink_cable" : "Pink Cable",
   "item.superposition.glowing_cable" : "Glowing Cable",
+  "item.superposition.widget" : "Widget",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

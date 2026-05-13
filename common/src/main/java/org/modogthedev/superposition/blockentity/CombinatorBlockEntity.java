@@ -163,7 +163,7 @@ public class CombinatorBlockEntity extends SignalActorBlockEntity implements Edi
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
         if (tag.contains("output")) {
-            expressionString = tag.getString("output");
+            expressionString = tag.getCompound("output").getString("output");
         }
         if (tag.contains("modifiedPosition")) {
             int position = tag.getInt("modifiedPosition");

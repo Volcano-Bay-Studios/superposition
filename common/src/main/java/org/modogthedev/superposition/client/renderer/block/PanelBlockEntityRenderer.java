@@ -50,6 +50,8 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         boolean hasLeft = leftState.is(SuperpositionBlocks.PANEL.get()) && leftState.getValue(FACING).equals(dir);
         boolean hasRight = rightState.is(SuperpositionBlocks.PANEL.get()) && rightState.getValue(FACING).equals(dir);
 
+        RenderSystem.setShaderColor(1f,1f,1f,1f);
+
         MatrixStack ms = (MatrixStack) ps;
 
         ms.matrixPush();
@@ -119,12 +121,27 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                         Vector3f pos = new Vector3f(blockHitResult.getLocation().toVector3f());
                         Vector3f position = be.transformLocal(pos);
                         Vector2i target = WidgetItem.target;
-                        target.set((int) (position.x * 16), (int) (position.z * 16));
-                        target.set(Mth.clamp(target.x,hasLeft ? -16 : 0,hasRight ? 16 : 32),Mth.clamp(target.y,0,16));
+                        target.set((int) (position.x * 16 - widget.getBounds().x * 8), (int) (position.z * 16 - widget.getBounds().z * 8));
+                        target.set((int) Mth.clamp(target.x,hasRight ? -16 : 0,(hasLeft ? 32 : 16) - widget.getBounds().x * 16), (int) Mth.clamp(target.y,0,16 - widget.getBounds().z * 16));
 
-                        ms.translate(target.x() / 16f, 0, target.y() / 16f);
+                        Vector2i min = new Vector2i();
+                        Vector2i max = new Vector2i();
+
+
+                        Vector2i otherMin = new Vector2i();
+                        Vector2i otherMax = new Vector2i();
+                        boolean collide = false;
+
+                        for (Widget otherWidget : widgets) {
+                            otherMin.set(otherWidget.getPosition().x,otherWidget.getPosition().y);
+                            otherMax.set(otherMin);
+                            otherMax.add((int) (otherWidget.getBounds().x * 16), (int) (otherWidget.getBounds().y * 16));
+
+
+                        }
+                        ms.translate(target.x() / 16f, 1/2048f, target.y() / 16f);
                         widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay);
-                        RenderSystem.setShaderColor(1f,1f,1f,0.5f);
+
                         ms.matrixPop();
                     }
                 }

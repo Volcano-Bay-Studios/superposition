@@ -37,7 +37,6 @@ import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.*;
 import org.spongepowered.asm.mixin.Unique;
 
-import java.security.Provider;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -301,7 +300,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
 
         for (ConfigurationTooltip.Editable editable : configurationTooltipEditable) {
             if (tag.contains(editable.getName())) {
-                String string = tag.getString(editable.getName());
+                String string = tag.getCompound(editable.getTag()).getString(editable.getStringKey());
                 editable.setEditingText(string);
             }
         }
@@ -322,6 +321,31 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
             @Override
             public void setEditingText(String text) {
                 set.accept(text);
+            }
+        });
+    }
+
+
+    public void addEditableTaggedConfigTooltip(String name, String tag,Supplier<String> read, Consumer<String> set) {
+        configurationTooltipEditable.add(new ConfigurationTooltip.Editable(name) {
+            @Override
+            public String getEditingText() {
+                return read.get();
+            }
+
+            @Override
+            public void setEditingText(String text) {
+                set.accept(text);
+            }
+
+            @Override
+            public String getTag() {
+                return tag;
+            }
+
+            @Override
+            public String getStringKey() {
+                return name;
             }
         });
     }
@@ -426,6 +450,11 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         }
     }
 
+    public void markDataDirty() {
+        setChanged();
+        sendData();
+    }
+
     @Override
     public void tick() {
         if (this.level != null && this.level.isClientSide) {
@@ -493,7 +522,6 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
             // TOOD: Players loading blocks should have their data sent to them
             if (signalsDirty) {
                 VeilPacketManager.around(null, (ServerLevel) level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 100).sendPacket(new BlockSignalSyncS2CPacket(putSignals, getBlockPos()));
-                sendData();
             }
             signalsDirty = false;
         }

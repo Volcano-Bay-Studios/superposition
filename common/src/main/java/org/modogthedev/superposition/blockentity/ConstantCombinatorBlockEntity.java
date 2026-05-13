@@ -63,7 +63,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
         if (tag.contains("output")) {
-            outputString = tag.getString("output");
+            outputString = tag.getCompound("output").getString("output");
         }
         if (tag.contains("modifiedPosition")) {
             int position = tag.getInt("modifiedPosition");

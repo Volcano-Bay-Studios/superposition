@@ -1,16 +1,40 @@
 package org.modogthedev.superposition.item;
 
+import foundry.veil.api.network.VeilPacketManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.AntennaBlock;
+import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
+import org.modogthedev.superposition.networking.packet.PlayerAttackUseC2SPacket;
 
 public class ScrewdriverItem extends Item {
     public ScrewdriverItem(Properties pProperties) {
         super(pProperties);
+    }
+
+    @Override
+    public boolean canAttackBlock(BlockState state, Level level, BlockPos pos, Player player) {
+        return super.canAttackBlock(state, level, pos, player);
+    }
+
+    public boolean attackUse(BlockPos pos, Vec3 location, Player player, ItemStack stack) {
+        if (player.level().isClientSide) {
+            VeilPacketManager.server().sendPacket(new PlayerAttackUseC2SPacket(pos, location));
+        }
+        if (player.level().getBlockEntity(pos) instanceof PanelBlockEntity panel) {
+            panel.removeWidget(location);
+            return true;
+        }
+        return false;
     }
 
     @Override

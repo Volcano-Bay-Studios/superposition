@@ -18,8 +18,8 @@ public class RedStoneWireBlockMixin {
     )
     private static void port_lib$shouldConnectTo(BlockState state, Direction side, CallbackInfoReturnable<Boolean> cir) {
         if (state.getBlock() instanceof ConnectableRedstoneBlock connectable) {
-            // Passing null for world and pos here just for extra upstream compat, not properly implementing it because
-            // 1. world and pos are never used in Create
+            // Passing null for world and blockPos here just for extra upstream compat, not properly implementing it because
+            // 1. world and blockPos are never used in Create
             // 2. extra work :help_me:
             cir.setReturnValue(connectable.canConnectRedstone(state, null, null, side));
         }

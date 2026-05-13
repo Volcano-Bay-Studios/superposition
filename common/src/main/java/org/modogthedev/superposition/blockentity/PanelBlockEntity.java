@@ -8,12 +8,16 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Clearable;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -23,6 +27,7 @@ import org.joml.Vector3f;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
+import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
@@ -35,7 +40,7 @@ import java.util.List;
 
 import static org.modogthedev.superposition.util.SignalActorTickingBlock.FACING;
 
-public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicShapedBlockEntity {
+public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicShapedBlockEntity, Clearable {
     private final List<Widget> widgets = new ArrayList<>();
 
     private float frontHeight;
@@ -47,7 +52,6 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     public PanelBlockEntity(BlockPos pos, BlockState state) {
         super(SuperpositionBlockEntities.PANEL.get(), pos, state);
-        widgets.add(SuperpositionWidgets.GAUGE.get().makeClone());
         rebuild();
     }
 
@@ -70,44 +74,82 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         resetTooltip();
         super.tick();
 
+        List<Widget> toRemove = new ArrayList<>();
+
         for (Widget widget : widgets) {
+
+            BlockState state = getBlockState();
+            Direction dir = state.getValue(FACING);
+            BlockState leftState = getLevel().getBlockState(getBlockPos().relative(dir.getClockWise()));
+            BlockState rightState = getLevel().getBlockState(getBlockPos().relative(dir.getCounterClockWise()));
+            boolean hasLeft = leftState.is(SuperpositionBlocks.PANEL.get()) && leftState.getValue(FACING).equals(dir);
+            boolean hasRight = rightState.is(SuperpositionBlocks.PANEL.get()) && rightState.getValue(FACING).equals(dir);
+
+            if (!new Vector2i((int) Mth.clamp(widget.getPosition().x,hasRight ? -16 : 0,(hasLeft ? 32 : 16) - widget.getBounds().x * 16), (int) Mth.clamp(widget.getPosition().y,0,16 - widget.getBounds().z * 16)).equals(widget.getPosition())) {
+                toRemove.add(widget);
+            }
+
             widget.tick(getLevel(), this);
         }
+
+        if (!toRemove.isEmpty()) {
+            widgets.removeAll(toRemove);
+
+            Vec3 center = getBlockPos().getCenter();
+            ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
+            stack.setCount(toRemove.size());
+            Containers.dropItemStack(level, center.x, center.y + 0.25f, center.z, stack);
+        }
+    }
+
+    public void dropOnRemove() {
+        if (widgets.isEmpty()) {
+            return;
+        }
+        Vec3 center = getBlockPos().getCenter();
+        ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
+        stack.setCount(widgets.size());
+        Containers.dropItemStack(level, center.x, center.y + 0.25f, center.z, stack);
+        widgets.clear();
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
         ListTag widgetListTag = new ListTag();
-        for (Widget widget : widgets) {
-            CompoundTag widgetTag = new CompoundTag();
-            ResourceLocation location = widget.getLocation();
-            widgetTag.putString("namespace", location.getNamespace());
-            widgetTag.putString("path", location.getPath());
-            widget.write(widgetTag);
-            widgetListTag.add(widgetTag);
+        if (!widgets.isEmpty()) {
+            for (Widget widget : widgets) {
+                CompoundTag widgetTag = new CompoundTag();
+                ResourceLocation location = widget.getLocation();
+                widgetTag.putString("namespace", location.getNamespace());
+                widgetTag.putString("path", location.getPath());
+                widget.write(widgetTag);
+                widgetListTag.add(widgetTag);
+            }
+            tag.put("widgets", widgetListTag);
         }
-        tag.put("widgets", widgetListTag);
         tag.putFloat("front_height", frontHeight);
         tag.putFloat("back_height", backHeight);
         updateAngle();
+        super.saveAdditional(tag, registries);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        if (getLevel().isClientSide && SuperpositionUITooltipRenderer.editPos.equals(getBlockPos())) {
+        if (getLevel() != null && getLevel().isClientSide && SuperpositionUITooltipRenderer.editPos.equals(getBlockPos())) {
             return;
         }
         super.loadAdditional(tag, registries);
-        widgets.clear();
-        ListTag widgetListTag = tag.getList("widgets", 10);
-        for (int i = 0; i < widgetListTag.size(); i++) {
-            CompoundTag widgetTag = widgetListTag.getCompound(i);
-            ResourceLocation location = ResourceLocation.fromNamespaceAndPath(widgetTag.getString("namespace"), widgetTag.getString("path"));
-            Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(location).makeClone();
-            if (widget != null) {
-                widget.read(widgetTag);
-                widgets.add(widget);
+        if (tag.contains("widgets")) {
+            widgets.clear();
+            ListTag widgetListTag = tag.getList("widgets", 10);
+            for (int i = 0; i < widgetListTag.size(); i++) {
+                CompoundTag widgetTag = widgetListTag.getCompound(i);
+                ResourceLocation location = ResourceLocation.fromNamespaceAndPath(widgetTag.getString("namespace"), widgetTag.getString("path"));
+                Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(location).makeClone();
+                if (widget != null) {
+                    widget.read(widgetTag);
+                    widgets.add(widget);
+                }
             }
         }
 
@@ -124,6 +166,12 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     @Override
     public void loadSyncedData(CompoundTag tag) {
         super.loadSyncedData(tag);
+        for (int i = 0; i < widgets.size(); i++) {
+            if (tag.contains("widget-"+i)) {
+                CompoundTag widgetTag = tag.getCompound("widget-" + i);
+                widgets.get(i).loadEditable(widgetTag);
+            }
+        }
         if (tag.contains("front_height")) {
             frontHeight = tag.getFloat("front_height");
             frontHeight = Mth.clamp(frontHeight, 0, 5);
@@ -147,7 +195,11 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     public void setupConfigTooltips(Player player) {
         super.setupConfigTooltips(player);
         if (lastTargeted != null) {
-            lastTargeted.addConfiguration(this);
+            for (int i = 0; i < widgets.size(); i++) {
+                if (widgets.get(i).equals(lastTargeted)) {
+                    lastTargeted.addConfiguration(this, i);
+                }
+            }
             lastTargeted = null;
         } else {
             this.addConfigTooltip("Front - " + frontHeight, () -> {
@@ -375,8 +427,11 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     public void placeWidget(Vector2i placement, Widget widget) {
         Widget newWidget = widget.makeClone();
-        newWidget.getPosition().set(placement);
-        widgets.add(widget);
+        newWidget.setPosition(placement);
+        widgets.add(newWidget);
+        if (!level.isClientSide) {
+            markDataDirty();
+        }
     }
 
     public Vector3f getRelativeHitLocation(Vector3f cameraHit, Widget widget) {
@@ -384,7 +439,19 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
         Vector2i position = widget.getPosition();
 
-        return pos.sub(position.x,0,position.y);
+        return pos.sub(position.x, 0, position.y);
+    }
+
+    public void removeWidget(Vec3 hit) {
+        Vector3f cameraHit = hit.toVector3f();
+
+        boolean didRemove = widgets.remove(getHit(cameraHit));
+        if (didRemove) {
+            Vec3 center = getBlockPos().getCenter();
+            ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
+            stack.setCount(1);
+            Containers.dropItemStack(level, center.x, center.y + 0.25f, center.z, stack);
+        }
     }
 
 
@@ -398,7 +465,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
         for (Widget widget : widgets) {
             Vector2i widgetPos = widget.getPosition();
-            min.set(widgetPos.x, 0, widgetPos.y);
+            min.set(widgetPos.x / 16f, 0, widgetPos.y / 16f);
             max.set(min);
             max.add(widget.getBounds());
             max.add(0, 9 / 16f + 1 / 64f, 0);
@@ -411,5 +478,30 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
             }
         }
         return targeted;
+    }
+
+    @Override
+    public void clearContent() {
+        widgets.clear();
+    }
+
+    // -----------INTERACTION-----------
+
+    public boolean primaryInteract(boolean alt, Vector3f cameraHit) {
+        Widget widget = getHit(cameraHit);
+        if (widget != null) {
+            cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
+            return widget.leftClickInteract(alt,level,cameraHit);
+        }
+        return false;
+    }
+
+    public boolean secondaryInteract(boolean alt, Vector3f cameraHit) {
+        Widget widget = getHit(cameraHit);
+        if (widget != null) {
+            cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
+            return widget.rightClickInteract(alt,level,cameraHit);
+        }
+        return false;
     }
 }

@@ -9,15 +9,22 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector2i;
+import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.compat.sable.SableCompat;
+import org.modogthedev.superposition.core.SuperpositionItems;
+import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.item.FilterItem;
+import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
+import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.util.SyncedBlockEntity;
 import oshi.util.tuples.Pair;
 
@@ -34,7 +41,7 @@ public class SuperpositionServerPacketHandler {
             return;
         }
 
-        double dist = player.position().distanceToSqr(SableCompat.tryTransform(level,packet.pos().getCenter()));
+        double dist = player.position().distanceToSqr(SableCompat.tryTransform(level, packet.pos().getCenter()));
         if (dist > 24) {
             return;
         }
@@ -73,6 +80,16 @@ public class SuperpositionServerPacketHandler {
         }
     }
 
+    public static void handlePlayerAttackUse(PlayerAttackUseC2SPacket packet, ServerPacketContext ctx) {
+        ItemStack itemInHand = ctx.player().getItemInHand(InteractionHand.MAIN_HAND);
+        ScrewdriverItem screwdriver = SuperpositionItems.SCREWDRIVER.get();
+        if (itemInHand.is(screwdriver)) {
+            screwdriver.attackUse(packet.blockPos(), packet.location(), ctx.player(), itemInHand);
+        } else if (ctx.level().getBlockEntity(packet.blockPos()) instanceof PanelBlockEntity panel) {
+            panel.secondaryInteract(ctx.player().isShiftKeyDown(), packet.location().toVector3f());
+        }
+    }
+
     public static void handleGrabCable(PlayerGrabCableC2SPacket packet, ServerPacketContext ctx) {
         ServerPlayer player = ctx.player();
         ServerLevel level = player.serverLevel();
@@ -106,6 +123,18 @@ public class SuperpositionServerPacketHandler {
                 if (anchor != null) {
                     anchor.setPort(packet.port());
                 }
+            }
+        }
+    }
+
+
+    public static void handlePlayerPlaceWidget(PlayerPlaceWidgetC2SPacket packet, ServerPacketContext ctx) {
+        BlockEntity blockEntity = ctx.level().getBlockEntity(packet.pos());
+        if (blockEntity instanceof PanelBlockEntity panel) {
+            Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(packet.location());
+            if (widget != null) {
+                Vector2i pos = new Vector2i(packet.x(), packet.y());
+                panel.placeWidget(pos, widget);
             }
         }
     }

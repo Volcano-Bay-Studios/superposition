@@ -6,11 +6,8 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.system.cable.PortConfig;
-import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.util.SignalHelper;
-
-import java.util.List;
 
 public class GaugeWidget extends Widget {
     private float minimum = 0;
@@ -27,6 +24,7 @@ public class GaugeWidget extends Widget {
     public void tick(Level level, PanelBlockEntity panel) {
         lastValue = value;
         value = SignalHelper.getFloat(getPortSignals("value", panel));
+        value = Mth.clamp(value,minimum,maximum);
     }
 
     @Override
@@ -53,13 +51,14 @@ public class GaugeWidget extends Widget {
         }
         if (tag.contains("value")) {
             value = tag.getFloat("value");
+            value = Mth.clamp(value,minimum,maximum);
             lastValue = value;
         }
     }
 
     @Override
-    public void addConfiguration(PanelBlockEntity panel) {
-        super.addConfiguration(panel);
+    public void addConfiguration(PanelBlockEntity panel, int index) {
+        super.addConfiguration(panel, index);
         panel.addEditableConfigTooltip("Minimum",() -> String.valueOf(minimum),(s -> {
             try {
                 minimum = Float.parseFloat(s);

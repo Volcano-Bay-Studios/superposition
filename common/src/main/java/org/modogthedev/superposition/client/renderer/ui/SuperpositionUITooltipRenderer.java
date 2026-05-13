@@ -129,7 +129,9 @@ public class SuperpositionUITooltipRenderer {
 
     private static void updateEditableBlockEntity(BlockPos pos) {
         CompoundTag tag = new CompoundTag();
-        tag.putString(editableTooltip.tagName(), editableTooltip.getText());
+        CompoundTag stringTag = new CompoundTag();
+        stringTag.putString(editableTooltip.stringKey(), editableTooltip.getText());
+        tag.put(editableTooltip.tagName(),stringTag);
         Level level = Minecraft.getInstance().level;
         if (level.getBlockEntity(editPos) instanceof SyncedBlockEntity syncedBlockEntity) {
             syncedBlockEntity.loadSyncedData(tag);
@@ -146,7 +148,10 @@ public class SuperpositionUITooltipRenderer {
                 editableTooltip.replaceText(editableTooltip.getText().substring(0, cursorPos) + (key) + editableTooltip.getText().substring(Math.min(cursorPos, editableTooltip.getText().length())));
             }
             CompoundTag tag = new CompoundTag();
-            tag.putString(editableTooltip.tagName(), editableTooltip.getText());
+            CompoundTag stringTag = new CompoundTag();
+            stringTag.putString(editableTooltip.stringKey(), editableTooltip.getText());
+            tag.put(editableTooltip.tagName(),stringTag);
+
             VeilPacketManager.server().sendPacket(new BlockEntityModificationC2SPacket(tag, editPos));
             cursorPos++;
             cursorPos = Mth.clamp(cursorPos, -1, editableTooltip.getText().length());
@@ -314,7 +319,7 @@ public class SuperpositionUITooltipRenderer {
         if (editableTooltip != null && editingEditable && flash < 40) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
             int xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + '"' + editableTooltip.getText().substring(0, cursorPos)) + 12)));
-            int yOffset = tooltipY + (int) textYOffset + (editableTooltip.lineOffset() * 10);
+            int yOffset = tooltipY + (int) textYOffset + (editableTooltip.lineOffset() != -1 ? (editableTooltip.lineOffset() * 10) : 0);
             graphics.fill(xOffset, yOffset, xOffset + 1, yOffset + 10, -3092272);
             if (selected) {
                 xOffset = (int) (tooltipX - tooltipTextWidth / 2f + textXOffset + ((Minecraft.getInstance().font.width(editableTooltip.prefix() + '"') + 12)));

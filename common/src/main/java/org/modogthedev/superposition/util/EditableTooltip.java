@@ -20,4 +20,8 @@ public interface EditableTooltip {
     default String tagName() {
         return "output";
     }
+
+    default String stringKey() {
+        return "output";
+    }
 }
