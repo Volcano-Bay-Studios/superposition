@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.Map;
 
 public class WidgetRenderer<T extends Widget> {
@@ -20,13 +21,14 @@ public class WidgetRenderer<T extends Widget> {
         return models.get(path);
     }
 
-    public void render(T widget, @Nullable BlockState state, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
+    public void render(T widget, @Nullable BlockState state, float pPartialTick, PoseStack ms, MultiBufferSource bufferSource, int light, int pPackedOverlay, Color color) {
 
     }
 
-    public void renderPartial(PartialModel model, @Nullable BlockState state, PoseStack ps, VertexConsumer buffer, int light) {
+    public void renderPartial(PartialModel model, @Nullable BlockState state, PoseStack ps, VertexConsumer buffer, int light, Color color) {
         CachedBuffers.partial(model,state)
                 .light(light)
+                .color(color.getRed(),color.getGreen(),color.getBlue(),color.getAlpha())
                 .renderInto(ps,buffer);
     }
 }

@@ -304,6 +304,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 editable.setEditingText(string);
             }
         }
+        markDataDirty();
     }
 
     public void addConfigTooltip(String name, ConfigurationTooltip configurationTooltip) {

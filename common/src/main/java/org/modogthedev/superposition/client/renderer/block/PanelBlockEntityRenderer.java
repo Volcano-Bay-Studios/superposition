@@ -30,6 +30,8 @@ import org.modogthedev.superposition.item.WidgetItem;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.modogthedev.superposition.util.SignalActorTickingBlock.FACING;
@@ -91,7 +93,7 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                 .light(light)
                 .renderInto(ms.toPoseStack(), bufferSource.getBuffer(RenderType.solid()));
 
-        List<Widget> widgets = be.getWidgets();
+        List<Widget> widgets = new ArrayList<>(be.getWidgets());
         ms.translate(0, 9.001 / 16f, 0);
         for (Widget widget : widgets) {
             WidgetRenderer<Widget> widgetRenderer = getRenderer(widget);
@@ -99,10 +101,12 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                 ms.matrixPush();
                 Vector2ic position = widget.getPosition();
                 ms.translate(position.x() / 16f, 0, position.y() / 16f);
-                widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay);
+                widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay,  new Color(1f,1f,1f,1f));
                 ms.matrixPop();
             }
         }
+
+
 
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -112,6 +116,7 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                 itemInHand = player.getItemInHand(InteractionHand.OFF_HAND);
             }
             if (itemInHand.is(SuperpositionItems.WIDGET.get())) {
+
                 ResourceLocation type = WidgetItem.getType(itemInHand);
                 Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(type);
                 if (widget != null) {
@@ -124,9 +129,15 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                         target.set((int) (position.x * 16 - widget.getBounds().x * 8), (int) (position.z * 16 - widget.getBounds().z * 8));
                         target.set((int) Mth.clamp(target.x,hasRight ? -16 : 0,(hasLeft ? 32 : 16) - widget.getBounds().x * 16), (int) Mth.clamp(target.y,0,16 - widget.getBounds().z * 16));
 
+                        ms.translate(target.x() / 16f, 1/2048f, target.y() / 16f);
+
                         Vector2i min = new Vector2i();
                         Vector2i max = new Vector2i();
 
+
+                        min.set(target.x,target.y);
+                        max.set(min);
+                        max.add((int) (widget.getBounds().x * 16), (int) (widget.getBounds().z * 16));
 
                         Vector2i otherMin = new Vector2i();
                         Vector2i otherMax = new Vector2i();
@@ -135,12 +146,48 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                         for (Widget otherWidget : widgets) {
                             otherMin.set(otherWidget.getPosition().x,otherWidget.getPosition().y);
                             otherMax.set(otherMin);
-                            otherMax.add((int) (otherWidget.getBounds().x * 16), (int) (otherWidget.getBounds().y * 16));
+                            otherMax.add((int) (otherWidget.getBounds().x * 16), (int) (otherWidget.getBounds().z * 16));
 
-
+                            if (boxesOverlap(min,max,otherMin,otherMax)) {
+                                collide = true;
+                                break;
+                            }
                         }
-                        ms.translate(target.x() / 16f, 1/2048f, target.y() / 16f);
-                        widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay);
+                        if (hasRight && be.getLevel().getBlockEntity(be.getBlockPos().relative(dir.getCounterClockWise())) instanceof PanelBlockEntity panel) {
+                            for (Widget otherWidget : panel.getWidgets()) {
+                                otherMin.set(otherWidget.getPosition().x - 16,otherWidget.getPosition().y);
+                                otherMax.set(otherMin);
+                                otherMax.add((int) (otherWidget.getBounds().x * 16), (int) (otherWidget.getBounds().z * 16));
+
+                                if (boxesOverlap(min,max,otherMin,otherMax)) {
+                                    collide = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (hasLeft && be.getLevel().getBlockEntity(be.getBlockPos().relative(dir.getClockWise())) instanceof PanelBlockEntity panel) {
+                            for (Widget otherWidget : panel.getWidgets()) {
+                                otherMin.set(otherWidget.getPosition().x + 16,otherWidget.getPosition().y);
+                                otherMax.set(otherMin);
+                                otherMax.add((int) (otherWidget.getBounds().x * 16), (int) (otherWidget.getBounds().z * 16));
+
+                                if (boxesOverlap(min,max,otherMin,otherMax)) {
+                                    collide = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        Color color;
+                        if (collide) {
+                            color = new Color(1f, 0.5f, 0.5f, 0.5f);
+                            WidgetItem.fail = true;
+                        } else {
+                            color = new Color(0.35f, 1f, 0.6f, 0.5f);
+                            WidgetItem.fail = false;
+                        }
+                        widgetRenderer.render(widget, state, pPartialTick, ms.toPoseStack(), bufferSource, light, pPackedOverlay, color);
 
                         ms.matrixPop();
                     }
@@ -148,6 +195,11 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
             }
         }
         ms.matrixPop();
+    }
+
+    public boolean boxesOverlap(Vector2i b1Min, Vector2i b1Max, Vector2i b2Min, Vector2i b2Max) {
+        return b1Min.x < b2Max.x && b1Max.x > b2Min.x &&
+                b1Min.y < b2Max.y && b1Max.y > b2Min.y;
     }
 
     @Nullable

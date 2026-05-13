@@ -13,7 +13,7 @@
   "block.superposition.constant_combinator" : "Constant Combinator",
   "block.superposition.spotlight" : "Spotlight",
   "block.superposition.inscriber" : "Inscriber",
-  "block.superposition.panel" : "Panel [WIP]",
+  "block.superposition.panel" : "Panel",
 
   "item.superposition.pliant_sheet" : "Pliant Sheet",
   "item.superposition.integrated_circuit" : "Integrated Circuit",

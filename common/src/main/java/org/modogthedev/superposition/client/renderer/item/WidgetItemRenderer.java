@@ -9,11 +9,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import org.modogthedev.superposition.client.renderer.block.PanelBlockEntityRenderer;
-import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.item.WidgetItem;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
+
+import java.awt.*;
 
 public class WidgetItemRenderer extends BlockEntityWithoutLevelRenderer {
 
@@ -30,7 +31,7 @@ public class WidgetItemRenderer extends BlockEntityWithoutLevelRenderer {
             if (widget != null) {
                 WidgetRenderer<Widget> widgetRenderer = PanelBlockEntityRenderer.getRenderer(widget);
                 if (widgetRenderer != null) {
-                    widgetRenderer.render(widget, Blocks.AIR.defaultBlockState(),partialTicks,poseStack,buffer,packedLight,packedOverlay);
+                    widgetRenderer.render(widget, Blocks.AIR.defaultBlockState(),partialTicks,poseStack,buffer,packedLight,packedOverlay, new Color(1f,1f,1f,1f));
                 }
             }
         }

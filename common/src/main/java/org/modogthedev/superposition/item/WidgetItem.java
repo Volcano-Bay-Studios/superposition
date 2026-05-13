@@ -23,6 +23,7 @@ import org.modogthedev.superposition.system.widget.Widget;
 
 public class WidgetItem extends Item {
     public static Vector2i target = new Vector2i();
+    public static boolean fail = false;
     public WidgetItem(Properties properties) {
         super(properties);
     }
@@ -40,6 +41,9 @@ public class WidgetItem extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
+        if (fail) {
+            return super.useOn(context);
+        }
         Level level = context.getLevel();
         BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
         ResourceLocation type = getType(context.getItemInHand());

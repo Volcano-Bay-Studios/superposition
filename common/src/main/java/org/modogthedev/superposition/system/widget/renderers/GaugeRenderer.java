@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
 import org.modogthedev.superposition.system.widget.widgets.GaugeWidget;
 
+import java.awt.*;
 import java.util.Map;
 
 public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
@@ -17,8 +18,8 @@ public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
     }
 
     @Override
-    public void render(GaugeWidget widget, BlockState state, float pPartialTick, PoseStack ps, MultiBufferSource bufferSource, int light, int pPackedOverlay) {
-        super.render(widget, state, pPartialTick, ps, bufferSource, light, pPackedOverlay);
+    public void render(GaugeWidget widget, BlockState state, float pPartialTick, PoseStack ps, MultiBufferSource bufferSource, int light, int pPackedOverlay, Color color) {
+        super.render(widget, state, pPartialTick, ps, bufferSource, light, pPackedOverlay, color);
         MatrixStack ms = (MatrixStack) ps;
         ms.matrixPush();
         ms.translate(1.5/16f,0/16f,1.5/16f);
@@ -26,9 +27,9 @@ public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
         ms.translate(-0.5/16f,0/16f,-0.5/16f);
 
         PartialModel gaugeNeedle = getModel("gauge_needle");
-        renderPartial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light);
+        renderPartial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light, color);
         ms.matrixPop();
         PartialModel gauge = getModel("gauge");
-        renderPartial(gauge,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.translucent()), light);
+        renderPartial(gauge,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.translucent()), light, color);
     }
 }
