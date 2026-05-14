@@ -36,6 +36,7 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
     public @Nullable Signal manipulateSignal(Signal signal) {
         if (signal != null && signal.getEncodedData() != null) {
             color = signal.getEncodedData().intValue();
+            markDataDirty();
             if (signal.getEncodedData().compoundTagData() != null) {
                 if (signal.getEncodedData().compoundTagData().contains("iris", 3)) {
                     iris = signal.getEncodedData().compoundTagData().getInt("iris");

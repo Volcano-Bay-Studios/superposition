@@ -134,14 +134,14 @@ public class AmplifierBlockEntity extends SignalActorBlockEntity implements Tick
                 temp += (tempGoal - temp) / 100f;
             }
             if (tempGoal - temp > 0.01f) {
-                markDirty();
+                markDataDirty();
             }
             throttle = (temp - 26f) * 10f;
             amplitude -= throttle;
             amplitude = Math.max(amplitude, 0);
 
             if (updateNext) {
-                markDirty();
+                markDataDirty();
                 level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
                 updateNext = false;
             }

@@ -1,7 +1,9 @@
 package org.modogthedev.superposition.networking.handler;
 
 import foundry.veil.api.network.handler.ClientPacketContext;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.screens.ScreenManager;
@@ -9,6 +11,7 @@ import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
+import org.modogthedev.superposition.util.SyncedBlockEntity;
 
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +26,15 @@ public class SuperpositionClientPacketHandler {
         }
 
         ClientSignalManager.processSignal(level, packet.getBuf());
+    }
+
+
+    public static void handleBlockSync(BlockDataSyncS2CPacket packet, ClientPacketContext ctx) {
+        BlockPos pos = packet.getPos();
+        BlockEntity blockEntity = ctx.level().getBlockEntity(pos);
+        if (blockEntity instanceof SyncedBlockEntity syncedBlockEntity) {
+            syncedBlockEntity.loadSyncedData(packet.getData());
+        }
     }
 
     public static void handleInscriberScreen(InscriberScreenS2CPacket packet, ClientPacketContext ctx) {

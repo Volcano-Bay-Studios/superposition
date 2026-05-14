@@ -30,7 +30,7 @@ public class WidgetItem extends Item {
 
     @Override
     public void verifyComponentsAfterLoad(ItemStack stack) {
-        putType(stack, new CompoundTag(), SuperpositionWidgets.GAUGE.getId());
+        putType(stack, new CompoundTag(), SuperpositionWidgets.BUTTON.getId());
         super.verifyComponentsAfterLoad(stack);
     }
 

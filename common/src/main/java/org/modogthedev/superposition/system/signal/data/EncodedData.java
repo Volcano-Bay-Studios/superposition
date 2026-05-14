@@ -266,6 +266,11 @@ public sealed interface EncodedData<T> extends Cloneable {
                 } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                     this.asNumber = 0;
                 }
+                if (Objects.equals(value, "false")) {
+                    this.asNumber = 0;
+                } else if (Objects.equals(value, "true")) {
+                    this.asNumber = 1;
+                }
             }
             return this.asNumber;
         }

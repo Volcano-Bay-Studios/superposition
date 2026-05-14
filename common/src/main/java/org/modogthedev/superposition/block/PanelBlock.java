@@ -2,6 +2,7 @@ package org.modogthedev.superposition.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
+    public static boolean pressing = true;
 
     public PanelBlock(Properties properties) {
         super(properties);
@@ -50,7 +53,7 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
 
     public void exploreShapes(BlockGetter level, BlockPos pos, BlockPos offset, List<VoxelShape> shapes, Direction dir) {
         if (level.getBlockState(pos).is(SuperpositionBlocks.PANEL.get())) {
-            shapes.add(Block.box(0,0,0, 16, 6, 16).move(offset.getX(),offset.getY(),offset.getZ()));
+            shapes.add(Block.box(0, 0, 0, 16, 6, 16).move(offset.getX(), offset.getY(), offset.getZ()));
             BlockPos relative = pos.relative(dir);
             exploreShapes(level, relative, relative.subtract(pos).offset(offset), shapes, dir);
         }
@@ -73,8 +76,20 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
     }
 
     @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.getBlockEntity(pos) instanceof PanelBlockEntity panel) {
+            if (panel.secondaryInteract(player.isShiftKeyDown(), hitResult.getLocation().toVector3f())) {
+                pressing = true;
+                return InteractionResult.CONSUME;
+            }
+        }
+        pressing = false;
+        return super.useWithoutItem(state, level, pos, player, hitResult);
+    }
+
+    @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape ourShape = Block.box(0,0,0, 16, 6, 16);
+        VoxelShape ourShape = Block.box(0, 0, 0, 16, 6, 16);
         Direction dir = state.getValue(FACING).getClockWise();
         BlockPos forward = pos.relative(dir);
         BlockPos back = pos.relative(dir.getOpposite());
@@ -85,7 +100,7 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
         exploreShapes(level, back, back.subtract(pos), shapes, dir.getOpposite());
 
         for (VoxelShape shape : shapes) {
-            ourShape = Shapes.join(ourShape,shape, BooleanOp.OR);
+            ourShape = Shapes.join(ourShape, shape, BooleanOp.OR);
         }
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
@@ -103,7 +118,7 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
 
     @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return getShape(pState,pLevel,pPos,pContext);
+        return getShape(pState, pLevel, pPos, pContext);
     }
 
     @Override

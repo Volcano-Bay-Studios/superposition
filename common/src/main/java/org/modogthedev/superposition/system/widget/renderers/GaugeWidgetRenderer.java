@@ -12,8 +12,8 @@ import org.modogthedev.superposition.system.widget.widgets.GaugeWidget;
 import java.awt.*;
 import java.util.Map;
 
-public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
-    public GaugeRenderer(Map<String, PartialModel> modelMap) {
+public class GaugeWidgetRenderer extends WidgetRenderer<GaugeWidget> {
+    public GaugeWidgetRenderer(Map<String, PartialModel> modelMap) {
         super(modelMap);
     }
 
@@ -27,7 +27,7 @@ public class GaugeRenderer extends WidgetRenderer<GaugeWidget> {
         ms.translate(-0.5/16f,0/16f,-0.5/16f);
 
         PartialModel gaugeNeedle = getModel("gauge_needle");
-        renderPartial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light, color);
+        renderPartial(gaugeNeedle,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.solid()), light, widget.getColor(color));
         ms.matrixPop();
         PartialModel gauge = getModel("gauge");
         renderPartial(gauge,state, ms.toPoseStack(),bufferSource.getBuffer(RenderType.translucent()), light, color);

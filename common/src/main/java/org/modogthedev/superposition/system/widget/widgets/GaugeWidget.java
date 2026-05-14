@@ -21,10 +21,11 @@ public class GaugeWidget extends Widget {
     }
 
     @Override
-    public void tick(Level level, PanelBlockEntity panel) {
+    public boolean tick(Level level, PanelBlockEntity panel) {
         lastValue = value;
         value = SignalHelper.getFloat(getPortSignals("value", panel));
         value = Mth.clamp(value,minimum,maximum);
+        return false;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class GaugeWidget extends Widget {
     @Override
     public void read(CompoundTag tag) {
         super.read(tag);
-        if (tag.contains("max")) {
+        if (tag.contains("min")) {
             minimum = tag.getFloat("min");
         }
         if (tag.contains("max")) {
@@ -54,6 +55,16 @@ public class GaugeWidget extends Widget {
             value = Mth.clamp(value,minimum,maximum);
             lastValue = value;
         }
+    }
+
+    public void loadEditable(CompoundTag tag) {
+        if (tag.contains("min")) {
+            minimum = tag.getFloat("min");
+        }
+        if (tag.contains("max")) {
+            maximum = tag.getFloat("max");
+        }
+        super.loadEditable(tag);
     }
 
     @Override

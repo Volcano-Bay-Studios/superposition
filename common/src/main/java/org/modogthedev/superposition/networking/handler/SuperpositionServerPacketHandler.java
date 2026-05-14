@@ -86,7 +86,7 @@ public class SuperpositionServerPacketHandler {
         if (itemInHand.is(screwdriver)) {
             screwdriver.attackUse(packet.blockPos(), packet.location(), ctx.player(), itemInHand);
         } else if (ctx.level().getBlockEntity(packet.blockPos()) instanceof PanelBlockEntity panel) {
-            panel.secondaryInteract(ctx.player().isShiftKeyDown(), packet.location().toVector3f());
+            panel.primaryInteract(ctx.player().isShiftKeyDown(), packet.location().toVector3f());
         }
     }
 

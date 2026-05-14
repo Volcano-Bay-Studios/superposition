@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import org.modogthedev.superposition.block.PanelBlock;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +30,9 @@ public abstract class MinecraftMixin {
     @Shadow
     protected abstract boolean startAttack();
 
+    @Shadow
+    private int rightClickDelay;
+
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", ordinal = 1), cancellable = true)
     private void startUseItem(CallbackInfo ci, @Local InteractionHand hand, @Local ItemStack stack) {
         if (!stack.isEmpty()) {
@@ -41,6 +45,13 @@ public abstract class MinecraftMixin {
                 this.player.swing(hand);
             }
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "handleKeybinds", at = @At("HEAD"))
+    private void resetCooldown(CallbackInfo ci) {
+        if (PanelBlock.pressing) {
+            this.rightClickDelay = 0;
         }
     }
 }

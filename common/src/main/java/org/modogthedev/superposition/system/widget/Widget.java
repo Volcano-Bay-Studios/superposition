@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
@@ -11,6 +12,7 @@ import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 
+import java.awt.*;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -18,6 +20,7 @@ import java.util.function.Supplier;
 public class Widget implements Cloneable {
     private ResourceLocation location = null;
     private String name = "deviceName";
+    private String color = "0xff3333";
 
     private Vector2i position = new Vector2i();
 
@@ -58,24 +61,25 @@ public class Widget implements Cloneable {
     }
 
 
-    public void getPortSignals(String port, List<Signal> signals, PanelBlockEntity panel) {
+    public void putPortSignals(String port, List<Signal> signals, PanelBlockEntity panel) {
         panel.putPortSignals(name + "-" + port, signals);
     }
 
     // Interaction and Behavior
-    public void tick(Level level, PanelBlockEntity panel) {
+    public boolean tick(Level level, PanelBlockEntity panel) {
+        return false;
     }
 
     public void hover(Vector3f relativePosition, Player player) {
 
     }
 
-
     /**
      * Called when the player left clicks the widget.
-     * @param alt If the shift key is pressed
+     *
+     * @param alt   If the shift key is pressed
      * @param level The level that is used
-     * @param hit The local position that was pressed
+     * @param hit   The local position that was pressed
      * @return If the original event should be intercepted. You must return true on the client, or the interaction will not be networked.
      */
     public boolean leftClickInteract(boolean alt, Level level, Vector3f hit) {
@@ -85,23 +89,27 @@ public class Widget implements Cloneable {
 
     /**
      * Called when the player right clicks the widget.
-     * @param alt If the shift key is pressed
+     *
+     * @param alt   If the shift key is pressed
      * @param level The level that is used
-     * @param hit The local position that was pressed
+     * @param hit   The local position that was pressed
      * @return If the original event should be intercepted.
      */
     public boolean rightClickInteract(boolean alt, Level level, Vector3f hit) {
         return false;
     }
 
-
     public void write(CompoundTag tag) {
         tag.putString("name", name);
         tag.putInt("x", position.x);
         tag.putInt("y", position.y);
+        tag.putString("color", color);
     }
 
     public void read(CompoundTag tag) {
+        if (tag.contains("color")) {
+            color = tag.getString("color");
+        }
         if (tag.contains("name")) {
             name = tag.getString("name");
         }
@@ -111,18 +119,35 @@ public class Widget implements Cloneable {
     }
 
     public void loadEditable(CompoundTag tag) {
+        if (tag.contains("Color")) {
+            color = tag.getString("Color");
+        }
         if (tag.contains("Name")) {
             name = tag.getString("Name");
         }
     }
+    public Color getColor(Color color) {
+        Color widgetColor = getColor();
+        return new Color((widgetColor.getRed()/255f) * (color.getRed()/255f), (widgetColor.getGreen()/255f) * (color.getGreen()/255f), (widgetColor.getBlue()/255f) * (color.getBlue()/255f), (widgetColor.getAlpha()/255f) * (color.getAlpha()/255f));
+    }
+
+    private Color getColor() {
+        try {
+            int colorI = NumberUtils.createNumber(this.color).intValue();
+            return new Color(colorI);
+        } catch (NumberFormatException ignored) {
+        }
+        return new Color(1f, 1f, 1f, 1f);
+    }
 
     public void addConfiguration(PanelBlockEntity panel, int index) {
-        addEditable(panel,"Name", index, () -> name, (s -> this.name = s));
+        addEditable(panel, "Name", index, () -> name, (s -> this.name = s));
+        addEditable(panel,"Color", index, () -> color, (s -> color = s));
     }
 
 
     public void addEditable(PanelBlockEntity panel, String name, int index, Supplier<String> read, Consumer<String> set) {
-        panel.addEditableTaggedConfigTooltip(name, "widget-"+ index, read,set);
+        panel.addEditableTaggedConfigTooltip(name, "widget-" + index, read, set);
     }
 
     @Override

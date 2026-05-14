@@ -76,6 +76,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
         List<Widget> toRemove = new ArrayList<>();
 
+        boolean update = false;
         for (Widget widget : widgets) {
 
             BlockState state = getBlockState();
@@ -89,7 +90,12 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
                 toRemove.add(widget);
             }
 
-            widget.tick(getLevel(), this);
+            if (widget.tick(getLevel(), this)) {
+                update = true;
+            }
+        }
+        if (update) {
+            markDataDirty();
         }
 
         if (!toRemove.isEmpty()) {
@@ -140,15 +146,23 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         }
         super.loadAdditional(tag, registries);
         if (tag.contains("widgets")) {
-            widgets.clear();
             ListTag widgetListTag = tag.getList("widgets", 10);
-            for (int i = 0; i < widgetListTag.size(); i++) {
-                CompoundTag widgetTag = widgetListTag.getCompound(i);
-                ResourceLocation location = ResourceLocation.fromNamespaceAndPath(widgetTag.getString("namespace"), widgetTag.getString("path"));
-                Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(location).makeClone();
-                if (widget != null) {
-                    widget.read(widgetTag);
-                    widgets.add(widget);
+            int size = widgetListTag.size();
+            if (size != widgets.size()) {
+                widgets.clear();
+                for (int i = 0; i < size; i++) {
+                    CompoundTag widgetTag = widgetListTag.getCompound(i);
+                    ResourceLocation location = ResourceLocation.fromNamespaceAndPath(widgetTag.getString("namespace"), widgetTag.getString("path"));
+                    Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(location).makeClone();
+                    if (widget != null) {
+                        widget.read(widgetTag);
+                        widgets.add(widget);
+                    }
+                }
+            } else {
+                for (int i = 0; i < widgets.size(); i++) {
+                    CompoundTag widgetTag = widgetListTag.getCompound(i);
+                    widgets.get(i).read(widgetTag);
                 }
             }
         }
@@ -491,7 +505,11 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         Widget widget = getHit(cameraHit);
         if (widget != null) {
             cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
-            return widget.leftClickInteract(alt,level,cameraHit);
+            boolean consume = widget.leftClickInteract(alt, level, cameraHit);
+            if (consume) {
+                markDataDirty();
+            }
+            return consume;
         }
         return false;
     }
@@ -500,7 +518,11 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         Widget widget = getHit(cameraHit);
         if (widget != null) {
             cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
-            return widget.rightClickInteract(alt,level,cameraHit);
+            boolean consume = widget.rightClickInteract(alt, level, cameraHit);
+            if (consume) {
+                markDataDirty();
+            }
+            return consume;
         }
         return false;
     }

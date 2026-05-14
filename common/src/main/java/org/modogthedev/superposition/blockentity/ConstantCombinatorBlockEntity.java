@@ -89,7 +89,7 @@ public class ConstantCombinatorBlockEntity extends SignalActorBlockEntity implem
         if (signal.getEncodedData() != null) {
             if (!outputString.equals(signal.getEncodedData().stringValue())) {
                 outputString = signal.getEncodedData().stringValue();
-                markDirty();
+                markDataDirty();
             }
         }
         return signal;
