@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.widget.widgets;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
@@ -57,27 +58,17 @@ public class GaugeWidget extends Widget {
         }
     }
 
-    public void loadEditable(CompoundTag tag) {
-        if (tag.contains("min")) {
-            minimum = tag.getFloat("min");
-        }
-        if (tag.contains("max")) {
-            maximum = tag.getFloat("max");
-        }
-        super.loadEditable(tag);
-    }
-
     @Override
-    public void addConfiguration(PanelBlockEntity panel, int index) {
-        super.addConfiguration(panel, index);
-        panel.addEditableConfigTooltip("Minimum",() -> String.valueOf(minimum),(s -> {
+    public void addConfiguration(PanelBlockEntity panel, int index, Player player) {
+        super.addConfiguration(panel, index, player);
+        addEditable(panel,"Minimum",index,() -> String.valueOf(minimum),(s -> {
             try {
                 minimum = Float.parseFloat(s);
             } catch (NumberFormatException ignored) {}
         }
         ));
 
-        panel.addEditableConfigTooltip("Maximum",() -> String.valueOf(maximum),(s -> {
+        addEditable(panel,"Maximum",index,() -> String.valueOf(maximum),(s -> {
             try {
                 maximum = Float.parseFloat(s);
             } catch (NumberFormatException ignored) {}

@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import org.modogthedev.superposition.client.renderer.block.PanelBlockEntityRenderer;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.item.WidgetItem;
 import org.modogthedev.superposition.system.widget.Widget;
@@ -29,7 +28,7 @@ public class WidgetItemRenderer extends BlockEntityWithoutLevelRenderer {
         if (type != null) {
             Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(type);
             if (widget != null) {
-                WidgetRenderer<Widget> widgetRenderer = PanelBlockEntityRenderer.getRenderer(widget);
+                WidgetRenderer<Widget> widgetRenderer = Widget.getRenderer(widget);
                 if (widgetRenderer != null) {
                     poseStack.pushPose();
                     poseStack.translate(widget.getBounds().x/2f - 2/16f,widget.getBounds().y/2f - 2/16f,widget.getBounds().z/2f - 2/16f);

@@ -19,6 +19,7 @@ import org.joml.Vector2i;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.networking.packet.PlayerPlaceWidgetC2SPacket;
+import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.system.widget.Widget;
 
 public class WidgetItem extends Item {
@@ -36,6 +37,9 @@ public class WidgetItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+        if (level.isClientSide) {
+            ScreenManager.openWidgetScreen(usedHand);
+        }
         return super.use(level, player, usedHand);
     }
 
@@ -54,6 +58,8 @@ public class WidgetItem extends Item {
                 VeilPacketManager.server().sendPacket(new PlayerPlaceWidgetC2SPacket(context.getClickedPos(),target.x,target.y,widget.getLocation()));
                 return InteractionResult.CONSUME;
             }
+        } else if (level.isClientSide) {
+            ScreenManager.openWidgetScreen(context.getHand());
         }
         return super.useOn(context);
     }

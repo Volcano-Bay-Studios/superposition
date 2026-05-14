@@ -5,15 +5,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -21,11 +25,19 @@ public class Widget implements Cloneable {
     private ResourceLocation location = null;
     private String name = "deviceName";
     private String color = "0xff3333";
+    private Map<String,Consumer<String>> editable = new HashMap<>();
 
     private Vector2i position = new Vector2i();
 
     public Widget() {
         super();
+    }
+
+    @Nullable
+    public static <T extends Widget> WidgetRenderer<T> getRenderer(T widget) {
+        ResourceLocation location = widget.getLocation();
+        //noinspection unchecked
+        return (WidgetRenderer<T>) SuperpositionWidgetRenderers.WIDGET_RENDERER.asVanillaRegistry().get(location);
     }
 
     public ResourceLocation getLocation() {
@@ -119,11 +131,10 @@ public class Widget implements Cloneable {
     }
 
     public void loadEditable(CompoundTag tag) {
-        if (tag.contains("Color")) {
-            color = tag.getString("Color");
-        }
-        if (tag.contains("Name")) {
-            name = tag.getString("Name");
+        for (String key : editable.keySet()) {
+            if (tag.contains(key)) {
+                editable.get(key).accept(tag.getString(key));
+            }
         }
     }
     public Color getColor(Color color) {
@@ -140,7 +151,7 @@ public class Widget implements Cloneable {
         return new Color(1f, 1f, 1f, 1f);
     }
 
-    public void addConfiguration(PanelBlockEntity panel, int index) {
+    public void addConfiguration(PanelBlockEntity panel, int index, Player player) {
         addEditable(panel, "Name", index, () -> name, (s -> this.name = s));
         addEditable(panel,"Color", index, () -> color, (s -> color = s));
     }
@@ -148,6 +159,7 @@ public class Widget implements Cloneable {
 
     public void addEditable(PanelBlockEntity panel, String name, int index, Supplier<String> read, Consumer<String> set) {
         panel.addEditableTaggedConfigTooltip(name, "widget-" + index, read, set);
+        editable.put(name,set);
     }
 
     @Override

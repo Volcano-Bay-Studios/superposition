@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.widget.widgets;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
@@ -31,7 +32,13 @@ public class ButtonWidget extends Widget {
     }
 
     public float getPosition(float partialTicks) {
-        return Mth.lerp(partialTicks,position,pressed);
+        float lerp = Mth.lerp(partialTicks, position, pressed);
+        if (lerp >= 0.51f) {
+            position = 1;
+            pressed = 1;
+            return 1;
+        }
+        return lerp;
     }
 
     @Override
@@ -58,8 +65,8 @@ public class ButtonWidget extends Widget {
     }
 
     @Override
-    public void addConfiguration(PanelBlockEntity panel, int index) {
-        super.addConfiguration(panel, index);
+    public void addConfiguration(PanelBlockEntity panel, int index, Player player) {
+        super.addConfiguration(panel, index, player);
 
     }
 

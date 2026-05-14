@@ -2,6 +2,7 @@ package org.modogthedev.superposition.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -69,7 +70,7 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (level.getBlockEntity(pos) instanceof PanelBlockEntity panel) {
+        if (level.getBlockEntity(pos) instanceof PanelBlockEntity panel && !newState.is(SuperpositionBlocks.PANEL.get())) {
             panel.dropOnRemove();
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
@@ -77,7 +78,7 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof PanelBlockEntity panel) {
+        if (level.getBlockEntity(pos) instanceof PanelBlockEntity panel && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
             if (panel.secondaryInteract(player.isShiftKeyDown(), hitResult.getLocation().toVector3f())) {
                 pressing = true;
                 return InteractionResult.CONSUME;

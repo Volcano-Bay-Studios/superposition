@@ -2,6 +2,7 @@ package org.modogthedev.superposition.screens;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import org.modogthedev.superposition.SuperpositionClient;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.card.Card;
@@ -13,6 +14,7 @@ public class ScreenManager {
     private static FilterScreen filterScreen;
     private static InscriberScreen inscriberScreen;
     private static PortScreen portScreen;
+    private static WidgetSelectionScreen widgetSelectionScreen;
     public static void openSignalGenerator(BlockPos pos) {
         signalGeneratorScreen = new SignalGeneratorScreen(Component.literal("Signal Generator"), pos);
         SuperpositionClient.setScreen(signalGeneratorScreen);
@@ -49,5 +51,10 @@ public class ScreenManager {
         if (portScreen != null) {
             portScreen.tryAdd(cable);
         }
+    }
+
+    public static void openWidgetScreen(InteractionHand hand) {
+        widgetSelectionScreen = new WidgetSelectionScreen(hand);
+        SuperpositionClient.setScreen(widgetSelectionScreen);
     }
 }

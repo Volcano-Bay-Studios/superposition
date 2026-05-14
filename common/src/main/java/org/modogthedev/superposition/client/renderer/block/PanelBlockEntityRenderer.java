@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3f;
@@ -96,7 +95,7 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
         List<Widget> widgets = new ArrayList<>(be.getWidgets());
         ms.translate(0, 9.001 / 16f, 0);
         for (Widget widget : widgets) {
-            WidgetRenderer<Widget> widgetRenderer = getRenderer(widget);
+            WidgetRenderer<Widget> widgetRenderer = Widget.getRenderer(widget);
             if (widgetRenderer != null) {
                 ms.matrixPush();
                 Vector2ic position = widget.getPosition();
@@ -120,7 +119,7 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                 ResourceLocation type = WidgetItem.getType(itemInHand);
                 Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(type);
                 if (widget != null) {
-                    WidgetRenderer<Widget> widgetRenderer = getRenderer(widget);
+                    WidgetRenderer<Widget> widgetRenderer = Widget.getRenderer(widget);
                     if (widgetRenderer != null) {
                         ms.matrixPush();
                         Vector3f pos = new Vector3f(blockHitResult.getLocation().toVector3f());
@@ -200,13 +199,6 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
     public boolean boxesOverlap(Vector2i b1Min, Vector2i b1Max, Vector2i b2Min, Vector2i b2Max) {
         return b1Min.x < b2Max.x && b1Max.x > b2Min.x &&
                 b1Min.y < b2Max.y && b1Max.y > b2Min.y;
-    }
-
-    @Nullable
-    public static <T extends Widget> WidgetRenderer<T> getRenderer(T widget) {
-        ResourceLocation location = widget.getLocation();
-        //noinspection unchecked
-        return (WidgetRenderer<T>) SuperpositionWidgetRenderers.WIDGET_RENDERER.asVanillaRegistry().get(location);
     }
 
 
