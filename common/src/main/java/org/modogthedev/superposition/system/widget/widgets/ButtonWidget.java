@@ -19,7 +19,7 @@ public class ButtonWidget extends Widget {
     private float pressed = 0;
 
     @Override
-    public boolean tick(Level level, PanelBlockEntity panel) {
+    public boolean tick(Level level, PanelBlockEntity panel, int index) {
         if (!level.isClientSide && pressed > 0) {
             pressed -= .2f;
             Signal signal = SignalHelper.getEmptySignal(level, panel.getBlockPos());
@@ -28,7 +28,7 @@ public class ButtonWidget extends Widget {
             return true;
         }
         position = pressed;
-        return super.tick(level, panel);
+        return super.tick(level, panel, index);
     }
 
     public float getPosition(float partialTicks) {
@@ -67,7 +67,6 @@ public class ButtonWidget extends Widget {
     @Override
     public void addConfiguration(PanelBlockEntity panel, int index, Player player) {
         super.addConfiguration(panel, index, player);
-
     }
 
     @Override

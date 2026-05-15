@@ -2,6 +2,7 @@ package org.modogthedev.superposition.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -14,19 +15,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
-import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
+import org.modogthedev.superposition.item.WidgetItem;
+import org.modogthedev.superposition.networking.packet.ChangeWidgetC2SPacket;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class WidgetSelectionScreen extends Screen {
@@ -46,11 +47,29 @@ public class WidgetSelectionScreen extends Screen {
     protected WidgetSelectionScreen(InteractionHand hand) {
         super(Component.empty());
         this.hand = hand;
+
+
         searchField.setBordered(false);
         searchField.setTextColor(Superposition.SUPERPOSITION_THEME.get("topBorder"));
         searchField.setVisible(false);
         addRenderableWidget(searchField);
         setInitialFocus(searchField);
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        ItemStack itemInHand = Minecraft.getInstance().player.getItemInHand(hand);
+        ResourceLocation type = WidgetItem.getType(itemInHand);
+        Registry<Widget> widgetRegistry = SuperpositionWidgets.WIDGET.asVanillaRegistry();
+        currentWidgets.addAll(widgetRegistry.keySet());
+        for (int i = 0; i < currentWidgets.size(); i++) {
+            if (currentWidgets.get(i).equals(type)) {
+                xScroll = i;
+                xScrollPosition = getIndexOffset(xScroll);
+                break;
+            }
+        }
     }
 
     @Override
@@ -94,7 +113,7 @@ public class WidgetSelectionScreen extends Screen {
                     poseStack.mulPose(Axis.XP.rotationDegrees((thisFocusY-ySize)/divide));
                     poseStack.translate(-bounds.x/2f, 0, -bounds.z/2f);
                     Color color = new Color(1f, 1f, 1f, 1f);
-                    renderer.render(widget,null,partialTick, poseStack, bufferSource, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, color);
+                    renderer.render(widget, Blocks.AIR.defaultBlockState(),partialTick, poseStack, bufferSource, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, color);
 
 
                     poseStack.popPose();
@@ -107,7 +126,7 @@ public class WidgetSelectionScreen extends Screen {
         poseStack.popPose();
         if (currentWidgets.size() > xScroll) {
             ResourceLocation location = currentWidgets.get(xScroll);
-            guiGraphics.drawCenteredString(mc.font, Component.translatable(location.getNamespace() + ".widget." + location.getPath()), xSize, ySize + 30, topBorder);
+            guiGraphics.drawCenteredString(mc.font, Component.translatable( "widget." + location.getNamespace() + "." + location.getPath()), xSize, ySize + 30, topBorder);
         }
 
 
@@ -194,5 +213,13 @@ public class WidgetSelectionScreen extends Screen {
         xScroll += (int) Math.round(scrollY);
         xScroll = Mth.clamp(xScroll,0,currentWidgets.size()-1);
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public void onClose() {
+        if (currentWidgets.size() > xScroll) {
+            VeilPacketManager.server().sendPacket(new ChangeWidgetC2SPacket(currentWidgets.get(xScroll)));
+        }
+        super.onClose();
     }
 }

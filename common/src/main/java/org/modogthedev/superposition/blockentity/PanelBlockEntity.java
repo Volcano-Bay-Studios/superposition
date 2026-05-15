@@ -77,6 +77,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         List<Widget> toRemove = new ArrayList<>();
 
         boolean update = false;
+        int i = 0;
         for (Widget widget : widgets) {
 
             BlockState state = getBlockState();
@@ -90,9 +91,10 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
                 toRemove.add(widget);
             }
 
-            if (widget.tick(getLevel(), this)) {
+            if (widget.tick(getLevel(), this,i)) {
                 update = true;
             }
+            i++;
         }
         if (update) {
             markDataDirty();
@@ -183,7 +185,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         for (int i = 0; i < widgets.size(); i++) {
             if (tag.contains("widget-"+i)) {
                 CompoundTag widgetTag = tag.getCompound("widget-" + i);
-                widgets.get(i).loadEditable(widgetTag);
+                widgets.get(i).loadSyncedData(widgetTag);
             }
         }
         if (tag.contains("front_height")) {
@@ -212,8 +214,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
             for (int i = 0; i < widgets.size(); i++) {
                 widgets.get(i).addConfiguration(this, i, player);
             }
-        }
-        if (lastTargeted != null) {
+        } else if (lastTargeted != null) {
             for (int i = 0; i < widgets.size(); i++) {
                 if (widgets.get(i).equals(lastTargeted)) {
                     lastTargeted.addConfiguration(this, i, player);

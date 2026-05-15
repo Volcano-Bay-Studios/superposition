@@ -78,7 +78,15 @@ public class Widget implements Cloneable {
     }
 
     // Interaction and Behavior
-    public boolean tick(Level level, PanelBlockEntity panel) {
+
+    /**
+     * Called every tick for each widget.
+     * @param level The level of the widget, on both client and server.
+     * @param panel The panel block entity that holds this widget.
+     * @param index This widgets index, can be used to network data to the server.
+     * @return True if the widgets data is dirty and needs to be networked to the client.
+     */
+    public boolean tick(Level level, PanelBlockEntity panel, int index) {
         return false;
     }
 
@@ -87,7 +95,7 @@ public class Widget implements Cloneable {
     }
 
     /**
-     * Called when the player left clicks the widget.
+     * Called when the player left-clicks the widget.
      *
      * @param alt   If the shift key is pressed
      * @param level The level that is used
@@ -100,7 +108,7 @@ public class Widget implements Cloneable {
 
 
     /**
-     * Called when the player right clicks the widget.
+     * Called when the player right-clicks the widget.
      *
      * @param alt   If the shift key is pressed
      * @param level The level that is used
@@ -111,6 +119,9 @@ public class Widget implements Cloneable {
         return false;
     }
 
+    /**
+     * Write data on the server to both send to clients, and to save.
+     */
     public void write(CompoundTag tag) {
         tag.putString("name", name);
         tag.putInt("x", position.x);
@@ -118,6 +129,9 @@ public class Widget implements Cloneable {
         tag.putString("color", color);
     }
 
+    /**
+     * Read data on the server and client to read from disk and read from network.
+     */
     public void read(CompoundTag tag) {
         if (tag.contains("color")) {
             color = tag.getString("color");
@@ -130,7 +144,10 @@ public class Widget implements Cloneable {
         }
     }
 
-    public void loadEditable(CompoundTag tag) {
+    /**
+     * Load data on the client that was sent from a client to modify this widget.
+     */
+    public void loadSyncedData(CompoundTag tag) {
         for (String key : editable.keySet()) {
             if (tag.contains(key)) {
                 editable.get(key).accept(tag.getString(key));

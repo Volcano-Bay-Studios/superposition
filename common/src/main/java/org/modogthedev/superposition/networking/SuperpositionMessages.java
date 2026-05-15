@@ -25,6 +25,7 @@ public class SuperpositionMessages {
         INSTANCE.registerServerbound(PlayerPlugCableC2SPacket.TYPE, PlayerPlugCableC2SPacket.CODEC, SuperpositionServerPacketHandler::handlePlugCable);
         INSTANCE.registerServerbound(PlayerPlaceWidgetC2SPacket.TYPE, PlayerPlaceWidgetC2SPacket.CODEC, SuperpositionServerPacketHandler::handlePlayerPlaceWidget);
         INSTANCE.registerServerbound(PlayerAttackUseC2SPacket.TYPE, PlayerAttackUseC2SPacket.CODEC, SuperpositionServerPacketHandler::handlePlayerAttackUse);
+        INSTANCE.registerServerbound(ChangeWidgetC2SPacket.TYPE, ChangeWidgetC2SPacket.CODEC, SuperpositionServerPacketHandler::handleChangeWidget);
     }
 
 //    public static void registerClient() {

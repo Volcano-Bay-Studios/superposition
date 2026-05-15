@@ -12,12 +12,14 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
+import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.item.ScrewdriverItem;
+import org.modogthedev.superposition.item.WidgetItem;
 import org.modogthedev.superposition.networking.packet.*;
 import org.modogthedev.superposition.system.cable.Cable;
 import org.modogthedev.superposition.system.cable.CableClipResult;
@@ -87,6 +89,28 @@ public class SuperpositionServerPacketHandler {
             screwdriver.attackUse(packet.blockPos(), packet.location(), ctx.player(), itemInHand);
         } else if (ctx.level().getBlockEntity(packet.blockPos()) instanceof PanelBlockEntity panel) {
             panel.primaryInteract(ctx.player().isShiftKeyDown(), packet.location().toVector3f());
+        }
+    }
+
+    public static void handleChangeWidget(ChangeWidgetC2SPacket packet, ServerPacketContext ctx) {
+        ServerPlayer player = ctx.player();
+        if (!SuperpositionWidgets.WIDGET.asVanillaRegistry().containsKey(packet.location())) {
+            Superposition.LOGGER.warn(player.getGameProfile().getName() + " ("+player.getUUID()+") sent a widget change packet with an invalid resource location!");
+            return;
+        }
+
+
+        InteractionHand hand = InteractionHand.MAIN_HAND;
+        ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+        if (!itemInHand.is(SuperpositionItems.WIDGET.get())) {
+            itemInHand = player.getItemInHand(InteractionHand.OFF_HAND);
+            hand = InteractionHand.OFF_HAND;
+        }
+
+        if (itemInHand.is(SuperpositionItems.WIDGET.get())) {
+            ItemStack alt = itemInHand.copy();
+            WidgetItem.putType(alt,WidgetItem.getCustomData(itemInHand),packet.location());
+            player.setItemInHand(hand,alt);
         }
     }
 

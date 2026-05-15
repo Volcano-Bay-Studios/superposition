@@ -22,11 +22,11 @@ public class GaugeWidget extends Widget {
     }
 
     @Override
-    public boolean tick(Level level, PanelBlockEntity panel) {
+    public boolean tick(Level level, PanelBlockEntity panel, int index) {
         lastValue = value;
         value = SignalHelper.getFloat(getPortSignals("value", panel));
         value = Mth.clamp(value,minimum,maximum);
-        return false;
+        return super.tick(level,panel,index);
     }
 
     @Override

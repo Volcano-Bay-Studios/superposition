@@ -31,7 +31,9 @@ public class WidgetItem extends Item {
 
     @Override
     public void verifyComponentsAfterLoad(ItemStack stack) {
-        putType(stack, new CompoundTag(), SuperpositionWidgets.BUTTON.getId());
+        if (getTagElement(stack) == null) {
+            putType(stack, new CompoundTag(), SuperpositionWidgets.GAUGE.getId());
+        }
         super.verifyComponentsAfterLoad(stack);
     }
 
@@ -92,10 +94,18 @@ public class WidgetItem extends Item {
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 
-    public static CompoundTag getTagElement(ItemStack stack) {
+
+    public static CompoundTag getCustomData(ItemStack stack) {
         CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
         if (customData != null) {
-            return customData.copyTag().getCompound("widget");
+            return customData.copyTag();
+        }
+        return new CompoundTag();
+    }
+    public static CompoundTag getTagElement(ItemStack stack) {
+        CompoundTag tag = getCustomData(stack);
+        if (tag.contains("widget")) {;
+            return tag.getCompound("widget");
         }
         return null;
     }

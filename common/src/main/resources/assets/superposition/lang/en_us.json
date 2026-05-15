@@ -44,6 +44,9 @@
   "item.superposition.glowing_cable" : "Glowing Cable",
   "item.superposition.widget" : "Widget",
 
+  "widget.superposition.gauge" : "Gauge",
+  "widget.superposition.button" : "Button",
+
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",
   "sounds.superposition.travelers" : "Music",
