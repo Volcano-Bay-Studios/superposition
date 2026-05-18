@@ -53,7 +53,7 @@ public class SuperpositionUITooltipRenderer {
     public static boolean selected;
 
     public static void keyPress(long windowPointer, int key, int scanCode, int action, int modifiers) {
-        if (editableTooltip != null && action != GLFW.GLFW_RELEASE) {
+        if (editableTooltip != null && editingEditable && action != GLFW.GLFW_RELEASE) {
             cursorPos = Mth.clamp(cursorPos, 0, editableTooltip.getText().length());
             switch (key) {
                 case 256 -> {

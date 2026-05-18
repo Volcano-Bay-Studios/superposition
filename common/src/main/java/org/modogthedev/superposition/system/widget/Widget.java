@@ -18,6 +18,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -26,6 +27,7 @@ public class Widget implements Cloneable {
     private String name = "deviceName";
     private String color = "0xff3333";
     private Map<String,Consumer<String>> editable = new HashMap<>();
+    private UUID uuid = UUID.randomUUID();
 
     private Vector2i position = new Vector2i();
 
@@ -127,6 +129,7 @@ public class Widget implements Cloneable {
         tag.putInt("x", position.x);
         tag.putInt("y", position.y);
         tag.putString("color", color);
+        tag.putUUID("uuid", uuid);
     }
 
     /**
@@ -142,6 +145,22 @@ public class Widget implements Cloneable {
         if (tag.contains("x")) {
             position.set(tag.getInt("x"), tag.getInt("y"));
         }
+        if (tag.contains("uuid")) {
+            uuid = tag.getUUID("uuid");
+        }
+    }
+
+    public Color getColor(Color color) {
+        Color widgetColor = getColor();
+        return new Color((widgetColor.getRed()/255f) * (color.getRed()/255f), (widgetColor.getGreen()/255f) * (color.getGreen()/255f), (widgetColor.getBlue()/255f) * (color.getBlue()/255f), (widgetColor.getAlpha()/255f) * (color.getAlpha()/255f));
+    }
+    private Color getColor() {
+        try {
+            int colorI = NumberUtils.createNumber(this.color).intValue();
+            return new Color(colorI);
+        } catch (NumberFormatException ignored) {
+        }
+        return new Color(1f, 1f, 1f, 1f);
     }
 
     /**
@@ -154,29 +173,30 @@ public class Widget implements Cloneable {
             }
         }
     }
-    public Color getColor(Color color) {
-        Color widgetColor = getColor();
-        return new Color((widgetColor.getRed()/255f) * (color.getRed()/255f), (widgetColor.getGreen()/255f) * (color.getGreen()/255f), (widgetColor.getBlue()/255f) * (color.getBlue()/255f), (widgetColor.getAlpha()/255f) * (color.getAlpha()/255f));
+
+    public void addConfiguration(PanelBlockEntity panel, Player player) {
+        addEditable(panel, "Name", () -> name, this::setName);
+        addEditable(panel,"Color", () -> color, this::setColor);
     }
 
-    private Color getColor() {
-        try {
-            int colorI = NumberUtils.createNumber(this.color).intValue();
-            return new Color(colorI);
-        } catch (NumberFormatException ignored) {
-        }
-        return new Color(1f, 1f, 1f, 1f);
-    }
-
-    public void addConfiguration(PanelBlockEntity panel, int index, Player player) {
-        addEditable(panel, "Name", index, () -> name, (s -> this.name = s));
-        addEditable(panel,"Color", index, () -> color, (s -> color = s));
-    }
-
-
-    public void addEditable(PanelBlockEntity panel, String name, int index, Supplier<String> read, Consumer<String> set) {
-        panel.addEditableTaggedConfigTooltip(name, "widget-" + index, read, set);
+    /**
+     * Adds an editable field on the widget.
+     * @param panel The panel block entity the widget is attached to.
+     * @param name This name is used both for display and for the tag key.
+     * @param read Retrieves the fields value.
+     * @param set Sets the field value. Note that values are final in a lambda so you must call a method to update the widgets fields. You can also use a method reference.
+     */
+    public void addEditable(PanelBlockEntity panel, String name, Supplier<String> read, Consumer<String> set) {
+        panel.addEditableTaggedConfigTooltip(name, "widget-" + uuid, read, set);
         editable.put(name,set);
+    }
+
+    protected void setName(String name) {
+        this.name = name;
+    }
+
+    protected void setColor(String color) {
+        this.color = color;
     }
 
     @Override
@@ -185,10 +205,15 @@ public class Widget implements Cloneable {
         return super.clone();
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public Widget makeClone() {
         try {
             Widget clone = (Widget) clone();
             clone.position = (Vector2i) position.clone();
+            clone.uuid = UUID.randomUUID();
             return clone;
         } catch (CloneNotSupportedException ignored) {
 

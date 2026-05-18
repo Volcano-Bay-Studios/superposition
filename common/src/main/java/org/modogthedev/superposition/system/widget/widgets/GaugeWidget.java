@@ -59,16 +59,16 @@ public class GaugeWidget extends Widget {
     }
 
     @Override
-    public void addConfiguration(PanelBlockEntity panel, int index, Player player) {
-        super.addConfiguration(panel, index, player);
-        addEditable(panel,"Minimum",index,() -> String.valueOf(minimum),(s -> {
+    public void addConfiguration(PanelBlockEntity panel, Player player) {
+        super.addConfiguration(panel, player);
+        addEditable(panel,"Minimum",() -> String.valueOf(minimum),(s -> {
             try {
                 minimum = Float.parseFloat(s);
             } catch (NumberFormatException ignored) {}
         }
         ));
 
-        addEditable(panel,"Maximum",index,() -> String.valueOf(maximum),(s -> {
+        addEditable(panel,"Maximum",() -> String.valueOf(maximum),(s -> {
             try {
                 maximum = Float.parseFloat(s);
             } catch (NumberFormatException ignored) {}

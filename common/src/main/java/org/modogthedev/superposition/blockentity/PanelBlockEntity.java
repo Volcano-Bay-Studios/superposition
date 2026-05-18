@@ -162,7 +162,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
                     }
                 }
             } else {
-                for (int i = 0; i < widgets.size(); i++) {
+                for (int i = 0; i < size; i++) {
                     CompoundTag widgetTag = widgetListTag.getCompound(i);
                     widgets.get(i).read(widgetTag);
                 }
@@ -181,11 +181,10 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     @Override
     public void loadSyncedData(CompoundTag tag) {
-        super.loadSyncedData(tag);
-        for (int i = 0; i < widgets.size(); i++) {
-            if (tag.contains("widget-"+i)) {
-                CompoundTag widgetTag = tag.getCompound("widget-" + i);
-                widgets.get(i).loadSyncedData(widgetTag);
+        for (Widget widget : widgets) {
+            if (tag.contains("widget-" + widget.getUuid())) {
+                CompoundTag widgetTag = tag.getCompound("widget-" + widget.getUuid());
+                widget.loadSyncedData(widgetTag);
             }
         }
         if (tag.contains("front_height")) {
@@ -200,6 +199,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         updateHeight(true);
         updateHeight(false);
         rebuild();
+        super.loadSyncedData(tag);
     }
 
     @Override
@@ -212,12 +212,12 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         super.setupConfigTooltips(player);
         if (player == null) {
             for (int i = 0; i < widgets.size(); i++) {
-                widgets.get(i).addConfiguration(this, i, player);
+                widgets.get(i).addConfiguration(this, player);
             }
         } else if (lastTargeted != null) {
             for (int i = 0; i < widgets.size(); i++) {
                 if (widgets.get(i).equals(lastTargeted)) {
-                    lastTargeted.addConfiguration(this, i, player);
+                    lastTargeted.addConfiguration(this, player);
                 }
             }
             lastTargeted = null;
