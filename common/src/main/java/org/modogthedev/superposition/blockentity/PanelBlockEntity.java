@@ -35,13 +35,12 @@ import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.modogthedev.superposition.util.SignalActorTickingBlock.FACING;
 
 public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicShapedBlockEntity, Clearable {
-    private final List<Widget> widgets = new ArrayList<>();
+    private final Map<UUID,Widget> widgets = new HashMap<>();
 
     private float frontHeight;
     private float backHeight;
@@ -58,7 +57,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     @Override
     public PortConfig.Builder buildPorts(PortConfig.Builder builder) {
         if (widgets != null) {
-            for (Widget widget : widgets) {
+            for (Widget widget : widgets.values()) {
                 widget.buildPorts(builder);
             }
         }
@@ -78,7 +77,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
         boolean update = false;
         int i = 0;
-        for (Widget widget : widgets) {
+        for (Widget widget : widgets.values()) {
 
             BlockState state = getBlockState();
             Direction dir = state.getValue(FACING);
@@ -101,7 +100,9 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         }
 
         if (!toRemove.isEmpty()) {
-            widgets.removeAll(toRemove);
+            for (Widget widget : toRemove) {
+                widgets.remove(widget.getUuid());
+            }
 
             Vec3 center = getBlockPos().getCenter();
             ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
@@ -125,7 +126,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag widgetListTag = new ListTag();
         if (!widgets.isEmpty()) {
-            for (Widget widget : widgets) {
+            for (Widget widget : widgets.values()) {
                 CompoundTag widgetTag = new CompoundTag();
                 ResourceLocation location = widget.getLocation();
                 widgetTag.putString("namespace", location.getNamespace());
@@ -158,13 +159,16 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
                     Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(location).makeClone();
                     if (widget != null) {
                         widget.read(widgetTag);
-                        widgets.add(widget);
+                        widgets.put(widget.getUuid(),widget);
                     }
                 }
             } else {
                 for (int i = 0; i < size; i++) {
                     CompoundTag widgetTag = widgetListTag.getCompound(i);
-                    widgets.get(i).read(widgetTag);
+                    Widget widget = widgets.get(widgetTag.getUUID("uuid"));
+                    if (widget != null) {
+                        widget.read(widgetTag);
+                    }
                 }
             }
         }
@@ -181,7 +185,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     @Override
     public void loadSyncedData(CompoundTag tag) {
-        for (Widget widget : widgets) {
+        for (Widget widget : widgets.values()) {
             if (tag.contains("widget-" + widget.getUuid())) {
                 CompoundTag widgetTag = tag.getCompound("widget-" + widget.getUuid());
                 widget.loadSyncedData(widgetTag);
@@ -211,13 +215,13 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     public void setupConfigTooltips(Player player) {
         super.setupConfigTooltips(player);
         if (player == null) {
-            for (int i = 0; i < widgets.size(); i++) {
-                widgets.get(i).addConfiguration(this, player);
+            for (Widget widget : widgets.values()) {
+               widget.addConfiguration(this, player);
             }
         } else if (lastTargeted != null) {
-            for (int i = 0; i < widgets.size(); i++) {
-                if (widgets.get(i).equals(lastTargeted)) {
-                    lastTargeted.addConfiguration(this, player);
+            for (Widget widget : widgets.values()) {
+                if (widget.equals(lastTargeted)) {
+                    widget.addConfiguration(this, player);
                 }
             }
             lastTargeted = null;
@@ -298,7 +302,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
             Vector3f min = new Vector3f();
             Vector3f max = new Vector3f();
 
-            for (Widget widget : widgets) {
+            for (Widget widget : widgets.values()) {
                 Vector2i widgetPos = widget.getPosition();
                 min.set(widgetPos.x, 0, widgetPos.y);
                 max.set(min);
@@ -406,8 +410,8 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         return angle;
     }
 
-    public List<Widget> getWidgets() {
-        return widgets;
+    public Collection<Widget> getWidgets() {
+        return widgets.values();
     }
 
     public Vector3f transformLocal(Vector3f pos) {
@@ -448,7 +452,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     public void placeWidget(Vector2i placement, Widget widget) {
         Widget newWidget = widget.makeClone();
         newWidget.setPosition(placement);
-        widgets.add(newWidget);
+        widgets.put(newWidget.getUuid(),newWidget);
         if (!level.isClientSide) {
             markDataDirty();
         }
@@ -465,7 +469,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     public void removeWidget(Vec3 hit) {
         Vector3f cameraHit = hit.toVector3f();
 
-        boolean didRemove = widgets.remove(getHit(cameraHit));
+        boolean didRemove = widgets.remove(getHit(cameraHit).getUuid()) != null;
         if (didRemove) {
             Vec3 center = getBlockPos().getCenter();
             ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
@@ -483,7 +487,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
         Widget targeted = null;
 
-        for (Widget widget : widgets) {
+        for (Widget widget : widgets.values()) {
             Vector2i widgetPos = widget.getPosition();
             min.set(widgetPos.x / 16f, 0, widgetPos.y / 16f);
             max.set(min);
