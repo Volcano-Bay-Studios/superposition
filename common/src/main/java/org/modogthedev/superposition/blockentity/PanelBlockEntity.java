@@ -450,10 +450,10 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     }
 
     public void placeWidget(Vector2i placement, Widget widget) {
-        Widget newWidget = widget.makeClone();
-        newWidget.setPosition(placement);
-        widgets.put(newWidget.getUuid(),newWidget);
         if (!level.isClientSide) {
+            Widget newWidget = widget.makeClone();
+            newWidget.setPosition(placement);
+            widgets.put(newWidget.getUuid(),newWidget);
             markDataDirty();
         }
     }
