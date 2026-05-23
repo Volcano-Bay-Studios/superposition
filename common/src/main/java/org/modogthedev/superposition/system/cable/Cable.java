@@ -41,6 +41,7 @@ public class Cable {
     private boolean emitsLight;
     private float brightness;
     private int stretchGrace = 0;
+    private boolean forward = true;
 
     private CableClientState clientState;
     private boolean clientDirty;
@@ -88,6 +89,14 @@ public class Cable {
 
             BlockPos startPos = firstNode.getAnchor().getAnchorBlock();
 
+            BlockPos endPos = lastNode.getAnchor().getAnchorBlock();
+
+            if (!forward) {
+                BlockPos old = endPos;
+                endPos = startPos;
+                startPos = old;
+            }
+
             List<Signal> signalList = new ArrayList<>(); // Collect Signals
 
             BlockEntity start = null;
@@ -118,6 +127,7 @@ public class Cable {
                     }
                 }
             }
+
             if (this.emitsLight) {
                 this.updateColor(signalList);
             }
@@ -141,8 +151,6 @@ public class Cable {
                     signalList.add(signal);
                 }
             }
-
-            BlockPos endPos = lastNode.getAnchor().getAnchorBlock();
 
             if (this.level.isLoaded(endPos)) {
                 BlockEntity end = this.level.getBlockEntity(endPos);
@@ -232,7 +240,7 @@ public class Cable {
     }
 
     public void write(FriendlyByteBuf buf) {
-        buf.writeInt(1); // Data format version, can be used in the future if data format changes
+        buf.writeInt(2); // Data format version, can be used in the future if data format changes
         buf.writeInt(CableManager.getInterpolationTick(level));
         buf.writeInt(this.color.getRGB());
         buf.writeByte((this.emitsLight ? 1 : 0) | (this.ropeSimulation.isSleeping() ? 2 : 0));
@@ -256,6 +264,7 @@ public class Cable {
             buf.writeVarInt(entry.getIntKey());
             buf.writeVarInt(entry.getIntValue());
         }
+        buf.writeBoolean(forward);
     }
 
     public void read(UUID id, FriendlyByteBuf buf, Level level) {
@@ -287,6 +296,9 @@ public class Cable {
             addPlayerHoldingPoint(buf.readVarInt(), buf.readVarInt());
         }
         this.level = level;
+        if (version >= 2) { // Use version numbers incrementally to check if the version allows new features.
+            forward = buf.readBoolean();
+        }
     }
 
     public static Cable readNew(UUID id, FriendlyByteBuf buf, Level level, boolean isCreating) {
@@ -309,6 +321,10 @@ public class Cable {
         }
         if (isCreating) {
             ropeSimulation.recalculateBaseRopeConstraints();
+        }
+
+        if (version >= 2) { // Use version numbers incrementally to check if the version allows new features.
+            cable.forward = buf.readBoolean();
         }
         return cable;
 //        return null;

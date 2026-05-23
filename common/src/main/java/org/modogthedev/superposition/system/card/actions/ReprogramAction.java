@@ -8,20 +8,20 @@ import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.Card;
 import org.modogthedev.superposition.system.card.ComputerAction;
+import org.modogthedev.superposition.system.card.NodePorts;
 import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.List;
 
-public class ReprogramAction extends Action implements ComputerAction {
+public class ReprogramAction extends ComputerAction {
 
     public ReprogramAction(ResourceLocation action, Information info) {
         super(action, info);
     }
 
-
     @Override
-    public void computer(List<Signal> signals, Level level, BlockPos pos, ComputerBlockEntity computerBlockEntity) {
-        Signal signal = signals.getFirst();
+    protected void computer(NodePorts input, Level level, BlockPos pos, ComputerBlockEntity computerBlockEntity) {
+        Signal signal = input.getSignals(inString()).getFirst();
         if (signal != null && signal.getEncodedData() != null && signal.getEncodedData().compoundTagData() != null) {
             CompoundTag tag = signal.getEncodedData().compoundTagData();
             Card card = new Card(tag);
@@ -30,7 +30,7 @@ public class ReprogramAction extends Action implements ComputerAction {
     }
 
     @Override
-    public int getOutputCount() {
-        return 0;
+    protected NodePorts.Builder buildOutputPorts(NodePorts.Builder builder) {
+        return builder.addVirtualPort(outString());
     }
 }

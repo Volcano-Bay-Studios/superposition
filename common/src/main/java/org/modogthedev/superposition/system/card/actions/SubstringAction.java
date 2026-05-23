@@ -2,17 +2,27 @@ package org.modogthedev.superposition.system.card.actions;
 
 import net.minecraft.resources.ResourceLocation;
 import org.modogthedev.superposition.system.card.Action;
-import org.modogthedev.superposition.system.card.BiModifyAction;
+import org.modogthedev.superposition.system.card.ArraySetExecutableAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class SubstringAction extends Action implements BiModifyAction {
+import java.util.List;
+
+public class SubstringAction extends ArraySetExecutableAction {
 
     public SubstringAction(ResourceLocation action, Information info) {
         super(action, info);
     }
 
     @Override
-    public Signal modify(Signal firstSignal, Signal secondSignal) {
+    protected List<String> arrayKeys() {
+        return List.of("string","index");
+    }
+
+    @Override
+    protected Signal executeArray(Signal[] signals) {
+        Signal firstSignal = signals[0];
+        Signal secondSignal = signals[1];
+
         if (secondSignal != null && firstSignal.getEncodedData() != null && secondSignal.getEncodedData() != null) {
             String s = firstSignal.getEncodedData().stringValue();
             int cutPosition = secondSignal.getEncodedData().intValue();

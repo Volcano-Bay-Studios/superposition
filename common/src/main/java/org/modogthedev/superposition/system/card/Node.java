@@ -8,11 +8,10 @@ import org.joml.Vector2f;
 import org.modogthedev.superposition.screens.utils.Bounds;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.SignalHelper;
+import org.modogthedev.superposition.util.SignalList;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Node {
     private Action action = null;
@@ -20,13 +19,12 @@ public class Node {
     private final Card card;
     private final Vector2f position = new Vector2f();
     private final Vector2f size = new Vector2f(10, 10);
-    private List<List<Signal>> signals;
+    private NodePorts inSignals;
+    private NodePorts outSignals;
     private final List<Attachment> attachments = new ArrayList<>();
-    private String issue = null;
 
     public Node(Card card) {
         this.card = card;
-        updateSize(0);
     }
 
     public Node getTarget() {
@@ -44,44 +42,26 @@ public class Node {
     public void updateAction(Action action) {
         this.action = action;
         action.setNode(this);
-        if (action instanceof ExecutableAction executableAction) {
-            updateSize(executableAction.getParameterCount());
-        }
+        NodePorts.Builder builder = new NodePorts.Builder();
+        inSignals = action.buildInputPorts(builder).build();
+        builder = new NodePorts.Builder();
+        outSignals = action.buildOutputPorts(builder).build();
+        calculateSize();
     }
 
-    public void fillData(int index, List<Signal> signals, Level level, BlockPos pos) {
-        List<Signal> fill = this.signals.get(index); // Add signals to node buffer
-        SignalHelper.updateSignalList(fill,signals);
-        int maxSize = 0;
-        for (List<Signal> signalList : this.signals) { // Check if all signals have been submitted
-            if (signalList.isEmpty()) {
-                return;
-            }
-            maxSize = Math.max(maxSize, signalList.size());
-        }
-        List<Signal> executionSignals = new ArrayList<>(); // Fill this list so that each sequential signal is from a different list, this maintains order in multisignal lists. This also means that AnyModifyActions will be executed on single lists if any of the lists are empty
-        if (this.signals.size() > 1) {
-            for (int i = 0; i < maxSize; i++) {
-                for (List<Signal> signalList : this.signals) {
-                    if (i < signalList.size()) {
-                        executionSignals.add(signalList.get(i));
+    public void fillData(String key, List<Signal> data) {
+        inSignals.putSignals(key,data);
+    }
+
+    public void execute(Level level, BlockPos pos) {
+        action.execute(inSignals,outSignals,level,pos);
+        for (String key : outSignals.getKeys()) {
+            for (Attachment attachment : attachments) {
+                if (attachment.getPort().equals(key)) {
+                    Attachment target = attachment.getFinalTargetAttachment();
+                    if (target != null) {
+                        target.getNode().fillData(target.getPort(),outSignals.getSignals(key));
                     }
-                }
-            }
-        } else {
-            executionSignals.addAll(this.signals.getFirst());
-        }
-        execute(executionSignals, level, pos); // Complete execution
-    }
-
-    public void execute(List<Signal> signals, Level level, BlockPos pos) {
-        if (action instanceof ExecutableAction executableAction && !signals.isEmpty()) {
-            List<Signal> returns = executableAction.execute(signals, level, pos);
-            for (int i = 0; i < executableAction.getOutputCount(); i++) {
-                Attachment attachment = attachments.get(i);
-                Attachment target = attachment.getFinalTargetAttachment();
-                if (target != null && attachment.getNode() != target.getNode() && target instanceof Attachment.InputAttachment inputAttachment) {
-                    target.getNode().fillData(inputAttachment.getIndex(), executableAction.sameOutput() ? new ArrayList<>(returns) : List.of(returns.get(i)), level, pos);
                 }
             }
         }
@@ -95,45 +75,30 @@ public class Node {
         return action;
     }
 
-    public void updateSize(int size) {
-        signals = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            signals.add(new ArrayList<>());
-        }
-        calculateSize();
-    }
-
-
     public void clearForExecution() {
-//        for (List<Signal> signalList : signals) {
-//            signalList.clear();
-//        }
+        inSignals.flush();
+        outSignals.flush();
     }
 
     private void calculateSize() {
-        size.x = 20;
-        size.y = 20;
-        if (signals != null) {
-            size.y = 12 + (8 * Math.max(1, getInputCount() - 1));
-        }
+        size.x = 60;
+        size.y = 40;
+        size.y = 32 + (8 * Math.max(1, Math.max(inSignals.size(), outSignals.size()) - 1));
 
         attachments.clear();
-        if (action instanceof ExecutableAction executableAction) {
-            int count = executableAction.getOutputCount();
-            for (int i = 0; i < count; i++) {
-                attachments.add(new Attachment(new Vector2f(size.x / 2, i * 8 - (Math.max(0, executableAction.getOutputCount() - 1) * 4)) , this));
-            }
-
+        int outputCount = outSignals.size();
+        int i = 0;
+        for (String key : outSignals.getVisible()) {
+            attachments.add(new Attachment(new Vector2f(size.x / 2, i * 8 - (Math.max(0, outputCount - 1) * 4)), key,this));
+            i++;
         }
 
-        int inputCount = getInputCount();
-        for (int i = 0; i < inputCount; i++) {
-            attachments.add(new Attachment.InputAttachment(new Vector2f(-size.x / 2, i * 8 - (Math.max(0, getInputCount() - 1) * 4)), this, i, UUID.randomUUID()));
+        int inputCount = inSignals.size();
+        i = 0;
+        for (String key : inSignals.getVisible()) {
+            attachments.add(new Attachment.InputAttachment(new Vector2f(-size.x / 2, i * 8 - (Math.max(0, inputCount - 1) * 4)), this, key, UUID.randomUUID()));
+            i++;
         }
-    }
-
-    public int getInputCount() {
-        return signals.size();
     }
 
     public List<Attachment> getAttachments() {
@@ -158,10 +123,10 @@ public class Node {
 
             attachmentTag.putFloat("x", attachment.getPosition().x()); // Put high level attachment data
             attachmentTag.putFloat("y", attachment.getPosition().y());
+            attachmentTag.putString("port", attachment.getPort());
 
             if (attachment instanceof Attachment.InputAttachment inputAttachment) { // Encode input data
-                attachmentTag.putUUID("uuid",inputAttachment.getUuid());
-                attachmentTag.putInt("index",inputAttachment.getIndex());
+                attachmentTag.putUUID("uuid", inputAttachment.getUuid());
             }
 
             ListTag internalAttachments = new ListTag();
@@ -170,14 +135,15 @@ public class Node {
                     CompoundTag segmentTag = new CompoundTag();
                     segmentTag.putFloat("x", segment.getPosition().x());
                     segmentTag.putFloat("y", segment.getPosition().y());
-                    if (segmentAttachment.getTargetUUID() != null) {
+                    segmentTag.putString("port",segment.getPort());
+                    if (segmentAttachment.getTargetUUID() != null) { // A segment may have a target
                         segmentTag.putUUID("targetUUID", segmentAttachment.getTargetUUID());
                     }
                     internalAttachments.add(segmentTag);
                 }
             }
             if (!internalAttachments.isEmpty()) { // Store segment data if present
-                attachmentTag.put("segments",internalAttachments);
+                attachmentTag.put("segments", internalAttachments);
             } else if (attachment.getTargetUUID() != null) {
                 attachmentTag.putUUID("targetUUID", attachment.getTargetUUID());
             }
@@ -202,22 +168,22 @@ public class Node {
             ListTag attachments = tag.getList("attachments", 10);
             for (int i = 0; i < attachments.size(); i++) {
                 CompoundTag attachmentTag = attachments.getCompound(i);
-                Vector2f position = new Vector2f(attachmentTag.getFloat("x"),attachmentTag.getFloat("y"));
+                Vector2f position = new Vector2f(attachmentTag.getFloat("x"), attachmentTag.getFloat("y"));
 
                 if (attachmentTag.contains("uuid")) { // Read as input
-                    this.attachments.add(new Attachment.InputAttachment(position,this,attachmentTag.getInt("index"),attachmentTag.getUUID("uuid")));
+                    this.attachments.add(new Attachment.InputAttachment(position, this, attachmentTag.getString("port"), attachmentTag.getUUID("uuid")));
                 } else {
-                    Attachment newAttachment = new Attachment(position, this);
+                    Attachment newAttachment = new Attachment(position, attachmentTag.getString("port"),this);
                     this.attachments.add(newAttachment);
                     if (attachmentTag.contains("targetUUID")) { // Read as output with direct target
                         newAttachment.setTargetUUID(attachmentTag.getUUID("targetUUID"));
                     } else if (attachmentTag.contains("segments")) { // Read as output with segments
-                        ListTag internalAttachments = attachmentTag.getList("segments",10);
+                        ListTag internalAttachments = attachmentTag.getList("segments", 10);
                         Attachment lastAttachment = newAttachment;
                         for (int j = 0; j < internalAttachments.size(); j++) {
                             CompoundTag segmentTag = internalAttachments.getCompound(j);
-                            Vector2f segmentPosition = new Vector2f(segmentTag.getFloat("x"),segmentTag.getFloat("y"));
-                            Attachment.SegmentAttachment segment = new Attachment.SegmentAttachment(segmentPosition,lastAttachment);
+                            Vector2f segmentPosition = new Vector2f(segmentTag.getFloat("x"), segmentTag.getFloat("y"));
+                            Attachment.SegmentAttachment segment = new Attachment.SegmentAttachment(segmentPosition, segmentTag.getString("port"),lastAttachment);
                             lastAttachment.setTarget(segment);
                             if (segmentTag.contains("targetUUID")) {
                                 segment.setTargetUUID(segmentTag.getUUID("targetUUID"));

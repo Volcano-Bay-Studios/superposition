@@ -7,12 +7,13 @@ import org.modogthedev.superposition.blockentity.ComputerBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionActions;
 import org.modogthedev.superposition.system.card.Action;
 import org.modogthedev.superposition.system.card.ComputerAction;
+import org.modogthedev.superposition.system.card.NodePorts;
 import org.modogthedev.superposition.system.card.actions.configuration.PortConfiguration;
 import org.modogthedev.superposition.system.signal.Signal;
 
 import java.util.List;
 
-public class OutputAction extends Action implements ComputerAction {
+public class OutputAction extends ComputerAction {
 
     public OutputAction(ResourceLocation action, Information info) {
         super(action, info);
@@ -24,14 +25,14 @@ public class OutputAction extends Action implements ComputerAction {
     }
 
     @Override
-    public void computer(List<Signal> signal, Level level, BlockPos pos, ComputerBlockEntity computerBlockEntity) {
+    protected void computer(NodePorts input, Level level, BlockPos pos, ComputerBlockEntity computerBlockEntity) {
         if (getConfigurations().getFirst() instanceof PortConfiguration portConfiguration) {
-            computerBlockEntity.addOutbound(portConfiguration.getString(), signal);
+            computerBlockEntity.addOutbound(portConfiguration.getString(), input.getSignals(inString()));
         }
     }
 
     @Override
-    public int getOutputCount() {
-        return 0;
+    protected NodePorts.Builder buildOutputPorts(NodePorts.Builder builder) {
+        return builder.addVirtualPort(outString());
     }
 }

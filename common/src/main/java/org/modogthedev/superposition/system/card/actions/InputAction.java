@@ -5,15 +5,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.core.SuperpositionActions;
 import org.modogthedev.superposition.system.card.Action;
-import org.modogthedev.superposition.system.card.ExecutableAction;
-import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.system.card.NodePorts;
 
-import java.util.List;
-
-public class InputAction extends Action implements ExecutableAction {
+public class InputAction extends Action {
 
     public InputAction(ResourceLocation action, Information info) {
         super(action, info);
+    }
+
+    @Override
+    public void execute(NodePorts input, NodePorts output, Level level, BlockPos pos) {
+        output.putSignals("out",input.getSignals("in"));
     }
 
     @Override
@@ -21,14 +23,8 @@ public class InputAction extends Action implements ExecutableAction {
         getConfigurations().add(SuperpositionActions.PORT_CONFIGURATION.get().copy());
     }
 
-
     @Override
-    public List<Signal> execute(List<Signal> signals, Level level, BlockPos pos) {
-        return signals;
-    }
-
-    @Override
-    public int getParameterCount() {
-        return 0;
+    public NodePorts.Builder buildInputPorts(NodePorts.Builder builder) {
+        return builder.addVirtualPort(inString());
     }
 }

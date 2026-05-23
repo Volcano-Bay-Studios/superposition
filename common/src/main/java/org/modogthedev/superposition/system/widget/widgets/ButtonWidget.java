@@ -19,12 +19,14 @@ public class ButtonWidget extends Widget {
 
     @Override
     public boolean tick(Level level, PanelBlockEntity panel, int index) {
-        if (!level.isClientSide && pressed > 0) {
-            pressed -= .2f;
+        if (!level.isClientSide) {
             Signal signal = SignalHelper.getEmptySignal(level, panel.getBlockPos());
             signal.encode(pressed > 0);
             putPortSignals("value", List.of(signal),panel);
-            return true;
+            if (pressed > 0) {
+                pressed -= .4f;
+                return true;
+            }
         }
         position = pressed;
         return super.tick(level, panel, index);
@@ -72,6 +74,6 @@ public class ButtonWidget extends Widget {
     @Override
     public boolean rightClickInteract(boolean alt, Level level, Vector3f hit) {
         pressed = 1;
-        return super.rightClickInteract(alt, level, hit);
+        return true;
     }
 }

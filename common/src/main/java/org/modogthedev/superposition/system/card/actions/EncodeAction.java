@@ -1,20 +1,28 @@
 package org.modogthedev.superposition.system.card.actions;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.modogthedev.superposition.system.card.Action;
-import org.modogthedev.superposition.system.card.BiModifyAction;
+import org.modogthedev.superposition.system.card.ArraySetExecutableAction;
 import org.modogthedev.superposition.system.signal.Signal;
 
-public class EncodeAction extends Action implements BiModifyAction {
+import java.util.List;
+
+public class EncodeAction extends ArraySetExecutableAction {
 
     public EncodeAction(ResourceLocation action, Information info) {
         super(action, info);
     }
 
     @Override
-    public Signal modify(Signal firstSignal, Signal secondSignal) {
+    protected List<String> arrayKeys() {
+        return List.of("signal", "data");
+    }
+
+    @Override
+    protected Signal executeArray(Signal[] signals) {
+        Signal firstSignal = signals[0];
+        Signal secondSignal = signals[1];
+
         if (firstSignal != null && secondSignal != null && secondSignal.getEncodedData() != null) {
             firstSignal.setEncodedData(secondSignal.getEncodedData());
         }

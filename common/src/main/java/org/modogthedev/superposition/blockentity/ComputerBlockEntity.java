@@ -16,14 +16,12 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.card.Card;
-import org.modogthedev.superposition.system.card.ExecutableAction;
 import org.modogthedev.superposition.system.card.Node;
 import org.modogthedev.superposition.system.card.actions.InputAction;
 import org.modogthedev.superposition.system.card.actions.OutputAction;
 import org.modogthedev.superposition.system.card.actions.configuration.PortConfiguration;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
-import org.modogthedev.superposition.util.SignalHelper;
 import org.modogthedev.superposition.util.TickableBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,11 +151,10 @@ public class ComputerBlockEntity extends SignalActorBlockEntity implements Ticka
                 if (node.getAction() instanceof InputAction inputAction && inputAction.getConfigurations().getFirst() instanceof PortConfiguration portConfiguration) {
                     List<Signal> signals = getPortSignals(portConfiguration.getString());
                     if (!signals.isEmpty()) {
-                        node.execute(signals, level, getBlockPos());
+                        node.fillData(inputAction.inString(),signals);
                     }
-                } else if (node.getAction() instanceof ExecutableAction action && action.getParameterCount() == 0) {
-                    node.execute(SignalHelper.listOf(SignalHelper.getEmptySignal(getLevel(), getBlockPos())), level, getBlockPos());
                 }
+                node.execute(level, getBlockPos());
             }
         }
         super.tick();

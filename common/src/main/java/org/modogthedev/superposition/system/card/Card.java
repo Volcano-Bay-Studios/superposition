@@ -42,7 +42,9 @@ public class Card { //TODO: make this work!
                 CompoundTag tag1 = nodesTag.getCompound(i);
                 Node node = new Node(this);
                 node.load(tag1);
-                nodes.add(node);
+                if (node.getAction() != null) {
+                    nodes.add(node);
+                }
             }
         } catch (Exception ignored) {
             return  null;

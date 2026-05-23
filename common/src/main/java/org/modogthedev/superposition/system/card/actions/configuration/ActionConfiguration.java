@@ -65,6 +65,7 @@ public class ActionConfiguration implements Cloneable {
     public CompoundTag load(CompoundTag tag) {
         return tag;
     }
+    public void remove(GuiGraphics guiGraphics) {}
 
     public static ActionConfiguration loadNew(CompoundTag tag) {
         ActionConfiguration configuration = SuperpositionActions.ACTION_CONFIGURATIONS.asVanillaRegistry().get(ResourceLocation.fromNamespaceAndPath(tag.getString("namespace"),tag.getString("path")));
@@ -73,4 +74,5 @@ public class ActionConfiguration implements Cloneable {
         }
         return configuration;
     }
+
 }

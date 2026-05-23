@@ -89,7 +89,7 @@ public class SuperpositionActions {
             Component.literal("Merges tags together"),
             Action.Type.MODIFY
     )));
-    public static final RegistryObject<Action> RETRIEVE = registerAction("retrieve", () -> new RetriveAction(Superposition.id("retrieve"), new Action.Information(
+    public static final RegistryObject<Action> RETRIEVE = registerAction("retrieve", () -> new RetrieveAction(Superposition.id("retrieve"), new Action.Information(
             Component.literal("Retrieve"),
             Component.literal("Retrieve the contents of a tag using the second signal as a tag"),
             Action.Type.MODIFY

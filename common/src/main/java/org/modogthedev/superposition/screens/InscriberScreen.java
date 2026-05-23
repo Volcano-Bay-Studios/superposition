@@ -5,6 +5,8 @@ import foundry.veil.api.client.color.Color;
 import foundry.veil.api.network.VeilPacketManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -48,6 +50,7 @@ public class InscriberScreen extends Screen {
     private Bounds windowBounds = new Bounds();
     private Action selectedAction = null;
     private boolean scrolling = false;
+    private EditBox title;
 
     private Node inspectingNode = null;
 
@@ -65,11 +68,22 @@ public class InscriberScreen extends Screen {
         super(Component.literal("Inscriber"));
         this.card = card;
         this.blockPos = pos;
+        title = new EditBox(Minecraft.getInstance().font, 100, 16, Component.literal("Title Field"));
+        title.setValue(card.title);
+        title.setBordered(false);
+        title.setTextColor(Superposition.SUPERPOSITION_THEME.get("topBorder"));
+    }
+
+    @Override
+    protected void init() {
+        addRenderableWidget(title);
+        super.init();
     }
 
     @Override
     public void tick() {
         animation++;
+        card.title = title.getValue();
         if (animation >= 40) {
             animation = 0;
         }
@@ -83,7 +97,8 @@ public class InscriberScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        title.setPosition(0, 0);
         PoseStack poseStack = guiGraphics.pose();
         width = guiGraphics.guiWidth();
         height = guiGraphics.guiHeight();
@@ -138,7 +153,12 @@ public class InscriberScreen extends Screen {
         SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, -2, -2, screenWidth + 2, 0, panelTopBorder, panelTopBorder);
         SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, -2, screenHeight, screenWidth + 2, screenHeight + 2, panelBottomBorder, panelBottomBorder);
         boolean hoveringTitle = (adjustedMouse.x > 0 && adjustedMouse.x < screenWidth && adjustedMouse.y < 0 && adjustedMouse.y > -30) || titleFocused;
-        guiGraphics.drawCenteredString(Minecraft.getInstance().font, card.title + (titleFocused && animation < 20 ? "|" : ""), screenWidth / 2, -15, hoveringTitle ? highlight : topBorder);
+        title.setTextColor(title.isHoveredOrFocused() ? topBorder : bottomBorder);
+        title.setPosition(4, 4);
+
+        for (Renderable renderable : renderables) {
+            renderable.render(guiGraphics, (int) mouse.x, (int) mouse.y, partialTick);
+        }
 
         dragNode(guiGraphics, mouseX, mouseY);
 
@@ -155,34 +175,14 @@ public class InscriberScreen extends Screen {
             connectingAttachment.setSegment(new Vector2f(mouse.x, mouse.y));
         }
 
-        for (Node node : card.getNodes()) { // Render Attachments
-            float x = node.getPosition().x;
-            float y = node.getPosition().y;
-
+        for (Node node : card.getNodes()) { // Render Attachment Line Connections
             for (Attachment attachment : node.getAttachments()) {
                 exploreAttachment(attachment, attachments);
             }
-
             for (Attachment attachment : attachments) {
                 if (attachment.getTarget() != null && !(attachment instanceof Attachment.InputAttachment)) {
                     drawConnection(guiGraphics, attachment.getAbsolutePosition().x, attachment.getAbsolutePosition().y, attachment.getTarget().getAbsolutePosition().x, attachment.getTarget().getAbsolutePosition().y, attachment.getSnapMode(), 1f, topBorder, topBorder);
                 }
-            }
-
-            for (Attachment attachment : attachments) {
-                float attachX = attachment.getPosition().x;
-                float attachY = attachment.getPosition().y;
-                if (connectingAttachment != null && attachment instanceof Attachment.SegmentAttachment segmentAttachment && segmentAttachment.getParent() == connectingAttachment && segmentAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 4) {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), errorTopBorder, errorTopBorder);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), errorBackground, errorBackground);
-                } else if (attachment.getAbsolutePosition().distance(mouse) < 5 && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null) || (connectingAttachment != null && connectingAttachment.getTarget() == attachment)) {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), topBorder, topBorder);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
-                } else {
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), bottomBorder, bottomBorder);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
-                }
-
             }
             attachments.clear();
         }
@@ -210,7 +210,29 @@ public class InscriberScreen extends Screen {
                     ActionSpritesheet.SpriteInformation sprite = spritesheet.get(action.getSelfReference());
                     guiGraphics.blit(spritesheet.spritesheetLocation, (int) (node.getPosition().x - node.getSize().x / 2f) + 2, (int) (node.getPosition().y - node.getSize().y / 2f) + 2, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
                 }
+                guiGraphics.drawString(Minecraft.getInstance().font, action.getInfo().name(), (int) (node.getPosition().x - node.getSize().x / 2f) + 19, (int) (node.getPosition().y - node.getSize().y / 2f) + 6, topBorder, false);
             }
+
+            for (Attachment attachment : node.getAttachments()) {
+                exploreAttachment(attachment, attachments);
+            }
+
+            for (Attachment attachment : attachments) {
+                float attachX = attachment.getPosition().x;
+                float attachY = attachment.getPosition().y;
+                if (connectingAttachment != null && attachment instanceof Attachment.SegmentAttachment segmentAttachment && segmentAttachment.getParent() == connectingAttachment && segmentAttachment.getAbsolutePosition().distance(segmentAttachment.getParent().getAbsolutePosition()) < 4) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), errorTopBorder, errorTopBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), errorBackground, errorBackground);
+                } else if (attachment.getAbsolutePosition().distance(mouse) < 5 && !(attachment instanceof Attachment.SegmentAttachment && connectingAttachment != null) || (connectingAttachment != null && connectingAttachment.getTarget() == attachment)) {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), topBorder, topBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
+                } else {
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 2), (int) (y + attachY - 2), (int) (x + attachX + 2), (int) (y + attachY + 2), bottomBorder, bottomBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (x + attachX - 1), (int) (y + attachY - 1), (int) (x + attachX + 1), (int) (y + attachY + 1), background, background);
+                }
+            }
+
+            attachments.clear();
         }
 
         // Render add window
@@ -306,6 +328,7 @@ public class InscriberScreen extends Screen {
         if (inspectingNode != null) {
             Action action = inspectingNode.getAction();
             if (action != null) {
+
                 SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 200), 0, (int) (width), (int) (height), background, background);
                 SPUIUtils.drawGradientRect(poseStack.last().pose(), 0, (int) (width - 196), 0, (int) (width - 192), (int) (height), topBorder, bottomBorder);
                 guiGraphics.drawCenteredString(Minecraft.getInstance().font, action.getInfo().name(), (int) (width - 100), 20, topBorder);
@@ -347,19 +370,19 @@ public class InscriberScreen extends Screen {
         if (selectedNode == null) {
             return;
         }
-        int topBorder = Superposition.SUPERPOSITION_THEME.get("bottomBorder");
+        int background = Superposition.SUPERPOSITION_THEME.get("background");
         PoseStack poseStack = guiGraphics.pose();
         Vector3f mouse = new Vector3f(mouseX / zoom - camera.x, mouseY / zoom - camera.y, 0);
         selectedNode.getPosition().set(mouse.x + offset.x, mouse.y + offset.y);
         for (Node node2 : card.getNodes()) {
             if (node2 != selectedNode) {
-                if (Math.abs(node2.getPosition().x - selectedNode.getPosition().x) < 5f) {
+                if (Math.abs(node2.getPosition().x - selectedNode.getPosition().x) < 2.5f) {
                     selectedNode.getPosition().set(node2.getPosition().x, selectedNode.getPosition().y);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) (selectedNode.getPosition().x - 1), (int) Math.min(node2.getPosition().y, selectedNode.getPosition().y), (int) (selectedNode.getPosition().x + 1), (int) Math.max(selectedNode.getPosition().y, node2.getPosition().y), topBorder, topBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) (selectedNode.getPosition().x - 1), (int) Math.min(node2.getPosition().y, selectedNode.getPosition().y), (int) (selectedNode.getPosition().x + 1), (int) Math.max(selectedNode.getPosition().y, node2.getPosition().y), background, background);
                 }
-                if (Math.abs(node2.getPosition().y - selectedNode.getPosition().y) < 5f) {
+                if (Math.abs(node2.getPosition().y - selectedNode.getPosition().y) < 2.5f) {
                     selectedNode.getPosition().set(selectedNode.getPosition().x, node2.getPosition().y);
-                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) Math.min(selectedNode.getPosition().x, node2.getPosition().x), (int) selectedNode.getPosition().y - 1, (int) Math.max(node2.getPosition().x, selectedNode.getPosition().x), (int) selectedNode.getPosition().y + 1, topBorder, topBorder);
+                    SPUIUtils.drawGradientRect(poseStack.last().pose(), 4, (int) Math.min(selectedNode.getPosition().x, node2.getPosition().x), (int) selectedNode.getPosition().y - 1, (int) Math.max(node2.getPosition().x, selectedNode.getPosition().x), (int) selectedNode.getPosition().y + 1, background, background);
                 }
             }
         }
@@ -458,8 +481,6 @@ public class InscriberScreen extends Screen {
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (button == 0) {
-
-
             if (connectingAttachment != null && connectingAttachment.getTarget() != null && connectingAttachment.getAbsolutePosition().distance(connectingAttachment.getTarget().getAbsolutePosition()) < 4) {
                 connectingAttachment.clearTarget();
             }
@@ -490,13 +511,10 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        title.setFocused(false);
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
-        boolean hoveringTitle = (mouse.x > 0 && mouse.x < screenWidth && mouse.y < 0 && mouse.y > -30);
-        if (hoveringTitle) {
-            titleFocused = true;
+        if (super.mouseClicked(mouse.x, mouse.y, button)) {
             return true;
-        } else if (titleFocused) {
-            titleFocused = false;
         }
         if (inspectingNode != null) {
             Action action = inspectingNode.getAction();
@@ -614,7 +632,7 @@ public class InscriberScreen extends Screen {
 
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return false;
     }
 
     @Override
@@ -650,9 +668,12 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
         if (inspectingNode != null) {
             for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
-                boolean type = configuration.keyPressed(keyCode,scanCode,modifiers);
+                boolean type = configuration.keyPressed(keyCode, scanCode, modifiers);
                 if (type) {
                     return true;
                 }
@@ -666,7 +687,7 @@ public class InscriberScreen extends Screen {
                 card.title = card.title.substring(0, Math.max(0, card.title.length() - 1));
             }
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return false;
     }
 
     @Override

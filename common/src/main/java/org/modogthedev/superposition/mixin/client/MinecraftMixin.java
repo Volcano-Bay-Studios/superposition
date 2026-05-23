@@ -52,6 +52,7 @@ public abstract class MinecraftMixin {
     private void resetCooldown(CallbackInfo ci) {
         if (PanelBlock.pressing) {
             this.rightClickDelay = 0;
+            PanelBlock.pressing = false;
         }
     }
 }

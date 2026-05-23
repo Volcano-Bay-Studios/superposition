@@ -1,11 +1,13 @@
 package org.modogthedev.superposition.system.card;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.modogthedev.superposition.core.SuperpositionActions;
 import org.modogthedev.superposition.system.card.actions.configuration.ActionConfiguration;
 
@@ -23,7 +25,6 @@ public abstract class Action implements Cloneable {
     }
 
     protected void setupConfigurations() {
-
     }
 
     public ResourceLocation getSelfReference() {
@@ -32,6 +33,25 @@ public abstract class Action implements Cloneable {
         }
         return selfReference;
     }
+
+    public abstract void execute(NodePorts input, NodePorts output, Level level, BlockPos pos);
+
+    protected NodePorts.Builder buildInputPorts(NodePorts.Builder builder) {
+        return builder.addPort(inString());
+    }
+
+    protected NodePorts.Builder buildOutputPorts(NodePorts.Builder builder) {
+        return builder.addPort(outString());
+    }
+
+    public String inString() {
+        return "in";
+    }
+
+    public String outString() {
+        return "out";
+    }
+
 
     public void setNode(Node node) {
         this.node = node;
@@ -63,9 +83,6 @@ public abstract class Action implements Cloneable {
 
     public List<ActionConfiguration> getConfigurations() {
         return configurations;
-    }
-
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY) {
     }
 
     public CompoundTag save(CompoundTag tag) {

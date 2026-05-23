@@ -270,9 +270,6 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     public Matrix4f getPanelMatrix() {
         Direction dir = getBlockState().getValue(FACING);
         Matrix4f ms = new Matrix4f();
-        float scale = 0.01f;
-        ms.scale(1 + scale);
-        ms.translate(-scale / 2f, -scale / 2f, -scale / 2f);
 
         ms.translate(0.5f, 0, 0.5f);
         ms.rotate((float) Math.atan2(-dir.getStepX(), -dir.getStepZ()), 0, 1, 0);

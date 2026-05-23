@@ -8,6 +8,8 @@
     "superposition:filter",
     "superposition:computer",
     "superposition:combinator",
+    "superposition:constant_combinator",
+    "superposition:panel",
     "computercraft:computer_normal",
     "computercraft:computer_advanced",
     "computercraft:computer_command",

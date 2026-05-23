@@ -1,5 +1,6 @@
 package org.modogthedev.superposition.system.card;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2f;
 import org.modogthedev.superposition.screens.utils.Bounds;
 
@@ -14,10 +15,12 @@ public class Attachment {
     private Attachment target = null;
     private UUID targetUUID = null;
     private int snapMode = 3;
+    private final String port;
 
-    public Attachment(Vector2f position, Node node) {
+    public Attachment(Vector2f position, String port, Node node) {
         this.position.set(position);
         this.node = node;
+        this.port = port;
     }
 
     public Vector2f getPosition() {
@@ -54,7 +57,7 @@ public class Attachment {
         this.snapMode = snapMode;
     }
 
-    public Attachment getFinalTargetAttachment() {
+    public @Nullable Attachment getFinalTargetAttachment() {
         if (finalTargetAttachment == null) {
             List<Attachment> attachments = new ArrayList<>();
             exploreAttachment(this, attachments);
@@ -70,11 +73,12 @@ public class Attachment {
         return node;
     }
 
+    public String getPort() {
+        return port;
+    }
+
     /**
      * This method is recursive and needs a limit
-     *
-     * @param attachment
-     * @return
      */
     private static void exploreAttachment(Attachment attachment, List<Attachment> attachments) {
         if (attachments.contains(attachment)) {
@@ -90,8 +94,6 @@ public class Attachment {
         return targetUUID;
     }
 
-
-
     /**
      * Sets the attachment to a segment
      *
@@ -99,7 +101,7 @@ public class Attachment {
      */
     public void setSegment(Vector2f position) {
         if (target == null) {
-            this.target = new SegmentAttachment(position.sub(node.getPosition()), this);
+            this.target = new SegmentAttachment(position.sub(node.getPosition()), port,this);
         } else {
             this.target.getPosition().set(position.sub(node.getPosition()));
         }
@@ -133,12 +135,11 @@ public class Attachment {
         finalTargetAttachment = null;
     }
 
-
     public static class SegmentAttachment extends Attachment {
         private Attachment parent;
 
-        public SegmentAttachment(Vector2f position, Attachment parent) {
-            super(position, parent.node);
+        public SegmentAttachment(Vector2f position, String port, Attachment parent) {
+            super(position, port, parent.node);
             this.parent = parent;
         }
 
@@ -152,21 +153,15 @@ public class Attachment {
     }
 
     public static class InputAttachment extends Attachment {
-        private int index = 0;
         private UUID uuid;
 
-        public InputAttachment(Vector2f position, Node node, int index, UUID uuid) {
-            super(position, node);
-            this.index = index;
+        public InputAttachment(Vector2f position, Node node, String port, UUID uuid) {
+            super(position, port, node);
             this.uuid = uuid;
         }
 
         public UUID getUuid() {
             return uuid;
-        }
-
-        public int getIndex() {
-            return index;
         }
     }
 }
