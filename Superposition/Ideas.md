@@ -4,6 +4,8 @@ Reciver
 Transmitter
 Signal Generator
 Modulator
+Computer
+Panel
 
 ## Working on
 
