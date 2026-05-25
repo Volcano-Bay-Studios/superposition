@@ -214,9 +214,9 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     @Override
     public void setupConfigTooltips(Player player) {
         super.setupConfigTooltips(player);
-        if (player == null) {
+        if (!player.level().isClientSide) {
             for (Widget widget : widgets.values()) {
-               widget.addConfiguration(this, player);
+               widget.addConfiguration(this, null);
             }
         } else if (lastTargeted != null) {
             for (Widget widget : widgets.values()) {

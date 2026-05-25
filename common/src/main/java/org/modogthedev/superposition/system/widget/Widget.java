@@ -214,6 +214,7 @@ public class Widget implements Cloneable {
             Widget clone = (Widget) clone();
             clone.position = (Vector2i) position.clone();
             clone.uuid = UUID.randomUUID();
+            clone.editable = new HashMap<>();
             return clone;
         } catch (CloneNotSupportedException ignored) {
 

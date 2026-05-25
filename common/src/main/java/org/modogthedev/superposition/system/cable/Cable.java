@@ -88,10 +88,11 @@ public class Cable {
             }
 
             BlockPos startPos = firstNode.getAnchor().getAnchorBlock();
+            BlockPos endPos = null;
 
-            BlockPos endPos = lastNode.getAnchor().getAnchorBlock();
 
-            if (!forward) {
+            if (!forward && lastNode.getAnchor() != null) {
+                endPos = lastNode.getAnchor().getAnchorBlock();
                 BlockPos old = endPos;
                 endPos = startPos;
                 startPos = old;
@@ -132,8 +133,13 @@ public class Cable {
                 this.updateColor(signalList);
             }
 
+
+
             if (lastNode.getAnchor() == null) {
                 return;
+            }
+            if (endPos == null) {
+                endPos = lastNode.getAnchor().getAnchorBlock();
             }
 
             if (signalList.isEmpty()) {
