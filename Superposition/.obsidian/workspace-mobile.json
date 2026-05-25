@@ -69,12 +69,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Items/Screwdriver.md",
+                "file": "Blocks/Panel.md",
                 "mode": "source",
-                "source": false
+                "source": true
               },
               "icon": "lucide-file",
-              "title": "Screwdriver"
+              "title": "Panel"
             }
           }
         ],
@@ -222,10 +222,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "cb22dc55014101f7",
+  "active": "f6b65119491dfb71",
   "lastOpenFiles": [
-    "Blocks/Panel.md",
     "Items/Screwdriver.md",
+    "Blocks/Panel.md",
     "Features/Widgets.md",
     "Superposition.md",
     "Ideas.md",
