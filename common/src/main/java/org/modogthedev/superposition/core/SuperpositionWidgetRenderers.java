@@ -9,8 +9,10 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
 import org.modogthedev.superposition.system.widget.renderers.ButtonWidgetRenderer;
 import org.modogthedev.superposition.system.widget.renderers.GaugeWidgetRenderer;
+import org.modogthedev.superposition.system.widget.renderers.SwitchWidgetRenderer;
 import org.modogthedev.superposition.system.widget.widgets.ButtonWidget;
 import org.modogthedev.superposition.system.widget.widgets.GaugeWidget;
+import org.modogthedev.superposition.system.widget.widgets.SwitchWidget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ public class SuperpositionWidgetRenderers {
 
     public static RegistryObject<WidgetRenderer<GaugeWidget>> GAUGE = register("gauge",(modelMap -> () -> new GaugeWidgetRenderer(modelMap)),"gauge_needle");
     public static RegistryObject<WidgetRenderer<ButtonWidget>> BUTTON = register("button",(modelMap -> () -> new ButtonWidgetRenderer(modelMap)),"button_button");
+    public static RegistryObject<WidgetRenderer<SwitchWidget>> SWITCH = register("switch",(modelMap -> () -> new SwitchWidgetRenderer(modelMap)),"switch_part");
 
     public static <T extends WidgetRenderer<?>> RegistryObject<T> register(String name, Function<Map<String, PartialModel>, Supplier<T>> supplier, String ... paths) {
         List<String> finalPaths = new ArrayList<>();

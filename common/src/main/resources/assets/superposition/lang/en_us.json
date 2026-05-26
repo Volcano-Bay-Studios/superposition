@@ -46,6 +46,7 @@
 
   "widget.superposition.gauge" : "Gauge",
   "widget.superposition.button" : "Button",
+  "widget.superposition.switch" : "Switch",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

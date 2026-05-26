@@ -34,6 +34,7 @@ import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.WidgetUseResult;
 
 import java.util.*;
 
@@ -466,12 +467,15 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     public void removeWidget(Vec3 hit) {
         Vector3f cameraHit = hit.toVector3f();
 
-        boolean didRemove = widgets.remove(getHit(cameraHit).getUuid()) != null;
-        if (didRemove) {
-            Vec3 center = getBlockPos().getCenter();
-            ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
-            stack.setCount(1);
-            Containers.dropItemStack(level, center.x, center.y + 0.25f, center.z, stack);
+        Widget widget = getHit(cameraHit);
+        if (widget != null) {
+            boolean didRemove = widgets.remove(widget.getUuid()) != null;
+            if (didRemove) {
+                Vec3 center = getBlockPos().getCenter();
+                ItemStack stack = SuperpositionItems.WIDGET.get().getDefaultInstance();
+                stack.setCount(1);
+                Containers.dropItemStack(level, center.x, center.y + 0.25f, center.z, stack);
+            }
         }
     }
 
@@ -508,29 +512,29 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     // -----------INTERACTION-----------
 
-    public boolean primaryInteract(boolean alt, Vector3f cameraHit) {
+    public WidgetUseResult primaryInteract(boolean alt, Vector3f cameraHit) {
         Widget widget = getHit(cameraHit);
         if (widget != null) {
             cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
-            boolean consume = widget.leftClickInteract(alt, level, cameraHit);
-            if (consume) {
+            WidgetUseResult result = widget.leftClickInteract(alt, level, cameraHit);
+            if (result.consumesAction()) {
                 markDataDirty();
             }
-            return consume;
+            return result;
         }
-        return false;
+        return WidgetUseResult.PASS;
     }
 
-    public boolean secondaryInteract(boolean alt, Vector3f cameraHit) {
+    public WidgetUseResult secondaryInteract(boolean alt, Vector3f cameraHit) {
         Widget widget = getHit(cameraHit);
         if (widget != null) {
             cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
-            boolean consume = widget.rightClickInteract(alt, level, cameraHit);
-            if (consume) {
+            WidgetUseResult result = widget.rightClickInteract(alt, level, cameraHit);
+            if (result.consumesAction()) {
                 markDataDirty();
             }
-            return consume;
+            return result;
         }
-        return false;
+        return WidgetUseResult.PASS;
     }
 }

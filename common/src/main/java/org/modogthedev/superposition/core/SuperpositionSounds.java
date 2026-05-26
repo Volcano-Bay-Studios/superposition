@@ -25,6 +25,9 @@ public class SuperpositionSounds {
     public static final RegistryObject<SoundEvent> SWITCH_OFF = registerSoundEvent("switch_off");
     public static final RegistryObject<SoundEvent> SCROLL = registerSoundEvent("scroll");
 
+    public static final RegistryObject<SoundEvent> BUTTON_DOWN = registerSoundEvent("button_down");
+    public static final RegistryObject<SoundEvent> BUTTON_UP = registerSoundEvent("button_up");
+
     // Songs
     public static final RegistryObject<SoundEvent> TRAVELERS = registerSong("travelers", "travelers");
     public static final RegistryObject<SoundEvent> TIMBER = registerSong("timber_hearth", "timber_hearth");

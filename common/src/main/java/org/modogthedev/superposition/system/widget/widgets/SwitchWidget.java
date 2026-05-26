@@ -14,29 +14,22 @@ import org.modogthedev.superposition.util.WidgetUseResult;
 
 import java.util.List;
 
-public class ButtonWidget extends Widget {
+public class SwitchWidget extends Widget {
     private float position = 0;
     private float pressed = 0;
-    private boolean canPlay = false;
 
     @Override
     public boolean tick(Level level, PanelBlockEntity panel, int index) {
-
         if (!level.isClientSide) {
             Signal signal = SignalHelper.getEmptySignal(level, panel.getBlockPos());
             signal.encode(pressed > 0);
-            putPortSignals("value", List.of(signal), panel);
-            if (pressed > 0) {
-                pressed -= .4f;
-                if (pressed <= 0) {
-                    playSound(panel, SuperpositionSounds.BUTTON_UP.get(), 1f);
-                } else if (canPlay) {
-                    playSound(panel,SuperpositionSounds.BUTTON_DOWN.get(), 1f);
-                    canPlay = false;
-                }
-                return true;
+            putPortSignals("value", List.of(signal),panel);
+        }
+        if (pressed != position) {
+            if (pressed == 1) {
+                playSound(panel, SuperpositionSounds.SWITCH_ON.get(), 1);
             } else {
-                canPlay = true;
+                playSound(panel,SuperpositionSounds.SWITCH_OFF.get(), 1);
             }
         }
         position = pressed;
@@ -44,13 +37,7 @@ public class ButtonWidget extends Widget {
     }
 
     public float getPosition(float partialTicks) {
-        float lerp = Mth.lerp(partialTicks, position, pressed);
-        if (lerp >= 0.51f) {
-            position = 1;
-            pressed = 1;
-            return 1;
-        }
-        return lerp;
+        return Mth.lerp(partialTicks, position, pressed);
     }
 
     @Override
@@ -58,11 +45,10 @@ public class ButtonWidget extends Widget {
         return super.buildPorts(builder).addOutputPort("value");
     }
 
-
     @Override
     public void write(CompoundTag tag) {
         super.write(tag);
-        tag.putFloat("pressed", pressed);
+        tag.putFloat("pressed",pressed);
     }
 
     @Override
@@ -74,17 +60,14 @@ public class ButtonWidget extends Widget {
         }
     }
 
-
     @Override
     public Vector3f getBounds() {
-        return new Vector3f(4 / 16f, 1 / 16f, 4 / 16f);
+        return new Vector3f(3 / 16f, 1 / 16f, 4 / 16f);
     }
 
     @Override
     public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3f hit) {
-        if (!level.isClientSide) {
-            pressed = 1;
-        }
-        return WidgetUseResult.HOLD;
+        pressed = (pressed == 1) ? 0 : 1;
+        return WidgetUseResult.CLICK;
     }
 }
