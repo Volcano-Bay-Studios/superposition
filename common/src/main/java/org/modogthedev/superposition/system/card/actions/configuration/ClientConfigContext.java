@@ -27,6 +27,8 @@ public abstract class ClientConfigContext {
         return false;
     }
 
+    public void looseFocus() {}
+
     public void tick(int animation) {
     }
 

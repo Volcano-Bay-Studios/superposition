@@ -39,6 +39,8 @@ public class ActionConfiguration implements Cloneable {
         return false;
     }
 
+    public void looseFocus() {}
+
     public ActionConfiguration copy() {
         try {
             ActionConfiguration clone = (ActionConfiguration) clone();

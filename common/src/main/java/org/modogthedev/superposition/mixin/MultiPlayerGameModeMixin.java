@@ -16,6 +16,7 @@ import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.networking.packet.PlayerAttackUseC2SPacket;
 import org.modogthedev.superposition.system.cable.CableManager;
+import org.modogthedev.superposition.util.WidgetUseResult;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -64,7 +65,8 @@ public abstract class MultiPlayerGameModeMixin {
                     cir.cancel();
                 }
             } else if (minecraft.level.getBlockEntity(blockHitResult.getBlockPos()) instanceof PanelBlockEntity panelBlockEntity) {
-                if (panelBlockEntity.primaryInteract(minecraft.player.isShiftKeyDown(), blockHitResult.getLocation().toVector3f())) {
+                WidgetUseResult widgetUseResult = panelBlockEntity.primaryInteract(minecraft.player.isShiftKeyDown(), blockHitResult.getLocation().toVector3f());
+                if (widgetUseResult.consumesAction()) {
                     VeilPacketManager.server().sendPacket(new PlayerAttackUseC2SPacket(blockPos,blockHitResult.getLocation()));
                 }
             }

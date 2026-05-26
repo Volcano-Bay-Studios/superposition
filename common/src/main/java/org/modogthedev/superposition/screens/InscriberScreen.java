@@ -514,7 +514,12 @@ public class InscriberScreen extends Screen {
         title.setFocused(false);
         Vector2f mouse = new Vector2f((float) (mouseX / zoom - camera.x), (float) (mouseY / zoom - camera.y));
         if (super.mouseClicked(mouse.x, mouse.y, button)) {
-            return true;
+            if (inspectingNode != null) {
+                for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
+                    configuration.looseFocus();
+                }
+                return true;
+            }
         }
         if (inspectingNode != null) {
             Action action = inspectingNode.getAction();
@@ -668,9 +673,6 @@ public class InscriberScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (super.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        }
         if (inspectingNode != null) {
             for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
                 boolean type = configuration.keyPressed(keyCode, scanCode, modifiers);
@@ -678,6 +680,14 @@ public class InscriberScreen extends Screen {
                     return true;
                 }
             }
+        }
+        if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            if (inspectingNode != null) {
+                for (ActionConfiguration configuration : inspectingNode.getAction().getConfigurations()) {
+                    configuration.looseFocus();
+                }
+            }
+            return true;
         }
         if (keyCode == 261 || keyCode == 259) {
             if (inspectingNode != null) {

@@ -6,7 +6,6 @@ import foundry.veil.api.client.render.light.data.LightData;
 import foundry.veil.api.client.render.light.data.PointLightData;
 import foundry.veil.api.client.render.light.renderer.LightRenderHandle;
 import foundry.veil.api.network.VeilPacketManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -29,7 +28,6 @@ import org.modogthedev.superposition.block.SignalGeneratorBlock;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionSounds;
-import org.modogthedev.superposition.item.ScrewdriverItem;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
@@ -372,7 +370,8 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         }
     }
 
-    private void finaliseConfigTooltips() {
+    public void finaliseConfigTooltips() {
+        checkEvents();
         int i = 0;
         for (String string : configurationTooltipString) {
             if (i == configSelection) {
@@ -492,14 +491,8 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
                 }
                 light.markDirty();
             }
-            if (Minecraft.getInstance().player.getMainHandItem().getItem() instanceof ScrewdriverItem) {
-                this.setupConfigTooltips(Minecraft.getInstance().player);
-                this.checkEvents();
-                this.finaliseConfigTooltips();
-            }
         }
         if (getLevel() != null && !getLevel().isClientSide) {
-            setupConfigTooltips(null);
             for (SignalList value : putSignals.values()) {
                 boolean change = value.flush();
                 if (change) {

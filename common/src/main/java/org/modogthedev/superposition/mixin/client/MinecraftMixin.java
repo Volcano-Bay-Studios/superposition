@@ -50,9 +50,9 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void resetCooldown(CallbackInfo ci) {
-        if (PanelBlock.pressing) {
-            this.rightClickDelay = 0;
-            PanelBlock.pressing = false;
+        if (PanelBlock.pressing != -1) {
+            this.rightClickDelay = PanelBlock.pressing;
+            PanelBlock.pressing = -1;
         }
     }
 }

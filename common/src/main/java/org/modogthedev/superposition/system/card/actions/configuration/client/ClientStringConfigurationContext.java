@@ -28,7 +28,11 @@ public class ClientStringConfigurationContext extends ClientConfigContext {
 
     @Override
     public boolean mouse(int button, double x, double y) {
-        return box.mouseClicked(x, y, button);
+        boolean consume = box.mouseClicked(x, y, button);
+        if (consume) {
+            box.setFocused(true);
+        }
+        return consume;
     }
 
     @Override
@@ -39,6 +43,11 @@ public class ClientStringConfigurationContext extends ClientConfigContext {
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
         return box.charTyped(codePoint,modifiers);
+    }
+
+    @Override
+    public void looseFocus() {
+        box.setFocused(false);
     }
 
     public String getText() {

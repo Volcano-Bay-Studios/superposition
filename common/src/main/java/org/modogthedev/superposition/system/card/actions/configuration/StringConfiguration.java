@@ -53,6 +53,11 @@ public class StringConfiguration extends ActionConfiguration {
     }
 
     @Override
+    public void looseFocus() {
+       getContext().looseFocus();
+    }
+
+    @Override
     public CompoundTag save(CompoundTag tag) {
         CompoundTag saveTag = super.save(tag);
         if (context != null) {

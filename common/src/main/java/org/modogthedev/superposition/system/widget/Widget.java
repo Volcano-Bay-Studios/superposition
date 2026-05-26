@@ -2,6 +2,8 @@ package org.modogthedev.superposition.system.widget;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -13,6 +15,7 @@ import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
+import org.modogthedev.superposition.util.WidgetUseResult;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -79,6 +82,13 @@ public class Widget implements Cloneable {
         panel.putPortSignals(name + "-" + port, signals);
     }
 
+    public void playSound(PanelBlockEntity panel, SoundEvent sound, float pitch) {
+        Level level = panel.getLevel();
+        if (level != null) {
+            level.playSound(null, panel.getBlockPos(), sound, SoundSource.BLOCKS, 1, pitch);
+        }
+    }
+
     // Interaction and Behavior
 
     /**
@@ -104,8 +114,8 @@ public class Widget implements Cloneable {
      * @param hit   The local position that was pressed
      * @return If the original event should be intercepted. You must return true on the client, or the interaction will not be networked.
      */
-    public boolean leftClickInteract(boolean alt, Level level, Vector3f hit) {
-        return false;
+    public WidgetUseResult leftClickInteract(boolean alt, Level level, Vector3f hit) {
+        return WidgetUseResult.PASS;
     }
 
 
@@ -117,8 +127,8 @@ public class Widget implements Cloneable {
      * @param hit   The local position that was pressed
      * @return If the original event should be intercepted.
      */
-    public boolean rightClickInteract(boolean alt, Level level, Vector3f hit) {
-        return false;
+    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3f hit) {
+        return WidgetUseResult.PASS;
     }
 
     /**
@@ -214,6 +224,7 @@ public class Widget implements Cloneable {
             Widget clone = (Widget) clone();
             clone.position = (Vector2i) position.clone();
             clone.uuid = UUID.randomUUID();
+            clone.editable = new HashMap<>();
             return clone;
         } catch (CloneNotSupportedException ignored) {
 

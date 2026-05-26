@@ -24,12 +24,13 @@ import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.util.DelegateVoxelShape;
 import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
 import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.WidgetUseResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
-    public static boolean pressing = true;
+    public static int pressing = -1;
 
     public PanelBlock(Properties properties) {
         super(properties);
@@ -79,12 +80,13 @@ public class PanelBlock extends SignalActorTickingBlock implements EntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof PanelBlockEntity panel && player.getItemInHand(InteractionHand.MAIN_HAND).isEmpty()) {
-            if (panel.secondaryInteract(player.isShiftKeyDown(), hitResult.getLocation().toVector3f())) {
-                pressing = true;
+            WidgetUseResult widgetUseResult = panel.secondaryInteract(player.isShiftKeyDown(), hitResult.getLocation().toVector3f());
+            if (widgetUseResult.consumesAction()) {
+                pressing = widgetUseResult.getConsumeTime();
                 return InteractionResult.CONSUME;
             }
         }
-        pressing = false;
+        pressing = -1;
         return super.useWithoutItem(state, level, pos, player, hitResult);
     }
 

@@ -30,6 +30,18 @@
       "superposition:switch_off"
     ]
   },
+  "button_down": {
+    "subtitles": "sounds.superposition.button_down",
+    "sounds": [
+      "superposition:button_down"
+    ]
+  },
+  "button_up": {
+    "subtitles": "sounds.superposition.button_up",
+    "sounds": [
+      "superposition:button_up"
+    ]
+  },
   "scroll": {
     "subtitles": "sounds.superposition.scroll",
     "sounds": [

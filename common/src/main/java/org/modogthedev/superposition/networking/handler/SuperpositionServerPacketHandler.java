@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
@@ -49,6 +50,10 @@ public class SuperpositionServerPacketHandler {
         }
 
         if (level.getBlockEntity(pos) instanceof SyncedBlockEntity be) {
+            if (be instanceof SignalActorBlockEntity signalActorBlockEntity) {
+                signalActorBlockEntity.setupConfigTooltips(player);
+                signalActorBlockEntity.finaliseConfigTooltips();
+            }
             be.loadSyncedData(packet.tag());
             be.sendData();
             be.setChanged();
