@@ -568,7 +568,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         Direction facing = this.getBlockState().getValue(SignalActorTickingBlock.FACING);
         light.getPosition().set(lightPosition.x, lightPosition.y, lightPosition.z);
         Quaternionf rotation = facing.getRotation();
-        Quaternionf poseRotation = SableCompat.getRotation(level, getBlockPos().getCenter());
+        Quaternionf poseRotation = SableCompat.getRotation(level, getBlockPos().getCenter(), 0);
         if (poseRotation != null) {
             rotation = poseRotation.mul(rotation);
         }

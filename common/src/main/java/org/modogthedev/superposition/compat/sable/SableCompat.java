@@ -1,9 +1,11 @@
 package org.modogthedev.superposition.compat.sable;
 
 import dev.ryanhcode.sable.companion.SableCompanion;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4d;
 import org.joml.Quaternionf;
 import org.modogthedev.superposition.compat.CompatabilityHandler;
 
@@ -40,9 +42,17 @@ public class SableCompat {
         return SableCompanion.INSTANCE.isInPlotGrid(level,pos);
     }
 
-    public static @Nullable Quaternionf getRotation(Level level, Vec3 pos) {
+    public static @Nullable Quaternionf getRotation(Level level, Vec3 pos, float partialTick) {
         if (CompatabilityHandler.Mod.SABLE.isLoaded) {
-            return SuperpositionSableHelper.getRotation(level,pos);
+            return SuperpositionSableHelper.getRotation(level,pos, partialTick);
+        }
+        return null;
+    }
+
+
+    public static @Nullable Matrix4d getTransformMatrix(Level level, BlockPos pos) {
+        if (CompatabilityHandler.Mod.SABLE.isLoaded) {
+            return SuperpositionSableHelper.getTransformMatrix(level,pos);
         }
         return null;
     }

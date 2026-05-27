@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.core.BlockPos;
@@ -14,7 +15,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Matrix4d;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,7 +43,13 @@ public abstract class LevelRendererMixin {
         if (blockEntity instanceof DynamicShapedBlockEntity shapedBlockEntity) {
             for (DynamicShapedBlockEntity.DynamicShape shape : shapedBlockEntity.getShapes(true)) {
                 poseStack.pushPose();
-                poseStack.translate(pos.getX() - camX, pos.getY() - camY, pos.getZ() - camZ);
+                Vec3 position = new Vec3(pos.getX(),pos.getY(),pos.getZ());
+                position = SableCompat.tryTransform(level,position);
+                poseStack.translate(position.x - camX, position.y - camY, position.z - camZ);
+                Quaternionf rotation = SableCompat.getRotation(level, pos.getCenter(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false));
+                if (rotation != null) {
+                    poseStack.mulPose(rotation);
+                }
                 poseStack.mulPose(shape.transformation());
                 renderShape(poseStack, consumer, shape.shape(), 0, 0, 0, 0.0F, 0.0F, 0.0F, 0.4F);
                 poseStack.popPose();

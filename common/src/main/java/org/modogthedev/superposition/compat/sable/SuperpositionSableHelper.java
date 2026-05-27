@@ -7,10 +7,13 @@ import dev.ryanhcode.sable.companion.math.Pose3d;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Matrix3f;
+import org.joml.Matrix4d;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -71,12 +74,12 @@ public class SuperpositionSableHelper {
         return pos;
     }
 
-    public static Quaternionf getRotation(Level level, Vec3 pos) {
+    public static Quaternionf getRotation(Level level, Vec3 pos, float partialTick) {
         SubLevel sublevel = Sable.HELPER.getContaining(level, pos);
         Pose3dc pose = null;
         if (sublevel != null) {
             if (sublevel instanceof ClientSubLevel clientSubLevel) {
-                pose = clientSubLevel.renderPose();
+                pose = clientSubLevel.renderPose(partialTick);
             } else {
                 pose = sublevel.logicalPose();
             }
@@ -87,6 +90,23 @@ public class SuperpositionSableHelper {
         return null;
     }
 
+    public static Matrix4d getTransformMatrix(Level level, BlockPos pos) {
+        SubLevel sublevel = Sable.HELPER.getContaining(level, pos);
+        Pose3dc pose = null;
+        if (sublevel != null) {
+            if (sublevel instanceof ClientSubLevel clientSubLevel) {
+                pose = clientSubLevel.renderPose();
+            } else {
+                pose = sublevel.logicalPose();
+            }
+        }
+        if (pose != null) {
+            return pose.bakeIntoMatrix(new Matrix4d());
+        }
+        return null;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
     public static Vec3 collide(Level level, Vec3 vel, Vec3 pos) {
         BoundingBox3d boundingBox = new BoundingBox3d(pos.subtract(1, 1, 1), pos.add(1, 1, 1));
 
