@@ -70,7 +70,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     @Override
     public Vec3 getCableOffset(Direction direction) {
         if (direction.getAxis().isHorizontal()) {
-            return new Vec3(0,-2/16f,0);
+            return new Vec3(0,-4/16f,0);
         }
         return Vec3.ZERO;
     }

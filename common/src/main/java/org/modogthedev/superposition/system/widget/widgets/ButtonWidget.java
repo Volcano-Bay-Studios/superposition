@@ -78,7 +78,7 @@ public class ButtonWidget extends Widget {
 
     @Override
     public Vector3f getBounds() {
-        return new Vector3f(4 / 16f, 1 / 16f, 4 / 16f);
+        return new Vector3f(4 / 16f, 1 / 64f, 4 / 16f);
     }
 
     @Override

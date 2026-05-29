@@ -43,7 +43,8 @@ public class WidgetOverlayRenderer {
                         matrixStack.toPoseStack().mulPose(rotation);
                     }
                     matrixStack.toPoseStack().mulPose(panel.getPanelMatrix());
-                    LevelRenderer.renderLineBox(matrixStack.toPoseStack(), bufferSource.getBuffer(RenderType.LINES), hit.getPosition().x /16f, 8/16f + 1/816f, hit.getPosition().y / 16f, hit.getPosition().x /16f + hit.getBounds().x, hit.getBounds().y + 9/16f, hit.getPosition().y /16f + hit.getBounds().z, 0f, 0.8f, 0f, 0.4f);
+                    float shrink = 1/256f;
+                    LevelRenderer.renderLineBox(matrixStack.toPoseStack(), bufferSource.getBuffer(RenderType.LINES), hit.getPosition().x /16f + shrink, 8/16f, hit.getPosition().y / 16f + shrink, hit.getPosition().x /16f + hit.getBounds().x - shrink, hit.getBounds().y + 9/16f - shrink, hit.getPosition().y /16f + hit.getBounds().z - shrink, 0.8f, 0.8f, 0.8f, 0.8f);
                 }
             }
         }

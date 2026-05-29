@@ -7,6 +7,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionConstants;
+import org.modogthedev.superposition.util.block.CableAttachmentOffset;
 
 import java.util.function.Supplier;
 
@@ -63,6 +64,10 @@ public class AnchorConstraint implements RopeConstraint {
         Level level = simulation.getLevel();
         Vec3 blockCenter = anchorBlock.getBottomCenter();
         blockCenter = blockCenter.add(0,8/16f,0);
+        if (level.getBlockEntity(anchorBlock) instanceof CableAttachmentOffset cableAttachmentOffset) {
+            Vec3 cableOffset = cableAttachmentOffset.getCableOffset(getDirection());
+            blockCenter = blockCenter.add(cableOffset);
+        }
         Vec3 center = SableCompat.tryTransform(level, blockCenter);
         if (offset != 0) {
             Vec3 normal = SableCompat.transformNormal(level, blockCenter,Vec3.atLowerCornerOf(getDirection().getNormal())).scale(offset);
