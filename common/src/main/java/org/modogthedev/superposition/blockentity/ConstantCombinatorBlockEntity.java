@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Unmodifiable;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.EditableTooltip;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.EditableTooltip;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SignalHelper;
 
 import java.util.List;

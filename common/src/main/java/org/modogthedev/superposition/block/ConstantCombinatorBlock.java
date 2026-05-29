@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.bridge.CommonRedstone;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 
 public class ConstantCombinatorBlock extends SignalActorTickingBlock implements EntityBlock, CommonRedstone {
 

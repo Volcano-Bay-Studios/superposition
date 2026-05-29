@@ -5,7 +5,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.modogthedev.superposition.compat.cc.PortInterfacePeripheral;
-import org.modogthedev.superposition.util.PortBehavior;
+import org.modogthedev.superposition.util.block.PortBehavior;
 
 public class SuperpositionForgeComputerCraftCompatibility {
 

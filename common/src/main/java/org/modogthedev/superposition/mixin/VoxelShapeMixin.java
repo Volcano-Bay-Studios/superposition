@@ -1,8 +1,8 @@
 package org.modogthedev.superposition.mixin;
 
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.modogthedev.superposition.util.DelegateVoxelShape;
-import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
+import org.modogthedev.superposition.util.block.DelegateVoxelShape;
+import org.modogthedev.superposition.util.block.DynamicShapedBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(VoxelShape.class)

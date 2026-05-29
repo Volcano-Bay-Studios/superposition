@@ -22,7 +22,7 @@ import org.modogthedev.superposition.system.card.actions.OutputAction;
 import org.modogthedev.superposition.system.card.actions.configuration.PortConfiguration;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

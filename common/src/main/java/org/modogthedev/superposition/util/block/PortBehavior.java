@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.util;
+package org.modogthedev.superposition.util.block;
 
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;

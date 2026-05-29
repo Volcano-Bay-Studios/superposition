@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -25,8 +24,8 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.screens.AmplifierScreen;
 import org.modogthedev.superposition.screens.ScreenManager;
-import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.IRedstoneConnectingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 
 import java.util.stream.Stream;
 

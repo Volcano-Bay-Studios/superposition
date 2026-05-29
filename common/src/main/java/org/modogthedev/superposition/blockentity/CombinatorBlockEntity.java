@@ -15,8 +15,8 @@ import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
-import org.modogthedev.superposition.util.EditableTooltip;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.EditableTooltip;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.List;

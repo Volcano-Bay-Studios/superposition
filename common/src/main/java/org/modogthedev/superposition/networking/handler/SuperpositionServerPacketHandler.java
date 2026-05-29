@@ -12,6 +12,7 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
@@ -28,7 +29,7 @@ import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
 import org.modogthedev.superposition.system.widget.Widget;
-import org.modogthedev.superposition.util.SyncedBlockEntity;
+import org.modogthedev.superposition.util.block.SyncedBlockEntity;
 import oshi.util.tuples.Pair;
 
 import java.util.List;
@@ -90,10 +91,11 @@ public class SuperpositionServerPacketHandler {
     public static void handlePlayerAttackUse(PlayerAttackUseC2SPacket packet, ServerPacketContext ctx) {
         ItemStack itemInHand = ctx.player().getItemInHand(InteractionHand.MAIN_HAND);
         ScrewdriverItem screwdriver = SuperpositionItems.SCREWDRIVER.get();
+        Vec3 location = packet.location();
         if (itemInHand.is(screwdriver)) {
-            screwdriver.attackUse(packet.blockPos(), packet.location(), ctx.player(), itemInHand);
+            screwdriver.attackUse(packet.blockPos(), location, ctx.player(), itemInHand);
         } else if (ctx.level().getBlockEntity(packet.blockPos()) instanceof PanelBlockEntity panel) {
-            panel.primaryInteract(ctx.player().isShiftKeyDown(), packet.location().toVector3f());
+            panel.primaryInteract(ctx.player().isShiftKeyDown(), new Vector3d(location.x,location.y,location.z));
         }
     }
 

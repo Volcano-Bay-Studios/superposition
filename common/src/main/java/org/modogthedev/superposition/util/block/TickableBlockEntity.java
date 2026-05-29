@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.util;
+package org.modogthedev.superposition.util.block;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;

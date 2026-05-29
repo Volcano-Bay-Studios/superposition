@@ -23,6 +23,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.client.renderer.ui.SuperpositionUITooltipRenderer;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
@@ -32,15 +33,16 @@ import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.widget.Widget;
-import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.CableAttachmentOffset;
+import org.modogthedev.superposition.util.block.DynamicShapedBlockEntity;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.WidgetUseResult;
 
 import java.util.*;
 
-import static org.modogthedev.superposition.util.SignalActorTickingBlock.FACING;
+import static org.modogthedev.superposition.util.block.SignalActorTickingBlock.FACING;
 
-public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicShapedBlockEntity, Clearable {
+public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicShapedBlockEntity, Clearable, CableAttachmentOffset {
     private final Map<UUID,Widget> widgets = new HashMap<>();
 
     private float frontHeight;
@@ -63,6 +65,14 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
             }
         }
         return builder;
+    }
+
+    @Override
+    public Vec3 getCableOffset(Direction direction) {
+        if (direction.getAxis().isHorizontal()) {
+            return new Vec3(0,-2/16f,0);
+        }
+        return Vec3.ZERO;
     }
 
     public void rebuild() {
@@ -412,18 +422,19 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         return widgets.values();
     }
 
-    public Vector3f transformLocal(Vector3f pos) {
+    public Vector3d transformLocal(Vector3d pos) {
         Matrix4f mat = getPanelMatrix();
         Matrix4f inv = new Matrix4f(mat).invert();
 
-        BlockPos blockPos = getBlockPos();
-        pos.sub(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        Vec3 blockPos = Vec3.atLowerCornerOf(getBlockPos());
+//        blockPos = SableCompat.tryTransform(level,blockPos);
+        pos.sub((float) blockPos.x, (float) blockPos.y, (float) blockPos.z);
         pos.mulPosition(inv);
 
         return pos;
     }
 
-    public boolean hoverCamera(Vector3f cameraHit, boolean tryOther) {
+    public boolean hoverCamera(Vector3d cameraHit, boolean tryOther) {
         Widget hit = getHit(cameraHit);
         if (hit != null) {
             lastTargeted = hit;
@@ -456,8 +467,8 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         }
     }
 
-    public Vector3f getRelativeHitLocation(Vector3f cameraHit, Widget widget) {
-        Vector3f pos = transformLocal(cameraHit);
+    public Vector3d getRelativeHitLocation(Vector3d cameraHit, Widget widget) {
+        Vector3d pos = transformLocal(cameraHit);
 
         Vector2i position = widget.getPosition();
 
@@ -465,7 +476,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     }
 
     public void removeWidget(Vec3 hit) {
-        Vector3f cameraHit = hit.toVector3f();
+        Vector3d cameraHit = new Vector3d(hit.x,hit.y,hit.z);
 
         Widget widget = getHit(cameraHit);
         if (widget != null) {
@@ -480,11 +491,11 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
     }
 
 
-    public Widget getHit(Vector3f cameraHit) {
-        Vector3f pos = transformLocal(cameraHit);
+    public Widget getHit(Vector3d cameraHit) {
+        Vector3d pos = transformLocal(cameraHit);
 
-        Vector3f min = new Vector3f();
-        Vector3f max = new Vector3f();
+        Vector3d min = new Vector3d();
+        Vector3d max = new Vector3d();
 
         Widget targeted = null;
 
@@ -512,7 +523,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
 
     // -----------INTERACTION-----------
 
-    public WidgetUseResult primaryInteract(boolean alt, Vector3f cameraHit) {
+    public WidgetUseResult primaryInteract(boolean alt, Vector3d cameraHit) {
         Widget widget = getHit(cameraHit);
         if (widget != null) {
             cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);
@@ -525,7 +536,7 @@ public class PanelBlockEntity extends SignalActorBlockEntity implements DynamicS
         return WidgetUseResult.PASS;
     }
 
-    public WidgetUseResult secondaryInteract(boolean alt, Vector3f cameraHit) {
+    public WidgetUseResult secondaryInteract(boolean alt, Vector3d cameraHit) {
         Widget widget = getHit(cameraHit);
         if (widget != null) {
             cameraHit.sub(widget.getPosition().x,0,widget.getPosition().y);

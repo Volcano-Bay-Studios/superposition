@@ -15,7 +15,7 @@ import org.modogthedev.superposition.system.behavior.types.ScanBehavior;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 
 import java.util.List;
 import java.util.Objects;

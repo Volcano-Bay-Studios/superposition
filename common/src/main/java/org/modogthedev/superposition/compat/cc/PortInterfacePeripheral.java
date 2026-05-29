@@ -4,7 +4,7 @@ import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.PortBehavior;
+import org.modogthedev.superposition.util.block.PortBehavior;
 
 import java.util.ArrayList;
 import java.util.List;

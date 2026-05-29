@@ -3,6 +3,7 @@ package org.modogthedev.superposition.core;
 import foundry.veil.platform.registry.RegistrationProvider;
 import foundry.veil.platform.registry.RegistryObject;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.block.*;
+import org.modogthedev.superposition.core.data.SuperpositionBlockTagsProvider;
 
 import java.util.function.Supplier;
 
@@ -79,9 +81,10 @@ public class SuperpositionBlocks {
 
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
-        RegistryObject<T> toReturn = BLOCKS.register(name, block);
-        SuperpositionItems.registerItem(name, () -> new BlockItem(toReturn.get(), new Item.Properties()));
-        return toReturn;
+        RegistryObject<T> blockSupplier = BLOCKS.register(name, block);
+        SuperpositionItems.registerItem(name, () -> new BlockItem(blockSupplier.get(), new Item.Properties()));
+        SuperpositionBlockTagsProvider.addBlockTag(BlockTags.MINEABLE_WITH_PICKAXE,blockSupplier);
+        return blockSupplier;
     }
 
     public static void bootstrap() {

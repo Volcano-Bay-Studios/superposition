@@ -3,6 +3,7 @@ package org.modogthedev.superposition.system.widget.widgets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
@@ -27,9 +28,9 @@ public class SwitchWidget extends Widget {
         }
         if (pressed != position) {
             if (pressed == 1) {
-                playSound(panel, SuperpositionSounds.SWITCH_ON.get(), 1);
+                playSound(panel, SuperpositionSounds.SWITCH_ON.get(), (float) (Math.random()/10f+1f));
             } else {
-                playSound(panel,SuperpositionSounds.SWITCH_OFF.get(), 1);
+                playSound(panel,SuperpositionSounds.SWITCH_OFF.get(), (float) (Math.random()/10f+1f));
             }
         }
         position = pressed;
@@ -66,7 +67,7 @@ public class SwitchWidget extends Widget {
     }
 
     @Override
-    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3f hit) {
+    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3d hit) {
         pressed = (pressed == 1) ? 0 : 1;
         return WidgetUseResult.CLICK;
     }

@@ -11,7 +11,7 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionFilters;
 import org.modogthedev.superposition.system.filter.Filter;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 
 import java.util.List;
 

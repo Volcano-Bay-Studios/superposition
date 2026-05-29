@@ -17,8 +17,8 @@ import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -128,6 +128,7 @@ public class SpotlightBlockEntity extends SignalActorBlockEntity implements Tick
         Color color1 = new Color(color);
         float brightness = (color1.getRed() / 255f) + (color1.getGreen() / 255f) + (color1.getBlue() / 255f);
         light.setBrightness(2f - (brightness / 3f));
+        light.setOcclusionEnabled(true);
     }
 
     @Override

@@ -7,6 +7,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionItems;
@@ -22,7 +24,8 @@ public class ClientHoverManager {
         if (hitResult instanceof BlockHitResult blockHitResult) {
             BlockEntity blockEntity = level.getBlockEntity(blockHitResult.getBlockPos());
             if (blockEntity instanceof PanelBlockEntity panel) {
-                panel.hoverCamera(blockHitResult.getLocation().toVector3f(), true);
+                Vec3 location = blockHitResult.getLocation();
+                panel.hoverCamera(new Vector3d(location.x,location.y,location.z), true);
             }
             if (blockEntity instanceof SignalActorBlockEntity signalActorBlockEntity) {
                 if (player.getItemInHand(InteractionHand.MAIN_HAND).is(SuperpositionItems.SCREWDRIVER.get()) || player.getItemInHand(InteractionHand.OFF_HAND).is(SuperpositionItems.SCREWDRIVER.get())) {

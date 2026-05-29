@@ -10,7 +10,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.data.EncodedData;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 
 import java.util.*;
 

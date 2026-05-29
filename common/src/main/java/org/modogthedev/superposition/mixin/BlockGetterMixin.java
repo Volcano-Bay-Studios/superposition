@@ -8,8 +8,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.modogthedev.superposition.util.DelegateVoxelShape;
-import org.modogthedev.superposition.util.DynamicShapedBlockEntity;
+import org.modogthedev.superposition.util.block.DelegateVoxelShape;
+import org.modogthedev.superposition.util.block.DynamicShapedBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,8 +41,11 @@ public interface BlockGetterMixin {
                 if (blockhitresult != null) {
                     Vec3 hit = blockhitresult.getLocation();
 
+                    Vec3 blockPos = Vec3.atLowerCornerOf(pos);
+//                    blockPos = SableCompat.tryTransform(Minecraft.getInstance().level,blockPos);
+
                     hit = new Vec3(new Vector3f((float) hit.x, (float) hit.y, (float) hit.z).mulPosition(mat));
-                    hit = new Vec3(hit.x + pos.getX(), hit.y + pos.getY(), hit.z + pos.getZ());
+                    hit = new Vec3(hit.x + blockPos.x, hit.y + blockPos.y, hit.z + blockPos.z);
 
                     BlockHitResult returnValue = new BlockHitResult(hit, blockhitresult.getDirection(), pos, blockhitresult.isInside());
                     cir.setReturnValue(returnValue);

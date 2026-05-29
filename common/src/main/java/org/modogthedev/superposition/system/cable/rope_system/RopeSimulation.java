@@ -82,6 +82,18 @@ public class RopeSimulation {
         recalculateBaseRopeConstraints();
     }
 
+    public void simulateSleeping(Level level) {
+        for (RopeNode node : nodes) {
+            AnchorConstraint anchor = node.getAnchor();
+            if (anchor != null) {
+                BlockState blockState = level.getBlockState(anchor.getAnchorBlock());
+                if (blockState.isAir()) {
+                    node.removeAnchor();
+                    sleepTime = 0;
+                }
+            }
+        }
+    }
 
     public void simulate(Level level) {
         float gravity = 0.25f * -9.8f / 40f;
@@ -107,15 +119,7 @@ public class RopeSimulation {
                 node.position = node.position.add(velocity);
             }
 
-            for (RopeNode node : nodes) {
-                AnchorConstraint anchor = node.getAnchor();
-                if (anchor != null) {
-                    BlockState blockState = level.getBlockState(anchor.getAnchorBlock());
-                    if (blockState.isAir()) {
-                        node.removeAnchor();
-                    }
-                }
-            }
+
 
             List<RopeConstraint> constraints = collectAllConstraints();
             for (int i = 0; i < constraints.size(); i++) {

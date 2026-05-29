@@ -73,6 +73,8 @@ public class Cable {
 //        this.freeStuckPoints();
         if (!this.isSleeping() || level.isClientSide) {
             this.ropeSimulation.simulate(this.level);
+        } else {
+            this.ropeSimulation.simulateSleeping(this.level);
         }
         this.sendSignal();
     }

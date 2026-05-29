@@ -26,8 +26,8 @@ import org.modogthedev.superposition.core.SuperpositionBlockStates;
 import org.modogthedev.superposition.item.FilterItem;
 import org.modogthedev.superposition.screens.ScreenManager;
 import org.modogthedev.superposition.screens.SignalGeneratorScreen;
-import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.IRedstoneConnectingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SuperpositionItemHelper;
 
 import java.util.stream.Stream;

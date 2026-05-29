@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.util;
+package org.modogthedev.superposition.util.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,16 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 public class BlockHelper {
-    //These are all the sides of the block
-    private static final Direction[] faces = {
-            Direction.DOWN,
-            Direction.UP,
-            Direction.NORTH,
-            Direction.EAST,
-            Direction.SOUTH,
-            Direction.WEST
-    };
-
     public static boolean base(Block b) {
         return (b instanceof TransmitterBlock || b instanceof ReceiverBlock);
     }
@@ -32,7 +22,7 @@ public class BlockHelper {
         BlockPos foundBase = null;
 
         //Loop through all block faces (All 6 sides around the block)
-        for (Direction face : faces) {
+        for (Direction face : Direction.values()) {
             BlockPos relative = pos.relative(face);
             Block b = reader.getBlockState(relative).getBlock();
             //Check if they're both of the same type
@@ -60,8 +50,9 @@ public class BlockHelper {
 
         //Check if current block is base
         Block b = level.getBlockState(pos).getBlock();
-        if (base(b))
+        if (base(b)) {
             basePos = pos;
+        }
 
         //Execute this method for each block in the 'todo' list
         while ((pos = list.poll()) != null) {

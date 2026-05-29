@@ -27,7 +27,6 @@ import org.joml.*;
 import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.blockentity.AnalyserBlockEntity;
 import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
-import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionConstants;
 import org.modogthedev.superposition.core.SuperpositionRenderTypes;
 import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
@@ -74,10 +73,7 @@ public class CableRenderer {
         CABLE_POINTS.add(firstPos);
         if (cable.getPoints().getFirst().getAnchor() != null) {
             RopeNode point = cable.getPoints().getFirst();
-            Vec3 normal = SableCompat.transformNormal((Level) level, point.getAnchor().getAnchorBlock().getCenter() ,Vec3.atLowerCornerOf(point.getAnchor().getDirection().getNormal())).scale(-0.2f);
-            Vec3 pos = SableCompat.tryTransform((Level) level, point.getAnchor().getAnchorBlock().getCenter()).add(normal);
-
-            CABLE_POINTS.add(pos);
+            CABLE_POINTS.add(point.getAnchor().getAnchorPosition(-2/16f));
         }
 
         for (RopeNode point : cable.getPoints()) {
@@ -87,10 +83,7 @@ public class CableRenderer {
 
         if (cable.getPoints().getLast().getAnchor() != null) {
             RopeNode point = cable.getPoints().getLast();
-            Vec3 normal = SableCompat.transformNormal((Level) level, point.getAnchor().getAnchorBlock().getCenter() ,Vec3.atLowerCornerOf(point.getAnchor().getDirection().getNormal())).scale(-0.2f);
-            Vec3 pos = SableCompat.tryTransform((Level) level, point.getAnchor().getAnchorBlock().getCenter()).add(normal);
-
-            CABLE_POINTS.add(pos);
+            CABLE_POINTS.add(point.getAnchor().getAnchorPosition(-2/16f));
         }
         RopeNode lastPoint = cable.getPoints().getLast();
         Vec3 lastPos = lastPoint.getPosition();

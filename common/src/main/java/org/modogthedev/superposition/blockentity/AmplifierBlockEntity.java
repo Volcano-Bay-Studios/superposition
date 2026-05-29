@@ -17,8 +17,8 @@ import org.modogthedev.superposition.block.AmplifierBlock;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.core.SuperpositionTags;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;

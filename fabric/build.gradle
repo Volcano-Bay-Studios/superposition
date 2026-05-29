@@ -49,6 +49,12 @@ dependencies {
     include(implementation("net.createmod.ponder:ponder-fabric:$ponder_version+mc$minecraft_version"))
 }
 
+fabricApi {
+    configureDataGeneration() {
+        outputDirectory = file('../common/src/generated/resources/')
+    }
+}
+
 loom {
     def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
     if (aw.exists()) {

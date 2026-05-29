@@ -16,7 +16,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
-import org.modogthedev.superposition.util.SPTooltipable;
+import org.modogthedev.superposition.util.block.SPTooltipable;
 
 import java.util.ArrayList;
 import java.util.List;

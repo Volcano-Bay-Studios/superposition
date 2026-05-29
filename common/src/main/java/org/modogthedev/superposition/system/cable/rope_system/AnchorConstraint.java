@@ -2,6 +2,7 @@ package org.modogthedev.superposition.system.cable.rope_system;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.compat.sable.SableCompat;
@@ -33,11 +34,10 @@ public class AnchorConstraint implements RopeConstraint {
 
     @Override
     public void applyConstraint() {
-        Vec3 center = SableCompat.tryTransform(simulation.getLevel(),anchorBlock.getCenter());
-        Vec3 normal = SableCompat.transformNormal(simulation.getLevel(), anchorBlock.getCenter() ,Vec3.atLowerCornerOf(getDirection().getNormal())).scale(0.5f + 1 / 16f);
         RopeNode prevNode = adjacentPrev.get();
         RopeNode nextNode = adjacentNext.get();
-        Vec3 anchorPosition = center.add(normal);
+        Vec3 center = getAnchorPosition(0);
+        Vec3 anchorPosition = getAnchorPosition(9/16f);
         if (prevNode != null) {
             if (prevNode.position.distanceTo(anchorPosition) > SuperpositionConstants.anchorSnapRange) {
                 node.removeAnchor();
@@ -57,6 +57,18 @@ public class AnchorConstraint implements RopeConstraint {
         if (nextNode != null) {
             nextNode.position = BendConstraint.resolveAnchorBend(center, node.position, nextNode.position, width);
         }
+    }
+
+    public Vec3 getAnchorPosition(float offset) {
+        Level level = simulation.getLevel();
+        Vec3 blockCenter = anchorBlock.getBottomCenter();
+        blockCenter = blockCenter.add(0,8/16f,0);
+        Vec3 center = SableCompat.tryTransform(level, blockCenter);
+        if (offset != 0) {
+            Vec3 normal = SableCompat.transformNormal(level, blockCenter,Vec3.atLowerCornerOf(getDirection().getNormal())).scale(offset);
+            center = center.add(normal);
+        }
+        return center;
     }
 
     public Direction getDirection() {

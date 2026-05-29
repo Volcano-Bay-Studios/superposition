@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 
 public class SuperpositionBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
 

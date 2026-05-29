@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.blockentity.util.CardHolder;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.item.CardItem;
-import org.modogthedev.superposition.util.IRedstoneConnectingBlock;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.IRedstoneConnectingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 import org.modogthedev.superposition.util.SuperpositionItemHelper;
 
 public class ComputerBlock extends SignalActorTickingBlock implements EntityBlock, IRedstoneConnectingBlock {

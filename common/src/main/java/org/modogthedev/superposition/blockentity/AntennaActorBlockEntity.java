@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.system.antenna.Antenna;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
-import org.modogthedev.superposition.util.TickableBlockEntity;
+import org.modogthedev.superposition.util.block.TickableBlockEntity;
 
 public class AntennaActorBlockEntity extends SignalActorBlockEntity implements TickableBlockEntity {
     int sleep = 0;

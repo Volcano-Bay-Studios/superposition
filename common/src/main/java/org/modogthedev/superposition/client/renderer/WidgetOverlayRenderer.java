@@ -12,8 +12,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.system.widget.Widget;
 
 public class WidgetOverlayRenderer {
@@ -26,13 +30,20 @@ public class WidgetOverlayRenderer {
         matrixStack.matrixPush();
         if (hitResult instanceof BlockHitResult blockHitResult) {
             BlockPos pos = blockHitResult.getBlockPos();
+            Vec3 position = new Vec3(pos.getX(),pos.getY(),pos.getZ());
+            position = SableCompat.tryTransform(level,position);
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity instanceof PanelBlockEntity panel) {
-                Widget hit = panel.getHit(blockHitResult.getLocation().toVector3f());
+                Vec3 location = blockHitResult.getLocation();
+                Widget hit = panel.getHit(new Vector3d(location.x,location.y,location.z));
                 if (hit != null) {
-                    matrixStack.translate(pos.getX() - camera.getPosition().x, pos.getY() - camera.getPosition().y, pos.getZ() - camera.getPosition().z);
+                    matrixStack.translate(position.x - camera.getPosition().x, position.y - camera.getPosition().y, position.z - camera.getPosition().z);
+                    Quaternionf rotation = SableCompat.getRotation(level, pos.getCenter(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false));
+                    if (rotation != null) {
+                        matrixStack.toPoseStack().mulPose(rotation);
+                    }
                     matrixStack.toPoseStack().mulPose(panel.getPanelMatrix());
-                    LevelRenderer.renderLineBox(matrixStack.toPoseStack(), bufferSource.getBuffer(RenderType.LINES), hit.getPosition().x /16f, 9/16f + 1/816f, hit.getPosition().y / 16f, hit.getPosition().x /16f + hit.getBounds().x, hit.getBounds().y + 9/16f, hit.getPosition().y /16f + hit.getBounds().z, 0.2f, 0.8f, 0.2f, 0.6f);
+                    LevelRenderer.renderLineBox(matrixStack.toPoseStack(), bufferSource.getBuffer(RenderType.LINES), hit.getPosition().x /16f, 8/16f + 1/816f, hit.getPosition().y / 16f, hit.getPosition().x /16f + hit.getBounds().x, hit.getBounds().y + 9/16f, hit.getPosition().y /16f + hit.getBounds().z, 0f, 0.8f, 0f, 0.4f);
                 }
             }
         }

@@ -6,7 +6,7 @@ import org.modogthedev.superposition.core.SuperpositionBehaviors;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.behavior.types.ManipulateBehavior;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 
 import java.util.List;
 

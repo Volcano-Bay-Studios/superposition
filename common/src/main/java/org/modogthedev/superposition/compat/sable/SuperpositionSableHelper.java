@@ -12,17 +12,20 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.joml.Matrix3f;
-import org.joml.Matrix4d;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SuperpositionSableHelper {
     public static Vec3 transformPosition(Level level, Vec3 position) {
         return SableCompanion.INSTANCE.projectOutOfSubLevel(level, position);
+    }
+
+
+    public static Vector3d transformPosition(Level level, Vector3d pos) {
+        return SableCompanion.INSTANCE.projectOutOfSubLevel(level, pos);
     }
 
     public static Vec3 transformNormal(Level level, Vec3 pos, Vec3 normal) {

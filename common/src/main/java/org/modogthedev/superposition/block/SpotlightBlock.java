@@ -14,7 +14,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
-import org.modogthedev.superposition.util.SignalActorTickingBlock;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 
 import java.util.stream.Stream;
 

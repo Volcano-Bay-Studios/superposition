@@ -3,6 +3,7 @@ package org.modogthedev.superposition.system.widget.widgets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
@@ -81,7 +82,7 @@ public class ButtonWidget extends Widget {
     }
 
     @Override
-    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3f hit) {
+    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3d hit) {
         if (!level.isClientSide) {
             pressed = 1;
         }

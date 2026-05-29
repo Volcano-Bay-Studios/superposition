@@ -7,12 +7,21 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4d;
 import org.joml.Quaternionf;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 import org.modogthedev.superposition.compat.CompatabilityHandler;
 
 public class SableCompat {
     public static Vec3 tryTransform(Level level, Vec3 pos) {
         if (CompatabilityHandler.Mod.SABLE.isLoaded) {
             return SuperpositionSableHelper.transformPosition(level,pos);
+        }
+        return pos;
+    }
+
+    public static Vector3f tryTransform(Level level, Vector3f pos) {
+        if (CompatabilityHandler.Mod.SABLE.isLoaded) {
+            return pos.set(SuperpositionSableHelper.transformPosition(level,new Vector3d(pos)));
         }
         return pos;
     }

@@ -5,7 +5,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.core.SuperpositionBlockEntities;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +31,7 @@ public class TransmitterBlockEntity extends AntennaActorBlockEntity {
             List<Signal> signals = getInputSignals();
             noSignal = signals.isEmpty();
             if (level.isClientSide) {
-                if (!signals.isEmpty()) {
-                    tooltip.add(Component.literal(signals.size() == 1 ? "Signal: " : "Signals: "));
-                    for (Signal broadcastSignal : signals) {
-                        tooltip.add(Component.literal(SuperpositionMth.formatHz(broadcastSignal.getFrequency())));
-                    }
-                } else {
-                    tooltip.add(Component.literal("No Signals"));
-                }
+
             } else {
                 if (isPowered) {
                     for (Signal broadcastSignal : signals) {

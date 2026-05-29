@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
@@ -102,7 +103,7 @@ public class Widget implements Cloneable {
         return false;
     }
 
-    public void hover(Vector3f relativePosition, Player player) {
+    public void hover(Vector3d relativePosition, Player player) {
 
     }
 
@@ -114,7 +115,7 @@ public class Widget implements Cloneable {
      * @param hit   The local position that was pressed
      * @return If the original event should be intercepted. You must return true on the client, or the interaction will not be networked.
      */
-    public WidgetUseResult leftClickInteract(boolean alt, Level level, Vector3f hit) {
+    public WidgetUseResult leftClickInteract(boolean alt, Level level, Vector3d hit) {
         return WidgetUseResult.PASS;
     }
 
@@ -127,7 +128,7 @@ public class Widget implements Cloneable {
      * @param hit   The local position that was pressed
      * @return If the original event should be intercepted.
      */
-    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3f hit) {
+    public WidgetUseResult rightClickInteract(boolean alt, Level level, Vector3d hit) {
         return WidgetUseResult.PASS;
     }
 

@@ -9,7 +9,7 @@ import org.modogthedev.superposition.blockentity.AntennaActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.system.antenna.type.PhysicalAntenna;
 import org.modogthedev.superposition.system.signal.SignalManager;
-import org.modogthedev.superposition.util.BlockHelper;
+import org.modogthedev.superposition.util.block.BlockHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;

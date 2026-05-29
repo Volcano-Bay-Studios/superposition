@@ -33,6 +33,7 @@ import org.modogthedev.superposition.networking.packet.BlockSignalSyncS2CPacket;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.util.*;
+import org.modogthedev.superposition.util.block.*;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.*;
@@ -439,7 +440,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
         } else {
             int editableIndex = index - configurationTooltipExecutable.size();
             if (editableIndex < configurationTooltipEditable.size()) {
-                org.modogthedev.superposition.util.EditableTooltip editableTooltip = configurationTooltipEditable.get(editableIndex).getEditable(index);
+                EditableTooltip editableTooltip = configurationTooltipEditable.get(editableIndex).getEditable(index);
 
                 if (level.isClientSide) {
                     SuperpositionUITooltipRenderer.editableTooltip = editableTooltip;
@@ -573,7 +574,7 @@ public abstract class SignalActorBlockEntity extends SyncedBlockEntity implement
             rotation = poseRotation.mul(rotation);
         }
         light.getOrientation().set(rotation.mul(new Quaternionf().fromAxisAngleDeg(1, 0, 0, -90)).conjugate());
-        light.setOcclusionEnabled(true);
+        light.setOcclusionEnabled(false);
     }
 
     public void configurePointLight(PointLightData light) {

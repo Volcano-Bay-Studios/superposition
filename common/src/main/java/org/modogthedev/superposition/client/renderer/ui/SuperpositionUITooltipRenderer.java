@@ -32,9 +32,9 @@ import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.networking.packet.BlockEntityModificationC2SPacket;
 import org.modogthedev.superposition.screens.WidgetScreen;
-import org.modogthedev.superposition.util.EditableTooltip;
-import org.modogthedev.superposition.util.SPTooltipable;
-import org.modogthedev.superposition.util.SyncedBlockEntity;
+import org.modogthedev.superposition.util.block.EditableTooltip;
+import org.modogthedev.superposition.util.block.SPTooltipable;
+import org.modogthedev.superposition.util.block.SyncedBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.compat.cc.PortInterfacePeripheral;
-import org.modogthedev.superposition.util.PortBehavior;
+import org.modogthedev.superposition.util.block.PortBehavior;
 
 public class SuperpositionFabricComputerCraftCompatibility {
     public static void setup() {

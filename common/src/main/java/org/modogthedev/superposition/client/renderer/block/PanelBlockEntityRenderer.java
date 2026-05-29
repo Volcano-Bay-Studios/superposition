@@ -22,9 +22,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
 import org.joml.Vector2ic;
-import org.joml.Vector3f;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
-import org.modogthedev.superposition.core.*;
+import org.modogthedev.superposition.core.SuperpositionBlocks;
+import org.modogthedev.superposition.core.SuperpositionItems;
+import org.modogthedev.superposition.core.SuperpositionPartials;
+import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.item.WidgetItem;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
@@ -33,7 +36,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.modogthedev.superposition.util.SignalActorTickingBlock.FACING;
+import static org.modogthedev.superposition.util.block.SignalActorTickingBlock.FACING;
 
 public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockEntity> {
     public PanelBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -122,8 +125,9 @@ public class PanelBlockEntityRenderer implements BlockEntityRenderer<PanelBlockE
                     WidgetRenderer<Widget> widgetRenderer = Widget.getRenderer(widget);
                     if (widgetRenderer != null) {
                         ms.matrixPush();
-                        Vector3f pos = new Vector3f(blockHitResult.getLocation().toVector3f());
-                        Vector3f position = be.transformLocal(pos);
+                        Vec3 location = blockHitResult.getLocation();
+                        Vector3d pos = new Vector3d(location.x,location.y,location.z);
+                        Vector3d position = be.transformLocal(pos);
                         Vector2i target = WidgetItem.target;
                         target.set((int) (position.x * 16 - widget.getBounds().x * 8), (int) (position.z * 16 - widget.getBounds().z * 8));
                         target.set((int) Mth.clamp(target.x,hasRight ? -16 : 0,(hasLeft ? 32 : 16) - widget.getBounds().x * 16), (int) Mth.clamp(target.y,0,16 - widget.getBounds().z * 16));

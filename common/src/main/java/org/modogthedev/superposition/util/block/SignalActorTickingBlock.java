@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.util;
+package org.modogthedev.superposition.util.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.context.BlockPlaceContext;

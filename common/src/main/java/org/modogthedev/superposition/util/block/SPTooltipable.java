@@ -1,4 +1,4 @@
-package org.modogthedev.superposition.util;
+package org.modogthedev.superposition.util.block;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;

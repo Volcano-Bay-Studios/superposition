@@ -11,6 +11,8 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3d;
 import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionItems;
@@ -59,15 +61,16 @@ public abstract class MultiPlayerGameModeMixin {
 
         ItemStack itemStack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
         if (this.minecraft.hitResult instanceof final BlockHitResult blockHitResult) {
+            Vec3 location = blockHitResult.getLocation();
             if (itemStack.is(SuperpositionItems.SCREWDRIVER.get())) {
-                if (SuperpositionItems.SCREWDRIVER.get().attackUse(blockHitResult.getBlockPos(), blockHitResult.getLocation(), minecraft.player, itemStack)) {
+                if (SuperpositionItems.SCREWDRIVER.get().attackUse(blockHitResult.getBlockPos(), location, minecraft.player, itemStack)) {
                     destroyDelay = 5;
                     cir.cancel();
                 }
             } else if (minecraft.level.getBlockEntity(blockHitResult.getBlockPos()) instanceof PanelBlockEntity panelBlockEntity) {
-                WidgetUseResult widgetUseResult = panelBlockEntity.primaryInteract(minecraft.player.isShiftKeyDown(), blockHitResult.getLocation().toVector3f());
+                WidgetUseResult widgetUseResult = panelBlockEntity.primaryInteract(minecraft.player.isShiftKeyDown(), new Vector3d(location.x,location.y,location.z));
                 if (widgetUseResult.consumesAction()) {
-                    VeilPacketManager.server().sendPacket(new PlayerAttackUseC2SPacket(blockPos,blockHitResult.getLocation()));
+                    VeilPacketManager.server().sendPacket(new PlayerAttackUseC2SPacket(blockPos, location));
                 }
             }
         }

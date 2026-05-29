@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.modogthedev.superposition.system.antenna.AntennaManager;
+import org.modogthedev.superposition.util.block.SignalActorTickingBlock;
 
 public class AntennaActorTickingBlock extends SignalActorTickingBlock {
     public AntennaActorTickingBlock(Properties pProperties) {

@@ -1,0 +1,19 @@
+{
+  "values": [
+    "superposition:antenna",
+    "superposition:signal_generator",
+    "superposition:monitor",
+    "superposition:transmitter",
+    "superposition:receiver",
+    "superposition:amplifier",
+    "superposition:filter",
+    "superposition:computer",
+    "superposition:inscriber",
+    "superposition:analyser",
+    "superposition:manipulator",
+    "superposition:combinator",
+    "superposition:constant_combinator",
+    "superposition:panel",
+    "superposition:spotlight"
+  ]
+}
