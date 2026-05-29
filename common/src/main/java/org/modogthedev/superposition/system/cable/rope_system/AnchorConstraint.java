@@ -18,6 +18,8 @@ public class AnchorConstraint implements RopeConstraint {
     RopeSimulation simulation;
     String port = null;
 
+    Vec3 lastTargetPosition = Vec3.ZERO;
+
     RopeNode node;
     Supplier<RopeNode> adjacentPrev, adjacentNext;
 
@@ -58,6 +60,18 @@ public class AnchorConstraint implements RopeConstraint {
         if (nextNode != null) {
             nextNode.position = BendConstraint.resolveAnchorBend(center, node.position, nextNode.position, width);
         }
+    }
+
+    public boolean shouldAwake() {
+        if (simulation.level.isClientSide) {
+            return false;
+        }
+        Vec3 current = getAnchorPosition(0.1f);
+        if (current.distanceTo(lastTargetPosition) > 0.05f) {
+            lastTargetPosition = current;
+            return true;
+        }
+        return false;
     }
 
     public Vec3 getAnchorPosition(float offset) {

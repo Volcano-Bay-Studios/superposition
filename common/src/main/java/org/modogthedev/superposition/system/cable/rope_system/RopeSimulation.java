@@ -83,13 +83,22 @@ public class RopeSimulation {
     }
 
     public void simulateSleeping(Level level) {
-        for (RopeNode node : nodes) {
-            AnchorConstraint anchor = node.getAnchor();
-            if (anchor != null) {
-                BlockState blockState = level.getBlockState(anchor.getAnchorBlock());
-                if (blockState.isAir()) {
-                    node.removeAnchor();
-                    sleepTime = 0;
+        if (!level.isClientSide) {
+            for (RopeNode node : nodes) {
+                AnchorConstraint anchor = node.getAnchor();
+                if (anchor != null) {
+                    BlockState blockState = level.getBlockState(anchor.getAnchorBlock());
+                    if (blockState.isAir()) {
+                        node.removeAnchor();
+                        sleepTime = 0;
+                        break;
+                    }
+                    if (SableCompat.isSublevel(level, Vec3.atLowerCornerOf(node.getAnchor().getAnchorBlock()))) {
+                        if (node.getAnchor() != null && node.getAnchor().shouldAwake()) {
+                            sleepTime = 0;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -118,8 +127,6 @@ public class RopeSimulation {
                 node.prevPosition = node.position;
                 node.position = node.position.add(velocity);
             }
-
-
 
             List<RopeConstraint> constraints = collectAllConstraints();
             for (int i = 0; i < constraints.size(); i++) {
@@ -163,7 +170,8 @@ public class RopeSimulation {
             if (movedLastTick.lengthSqr() > 1e-9) {
                 shouldSleep = false;
                 break;
-            } else if (node.getAnchor() != null && SableCompat.isSublevel(level, Vec3.atLowerCornerOf(node.getAnchor().getAnchorBlock()))){
+            }
+            if (node.getAnchor() != null && node.getAnchor().shouldAwake()) {
                 shouldSleep = false;
                 break;
             }

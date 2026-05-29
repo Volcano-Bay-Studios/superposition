@@ -36,8 +36,6 @@ public class FilterBlockEntity extends SignalActorBlockEntity implements Tickabl
         return type;
     }
 
-
-
     public boolean passSignal(Signal signal) {
         if (type != null)
             return type.passSignal(signal);

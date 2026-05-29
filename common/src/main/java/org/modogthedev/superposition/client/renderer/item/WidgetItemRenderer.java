@@ -31,7 +31,9 @@ public class WidgetItemRenderer extends BlockEntityWithoutLevelRenderer {
                 WidgetRenderer<Widget> widgetRenderer = Widget.getRenderer(widget);
                 if (widgetRenderer != null) {
                     poseStack.pushPose();
-                    poseStack.translate(widget.getBounds().x/2f - 2/16f,widget.getBounds().y/2f - 2/16f,widget.getBounds().z/2f - 2/16f);
+                    float scale = 1f / widget.getBounds().length();
+                    poseStack.scale(scale,scale,scale);
+                    poseStack.translate((-widget.getBounds().x/2f) / scale,(-widget.getBounds().y/2f)/ scale,(-widget.getBounds().z/2f)/scale);
                     widgetRenderer.render(widget, Blocks.AIR.defaultBlockState(),partialTicks,poseStack,buffer,packedLight,packedOverlay, new Color(1f,1f,1f,1f));
                     poseStack.popPose();
                 }
