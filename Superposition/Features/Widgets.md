@@ -4,8 +4,6 @@ aliases:
   - Widget
   - Widgets
 ---
-
-# Widgets
 Widgets are a collection of many small parts that can be placed on the surface of a [[Panel]]. They consist of Gauges, Buttons, Switches, Dials, and much more.
 
 ## Configuration 

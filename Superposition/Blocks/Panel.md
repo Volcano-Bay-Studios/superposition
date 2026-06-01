@@ -5,7 +5,6 @@ aliases:
   - Panels
   - Control Panel
 ---
-# Panel
 The Panel block allows placement of [[Widgets]] on the "panel" surface. 
 
 ## Configuration 
