@@ -33,7 +33,7 @@ jobs:
       - name: Generate Global mkdocs.yml File
         run: |
           cat << 'EOF' > mkdocs.yml
-          site_name: My Obsidian Wiki
+          site_name: Superposition Wiki
           docs_dir: ${{ env.OBSIDIAN_PATH }}
           theme:
             name: material
