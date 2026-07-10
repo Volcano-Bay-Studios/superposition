@@ -1,0 +1,52 @@
+name: Deploy Obsidian Wiki with MkDocs
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write 
+  pages: write
+  id-token: write
+  
+env:
+  OBSIDIAN_PATH: "Superposition"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/with-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install MkDocs and Obsidian Plugins
+        run: |
+          python -m pip install --upgrade pip
+          pip install mkdocs-material mkdocs-roamlinks-plugin mkdocs-callouts
+
+      - name: Generate Global mkdocs.yml File
+        run: |
+          cat << 'EOF' > mkdocs.yml
+          site_name: My Obsidian Wiki
+          docs_dir: ${{ env.OBSIDIAN_PATH }}
+          theme:
+            name: material
+            features:
+              - navigation.tabs
+              - search.suggest
+              - search.highlight
+          plugins:
+            - search
+            - roamlinks
+            - callouts
+          EOF
+
+      - name: Deploy to GitHub Pages
+        run: |
+          mkdocs gh-deploy --force
