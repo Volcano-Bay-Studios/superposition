@@ -15,7 +15,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Matrix4d;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +111,7 @@ public class SuperpositionSableHelper {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public static Vec3 collide(Level level, Vec3 vel, Vec3 pos) {
+    public static Vec3 collide(Level level, Vec3 vel, Vec3 pos, float size) {
         BoundingBox3d boundingBox = new BoundingBox3d(pos.subtract(1, 1, 1), pos.add(1, 1, 1));
 
         for (SubLevel sublevel : Sable.HELPER.getAllIntersecting(level, boundingBox)) {
@@ -121,8 +120,8 @@ public class SuperpositionSableHelper {
             Vec3 posTransformed = pose.transformPositionInverse(pos);
 
 
-            Vec3 minBox = posTransformed.subtract(2 / 16f, 2 / 16f, 2 / 16f);
-            Vec3 maxBox = posTransformed.add(2 / 16f, 2 / 16f, 2 / 16f);
+            Vec3 minBox = posTransformed.subtract(size, size, size);
+            Vec3 maxBox = posTransformed.add(size, size, size);
 
             AABB collisionBox = new AABB(minBox, maxBox);
 
@@ -140,8 +139,6 @@ public class SuperpositionSableHelper {
 
 
     public static Vec3 resolveCollisions(AABB target, List<AABB> colliders) {
-        Vector3f currentCenter = target.getCenter().toVector3f();
-
         for (AABB other : colliders) {
             if (target.intersects(other)) {
                 float overlapX = (float) (Math.min(target.maxX, other.maxX) - Math.max(target.minX, other.minX));

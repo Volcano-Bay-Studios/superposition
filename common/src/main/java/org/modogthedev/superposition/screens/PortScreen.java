@@ -326,6 +326,11 @@ public class PortScreen extends Screen {
 
     @Override
     public void onClose() {
+        for (PortConfig.ScreenCable screenCable : screenCables) {
+            if (screenCable.getBind().isEmpty()) {
+                screenCable.free();
+            }
+        }
         super.onClose();
     }
 

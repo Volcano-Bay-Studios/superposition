@@ -66,9 +66,9 @@ public class SableCompat {
         return null;
     }
 
-    public static Vec3 tryCollide(Level level, Vec3 vel, Vec3 pos) {
+    public static Vec3 tryCollide(Level level, Vec3 vel, Vec3 pos, float size) {
         if (CompatabilityHandler.Mod.SABLE.isLoaded) {
-            return SuperpositionSableHelper.collide(level,vel, pos);
+            return SuperpositionSableHelper.collide(level,vel, pos, size);
         }
         return pos;
     }

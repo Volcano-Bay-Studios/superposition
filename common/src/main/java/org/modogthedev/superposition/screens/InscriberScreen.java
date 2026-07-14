@@ -202,6 +202,9 @@ public class InscriberScreen extends Screen {
 
             Action action = node.getAction();
             if (action != null) {
+                poseStack.pushPose();
+                float scale = 0.5f;
+//                poseStack.scale(scale,scale,scale);
                 ItemStack item = action.getThumbnailItem();
                 if (item != null) {
                     guiGraphics.renderItem(item, (int) (node.getPosition().x - node.getSize().x / 2f) + 2, (int) (node.getPosition().y - node.getSize().y / 2f) + 2);
@@ -211,6 +214,7 @@ public class InscriberScreen extends Screen {
                     guiGraphics.blit(spritesheet.spritesheetLocation, (int) (node.getPosition().x - node.getSize().x / 2f) + 2, (int) (node.getPosition().y - node.getSize().y / 2f) + 2, sprite.u1(), sprite.u2(), sprite.v1(), sprite.v2(), spritesheet.scale, spritesheet.scale);
                 }
                 guiGraphics.drawString(Minecraft.getInstance().font, action.getInfo().name(), (int) (node.getPosition().x - node.getSize().x / 2f) + 19, (int) (node.getPosition().y - node.getSize().y / 2f) + 6, topBorder, false);
+                poseStack.popPose();
             }
 
             for (Attachment attachment : node.getAttachments()) {

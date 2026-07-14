@@ -35,14 +35,14 @@ public class SuperpositionRenderTypes extends RenderType {
 
     private static final RenderType  BLOOM_POSITION_COLOR_POLYGON_OFFSET =
         VeilRenderType.layered(
-        create(Superposition.MODID + ":block_polygon_offset_bloom", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
+        create(Superposition.MODID + ":position_polygon_offset_bloom", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
             RenderType.CompositeState.builder()
                 .setOutputState(VeilRenderSystem.BLOOM_SHARD)
                 .setShaderState(RenderStateShard.RENDERTYPE_CUTOUT_SHADER)
                 .setWriteMaskState(RenderType.COLOR_WRITE)
                 .setLightmapState(LIGHTMAP)
                 .createCompositeState(true)),
-        create(Superposition.MODID + ":block_polygon_offset_standard", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
+        create(Superposition.MODID + ":position_polygon_offset_standard", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
             RenderType.CompositeState.builder()
                 .setShaderState(RENDERTYPE_CUTOUT_SHADER)
                 .setLayeringState(POLYGON_OFFSET_LAYERING)
@@ -65,7 +65,7 @@ public class SuperpositionRenderTypes extends RenderType {
     };
 
     private static final RenderType POSITION_COLOR_POLYGON_OFFSET =
-        create(Superposition.MODID + ":block_polygon_offset", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
+        create(Superposition.MODID + ":position_polygon_offset", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, TRANSIENT_BUFFER_SIZE, true, true,
            RenderType.CompositeState.builder()
                 .setShaderState(RENDERTYPE_CUTOUT_SHADER)
                 .setLayeringState(POLYGON_OFFSET_LAYERING)

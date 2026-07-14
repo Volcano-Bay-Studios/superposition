@@ -156,5 +156,13 @@ public class PortConfig {
                 }
             }
         }
+
+        public void free() {
+            if (isOut) {
+                cable.getPoints().getFirst().removeAnchor();
+            } else {
+                cable.getPoints().getLast().removeAnchor();
+            }
+        }
     }
 }

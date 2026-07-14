@@ -7,11 +7,10 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector2f;
 import org.modogthedev.superposition.screens.utils.Bounds;
 import org.modogthedev.superposition.system.signal.Signal;
-import org.modogthedev.superposition.util.SignalHelper;
-import org.modogthedev.superposition.util.SignalList;
-import org.modogthedev.superposition.util.SuperpositionMth;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class Node {
     private Action action = null;
@@ -81,8 +80,7 @@ public class Node {
     }
 
     private void calculateSize() {
-        size.x = 60;
-        size.y = 40;
+        size.x = 80;
         size.y = 32 + (8 * Math.max(1, Math.max(inSignals.size(), outSignals.size()) - 1));
 
         attachments.clear();
@@ -164,17 +162,21 @@ public class Node {
             }
         }
         if (tag.contains("attachments")) {
-            this.attachments.clear();
             ListTag attachments = tag.getList("attachments", 10);
             for (int i = 0; i < attachments.size(); i++) {
                 CompoundTag attachmentTag = attachments.getCompound(i);
                 Vector2f position = new Vector2f(attachmentTag.getFloat("x"), attachmentTag.getFloat("y"));
 
                 if (attachmentTag.contains("uuid")) { // Read as input
-                    this.attachments.add(new Attachment.InputAttachment(position, this, attachmentTag.getString("port"), attachmentTag.getUUID("uuid")));
+                    Attachment.InputAttachment newAttachment = new Attachment.InputAttachment(position, this, attachmentTag.getString("port"), attachmentTag.getUUID("uuid"));
+                    Attachment old = this.attachments.get(i);
+                    newAttachment.getPosition().set(old.getPosition());
+                    this.attachments.set(i, newAttachment);
                 } else {
                     Attachment newAttachment = new Attachment(position, attachmentTag.getString("port"),this);
-                    this.attachments.add(newAttachment);
+                    Attachment old = this.attachments.get(i);
+                    newAttachment.getPosition().set(old.getPosition());
+                    this.attachments.set(i,newAttachment);
                     if (attachmentTag.contains("targetUUID")) { // Read as output with direct target
                         newAttachment.setTargetUUID(attachmentTag.getUUID("targetUUID"));
                     } else if (attachmentTag.contains("segments")) { // Read as output with segments

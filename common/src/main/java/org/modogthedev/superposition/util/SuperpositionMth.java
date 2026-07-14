@@ -125,21 +125,22 @@ public class SuperpositionMth {
     /**
      * Estimates the scalar reduction factor for signal amplitude(Voltage/Current).
      *
-     * @param fAntenna The frequency of the antenna
-     * @param fSignal  The actual signal frequency
+     * @param antennaFreqHz The frequency of the antenna
+     * @param signalFreqHz  The actual signal frequency
      * @param Q        The quality factor (High Q = Narrow Band, Low Q = Wide Band)
      * @return Scalar multiplier for current amplitude (1.0 = no loss, 0.5 = half)
      */
-    public static double getAmplitudeScalar(double fAntenna, double fSignal, double Q) {
-        double deltaF = Math.abs(fSignal - fAntenna) / fAntenna;
+    public static double getAmplitudeScalar(double antennaFreqHz, double signalFreqHz, double Q) {
+        if (signalFreqHz <= 0 || antennaFreqHz <= 0) {
+            return 0.0;
+        }
 
-        double vswr = 1.0 + (Q * deltaF * 2.0);
+        double frequencyRatio = signalFreqHz / antennaFreqHz;
+        double deviation = frequencyRatio - (1.0 / frequencyRatio);
 
-        double gamma = (vswr - 1.0) / (vswr + 1.0);
+        double denominator = Math.sqrt(1.0 + Math.pow(Q * deviation, 2));
 
-        double lossDb = -10.0 * Math.log10(1.0 - Math.pow(gamma, 2));
-
-        return Math.pow(10, -lossDb / 20.0);
+        return 1.0 / denominator;
     }
 
     public static int gcdByEuclidsAlgorithm(int n1, int n2) {

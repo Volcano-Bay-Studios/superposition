@@ -10,6 +10,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.modogthedev.superposition.compat.sable.SableCompat;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -97,7 +98,7 @@ public class RopeNode {
         }
 
         position = SableCompat.tryTransform(level,prevPosition.add(velocity));
-        position = SableCompat.tryCollide(level,velocity,position);
+        position = SableCompat.tryCollide(level,velocity,position, SuperpositionConstants.cableWidth);
     }
 
     public void read(FriendlyByteBuf buf, int gameTick) {
