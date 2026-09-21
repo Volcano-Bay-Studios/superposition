@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class Cable {
-
     private final UUID id;
     private Int2IntMap playerHoldingPointMap = new Int2IntArrayMap();
     private Level level;

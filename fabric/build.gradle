@@ -37,9 +37,7 @@ dependencies {
         transitive = false
     }
 
-    api(include("dev.ryanhcode.sable-companion:sable-companion-fabric-${project.minecraft_version}:${project.sable_companion_version}")) {
-        exclude group: "foundry.veil"
-    }
+    include(modApi("dev.ryanhcode.sable-companion:sable-companion-fabric-1.21.1:${project.sable_companion_version}"))
 
     api("com.ezylang:EvalEx:3.6.1")
     include(api("com.ezylang:EvalEx:${project.evalex_version}"))
