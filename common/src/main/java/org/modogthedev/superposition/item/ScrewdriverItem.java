@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.modogthedev.superposition.block.AntennaBlock;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.blockentity.WidgetPanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionBlocks;
 import org.modogthedev.superposition.networking.packet.PlayerAttackUseC2SPacket;
@@ -30,7 +30,7 @@ public class ScrewdriverItem extends Item {
         if (player.level().isClientSide) {
             VeilPacketManager.server().sendPacket(new PlayerAttackUseC2SPacket(pos, location));
         }
-        if (player.level().getBlockEntity(pos) instanceof PanelBlockEntity panel) {
+        if (player.level().getBlockEntity(pos) instanceof WidgetPanelBlockEntity panel) {
             panel.removeWidget(location);
             return true;
         }

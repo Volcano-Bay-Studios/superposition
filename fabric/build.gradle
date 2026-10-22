@@ -12,7 +12,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-//    modImplementation( "maven.modrinth:simple-voice-chat:api-${project.voicechat_version}:fabric-stub")
+    compileOnly("de.maxhenkel.voicechat:voicechat-api:${project.voicechat_version}")
 //    modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_version}"
 
     modImplementation(include("foundry.veil:veil-fabric-${project.minecraft_version}:${project.veil_version}"))
@@ -41,6 +41,7 @@ dependencies {
 
     api("com.ezylang:EvalEx:3.6.1")
     include(api("com.ezylang:EvalEx:${project.evalex_version}"))
+    include(implementation("io.github.jaredmdobson:concentus:${project.concentus_version}"))
 
     api("dev.engine-room.flywheel:flywheel-fabric-api-${minecraft_version}:${flywheel_version}")
     include(implementation("dev.engine-room.flywheel:flywheel-fabric-${minecraft_version}:${flywheel_version}"))

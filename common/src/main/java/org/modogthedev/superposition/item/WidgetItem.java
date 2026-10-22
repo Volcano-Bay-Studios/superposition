@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.blockentity.WidgetPanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.networking.packet.PlayerPlaceWidgetC2SPacket;
 import org.modogthedev.superposition.screens.ScreenManager;
@@ -53,10 +53,9 @@ public class WidgetItem extends Item {
         Level level = context.getLevel();
         BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
         ResourceLocation type = getType(context.getItemInHand());
-        if (blockEntity instanceof PanelBlockEntity panel && type != null && level.isClientSide) {
+        if (blockEntity instanceof WidgetPanelBlockEntity panel && type != null && level.isClientSide) {
             Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(type);
             if (widget != null) {
-                panel.placeWidget(target, widget);
                 VeilPacketManager.server().sendPacket(new PlayerPlaceWidgetC2SPacket(context.getClickedPos(),target.x,target.y,widget.getLocation()));
                 return InteractionResult.CONSUME;
             }

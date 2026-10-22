@@ -12,4 +12,14 @@ public class SuperpositionConstants {
     public static final float periphrealFrequency = 42f;
     public static final boolean bloomEnabled = true;
     public static final float interpolationDelay = 1.5f;
+    public static final int maxStreamFrameSize = 200;
+    public static final int maxStreamFramesPerSecond = 55;
+    public static final int maxStreamSubscriptions = 8;
+    public static final int maxStreamDelay = 100;
+    public static final int streamExpiry = 20;
+    public static final int streamTalkerTimeout = 10;
+    public static final float microphoneRange = 6f;
+    public static final float speakerRange = 32f;
+    // The signal amplitude that plays audio at full volume
+    public static final float fullVolumeAmplitude = 20f;
 }

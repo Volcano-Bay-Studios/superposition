@@ -9,9 +9,13 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.widget.WidgetRenderer;
 import org.modogthedev.superposition.system.widget.renderers.ButtonWidgetRenderer;
 import org.modogthedev.superposition.system.widget.renderers.GaugeWidgetRenderer;
+import org.modogthedev.superposition.system.widget.renderers.MicrophoneWidgetRenderer;
+import org.modogthedev.superposition.system.widget.renderers.SpeakerWidgetRenderer;
 import org.modogthedev.superposition.system.widget.renderers.SwitchWidgetRenderer;
 import org.modogthedev.superposition.system.widget.widgets.ButtonWidget;
 import org.modogthedev.superposition.system.widget.widgets.GaugeWidget;
+import org.modogthedev.superposition.system.widget.widgets.MicrophoneWidget;
+import org.modogthedev.superposition.system.widget.widgets.SpeakerWidget;
 import org.modogthedev.superposition.system.widget.widgets.SwitchWidget;
 
 import java.util.ArrayList;
@@ -28,6 +32,8 @@ public class SuperpositionWidgetRenderers {
     public static RegistryObject<WidgetRenderer<GaugeWidget>> GAUGE = register("gauge",(modelMap -> () -> new GaugeWidgetRenderer(modelMap)),"gauge_needle");
     public static RegistryObject<WidgetRenderer<ButtonWidget>> BUTTON = register("button",(modelMap -> () -> new ButtonWidgetRenderer(modelMap)),"button_button");
     public static RegistryObject<WidgetRenderer<SwitchWidget>> SWITCH = register("switch",(modelMap -> () -> new SwitchWidgetRenderer(modelMap)),"switch_part");
+    public static RegistryObject<WidgetRenderer<MicrophoneWidget>> MICROPHONE = register("microphone",(modelMap -> () -> new MicrophoneWidgetRenderer(modelMap)),"microphone_head");
+    public static RegistryObject<WidgetRenderer<SpeakerWidget>> SPEAKER = register("speaker",(modelMap -> () -> new SpeakerWidgetRenderer(modelMap)));
 
     public static <T extends WidgetRenderer<?>> RegistryObject<T> register(String name, Function<Map<String, PartialModel>, Supplier<T>> supplier, String ... paths) {
         List<String> finalPaths = new ArrayList<>();

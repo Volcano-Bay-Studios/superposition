@@ -8,6 +8,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.util.List;
 
@@ -45,6 +46,18 @@ public class SuperpositionMth {
      */
     public static float mapAmplitude(float value) {
         return Mth.map(value, 0, 153, 3, 10);
+    }
+
+    /**
+     * Converts a signal amplitude into a sound volume. This is logarithmic so amplifying a weak signal is as noticeable as amplifying a strong one.
+     *
+     * @return The volume from 0 to 1, reaching 1 at {@link SuperpositionConstants#fullVolumeAmplitude}
+     */
+    public static float amplitudeToVolume(float amplitude) {
+        if (amplitude <= 0) {
+            return 0;
+        }
+        return Mth.clamp((float) (Math.log1p(amplitude) / Math.log1p(SuperpositionConstants.fullVolumeAmplitude)), 0, 1);
     }
 
     /**

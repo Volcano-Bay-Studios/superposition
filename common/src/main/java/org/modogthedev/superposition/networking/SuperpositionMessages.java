@@ -16,6 +16,7 @@ public class SuperpositionMessages {
         INSTANCE.registerClientbound(SignalSyncS2CPacket.TYPE, SignalSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleSignalSync);
         INSTANCE.registerClientbound(CableSyncS2CPacket.TYPE, CableSyncS2CPacket.CODEC, SuperpositionClientPacketHandler::handleCableSync);
         INSTANCE.registerClientbound(InterpolationStateS2CPacket.TYPE, InterpolationStateS2CPacket.CODEC, SuperpositionClientPacketHandler::handleInterpolationState);
+        INSTANCE.registerClientbound(StreamFramesS2CPacket.TYPE, StreamFramesS2CPacket.CODEC, SuperpositionClientPacketHandler::handleStreamFrames);
 
         INSTANCE.registerServerbound(BlockEntityModificationC2SPacket.TYPE, BlockEntityModificationC2SPacket.CODEC, SuperpositionServerPacketHandler::handleBlockEntityModification);
         INSTANCE.registerServerbound(FilterItemModificationC2SPacket.TYPE, FilterItemModificationC2SPacket.CODEC, SuperpositionServerPacketHandler::handleFilterItemModification);
@@ -25,6 +26,8 @@ public class SuperpositionMessages {
         INSTANCE.registerServerbound(PlayerPlaceWidgetC2SPacket.TYPE, PlayerPlaceWidgetC2SPacket.CODEC, SuperpositionServerPacketHandler::handlePlayerPlaceWidget);
         INSTANCE.registerServerbound(PlayerAttackUseC2SPacket.TYPE, PlayerAttackUseC2SPacket.CODEC, SuperpositionServerPacketHandler::handlePlayerAttackUse);
         INSTANCE.registerServerbound(ChangeWidgetC2SPacket.TYPE, ChangeWidgetC2SPacket.CODEC, SuperpositionServerPacketHandler::handleChangeWidget);
+        INSTANCE.registerServerbound(StreamFrameC2SPacket.TYPE, StreamFrameC2SPacket.CODEC, SuperpositionServerPacketHandler::handleStreamFrame);
+        INSTANCE.registerServerbound(StreamSubscribeC2SPacket.TYPE, StreamSubscribeC2SPacket.CODEC, SuperpositionServerPacketHandler::handleStreamSubscribe);
     }
 
 //    public static void registerClient() {

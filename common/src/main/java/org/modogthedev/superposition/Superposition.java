@@ -19,6 +19,7 @@ import org.modogthedev.superposition.system.cable.CarabinerManager;
 import org.modogthedev.superposition.system.signal.ClientSignalManager;
 import org.modogthedev.superposition.system.signal.SignalManager;
 import org.modogthedev.superposition.system.sound.ClientAudioManager;
+import org.modogthedev.superposition.system.stream.StreamManager;
 import org.modogthedev.superposition.system.widget.ClientHoverManager;
 import org.modogthedev.superposition.system.world.RedstoneWorld;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class Superposition {
 
     public static void tick(ServerLevel level) {
         SignalManager.tick(level);
+        StreamManager.tick(level);
         AntennaManager.tickAntennas(level);
         CableSavedData.get(level);
         CableManager.tick(level);
@@ -96,6 +98,7 @@ public class Superposition {
             RedstoneWorld.clear();
             ClientSignalManager.clientSignals.clear();
             AntennaManager.clear();
+            ClientAudioManager.clear();
         }
     }
 

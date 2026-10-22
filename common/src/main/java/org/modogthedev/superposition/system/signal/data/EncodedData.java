@@ -3,16 +3,20 @@ package org.modogthedev.superposition.system.signal.data;
 import com.ezylang.evalex.Expression;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.modogthedev.superposition.core.SuperpositionConstants;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.UUID;
 
 public sealed interface EncodedData<T> extends Cloneable {
 
@@ -463,7 +467,7 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public Type type() {
-            return Type.INT;
+            return Type.BYTE_ARRAY;
         }
 
         @Override
@@ -485,11 +489,112 @@ public sealed interface EncodedData<T> extends Cloneable {
 
         @Override
         public String toString() {
-            return "IntData[value=" + Arrays.toString(this.value) + ']';
+            return "ByteArrayData[value=" + Arrays.toString(this.value) + ']';
         }
 
         public void writeTag(CompoundTag tag, String key) {
             tag.putByteArray(key, value);
+        }
+    }
+
+    /**
+     * A handle to a byte stream. The frames of the stream are networked separately from the signal, see {@link org.modogthedev.superposition.system.stream.StreamManager}.
+     */
+    final class StreamData implements EncodedData<StreamData.Handle> {
+
+        /**
+         * @param id    The stream this handle points to
+         * @param delay How many ticks behind the source this handle should be read
+         */
+        public record Handle(UUID id, int delay) {
+        }
+
+        private final Handle value;
+        private String asString;
+
+        public StreamData(Handle value) {
+            this.value = value;
+        }
+
+        @Override
+        public Handle value() {
+            return this.value;
+        }
+
+        public UUID id() {
+            return this.value.id;
+        }
+
+        public int delay() {
+            return this.value.delay;
+        }
+
+        /**
+         * @param ticks The amount of ticks to delay this stream by
+         * @return A new handle to the same stream that is read further behind the source
+         */
+        public StreamData delayed(int ticks) {
+            return new StreamData(new Handle(this.value.id, Mth.clamp(this.value.delay + ticks, 0, SuperpositionConstants.maxStreamDelay)));
+        }
+
+        @Override
+        public boolean booleanValue() {
+            return true;
+        }
+
+        @Override
+        public Number numberValue() {
+            return this.value.delay;
+        }
+
+        @Override
+        public String stringValue() {
+            if (this.asString == null) {
+                this.asString = "stream:" + this.value.id;
+            }
+            return this.asString;
+        }
+
+        @Override
+        public byte[] byteArrayValue() {
+            return ByteBuffer.allocate(16).putLong(this.value.id.getMostSignificantBits()).putLong(this.value.id.getLeastSignificantBits()).array();
+        }
+
+        @Override
+        public Type type() {
+            return Type.STREAM;
+        }
+
+        @Override
+        public void asExpressionVariable(String param, Expression expression) {
+            expression.with(param, stringValue());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+            var that = (StreamData) obj;
+            return this.value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.value.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "StreamData[value=" + this.value + ']';
+        }
+
+        @Override
+        public void writeTag(CompoundTag tag, String key) {
+            tag.putString(key, stringValue());
         }
     }
 
@@ -515,6 +620,10 @@ public sealed interface EncodedData<T> extends Cloneable {
 
     static EncodedData<byte[]> of(byte[] value) {
         return new ByteArrayData(value);
+    }
+
+    static EncodedData<StreamData.Handle> of(UUID id, int delay) {
+        return new StreamData(new StreamData.Handle(id, delay));
     }
 
     T value();
@@ -598,7 +707,8 @@ public sealed interface EncodedData<T> extends Cloneable {
         FLOAT(ByteBufCodecs.FLOAT.map(FloatData::new, data -> ((FloatData) data).value)),
         STRING(ByteBufCodecs.STRING_UTF8.map(StringData::new, data -> ((StringData) data).value)),
         COMPOUND_TAG(ByteBufCodecs.COMPOUND_TAG.map(CompoundTagData::new, data -> ((CompoundTagData) data).value)),
-        BYTE_ARRAY(ByteBufCodecs.BYTE_ARRAY.map(ByteArrayData::new, data -> ((ByteArrayData) data).value));
+        BYTE_ARRAY(ByteBufCodecs.BYTE_ARRAY.map(ByteArrayData::new, data -> ((ByteArrayData) data).value)),
+        STREAM(StreamCodec.composite(UUIDUtil.STREAM_CODEC, StreamData.Handle::id, ByteBufCodecs.VAR_INT, StreamData.Handle::delay, StreamData.Handle::new).map(StreamData::new, data -> ((StreamData) data).value));
 
         private final StreamCodec<ByteBuf, EncodedData<?>> codec;
 

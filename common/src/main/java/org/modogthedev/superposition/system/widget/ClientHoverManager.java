@@ -9,7 +9,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.blockentity.WidgetPanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionItems;
 
@@ -23,7 +23,7 @@ public class ClientHoverManager {
         }
         if (hitResult instanceof BlockHitResult blockHitResult) {
             BlockEntity blockEntity = level.getBlockEntity(blockHitResult.getBlockPos());
-            if (blockEntity instanceof PanelBlockEntity panel) {
+            if (blockEntity instanceof WidgetPanelBlockEntity panel) {
                 Vec3 location = blockHitResult.getLocation();
                 panel.hoverCamera(new Vector3d(location.x,location.y,location.z), true);
             }

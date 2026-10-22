@@ -8,7 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import org.modogthedev.superposition.block.PanelBlock;
+import org.modogthedev.superposition.block.WidgetPanelBlock;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -50,9 +50,9 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void resetCooldown(CallbackInfo ci) {
-        if (PanelBlock.pressing != -1) {
-            this.rightClickDelay = PanelBlock.pressing;
-            PanelBlock.pressing = -1;
+        if (WidgetPanelBlock.pressing != -1) {
+            this.rightClickDelay = WidgetPanelBlock.pressing;
+            WidgetPanelBlock.pressing = -1;
         }
     }
 }

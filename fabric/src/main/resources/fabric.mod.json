@@ -21,6 +21,9 @@
     ],
     "client": [
       "org.modogthedev.superposition.fabric.client.SuperpositionFabricClient"
+    ],
+    "voicechat": [
+      "org.modogthedev.superposition.compat.voicechat.SuperpositionVoicechatPlugin"
     ]
   },
   "mixins": [

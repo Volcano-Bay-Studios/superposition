@@ -8,6 +8,8 @@ import org.modogthedev.superposition.Superposition;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.system.widget.widgets.ButtonWidget;
 import org.modogthedev.superposition.system.widget.widgets.GaugeWidget;
+import org.modogthedev.superposition.system.widget.widgets.MicrophoneWidget;
+import org.modogthedev.superposition.system.widget.widgets.SpeakerWidget;
 import org.modogthedev.superposition.system.widget.widgets.SwitchWidget;
 
 import java.util.function.Supplier;
@@ -19,6 +21,8 @@ public class SuperpositionWidgets {
     public static RegistryObject<GaugeWidget> GAUGE = register("gauge", GaugeWidget::new);
     public static RegistryObject<ButtonWidget> BUTTON = register("button", ButtonWidget::new);
     public static RegistryObject<SwitchWidget> SWITCH = register("switch", SwitchWidget::new);
+    public static RegistryObject<MicrophoneWidget> MICROPHONE = register("microphone", MicrophoneWidget::new);
+    public static RegistryObject<SpeakerWidget> SPEAKER = register("speaker", SpeakerWidget::new);
 
     public static <T extends Widget> RegistryObject<T> register(String name, Supplier<T> supplier) {
         return WIDGET.register(name, supplier);

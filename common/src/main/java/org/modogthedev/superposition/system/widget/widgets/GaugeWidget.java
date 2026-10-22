@@ -5,9 +5,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3f;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.widget.Widget;
+import org.modogthedev.superposition.system.widget.WidgetHost;
 import org.modogthedev.superposition.util.SignalHelper;
 
 public class GaugeWidget extends Widget {
@@ -22,11 +22,11 @@ public class GaugeWidget extends Widget {
     }
 
     @Override
-    public boolean tick(Level level, PanelBlockEntity panel, int index) {
+    public boolean tick(Level level, WidgetHost host, int index) {
         lastValue = value;
-        value = SignalHelper.getFloat(getPortSignals("value", panel));
+        value = SignalHelper.getFloat(getPortSignals("value", host));
         value = Mth.clamp(value,minimum,maximum);
-        return super.tick(level,panel,index);
+        return super.tick(level,host,index);
     }
 
     @Override
@@ -59,16 +59,16 @@ public class GaugeWidget extends Widget {
     }
 
     @Override
-    public void addConfiguration(PanelBlockEntity panel, Player player) {
-        super.addConfiguration(panel, player);
-        addEditable(panel,"Minimum",() -> String.valueOf(minimum),(s -> {
+    public void addConfiguration(WidgetHost host, Player player) {
+        super.addConfiguration(host, player);
+        addEditable(host,"Minimum",() -> String.valueOf(minimum),(s -> {
             try {
                 minimum = Float.parseFloat(s);
             } catch (NumberFormatException ignored) {}
         }
         ));
 
-        addEditable(panel,"Maximum",() -> String.valueOf(maximum),(s -> {
+        addEditable(host,"Maximum",() -> String.valueOf(maximum),(s -> {
             try {
                 maximum = Float.parseFloat(s);
             } catch (NumberFormatException ignored) {}

@@ -44,6 +44,7 @@ repositories {
 
 dependencies {
     jarJar(api(additionalRuntimeClasspath("com.ezylang:EvalEx:${project.evalex_version}")))
+    jarJar(implementation(additionalRuntimeClasspath("io.github.jaredmdobson:concentus:${project.concentus_version}")))
     jarJar(implementation("foundry.veil:veil-neoforge-${project.minecraft_version}:${project.veil_version}") {
         exclude group: "maven.modrinth"
     })
@@ -54,7 +55,7 @@ dependencies {
     compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-core-api:${project.cc_version}")
     compileOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge-api:${project.cc_version}")
     runtimeOnly("cc.tweaked:cc-tweaked-${project.minecraft_version}-forge:${project.cc_version}")
-//    implementation( "de.maxhenkel.voicechat:voicechat-api:api-${project.voicechat_version}")
+    compileOnly("de.maxhenkel.voicechat:voicechat-api:${project.voicechat_version}")
 //    implementation( "maven.modrinth:simple-voice-chat:neoforge-${project.voicechat_version}")
 
 

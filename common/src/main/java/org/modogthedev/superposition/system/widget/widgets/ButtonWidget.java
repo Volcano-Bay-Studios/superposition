@@ -5,12 +5,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionSounds;
 import org.modogthedev.superposition.system.cable.PortConfig;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.widget.Widget;
-import org.modogthedev.superposition.util.SignalHelper;
+import org.modogthedev.superposition.system.widget.WidgetHost;
 import org.modogthedev.superposition.util.WidgetUseResult;
 
 import java.util.List;
@@ -21,18 +20,18 @@ public class ButtonWidget extends Widget {
     private boolean canPlay = false;
 
     @Override
-    public boolean tick(Level level, PanelBlockEntity panel, int index) {
+    public boolean tick(Level level, WidgetHost host, int index) {
 
         if (!level.isClientSide) {
-            Signal signal = SignalHelper.getEmptySignal(level, panel.getBlockPos());
+            Signal signal = host.createSignal();
             signal.encode(pressed > 0);
-            putPortSignals("value", List.of(signal), panel);
+            putPortSignals("value", List.of(signal), host);
             if (pressed > 0) {
                 pressed -= .4f;
                 if (pressed <= 0) {
-                    playSound(panel, SuperpositionSounds.BUTTON_UP.get(), 1f);
+                    playSound(host, SuperpositionSounds.BUTTON_UP.get(), 1f);
                 } else if (canPlay) {
-                    playSound(panel,SuperpositionSounds.BUTTON_DOWN.get(), 1f);
+                    playSound(host,SuperpositionSounds.BUTTON_DOWN.get(), 1f);
                     canPlay = false;
                 }
                 return true;
@@ -41,7 +40,7 @@ public class ButtonWidget extends Widget {
             }
         }
         position = pressed;
-        return super.tick(level, panel, index);
+        return super.tick(level, host, index);
     }
 
     public float getPosition(float partialTicks) {

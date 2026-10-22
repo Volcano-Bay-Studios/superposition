@@ -10,6 +10,7 @@
     "superposition:combinator",
     "superposition:constant_combinator",
     "superposition:panel",
+    "superposition:mounted_panel",
     "computercraft:computer_normal",
     "computercraft:computer_advanced",
     "computercraft:computer_command",

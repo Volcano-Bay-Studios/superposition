@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.Superposition;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.blockentity.WidgetPanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.compat.sable.SableCompat;
 import org.modogthedev.superposition.core.SuperpositionItems;
@@ -28,6 +28,7 @@ import org.modogthedev.superposition.system.cable.CableClipResult;
 import org.modogthedev.superposition.system.cable.CableManager;
 import org.modogthedev.superposition.system.cable.rope_system.AnchorConstraint;
 import org.modogthedev.superposition.system.cable.rope_system.RopeNode;
+import org.modogthedev.superposition.system.stream.StreamManager;
 import org.modogthedev.superposition.system.widget.Widget;
 import org.modogthedev.superposition.util.block.SyncedBlockEntity;
 import oshi.util.tuples.Pair;
@@ -94,7 +95,7 @@ public class SuperpositionServerPacketHandler {
         Vec3 location = packet.location();
         if (itemInHand.is(screwdriver)) {
             screwdriver.attackUse(packet.blockPos(), location, ctx.player(), itemInHand);
-        } else if (ctx.level().getBlockEntity(packet.blockPos()) instanceof PanelBlockEntity panel) {
+        } else if (ctx.level().getBlockEntity(packet.blockPos()) instanceof WidgetPanelBlockEntity panel) {
             panel.primaryInteract(ctx.player().isShiftKeyDown(), new Vector3d(location.x,location.y,location.z));
         }
     }
@@ -161,7 +162,7 @@ public class SuperpositionServerPacketHandler {
 
     public static void handlePlayerPlaceWidget(PlayerPlaceWidgetC2SPacket packet, ServerPacketContext ctx) {
         BlockEntity blockEntity = ctx.level().getBlockEntity(packet.pos());
-        if (blockEntity instanceof PanelBlockEntity panel) {
+        if (blockEntity instanceof WidgetPanelBlockEntity panel) {
             Widget widget = SuperpositionWidgets.WIDGET.asVanillaRegistry().get(packet.location());
             if (widget != null) {
                 Vector2i pos = new Vector2i(packet.x(), packet.y());
@@ -169,5 +170,12 @@ public class SuperpositionServerPacketHandler {
             }
         }
     }
-}
 
+    public static void handleStreamFrame(StreamFrameC2SPacket packet, ServerPacketContext ctx) {
+        StreamManager.pushFrame(ctx.player().getUUID(), packet.frame());
+    }
+
+    public static void handleStreamSubscribe(StreamSubscribeC2SPacket packet, ServerPacketContext ctx) {
+        StreamManager.subscribe(ctx.player(), packet.streams());
+    }
+}

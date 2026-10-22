@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import org.joml.Vector3d;
 import org.modogthedev.superposition.system.signal.Signal;
 import org.modogthedev.superposition.system.signal.SignalManager;
+import org.modogthedev.superposition.system.signal.data.EncodedData;
 import org.modogthedev.superposition.util.LongRaycast;
 
 import java.util.ArrayList;
@@ -84,6 +85,9 @@ public class Antenna {
                     Signal receiving = new Signal(signal);
                     receiving.addTraversalDistance((float) signal.getPos().distance(new Vector3d(to.x, to.y, to.z)));
                     receiving.setAmplitude((float) amplitude);
+                    if (receiving.getEncodedData() instanceof EncodedData.StreamData streamData) {
+                        receiving.setEncodedData(streamData.delayed(Math.round(dist / Signal.SPEED)));
+                    }
                     signals.add(receiving);
                 }
             }

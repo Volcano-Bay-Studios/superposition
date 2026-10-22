@@ -13,7 +13,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
+import org.modogthedev.superposition.blockentity.WidgetPanelBlockEntity;
 import org.modogthedev.superposition.blockentity.SignalActorBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionItems;
 import org.modogthedev.superposition.networking.packet.PlayerAttackUseC2SPacket;
@@ -67,7 +67,7 @@ public abstract class MultiPlayerGameModeMixin {
                     destroyDelay = 5;
                     cir.cancel();
                 }
-            } else if (minecraft.level.getBlockEntity(blockHitResult.getBlockPos()) instanceof PanelBlockEntity panelBlockEntity) {
+            } else if (minecraft.level.getBlockEntity(blockHitResult.getBlockPos()) instanceof WidgetPanelBlockEntity panelBlockEntity) {
                 WidgetUseResult widgetUseResult = panelBlockEntity.primaryInteract(minecraft.player.isShiftKeyDown(), new Vector3d(location.x,location.y,location.z));
                 if (widgetUseResult.consumesAction()) {
                     VeilPacketManager.server().sendPacket(new PlayerAttackUseC2SPacket(blockPos, location));

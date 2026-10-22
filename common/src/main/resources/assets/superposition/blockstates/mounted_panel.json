@@ -1,0 +1,64 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "face": "floor"
+      },
+      "apply": {
+        "model": "superposition:block/mounted_panel"
+      }
+    },
+    {
+      "when": {
+        "face": "ceiling"
+      },
+      "apply": {
+        "model": "superposition:block/mounted_panel",
+        "x": 180
+      }
+    },
+    {
+      "when": {
+        "face": "wall",
+        "facing": "north"
+      },
+      "apply": {
+        "model": "superposition:block/mounted_panel",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "face": "wall",
+        "facing": "east"
+      },
+      "apply": {
+        "model": "superposition:block/mounted_panel",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "face": "wall",
+        "facing": "south"
+      },
+      "apply": {
+        "model": "superposition:block/mounted_panel",
+        "x": 90,
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "face": "wall",
+        "facing": "west"
+      },
+      "apply": {
+        "model": "superposition:block/mounted_panel",
+        "x": 90,
+        "y": 270
+      }
+    }
+  ]
+}

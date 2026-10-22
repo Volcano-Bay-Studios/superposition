@@ -13,7 +13,8 @@
   "block.superposition.constant_combinator" : "Constant Combinator",
   "block.superposition.spotlight" : "Spotlight",
   "block.superposition.inscriber" : "Inscriber",
-  "block.superposition.panel" : "Panel",
+  "block.superposition.panel" : "Adjustable Panel",
+  "block.superposition.mounted_panel" : "Mounted Panel",
 
   "item.superposition.pliant_sheet" : "Pliant Sheet",
   "item.superposition.integrated_circuit" : "Integrated Circuit",
@@ -47,6 +48,8 @@
   "widget.superposition.gauge" : "Gauge",
   "widget.superposition.button" : "Button",
   "widget.superposition.switch" : "Switch",
+  "widget.superposition.microphone" : "Microphone",
+  "widget.superposition.speaker" : "Speaker",
 
   "sounds.superposition.sine" : "Sine Plays",
   "sounds.superposition.screwdriver" : "Screwdriver Screws",

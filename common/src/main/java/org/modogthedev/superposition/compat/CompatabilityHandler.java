@@ -3,7 +3,8 @@ package org.modogthedev.superposition.compat;
 public class CompatabilityHandler {
     public enum Mod {
         COMPUTERCRAFT,
-        SABLE;
+        SABLE,
+        VOICECHAT;
 
         public boolean isLoaded = false;
 

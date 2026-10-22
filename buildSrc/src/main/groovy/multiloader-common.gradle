@@ -51,6 +51,13 @@ repositories {
         }
     }
     maven {
+        name = "henkelmax"
+        url = "https://maven.maxhenkel.de/repository/public"
+        content {
+            includeGroup("de.maxhenkel.voicechat")
+        }
+    }
+    maven {
         name = "RyanHCode Maven"
         url = "https://maven.ryanhcode.dev/releases"
     }

@@ -3,7 +3,6 @@ package org.modogthedev.superposition.system.widget;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
-import org.modogthedev.superposition.blockentity.PanelBlockEntity;
 import org.modogthedev.superposition.core.SuperpositionWidgetRenderers;
 import org.modogthedev.superposition.core.SuperpositionWidgets;
 import org.modogthedev.superposition.system.cable.PortConfig;
@@ -74,20 +72,17 @@ public class Widget implements Cloneable {
         return builder;
     }
 
-    public List<Signal> getPortSignals(String port, PanelBlockEntity panel) {
-        return panel.getPortSignals(name + "-" + port);
+    public List<Signal> getPortSignals(String port, WidgetHost host) {
+        return host.getPortSignals(name + "-" + port);
     }
 
 
-    public void putPortSignals(String port, List<Signal> signals, PanelBlockEntity panel) {
-        panel.putPortSignals(name + "-" + port, signals);
+    public void putPortSignals(String port, List<Signal> signals, WidgetHost host) {
+        host.putPortSignals(name + "-" + port, signals);
     }
 
-    public void playSound(PanelBlockEntity panel, SoundEvent sound, float pitch) {
-        Level level = panel.getLevel();
-        if (level != null) {
-            level.playSound(null, panel.getBlockPos(), sound, SoundSource.BLOCKS, 1, pitch);
-        }
+    public void playSound(WidgetHost host, SoundEvent sound, float pitch) {
+        host.playSound(sound, pitch);
     }
 
     // Interaction and Behavior
@@ -95,11 +90,11 @@ public class Widget implements Cloneable {
     /**
      * Called every tick for each widget.
      * @param level The level of the widget, on both client and server.
-     * @param panel The panel block entity that holds this widget.
+     * @param host The host that holds this widget.
      * @param index This widgets index, can be used to network data to the server.
      * @return True if the widgets data is dirty and needs to be networked to the client.
      */
-    public boolean tick(Level level, PanelBlockEntity panel, int index) {
+    public boolean tick(Level level, WidgetHost host, int index) {
         return false;
     }
 
@@ -185,20 +180,20 @@ public class Widget implements Cloneable {
         }
     }
 
-    public void addConfiguration(PanelBlockEntity panel, Player player) {
-        addEditable(panel, "Name", () -> name, this::setName);
-        addEditable(panel,"Color", () -> color, this::setColor);
+    public void addConfiguration(WidgetHost host, Player player) {
+        addEditable(host, "Name", () -> name, this::setName);
+        addEditable(host,"Color", () -> color, this::setColor);
     }
 
     /**
      * Adds an editable field on the widget.
-     * @param panel The panel block entity the widget is attached to.
+     * @param host The host the widget is attached to.
      * @param name This name is used both for display and for the tag key.
      * @param read Retrieves the fields value.
      * @param set Sets the field value. Note that values are final in a lambda so you must call a method to update the widgets fields. You can also use a method reference.
      */
-    public void addEditable(PanelBlockEntity panel, String name, Supplier<String> read, Consumer<String> set) {
-        panel.addEditableTaggedConfigTooltip(name, "widget-" + uuid, read, set);
+    public void addEditable(WidgetHost host, String name, Supplier<String> read, Consumer<String> set) {
+        host.addEditableTaggedConfigTooltip(name, "widget-" + uuid, read, set);
         editable.put(name,set);
     }
 

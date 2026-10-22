@@ -74,6 +74,10 @@ public class SuperpositionBlocks {
             () -> new PanelBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
             ));
+    public static final RegistryObject<MountedPanelBlock> MOUNTED_PANEL = registerBlock("mounted_panel",
+            () -> new MountedPanelBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
+                    .strength(2.0f, 8f).noOcclusion()
+            ));
     public static final RegistryObject<SpotlightBlock> SPOTLIGHT = registerBlock("spotlight",
             () -> new SpotlightBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK)
                     .strength(2.0f, 8f).noOcclusion()
